@@ -48,8 +48,11 @@ Einstellungen → „Speicher": Belegung gesamt und pro Podcast, Knopf „Jetzt 
 ## Arbeitsspeicher
 - Jede `StreamSubscription`, jeder `Timer`, `AnimationController`, `TextEditingController`, `ScrollController`
   wird in `dispose()` bzw. `ref.onDispose` freigegeben.
-- Genau eine Player-Instanz. Keine Player-Objekte in Widgets anlegen.
-- Positions-Updates des Players gedrosselt in die DB schreiben (z. B. alle 5 s + bei Pause/Stopp), nicht bei jedem Tick.
+- Genau eine Player-Instanz (`PodcastAudioHandler`, erstellt in `main()`). Keine Player-Objekte in Widgets anlegen. ✅
+- Nach 10 Minuten Pause gibt der Handler den Player (Decoder, Netzwerkpuffer) frei. ✅
+- Der Live-Positions-Stream wird nur abonniert, solange Mini-/Vollbild-Player sichtbar sind (`autoDispose`). ✅
+- `audio_service` nutzt für Benachrichtigungs-Cover den begrenzten `CoverCacheManager` (kein zweiter Cache). ✅
+- Positions-Updates des Players gedrosselt in die DB schreiben (alle 5 s + bei Pause/Seek/Stopp/Folgenwechsel). ✅
 - Lange Listen nur mit `ListView.builder`; Bilder mit `memCacheWidth`/`cacheWidth` dekodieren.
 - Feed-XML nach dem Parsen verwerfen; Beschreibungen gekürzt speichern.
 - Keine unbegrenzt wachsenden Listen/Maps in Services.

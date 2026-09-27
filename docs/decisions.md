@@ -25,3 +25,10 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Paket `file_picker` für OPML-Import** · Systemdialog zur Dateiauswahl, keine Speicher-Berechtigung nötig.
 - 2026-09-27 · **Suchergebnisse abwechselnd zusammenführen** · beide Rankings bleiben erhalten; Dubletten per URL-Schlüssel oder Titel+Autor.
 - 2026-09-27 · **PRs merged der Agent selbst, sobald CI grün** · Vorgabe des Benutzers. GitHub-Auto-Merge ist im Repo deaktiviert → `gh pr merge <n> --merge --delete-branch`.
+- 2026-09-27 · **Pakete M3: just_audio, audio_service, audio_session** · wie geplant; Boost über `AndroidLoudnessEnhancer`.
+- 2026-09-27 · **`PlayerEngine`-Interface um just_audio** · Wiedergabe-Logik ohne echtes Audio testbar (Fake-Engine).
+- 2026-09-27 · **Dienst bleibt in der Pause im Vordergrund, Selbst-Stopp nach 10 Min.** · Android 12+ verbietet sonst ggf. den Neustart aus dem Hintergrund (Samsung).
+- 2026-09-27 · **Nach kurzer Unterbrechung (Anruf) automatisch weiterspielen** · Standardverhalten von just_audio; ersetzt die ursprüngliche Notiz „nicht automatisch weiterspielen".
+- 2026-09-27 · **Gespielte Folge erneut abspielen = wieder „angefangen" ab 0** · verhindert, dass eine Folge während des erneuten Hörens nach 96 h gelöscht wird.
+- 2026-09-27 · **`player_state`-Tabelle entfällt, stattdessen `settings`** · ein Key/Value-Speicher reicht für letzte Folge, Boost und später aktive Playlist.
+- 2026-09-27 · **Drift-Schema-Schnappschüsse + generierte Migrationstests** · jede künftige Migration (auch von ChatGPT) wird gegen die alten Schemata geprüft.

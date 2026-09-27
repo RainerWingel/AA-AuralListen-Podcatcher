@@ -441,6 +441,96 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Nicht importiert:'**
   String get opmlResultFailedList;
+
+  /// No description provided for @playerPlay.
+  ///
+  /// In de, this message translates to:
+  /// **'Abspielen'**
+  String get playerPlay;
+
+  /// No description provided for @playerPause.
+  ///
+  /// In de, this message translates to:
+  /// **'Pause'**
+  String get playerPause;
+
+  /// No description provided for @playerRewind.
+  ///
+  /// In de, this message translates to:
+  /// **'15 Sekunden zurück'**
+  String get playerRewind;
+
+  /// No description provided for @playerForward.
+  ///
+  /// In de, this message translates to:
+  /// **'30 Sekunden vor'**
+  String get playerForward;
+
+  /// No description provided for @playerClose.
+  ///
+  /// In de, this message translates to:
+  /// **'Player schließen'**
+  String get playerClose;
+
+  /// No description provided for @playerOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Player öffnen'**
+  String get playerOpen;
+
+  /// No description provided for @nowPlaying.
+  ///
+  /// In de, this message translates to:
+  /// **'Läuft gerade'**
+  String get nowPlaying;
+
+  /// No description provided for @boostTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Lautstärke-Boost'**
+  String get boostTitle;
+
+  /// No description provided for @boostOff.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus'**
+  String get boostOff;
+
+  /// No description provided for @boostValue.
+  ///
+  /// In de, this message translates to:
+  /// **'+{db} dB'**
+  String boostValue(int db);
+
+  /// No description provided for @boostButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Boost: {value}'**
+  String boostButton(String value);
+
+  /// No description provided for @boostPerPodcast.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur für diesen Podcast'**
+  String get boostPerPodcast;
+
+  /// No description provided for @boostPerPodcastHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Sonst gilt der Wert für alle Podcasts ohne eigene Einstellung.'**
+  String get boostPerPodcastHint;
+
+  /// No description provided for @markPlayed.
+  ///
+  /// In de, this message translates to:
+  /// **'Als gespielt markieren'**
+  String get markPlayed;
+
+  /// No description provided for @markUnplayed.
+  ///
+  /// In de, this message translates to:
+  /// **'Als ungespielt markieren'**
+  String get markUnplayed;
 }
 
 class _AppLocalizationsDelegate

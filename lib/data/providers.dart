@@ -6,7 +6,9 @@ import 'db/app_database.dart';
 import 'directory/directory_search.dart';
 import 'feed/feed_fetcher.dart';
 import 'opml_importer.dart';
+import 'playback_repository.dart';
 import 'podcast_repository.dart';
+import 'settings_repository.dart';
 import 'storage/cover_cache.dart';
 
 // App-wide singletons (think: services registered in a DI container).
@@ -35,6 +37,15 @@ final podcastRepositoryProvider = Provider<PodcastRepository>(
     clock: ref.watch(clockProvider),
     coverCache: ref.watch(coverCacheProvider),
   ),
+);
+
+final settingsRepositoryProvider = Provider<SettingsRepository>(
+  (ref) => SettingsRepository(ref.watch(databaseProvider)),
+);
+
+final playbackRepositoryProvider = Provider<PlaybackRepository>(
+  (ref) =>
+      PlaybackRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
 );
 
 final directorySearchProvider = Provider<DirectorySearch>((ref) {

@@ -5,6 +5,7 @@ abstract final class Routes {
   static const playlists = '/playlists';
   static const downloads = '/downloads';
   static const settings = '/einstellungen';
+  static const player = '/player';
 
   static const search = '$subscriptions/suche';
 

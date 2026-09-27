@@ -19,3 +19,14 @@ String formatEpisodeDuration(AppLocalizations l10n, Duration duration) {
   }
   return l10n.durationMinutes(minutes < 1 ? 1 : minutes);
 }
+
+/// Player clock: "4:05" or "1:02:03".
+String formatClock(Duration duration) {
+  final d = duration.isNegative ? Duration.zero : duration;
+  final hours = d.inHours;
+  final minutes = d.inMinutes.remainder(60);
+  final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+  return hours > 0
+      ? '$hours:${minutes.toString().padLeft(2, '0')}:$seconds'
+      : '$minutes:$seconds';
+}

@@ -227,4 +227,54 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get opmlResultFailedList => 'Nicht importiert:';
+
+  @override
+  String get playerPlay => 'Abspielen';
+
+  @override
+  String get playerPause => 'Pause';
+
+  @override
+  String get playerRewind => '15 Sekunden zurück';
+
+  @override
+  String get playerForward => '30 Sekunden vor';
+
+  @override
+  String get playerClose => 'Player schließen';
+
+  @override
+  String get playerOpen => 'Player öffnen';
+
+  @override
+  String get nowPlaying => 'Läuft gerade';
+
+  @override
+  String get boostTitle => 'Lautstärke-Boost';
+
+  @override
+  String get boostOff => 'Aus';
+
+  @override
+  String boostValue(int db) {
+    return '+$db dB';
+  }
+
+  @override
+  String boostButton(String value) {
+    return 'Boost: $value';
+  }
+
+  @override
+  String get boostPerPodcast => 'Nur für diesen Podcast';
+
+  @override
+  String get boostPerPodcastHint =>
+      'Sonst gilt der Wert für alle Podcasts ohne eigene Einstellung.';
+
+  @override
+  String get markPlayed => 'Als gespielt markieren';
+
+  @override
+  String get markUnplayed => 'Als ungespielt markieren';
 }
