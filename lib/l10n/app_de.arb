@@ -1,0 +1,13 @@
+{
+  "@@locale": "de",
+  "appTitle": "AA-PodcastGuru",
+  "navHome": "Start",
+  "navSubscriptions": "Abos",
+  "navPlaylists": "Playlists",
+  "navDownloads": "Downloads",
+  "navSettings": "Einstellungen",
+  "placeholderComingSoon": "Kommt bald",
+  "@placeholderComingSoon": {
+    "description": "Temporary text on screens that are not implemented yet."
+  }
+}

@@ -35,7 +35,7 @@ Alles Fachliche steht in Themen-Dateien unter `docs/`.
 - **Speicherlecks sind Fehler höchster Priorität** – vor jedem Code, der Dateien, Streams, Timer, Controller oder Caches
   anlegt, `docs/eviction.md` lesen.
 - **Neue Pakete** nur nach Rückfrage beim Benutzer; begründen in `docs/decisions.md`.
-- **Keine Secrets ins Git** (Repo ist öffentlich!): API-Keys, Keystore, `key.properties`, `ssh-temp/`.
+- **Keine Secrets ins Git** (Repo ist öffentlich!): API-Keys, Keystore, `android/key.properties`.
 - **Vor jedem Commit:** `dart format .` · `flutter analyze` (0 Probleme) · `flutter test` (alle grün).
 - **Nie mit uncommitteten Änderungen enden** – der andere Agent arbeitet nur mit dem, was gepusht ist
   (Details: `docs/git-workflow.md`).
@@ -46,6 +46,6 @@ flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # Codegenerierung (Drift)
 flutter analyze
 flutter test
-flutter run --dart-define-from-file=config/secrets.json    # auf dem angeschlossenen Galaxy S25
-flutter build apk --release --dart-define-from-file=config/secrets.json
+flutter run                   # auf dem verbundenen Galaxy S25 (WLAN-Debugging)
+flutter build apk --release   # signiert mit Release-Keystore, falls android/key.properties existiert
 ```
