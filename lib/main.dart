@@ -10,6 +10,7 @@ import 'audio/player_engine.dart';
 import 'audio/podcast_audio_handler.dart';
 import 'data/db/app_database.dart';
 import 'data/playback_repository.dart';
+import 'data/playlist_repository.dart';
 import 'data/providers.dart';
 import 'data/settings_repository.dart';
 import 'data/storage/cover_cache.dart';
@@ -28,6 +29,7 @@ Future<void> main() async {
       engine: JustAudioEngine(),
       playback: PlaybackRepository(db, DateTime.now),
       settings: SettingsRepository(db),
+      playlists: PlaylistRepository(db, DateTime.now),
       localAudioFile: (id) =>
           container.read(downloadServiceProvider).localFile(id),
     ),

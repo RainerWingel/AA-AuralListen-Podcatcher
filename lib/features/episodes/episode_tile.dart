@@ -8,6 +8,7 @@ import '../../core/widgets/cover_image.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../playlists/playlist_actions.dart';
 
 /// One episode row: cover, title, date · duration, listening state.
 /// Tap plays the episode, long press opens the episode menu.
@@ -16,6 +17,7 @@ class EpisodeTile extends ConsumerWidget {
     required this.episode,
     required this.podcast,
     this.showPodcastTitle = false,
+    this.playlistId,
     super.key,
   });
 
@@ -23,7 +25,13 @@ class EpisodeTile extends ConsumerWidget {
   final Podcast podcast;
   final bool showPodcastTitle;
 
+  /// Set when shown inside a playlist: playing continues with the playlist.
+  final int? playlistId;
+
   Future<void> _showMenu(BuildContext context, WidgetRef ref) {
+    // The sheet's own context is gone once it closes; dialogs/snackbars that
+    // follow a menu action use the tile's context.
+    final outerContext = context;
     final l10n = AppLocalizations.of(context);
     final playback = ref.read(playbackRepositoryProvider);
     final downloads = ref.read(downloadServiceProvider);
@@ -77,7 +85,17 @@ class EpisodeTile extends ConsumerWidget {
               title: Text(l10n.playerPlay),
               onTap: () {
                 Navigator.of(context).pop();
-                ref.read(audioHandlerProvider).playEpisode(episode.id);
+                ref
+                    .read(audioHandlerProvider)
+                    .playEpisode(episode.id, playlistId: playlistId);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.playlist_add),
+              title: Text(l10n.addToPlaylist),
+              onTap: () {
+                Navigator.of(context).pop();
+                addToPlaylist(outerContext, ref, episode.id);
               },
             ),
             ListTile(
@@ -127,7 +145,9 @@ class EpisodeTile extends ConsumerWidget {
     };
 
     return ListTile(
-      onTap: () => ref.read(audioHandlerProvider).playEpisode(episode.id),
+      onTap: () => ref
+          .read(audioHandlerProvider)
+          .playEpisode(episode.id, playlistId: playlistId),
       onLongPress: () => _showMenu(context, ref),
       selected: isCurrent,
       leading: CoverImage(url: episode.imageUrl ?? podcast.imageUrl, size: 56),

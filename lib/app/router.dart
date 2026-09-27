@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/downloads/downloads_screen.dart';
 import '../features/episodes/home_screen.dart';
 import '../features/player/player_screen.dart';
+import '../features/playlists/playlist_screen.dart';
 import '../features/playlists/playlists_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -59,7 +60,22 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          _branch(Routes.playlists, const PlaylistsScreen()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.playlists,
+                builder: (context, state) => const PlaylistsScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) => PlaylistScreen(
+                      playlistId: int.parse(state.pathParameters['id']!),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
           _branch(Routes.downloads, const DownloadsScreen()),
           _branch(Routes.settings, const SettingsScreen()),
         ],

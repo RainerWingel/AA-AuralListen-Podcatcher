@@ -108,3 +108,30 @@ class Downloads extends Table {
   @override
   Set<Column> get primaryKey => {episodeId};
 }
+
+/// User playlists (Castbox-like, filled manually) – schema v4.
+@DataClassName('Playlist')
+class Playlists extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+
+  /// Order in the Playlists tab (ascending).
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+/// Episodes in a playlist. An episode appears at most once per playlist.
+@DataClassName('PlaylistItem')
+class PlaylistItems extends Table {
+  IntColumn get playlistId =>
+      integer().references(Playlists, #id, onDelete: KeyAction.cascade)();
+  IntColumn get episodeId =>
+      integer().references(Episodes, #id, onDelete: KeyAction.cascade)();
+
+  /// Order inside the playlist (ascending). New items get max + 1.
+  IntColumn get position => integer()();
+  DateTimeColumn get addedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {playlistId, episodeId};
+}

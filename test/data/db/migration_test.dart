@@ -48,4 +48,20 @@ void main() {
     await verifier.migrateAndValidate(db, db.schemaVersion);
     await db.close();
   });
+
+  test('upgrade v3 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(3);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v4 creates the default playlist', () async {
+    final db = AppDatabase.forTesting(
+      (await verifier.schemaAt(3)).newConnection(),
+    );
+    final playlists = await db.select(db.playlists).get();
+    expect(playlists.single.name, AppDatabase.defaultPlaylistName);
+    await db.close();
+  });
 }

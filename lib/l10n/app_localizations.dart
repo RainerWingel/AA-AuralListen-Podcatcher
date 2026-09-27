@@ -687,6 +687,132 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen.'**
   String get downloadLimitHint;
+
+  /// No description provided for @playlistNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Playlist'**
+  String get playlistNew;
+
+  /// No description provided for @playlistName.
+  ///
+  /// In de, this message translates to:
+  /// **'Name'**
+  String get playlistName;
+
+  /// No description provided for @playlistRename.
+  ///
+  /// In de, this message translates to:
+  /// **'Umbenennen'**
+  String get playlistRename;
+
+  /// No description provided for @playlistDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Playlist löschen'**
+  String get playlistDelete;
+
+  /// No description provided for @playlistDeleteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ löschen? Die Folgen selbst bleiben erhalten.'**
+  String playlistDeleteConfirm(String name);
+
+  /// No description provided for @delete.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get delete;
+
+  /// No description provided for @save.
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern'**
+  String get save;
+
+  /// No description provided for @create.
+  ///
+  /// In de, this message translates to:
+  /// **'Anlegen'**
+  String get create;
+
+  /// No description provided for @playlistsEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Playlists'**
+  String get playlistsEmpty;
+
+  /// No description provided for @playlistEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Playlist ist leer'**
+  String get playlistEmpty;
+
+  /// No description provided for @playlistEmptyHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Folge lange drücken → „Zu Playlist hinzufügen…“'**
+  String get playlistEmptyHint;
+
+  /// No description provided for @playlistSummary.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Leer} =1{1 Folge} other{{count} Folgen}}{duration}'**
+  String playlistSummary(int count, String duration);
+
+  /// No description provided for @playlistPlay.
+  ///
+  /// In de, this message translates to:
+  /// **'Playlist abspielen'**
+  String get playlistPlay;
+
+  /// No description provided for @addToPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Zu Playlist hinzufügen…'**
+  String get addToPlaylist;
+
+  /// No description provided for @addedToPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Zu „{name}“ hinzugefügt'**
+  String addedToPlaylist(String name);
+
+  /// No description provided for @alreadyInPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Schon in „{name}“'**
+  String alreadyInPlaylist(String name);
+
+  /// No description provided for @removedFromPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus der Playlist entfernt'**
+  String get removedFromPlaylist;
+
+  /// No description provided for @undo.
+  ///
+  /// In de, this message translates to:
+  /// **'Rückgängig'**
+  String get undo;
+
+  /// No description provided for @playerNext.
+  ///
+  /// In de, this message translates to:
+  /// **'Nächste Folge'**
+  String get playerNext;
+
+  /// No description provided for @playingFromPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus Playlist „{name}“'**
+  String playingFromPlaylist(String name);
+
+  /// No description provided for @dragToReorder.
+  ///
+  /// In de, this message translates to:
+  /// **'Zum Verschieben ziehen'**
+  String get dragToReorder;
 }
 
 class _AppLocalizationsDelegate

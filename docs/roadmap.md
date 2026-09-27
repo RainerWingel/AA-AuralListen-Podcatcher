@@ -50,7 +50,12 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [ ] Praxistest auf dem S25: Download im Hintergrund, Offline-Wiedergabe, Auto-Download (Benutzer)
 
 ## M5 – Playlists (Castbox-Ersatz komplett)
-- [ ] Mehrere Playlists, Drag & Drop, Weiterspielen nach `playlists.md`
+- [x] Mehrere Playlists (anlegen, umbenennen, löschen, sortieren), Standard „Wiedergabeliste"
+- [x] Folgen hinzufügen (Folgen-Menü), sortieren (Drag & Drop), entfernen (Wischen, Rückgängig)
+- [x] Weiterspielen nach `playlists.md`: gespielt → aus allen Playlists, nächste startet, dynamisch aus der DB
+- [x] „Nächste Folge" (überspringen, bleibt ungespielt), aktive Playlist übersteht Neustart
+- [x] DB-Schema v4 inkl. Migrationstests
+- [ ] Praxistest auf dem S25 (Benutzer)
 
 ## M6 – Kapitel & Lesezeichen
 ## M7 – OPML-Export, Backup/Restore, Dark Mode, Feinschliff
