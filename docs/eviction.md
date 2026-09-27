@@ -89,4 +89,8 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
   nur Dev-Abhängigkeit): Controller/Notifier, die ohne `dispose()` weggeräumt werden, lassen den Testlauf scheitern.
   Bewusst **ohne** `createdByTestHelpers`-Ausnahme – mit ihr blieb ein absichtlich eingebautes Leck unentdeckt. ✅
 - Handler und DownloadService: Tests prüfen, dass `dispose()` alle eigenen Streams schließt bzw. abbestellt. ✅
-- Vor Release (M8): DevTools-Speicherprofil, Soak-Test 2 h Wiedergabe + 50 Refreshes, Speicher darf nicht wachsen.
+- Soak-Tests (M8), Speicher darf nicht wachsen:
+  - **50 Refreshes** von 10 Feeds × 400 Folgen: `flutter test --run-skipped --tags soak test/soak` (misst RSS; wird im
+    normalen Lauf und in der CI übersprungen, `dart_test.yaml`). Ergebnis 2026-09-27: 262 → 270 MB, kein Trend. ✅
+  - **2 h Wiedergabe auf dem S25:** Folge starten, dann `tool/soak_memory.sh 120 60 > soak.csv` (nur lesend:
+    `dumpsys meminfo`, Threads, Wiedergabe-Status je Minute). TOTAL PSS darf keinen steigenden Trend zeigen.

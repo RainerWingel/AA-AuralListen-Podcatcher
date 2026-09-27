@@ -84,7 +84,8 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Podcast-Umzug: `itunes:new-feed-url` beim Refresh/Abonnieren, Umzüge per Infobox, „Feed-Adresse ändern" (Benutzerwunsch)
 - [x] Leak-Tests: leak_tracker in allen Widget-Tests, `dispose()`-Tests für Handler und Downloads
 - [x] Fix: Downloads von `http://`-Links (CRE) scheiterten an Androids Klartext-Sperre
-- [ ] Soak-Test auf dem S25 (2 h Wiedergabe, Speicher beobachten)
+- [x] Soak-Test Refresh: 50 Refreshes, Speicher flach (`test/soak`)
+- [ ] Soak-Test auf dem S25: 2 h Wiedergabe mit `tool/soak_memory.sh` (läuft)
 - [x] Eigenes App-Symbol (adaptiv, Designsymbol, Statusleiste)
 - [ ] Version 1.0.0, Release-APK
 

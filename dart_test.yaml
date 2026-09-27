@@ -1,0 +1,5 @@
+# Soak tests run long and measure process memory: only on request
+# (flutter test --run-skipped --tags soak test/soak), not in CI.
+tags:
+  soak:
+    skip: "Soak test – run explicitly with --run-skipped --tags soak"
