@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/routes.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/playlist_repository.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
@@ -27,14 +28,13 @@ class PlaylistScreen extends ConsumerWidget {
     final repo = ref.read(playlistRepositoryProvider);
     await repo.remove(playlistId, entry.episode.id);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.removedFromPlaylist),
-        action: SnackBarAction(
-          label: l10n.undo,
-          // Re-adding appends; restoring the old place is not worth the code.
-          onPressed: () => repo.add(playlistId, entry.episode.id),
-        ),
+    showInfoSnackBar(
+      ScaffoldMessenger.of(context),
+      l10n.removedFromPlaylist,
+      action: SnackBarAction(
+        label: l10n.undo,
+        // Re-adding appends; restoring the old place is not worth the code.
+        onPressed: () => repo.add(playlistId, entry.episode.id),
       ),
     );
   }

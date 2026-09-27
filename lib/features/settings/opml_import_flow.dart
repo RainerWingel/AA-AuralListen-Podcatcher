@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/feed/opml.dart';
 import '../../data/feed/rss_parser.dart' show FeedFormatException;
 import '../../data/opml_importer.dart';
@@ -17,8 +18,7 @@ const _maxOpmlBytes = 5 * 1024 * 1024;
 Future<void> runOpmlImport(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
-  void showError(String text) =>
-      messenger.showSnackBar(SnackBar(content: Text(text)));
+  void showError(String text) => showInfoSnackBar(messenger, text);
 
   final List<OpmlFeed> feeds;
   try {

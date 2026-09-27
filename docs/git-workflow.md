@@ -13,8 +13,12 @@
 - `main` ist immer lauffähig, CI grün.
 - Arbeit auf `feature/<kurz>`, `fix/<kurz>`, `chore/<kurz>`, `docs/<kurz>`.
 - Ein Meilenstein bzw. eine abgeschlossene Aufgabe = ein Pull Request.
-- Der Agent merged seinen PR selbst, sobald die CI grün ist: `gh pr merge <n> --merge --delete-branch`
-  (GitHub-Auto-Merge ist im Repo nicht aktiviert).
+- Der Agent merged seinen PR selbst, sobald die CI grün ist – **nur** mit Prüfung im selben Befehl
+  (`gh pr merge` merged sonst auch bei laufender CI, das ist einmal passiert):
+  ```bash
+  gh pr checks <n> --json bucket -q 'all(.[]; .bucket == "pass")' | grep -qx true && gh pr merge <n> --merge --delete-branch
+  ```
+  (GitHub-Auto-Merge ist im Repo nicht aktiviert.)
 
 ## Commits
 - Conventional Commits auf Englisch: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`, `ci:`.

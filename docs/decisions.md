@@ -38,3 +38,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Gespielt-Regel „aus allen Playlists" zentral in `markPlayed`** · gilt für 98 %, Dateiende und manuelles Markieren gleich.
 - 2026-09-27 · **Nächste Folge = kleinste Position größer als die der laufenden** · dynamisch gelesen; Position wird vor dem Entfernen aktualisiert (Umsortieren während der Wiedergabe).
 - 2026-09-27 · **„Rückgängig" beim Entfernen fügt am Ende ein** · alte Position wiederherzustellen lohnt den Aufwand nicht.
+- 2026-09-27 · **Infoboxen max. 7 s, zentraler Helfer** · Vorgabe des Benutzers; Flutter-Standard ließ Boxen mit Knopf unbegrenzt stehen.
+- 2026-09-27 · **Merge nur mit expliziter CI-Prüfung** · PR #9 wurde versehentlich bei laufender CI gemergt (die CI war danach grün bzw. wird geprüft).
