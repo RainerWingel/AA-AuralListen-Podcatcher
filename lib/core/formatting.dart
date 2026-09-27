@@ -1,0 +1,21 @@
+import 'package:intl/intl.dart';
+
+import '../l10n/app_localizations.dart';
+
+/// "10. Juni 2025", or without year for the current year ("10. Juni").
+String formatEpisodeDate(DateTime date, {required DateTime now}) {
+  final local = date.toLocal();
+  return local.year == now.year
+      ? DateFormat.MMMMd('de').format(local)
+      : DateFormat.yMMMMd('de').format(local);
+}
+
+/// "1 Std. 5 Min." or "42 Min." (at least 1 minute).
+String formatEpisodeDuration(AppLocalizations l10n, Duration duration) {
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes.remainder(60);
+  if (hours > 0) {
+    return l10n.durationHoursMinutes(hours, minutes);
+  }
+  return l10n.durationMinutes(minutes < 1 ? 1 : minutes);
+}

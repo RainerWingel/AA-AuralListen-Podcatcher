@@ -25,12 +25,20 @@ Aktuell keine (Podcast Index entfällt). Falls künftig nötig: `config/secrets.
 
 ## Installation
 ```bash
-flutter run                    # Debug auf dem Gerät
-flutter build apk --release
-adb install -r build/app/outputs/flutter-apk/app-release.apk
+flutter run                                  # Debug auf dem Gerät
+flutter build apk --release --split-per-abi  # nur passende CPU-Architektur → deutlich kleiner
+adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
 ## CI (GitHub Actions)
 Bei jedem Push/PR: `flutter pub get` → `dart format --set-exit-if-changed` → `flutter analyze` → `flutter test`
 → Debug-APK bauen (als Artefakt 7 Tage herunterladbar). Keine Secrets in der CI.
 - Workflow: `.github/workflows/ci.yml`, Flutter-Version dort fest eingetragen – bei Flutter-Upgrade mit anpassen.
+
+## Bekannte Stolpersteine
+- **Immer mit `--split-per-abi` bauen.** Das erhöht den internen `versionCode` (+2000 für arm64). Eine APK ohne
+  diesen Schalter hätte einen kleineren `versionCode` und ließe sich nicht mehr über die installierte App spielen (Downgrade).
+- `Execution failed for task ':app:compileFlutterBuildRelease' … problem occurred starting process 'flutter'`:
+  hängender Gradle-Daemon → `cd android && ./gradlew --stop`, dann erneut bauen.
+- Die Internet-Berechtigung steht in `android/app/src/main/AndroidManifest.xml` (Flutter legt sie standardmäßig nur für Debug an).
+- WLAN-Debugging reißt ab, wenn das Handy in den Standby geht – Bildschirm beim Installieren anlassen.

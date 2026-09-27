@@ -17,11 +17,13 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] App startet auf dem Galaxy S25 (Release-APK)
 
 ## M1 – Abos & Feeds
-- [ ] Drift-Schema v1 (`data-model.md`)
-- [ ] RSS-Parser inkl. iTunes-/Podcasting-2.0-Namespace, mit Tests
-- [ ] Abo per RSS-URL
-- [ ] Abo-Übersicht + Folgenliste
-- [ ] Refresh bei App-Start + Pull-to-Refresh (ETag/Last-Modified)
+- [x] Drift-Schema v1 (`data-model.md`)
+- [x] RSS-Parser inkl. iTunes-/Podcasting-2.0-Namespace, mit Tests (+ Smoke-Test gegen echte Feeds)
+- [x] Abo per RSS-URL
+- [x] Abo-Übersicht (Raster) + Podcast-Detail mit Folgenliste + Startseite „neueste Folgen"
+- [x] Refresh bei App-Start + Pull-to-Refresh (ETag/Last-Modified, Redirects)
+- [x] Abo kündigen (inkl. Cover-Cache)
+- [x] Begrenzter Cover-Cache (300 Bilder / 30 Tage)
 
 ## M2 – Suche & Import
 - [ ] Suche: iTunes, fyyd

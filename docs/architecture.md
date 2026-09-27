@@ -22,10 +22,12 @@ Exakte Versionen stehen in `pubspec.lock`. Neue Pakete nur nach Rückfrage (sieh
 ```
 lib/
   main.dart
-  app/            # App-Widget, Routing, Theme
+  app/            # App-Widget, Routing (router.dart, routes.dart), Theme, AppShell
   core/           # Logging, Fehler, Konstanten, Hilfsfunktionen
   data/
-    db/           # Drift-Datenbank, Tabellen, DAOs, Migrationen
+    providers.dart          # Riverpod-Provider der Datenschicht (DB, HTTP, Repository, Streams)
+    podcast_repository.dart # Abos, Refresh, Folgen-Abfragen
+    db/           # Drift-Datenbank, Tabellen, Migrationen
     feed/         # RSS-/OPML-Parser, Feed-Fetcher
     directory/    # iTunes, fyyd, Podcast Index
     storage/      # Dateiverwaltung, Download-Service, Eviction
@@ -43,3 +45,16 @@ test/             # spiegelt lib/
 - Die **Datenbank ist die einzige Wahrheit**. Dateien werden mit ihr abgeglichen (`eviction.md`).
 - Genau **eine** Player-Instanz für die gesamte Laufzeit (`playback.md`).
 - Zeit (`DateTime.now`) über einen injizierbaren `Clock`-Provider, damit Eviction-Regeln (96 h) testbar sind.
+
+## Riverpod-Konventionen
+- App-weite Dienste: `Provider` mit `ref.onDispose(...)` zum Schließen (DB, HTTP-Client, Router).
+- Bildschirm-Daten: `StreamProvider.autoDispose` (bzw. `.family`) über Drift-`watch()`-Abfragen –
+  die UI aktualisiert sich automatisch bei DB-Änderungen, und die Abfrage endet, wenn niemand mehr zuhört.
+- Aktionen (abonnieren, refresh) ruft die UI direkt am Repository auf: `ref.read(podcastRepositoryProvider).…`.
+
+## Tests
+- Unit-Tests mit `NativeDatabase.memory()` und `MockClient` aus `package:http/testing.dart` (kein Netz).
+- Widget-Tests mit Drift: **nicht** `pumpAndSettle` (hängt, solange ein Ladekreis auf SQLite wartet), sondern den
+  `settle()`-Helfer aus `test/widget_test.dart`; DB im `tearDown` schließen, nicht im Test selbst (hängt sonst).
+  Test-Feeds ohne Bilder verwenden (Bild-Cache braucht Plugins, die es im Test nicht gibt).
+- Immer ein `timeout` an Widget-Tests setzen.

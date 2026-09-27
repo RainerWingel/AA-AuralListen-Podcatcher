@@ -6,17 +6,10 @@ import '../features/downloads/downloads_screen.dart';
 import '../features/episodes/home_screen.dart';
 import '../features/playlists/playlists_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/subscriptions/podcast_detail_screen.dart';
 import '../features/subscriptions/subscriptions_screen.dart';
 import 'app_shell.dart';
-
-/// Route paths, kept in one place to avoid typos.
-abstract final class Routes {
-  static const home = '/';
-  static const subscriptions = '/abos';
-  static const playlists = '/playlists';
-  static const downloads = '/downloads';
-  static const settings = '/einstellungen';
-}
+import 'routes.dart';
 
 /// The app's single [GoRouter]. Disposed together with the provider.
 final routerProvider = Provider<GoRouter>((ref) {
@@ -28,7 +21,22 @@ final routerProvider = Provider<GoRouter>((ref) {
             AppShell(navigationShell: navigationShell),
         branches: [
           _branch(Routes.home, const HomeScreen()),
-          _branch(Routes.subscriptions, const SubscriptionsScreen()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.subscriptions,
+                builder: (context, state) => const SubscriptionsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'podcast/:id',
+                    builder: (context, state) => PodcastDetailScreen(
+                      podcastId: int.parse(state.pathParameters['id']!),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
           _branch(Routes.playlists, const PlaylistsScreen()),
           _branch(Routes.downloads, const DownloadsScreen()),
           _branch(Routes.settings, const SettingsScreen()),

@@ -135,6 +135,162 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Kommt bald'**
   String get placeholderComingSoon;
+
+  /// No description provided for @cancel.
+  ///
+  /// In de, this message translates to:
+  /// **'Abbrechen'**
+  String get cancel;
+
+  /// No description provided for @loadError.
+  ///
+  /// In de, this message translates to:
+  /// **'Fehler beim Laden'**
+  String get loadError;
+
+  /// No description provided for @homeEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Folgen'**
+  String get homeEmpty;
+
+  /// No description provided for @homeEmptyHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Abonniere Podcasts im Tab „Abos“.'**
+  String get homeEmptyHint;
+
+  /// No description provided for @subscriptionsEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Abos'**
+  String get subscriptionsEmpty;
+
+  /// No description provided for @subscriptionsEmptyHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Füge deinen ersten Podcast per RSS-URL hinzu.'**
+  String get subscriptionsEmptyHint;
+
+  /// No description provided for @addFeedAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Per RSS-URL hinzufügen'**
+  String get addFeedAction;
+
+  /// No description provided for @addFeedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Podcast hinzufügen'**
+  String get addFeedTitle;
+
+  /// No description provided for @addFeedLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'RSS-URL'**
+  String get addFeedLabel;
+
+  /// No description provided for @addFeedHint.
+  ///
+  /// In de, this message translates to:
+  /// **'https://beispiel.de/feed.xml'**
+  String get addFeedHint;
+
+  /// No description provided for @addFeedSubmit.
+  ///
+  /// In de, this message translates to:
+  /// **'Abonnieren'**
+  String get addFeedSubmit;
+
+  /// No description provided for @subscribeErrorInvalidUrl.
+  ///
+  /// In de, this message translates to:
+  /// **'Das ist keine gültige Adresse.'**
+  String get subscribeErrorInvalidUrl;
+
+  /// No description provided for @subscribeErrorAlreadySubscribed.
+  ///
+  /// In de, this message translates to:
+  /// **'Diesen Podcast hast du schon abonniert.'**
+  String get subscribeErrorAlreadySubscribed;
+
+  /// No description provided for @subscribeErrorNetwork.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Feed konnte nicht geladen werden. Bitte Adresse und Internetverbindung prüfen.'**
+  String get subscribeErrorNetwork;
+
+  /// No description provided for @subscribeErrorNotAFeed.
+  ///
+  /// In de, this message translates to:
+  /// **'Unter dieser Adresse liegt kein Podcast-Feed.'**
+  String get subscribeErrorNotAFeed;
+
+  /// No description provided for @refreshFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Feed konnte nicht aktualisiert werden.} other{{count} Feeds konnten nicht aktualisiert werden.}}'**
+  String refreshFailed(int count);
+
+  /// No description provided for @podcastNotFound.
+  ///
+  /// In de, this message translates to:
+  /// **'Podcast nicht gefunden'**
+  String get podcastNotFound;
+
+  /// No description provided for @podcastRefreshError.
+  ///
+  /// In de, this message translates to:
+  /// **'Letzte Aktualisierung fehlgeschlagen'**
+  String get podcastRefreshError;
+
+  /// No description provided for @episodeCount.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Keine Folgen} =1{1 Folge} other{{count} Folgen}}'**
+  String episodeCount(int count);
+
+  /// No description provided for @episodeNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Neu'**
+  String get episodeNew;
+
+  /// No description provided for @episodePlayed.
+  ///
+  /// In de, this message translates to:
+  /// **'Gespielt'**
+  String get episodePlayed;
+
+  /// No description provided for @durationHoursMinutes.
+  ///
+  /// In de, this message translates to:
+  /// **'{hours} Std. {minutes} Min.'**
+  String durationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @durationMinutes.
+  ///
+  /// In de, this message translates to:
+  /// **'{minutes} Min.'**
+  String durationMinutes(int minutes);
+
+  /// No description provided for @unsubscribe.
+  ///
+  /// In de, this message translates to:
+  /// **'Abo kündigen'**
+  String get unsubscribe;
+
+  /// No description provided for @unsubscribeConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Abo kündigen?'**
+  String get unsubscribeConfirmTitle;
+
+  /// No description provided for @unsubscribeConfirmBody.
+  ///
+  /// In de, this message translates to:
+  /// **'„{title}“ und alle Folgen werden aus der App entfernt.'**
+  String unsubscribeConfirmBody(String title);
 }
 
 class _AppLocalizationsDelegate
