@@ -149,11 +149,15 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (!_loaded) await _load();
     if (!_loaded) return;
     await _engine.play();
+    // just_audio emits no event if it was already playing (e.g. when switching
+    // episodes), so report the state ourselves.
+    _broadcastState();
   }
 
   @override
   Future<void> pause() async {
     await _engine.pause();
+    _broadcastState();
     await _saveCurrentPosition();
     _pauseTimer?.cancel();
     _pauseTimer = Timer(stopAfterPause, stop);
@@ -252,6 +256,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await _engine.setBoostDb(await _boostFor(row.podcast));
 
     _loaded = true;
+    _broadcastState();
     _markedPlayed = false;
     _lastSaved = start;
   }

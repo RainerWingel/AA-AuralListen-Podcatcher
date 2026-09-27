@@ -20,6 +20,12 @@ UI (Mini-/Vollbild-Player, EpisodeTile)      Benachrichtigung / Sperrbildschirm 
 - Quelle: Streaming der `audioUrl`. Ab M4: lokale Datei, falls heruntergeladen.
 - Keine Geschwindigkeitsregelung, kein Sleep-Timer, kein Stille-Kürzen (bewusst weggelassen).
 
+### Zustandsmeldungen (Stolperfalle)
+`just_audio` meldet **keinen** neuen Zustand, wenn es beim Folgenwechsel schon spielte (`playing` bleibt `true`, `play()`
+ändert nichts). Der Handler ruft deshalb nach dem Laden sowie nach `play()`/`pause()` selbst `_broadcastState()` auf –
+sonst bleibt der Play-Button auf „Play" stehen. Die `FakePlayerEngine` bildet dieses Verhalten bewusst nach;
+Regressionstest: „switching episodes while playing reports "playing"".
+
 ## Android-Besonderheiten
 - Manifest: Service `AudioService` (Typ `mediaPlayback`), `MediaButtonReceiver`, Rechte `WAKE_LOCK`, `FOREGROUND_SERVICE`,
   `FOREGROUND_SERVICE_MEDIA_PLAYBACK`. `MainActivity` erbt von `AudioServiceActivity`.
