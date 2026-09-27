@@ -13,6 +13,18 @@
   (sonst ist es für Android eine andere App, Daten weg).
 - Dart-Paketname: `aapodcastguru`.
 
+## App-Symbol
+Vorlage vom Benutzer: `tool/icon/source.webp` (Kopfhörer + „AA" + Mikrofon auf Navy). Erzeugt mit
+`tool/icon/make_icons.py` (Aufruf steht im Skript; braucht Pillow + numpy in einem Wegwerf-venv, **kein** App-Paket):
+- **Adaptives Symbol** (Android 8+, `mipmap-anydpi-v26/ic_launcher.xml`): Hintergrund = Verlauf
+  `drawable/ic_launcher_background.xml`, Vordergrund = Motiv freigestellt (transparent, über den Blau-Kanal),
+  innerhalb der 66-dp-Schutzzone, damit Kreis-, Squircle- und Samsung-Masken nichts abschneiden.
+- **Monochrom-Ebene** für Android-13-„Designsymbole".
+- **Legacy** `mipmap-*/ic_launcher.png`: Originalbild mit transparenten Ecken.
+- **Statusleiste** `drawable-*/ic_stat_podcast.png`: weiße Silhouette, in `main.dart` als
+  `androidNotificationIcon` gesetzt und in `res/raw/keep.xml` vor dem Ressourcen-Schrumpfen geschützt.
+Neues Motiv: `source.webp` ersetzen, Skript laufen lassen, Vorschau-PNG prüfen, Farben im Hintergrund-XML anpassen.
+
 ## Signatur
 - Release-APKs werden mit einem eigenen Keystore signiert. Updates lassen sich nur mit **demselben** Keystore
   über die bestehende Installation spielen – bei Verlust: Neuinstallation + Datenverlust (Backup vorher!).

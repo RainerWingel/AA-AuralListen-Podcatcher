@@ -39,6 +39,9 @@ Future<void> main() async {
       androidNotificationChannelId:
           'io.github.rainerwingel.aapodcastguru.playback',
       androidNotificationChannelName: 'Wiedergabe',
+      // White silhouette for the status bar (tool/icon/make_icons.py); the
+      // coloured launcher icon would show up as a blank square there.
+      androidNotificationIcon: 'drawable/ic_stat_podcast',
       // Keep the service in the foreground while paused: Android 12+ may forbid
       // restarting it from the background (Samsung is strict). The handler stops
       // it itself after 10 minutes of pause (docs/playback.md).

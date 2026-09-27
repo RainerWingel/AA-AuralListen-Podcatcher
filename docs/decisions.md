@@ -49,3 +49,4 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Speichern über den Android-Speichern-Dialog (file_picker.saveFile)** · Benutzer wählt Ort (Downloads, Drive); kein Teilen-Paket nötig, keine Temp-Dateien.
 - 2026-09-27 · **Wiederherstellung per ATTACH + Tabellenkopie statt Datei-Austausch** · kein App-Neustart nötig (audio_service hält den Prozess am Leben, ein Neustart wäre unzuverlässig); alte Backups werden vorher migriert.
 - 2026-09-27 · **Downloads gehören nicht ins Backup** · Audiodateien sind groß und jederzeit neu ladbar.
+- 2026-09-27 · **App-Symbol per eigenem Python-Skript statt `flutter_launcher_icons`** · kein zusätzliches Paket; Freistellen des Motivs und Statusleisten-Silhouette braucht das Paket ohnehin nicht zu können.

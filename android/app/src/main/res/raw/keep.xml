@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Release builds strip resources that look unused. audio_service looks up its
-     notification icons (play, pause, −15 s, +30 s) by name at runtime, so keep them. -->
+     notification icons (play, pause, −15 s, +30 s) and our status bar icon by
+     name at runtime, so keep them. -->
 <resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@drawable/audio_service_*" />
+    tools:keep="@drawable/audio_service_*,@drawable/ic_stat_podcast" />
