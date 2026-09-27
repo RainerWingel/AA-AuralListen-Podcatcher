@@ -6,6 +6,8 @@
 #
 # Start playback of a long episode first. The memory must not grow over time
 # (docs/eviction.md); a slow upward trend of TOTAL PSS over 2 h is a leak.
+# If the pid changes, the process was restarted: check the reason with
+#   adb shell dumpsys activity exit-info io.github.rainerwingel.aapodcastguru
 set -euo pipefail
 ADB="${ADB:-$HOME/Library/Android/sdk/platform-tools/adb}"
 PKG=io.github.rainerwingel.aapodcastguru
@@ -26,7 +28,7 @@ while [ "$(date +%s)" -lt "$END" ]; do
     GFX=$(echo "$MEM" | awk '/Graphics:/ {print $2; exit}')
     THREADS=$("$ADB" shell "grep Threads /proc/$PID/status" 2>/dev/null | awk '{print $2}' | tr -d '\r')
     STATE=$("$ADB" shell dumpsys media_session | tr -d '\r' \
-      | awk -v p="$PKG" '$0 ~ "package="p {f=1} f && /state=PlaybackState/ {print ($0 ~ /state=3/ ? "yes" : "no"); exit}')
+      | awk -v p="$PKG" '$0 ~ "package="p {f=1} f && /state=PlaybackState/ {print ($0 ~ /state=PLAYING/ ? "yes" : "no"); exit}')
     echo "$(date +%H:%M:%S),$PID,$TOTAL,$JAVA,$NATIVE,$GFX,$THREADS,${STATE:-?}"
   fi
   sleep "$INTERVAL"

@@ -94,3 +94,6 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
     normalen Lauf und in der CI übersprungen, `dart_test.yaml`). Ergebnis 2026-09-27: 262 → 270 MB, kein Trend. ✅
   - **2 h Wiedergabe auf dem S25:** Folge starten, dann `tool/soak_memory.sh 120 60 > soak.csv` (nur lesend:
     `dumpsys meminfo`, Threads, Wiedergabe-Status je Minute). TOTAL PSS darf keinen steigenden Trend zeigen.
+    Ergebnis 2026-09-27 (CRE197, 21:43–23:47): Bildschirm aus ≈ 120 MB (zuletzt 104 MB), Threads konstant ≈ 64,
+    kein Wachstum. ✅ Sprünge um ~110 MB sind Grafikspeicher bei eingeschaltetem Bildschirm.
+    Um 22:22 wurde der Prozess von außen beendet (`SIGNALED`, Signal 9, kein Absturz, Speicher davor flach) – Ursache offen.
