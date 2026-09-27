@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:aapodcastguru/app/app.dart';
 import 'package:aapodcastguru/audio/audio_providers.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+import 'support/fake_download_engine.dart';
 import 'support/fake_player_engine.dart';
 
 // Feed without images, so no network image loading happens in widget tests.
@@ -65,8 +67,12 @@ void main() {
   late AppDatabase db;
   late FakePlayerEngine engine;
   late PodcastAudioHandler handler;
+  late Directory episodesDir;
+  late FakeDownloadEngine downloadEngine;
 
   setUp(() {
+    episodesDir = Directory.systemTemp.createTempSync('widget_episodes_');
+    downloadEngine = FakeDownloadEngine(episodesDir);
     db = AppDatabase.forTesting(NativeDatabase.memory());
     engine = FakePlayerEngine();
     handler = PodcastAudioHandler(
@@ -79,6 +85,7 @@ void main() {
   tearDown(() async {
     await handler.dispose();
     await db.close();
+    if (episodesDir.existsSync()) episodesDir.deleteSync(recursive: true);
   });
 
   Future<void> pumpApp(WidgetTester tester) async {
@@ -87,6 +94,8 @@ void main() {
         overrides: [
           databaseProvider.overrideWithValue(db),
           audioHandlerProvider.overrideWithValue(handler),
+          downloadEngineProvider.overrideWithValue(downloadEngine),
+          episodesDirectoryProvider.overrideWithValue(() async => episodesDir),
           httpClientProvider.overrideWithValue(
             MockClient(
               (request) async => switch (request.url.host) {
@@ -374,6 +383,48 @@ void main() {
       find.text('wrint: gespräche zum runterladen – ein sehr langer Name'),
       findsOneWidget,
     );
+
+    await disposeApp(tester);
+  });
+
+  testWidgets('downloads an episode and deletes it again', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://example.com/feed'),
+    );
+    await settle(tester);
+
+    // Long press → "Herunterladen".
+    await tester.longPress(find.text('Erste Folge'));
+    await settle(tester);
+    await tester.tap(find.text('Herunterladen'));
+    await settle(tester);
+    expect(downloadEngine.active, hasLength(1));
+
+    final episodeId = downloadEngine.active.keys.single;
+    await tester.runAsync(() => downloadEngine.finish(episodeId, bytes: 2048));
+    await settle(tester);
+    expect(find.byTooltip('Heruntergeladen'), findsOneWidget);
+
+    // Downloads tab lists it with its size.
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Downloads'));
+    await settle(tester);
+    expect(find.text('Erste Folge'), findsOneWidget);
+    expect(find.text('1 MB'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Download löschen'));
+    await settle(tester);
+    expect(find.text('Keine Downloads'), findsOneWidget);
+    expect(episodesDir.listSync(), isEmpty);
 
     await disposeApp(tester);
   });

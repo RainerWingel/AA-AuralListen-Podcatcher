@@ -537,6 +537,156 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Einstellungen'**
   String get settingsTitle;
+
+  /// No description provided for @download.
+  ///
+  /// In de, this message translates to:
+  /// **'Herunterladen'**
+  String get download;
+
+  /// No description provided for @downloadCancel.
+  ///
+  /// In de, this message translates to:
+  /// **'Download abbrechen'**
+  String get downloadCancel;
+
+  /// No description provided for @downloadDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Download löschen'**
+  String get downloadDelete;
+
+  /// No description provided for @downloadRetry.
+  ///
+  /// In de, this message translates to:
+  /// **'Erneut herunterladen'**
+  String get downloadRetry;
+
+  /// No description provided for @downloadDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Heruntergeladen'**
+  String get downloadDone;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Download fehlgeschlagen'**
+  String get downloadFailed;
+
+  /// No description provided for @downloadQueued.
+  ///
+  /// In de, this message translates to:
+  /// **'Wartet …'**
+  String get downloadQueued;
+
+  /// No description provided for @downloadWifiWaiting.
+  ///
+  /// In de, this message translates to:
+  /// **'Wartet auf WLAN …'**
+  String get downloadWifiWaiting;
+
+  /// No description provided for @downloadsEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Downloads'**
+  String get downloadsEmpty;
+
+  /// No description provided for @downloadsEmptyHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Folge lange drücken → „Herunterladen“, oder Auto-Download in den Podcast-Einstellungen aktivieren.'**
+  String get downloadsEmptyHint;
+
+  /// No description provided for @downloadsUsage.
+  ///
+  /// In de, this message translates to:
+  /// **'{used} von {limit} belegt'**
+  String downloadsUsage(String used, String limit);
+
+  /// No description provided for @cleanUpNow.
+  ///
+  /// In de, this message translates to:
+  /// **'Jetzt aufräumen'**
+  String get cleanUpNow;
+
+  /// No description provided for @cleanUpResult.
+  ///
+  /// In de, this message translates to:
+  /// **'{freed} freigegeben'**
+  String cleanUpResult(String freed);
+
+  /// No description provided for @cleanUpNothing.
+  ///
+  /// In de, this message translates to:
+  /// **'Alles aufgeräumt – nichts zu löschen.'**
+  String get cleanUpNothing;
+
+  /// No description provided for @podcastSettings.
+  ///
+  /// In de, this message translates to:
+  /// **'Podcast-Einstellungen'**
+  String get podcastSettings;
+
+  /// No description provided for @autoDownload.
+  ///
+  /// In de, this message translates to:
+  /// **'Automatisch herunterladen'**
+  String get autoDownload;
+
+  /// No description provided for @autoDownloadOff.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus'**
+  String get autoDownloadOff;
+
+  /// No description provided for @autoDownloadWifi.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur WLAN'**
+  String get autoDownloadWifi;
+
+  /// No description provided for @autoDownloadAlways.
+  ///
+  /// In de, this message translates to:
+  /// **'Immer'**
+  String get autoDownloadAlways;
+
+  /// No description provided for @autoDownloadMax.
+  ///
+  /// In de, this message translates to:
+  /// **'Neueste ungespielte Folgen behalten'**
+  String get autoDownloadMax;
+
+  /// No description provided for @autoDeletePlayed.
+  ///
+  /// In de, this message translates to:
+  /// **'Gespielte Folgen löschen'**
+  String get autoDeletePlayed;
+
+  /// No description provided for @autoDeletePlayedHint.
+  ///
+  /// In de, this message translates to:
+  /// **'96 Stunden nachdem eine Folge zu 98 % gehört wurde'**
+  String get autoDeletePlayedHint;
+
+  /// No description provided for @settingsSectionDownloads.
+  ///
+  /// In de, this message translates to:
+  /// **'Downloads'**
+  String get settingsSectionDownloads;
+
+  /// No description provided for @downloadLimit.
+  ///
+  /// In de, this message translates to:
+  /// **'Speicherlimit für Downloads'**
+  String get downloadLimit;
+
+  /// No description provided for @downloadLimitHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen.'**
+  String get downloadLimitHint;
 }
 
 class _AppLocalizationsDelegate

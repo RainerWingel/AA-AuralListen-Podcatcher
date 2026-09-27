@@ -175,5 +175,47 @@
   "boostPerPodcastHint": "Sonst gilt der Wert für alle Podcasts ohne eigene Einstellung.",
   "markPlayed": "Als gespielt markieren",
   "markUnplayed": "Als ungespielt markieren",
-  "settingsTitle": "Einstellungen"
+  "settingsTitle": "Einstellungen",
+  "download": "Herunterladen",
+  "downloadCancel": "Download abbrechen",
+  "downloadDelete": "Download löschen",
+  "downloadRetry": "Erneut herunterladen",
+  "downloadDone": "Heruntergeladen",
+  "downloadFailed": "Download fehlgeschlagen",
+  "downloadQueued": "Wartet …",
+  "downloadWifiWaiting": "Wartet auf WLAN …",
+  "downloadsEmpty": "Keine Downloads",
+  "downloadsEmptyHint": "Folge lange drücken → „Herunterladen“, oder Auto-Download in den Podcast-Einstellungen aktivieren.",
+  "downloadsUsage": "{used} von {limit} belegt",
+  "@downloadsUsage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "cleanUpNow": "Jetzt aufräumen",
+  "cleanUpResult": "{freed} freigegeben",
+  "@cleanUpResult": {
+    "placeholders": {
+      "freed": {
+        "type": "String"
+      }
+    }
+  },
+  "cleanUpNothing": "Alles aufgeräumt – nichts zu löschen.",
+  "podcastSettings": "Podcast-Einstellungen",
+  "autoDownload": "Automatisch herunterladen",
+  "autoDownloadOff": "Aus",
+  "autoDownloadWifi": "Nur WLAN",
+  "autoDownloadAlways": "Immer",
+  "autoDownloadMax": "Neueste ungespielte Folgen behalten",
+  "autoDeletePlayed": "Gespielte Folgen löschen",
+  "autoDeletePlayedHint": "96 Stunden nachdem eine Folge zu 98 % gehört wurde",
+  "settingsSectionDownloads": "Downloads",
+  "downloadLimit": "Speicherlimit für Downloads",
+  "downloadLimitHint": "Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen."
 }

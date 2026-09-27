@@ -5,4 +5,7 @@ abstract final class SettingsKeys {
 
   /// Global loudness boost in dB (default 0 = off).
   static const boostDb = 'player.boostDb';
+
+  /// Upper limit for all downloaded audio files in bytes (default 5 GB).
+  static const downloadLimitBytes = 'downloads.limitBytes';
 }

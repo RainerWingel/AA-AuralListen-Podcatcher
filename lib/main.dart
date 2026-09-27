@@ -20,11 +20,16 @@ Future<void> main() async {
   // The database is created first because the audio handler (which lives
   // outside the widget tree, in the playback service) needs it too.
   final db = AppDatabase();
+  // The container is created after the handler; the handler only calls this
+  // lookup when playback starts, long after both exist.
+  late final ProviderContainer container;
   final handler = await AudioService.init(
     builder: () => PodcastAudioHandler(
       engine: JustAudioEngine(),
       playback: PlaybackRepository(db, DateTime.now),
       settings: SettingsRepository(db),
+      localAudioFile: (id) =>
+          container.read(downloadServiceProvider).localFile(id),
     ),
     // Reuse the bounded cover cache instead of a second, separate image cache.
     cacheManager: CoverCacheManager.instance,
@@ -44,7 +49,7 @@ Future<void> main() async {
     ),
   );
 
-  final container = ProviderContainer(
+  container = ProviderContainer(
     overrides: [
       databaseProvider.overrideWithValue(db),
       audioHandlerProvider.overrideWithValue(handler),
@@ -52,8 +57,7 @@ Future<void> main() async {
   );
 
   unawaited(handler.restoreLastEpisode());
-  // Feeds are refreshed on app start only (no background refresh, see docs/decisions.md).
-  unawaited(container.read(podcastRepositoryProvider).refreshAll());
+  unawaited(_startup(container));
 
   runApp(
     UncontrolledProviderScope(
@@ -61,4 +65,14 @@ Future<void> main() async {
       child: const PodcastGuruApp(),
     ),
   );
+}
+
+/// Background work after the UI is up: finish downloads that completed while
+/// the app was closed, refresh feeds (only on app start – no background
+/// refresh, see docs/decisions.md), then clean up / auto-download.
+Future<void> _startup(ProviderContainer container) async {
+  final downloads = container.read(downloadServiceProvider);
+  await downloads.start();
+  await container.read(podcastRepositoryProvider).refreshAll();
+  await downloads.runMaintenance();
 }

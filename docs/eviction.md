@@ -2,37 +2,58 @@
 
 Speicherlecks – im Arbeitsspeicher wie auf dem Datenträger – gelten als **Fehler höchster Priorität**.
 
-## Datenträger
+## Datenträger (M4 ✅)
+
+Code: `lib/data/storage/download_service.dart` (alle Regeln), `download_engine.dart` (Download-Paket-Kapsel),
+Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 96-h-Regel).
 
 ### Ablage
 - Nur im **app-spezifischen internen Speicher** (`getApplicationSupportDirectory()/episodes/`).
   Keine Speicher-Berechtigung nötig; wird bei Deinstallation automatisch entfernt. Keine SD-Karte (Gerät hat keine).
-- Dateiname = `<episodeId>.<ext>`, damit Zuordnung eindeutig ist.
+- Dateiname = `<episodeId>.<ext>` (Endung aus MIME-Typ, sonst URL, sonst `mp3`), damit Zuordnung eindeutig ist.
 
 ### Invarianten
-1. Jede Audiodatei hat genau einen `downloads`-Eintrag mit `state=done` – und umgekehrt.
-2. Downloads schreiben in `<name>.part`; erst nach Erfolg umbenennen, dann DB auf `done` setzen.
-   Bei Fehler/Abbruch: `.part` löschen, Eintrag `failed` bzw. entfernen.
-3. Jeder Code, der eine Datei anlegt, hat auch den Löschpfad (inkl. Fehlerfall).
+1. Jede Audiodatei im Ordner hat einen `downloads`-Eintrag (nicht `failed`) – und jeder `done`-Eintrag eine Datei.
+2. `background_downloader` lädt in eine **temporäre Datei** (App-Cache) und verschiebt sie erst nach Erfolg in den
+   Episoden-Ordner. Halbfertige Dateien landen also nie dort; Abbruch/Fehler räumt das Paket selbst auf.
+3. Unsere Tabelle `downloads` ist die einzige Buchführung: Das Paket-eigene Tracking (`trackTasks`) wird **nicht** genutzt,
+   damit keine zweite, wachsende Datenbank entsteht.
+4. Jeder Code, der eine Datei anlegt, hat auch den Löschpfad (inkl. Fehlerfall).
+5. Der `DownloadService` hört ab seiner Erzeugung auf Download-Ereignisse; `start()` holt Ereignisse nach, die passiert
+   sind, während die App geschlossen war.
 
 ### Automatisches Löschen (Regel des Benutzers)
 - Eine Folge gilt als **gespielt**, sobald ≥ 98 % gehört wurden (`data-model.md`).
 - Heruntergeladene, **gespielte** Folgen werden **96 Stunden nach `playedAt`** automatisch gelöscht
-  (sofern `autoDeletePlayed` für den Podcast aktiv ist – Standard: an).
+  (sofern „Gespielte Folgen löschen" für den Podcast an ist – Standard: an).
 - Folgen **unter 98 %** werden **nie** automatisch gelöscht.
-- Die gerade aktive Folge wird nie gelöscht.
-- Wird eine Folge wieder „ungespielt" markiert, entfällt die Löschung.
-- Ausgeführt: bei jedem App-Start und nach jedem Refresh (kein Hintergrund-Job).
+- Die Folge im Player wird nie automatisch gelöscht.
+- Wird eine Folge wieder „ungespielt" markiert oder erneut abgespielt, entfällt die Löschung (`playedAt` = null).
+
+### Speicherlimit
+- Einstellbar in Optionen: 1 / 2 / 5 / 10 / 20 GB (Standard 5 GB, `settings['downloads.limitBytes']`).
+- Über dem Limit: gespielte Downloads werden gelöscht, **älteste zuerst** (nach `playedAt`) – auch vor Ablauf der 96 h.
+- **Ungespielte Downloads werden nie wegen des Limits gelöscht**; stattdessen lädt Auto-Download nichts Neues mehr.
 
 ### Auto-Download
-- Pro Podcast einstellbar: aus / nur WLAN / immer, max. N ungespielte Downloads.
-- Wird N überschritten, lädt die App keine weiteren herunter (sie löscht keine ungespielten Folgen selbstständig).
+- Pro Podcast (Podcast → ⋮ → Podcast-Einstellungen): Aus / Nur WLAN / Immer, „Neueste ungespielte Folgen behalten": 1/2/3/5/10.
+- Geladen werden die **neuesten** Folgen mit Status `neu` ohne Download, bis N ungespielte Downloads existieren.
+  Fehlgeschlagene zählen nicht mit und werden nicht automatisch erneut versucht (Knopf „Erneut herunterladen").
+- Budget: Feed-Größenangabe (`audioSizeBytes`) gegen das Speicherlimit; reicht es nicht, wird gestoppt.
+- Manuelle Downloads (langes Drücken → „Herunterladen") laufen über jedes Netz.
 
-### Reconciliation bei jedem App-Start
-- Dateien ohne DB-Eintrag → löschen.
-- `.part`-Reste → löschen.
-- DB-Einträge ohne Datei → Eintrag entfernen, Folge wird wieder „streambar".
-- Abo kündigen → alle Dateien, Downloads-Einträge und Cover-Cache-Einträge des Podcasts löschen.
+### Wartung (`runMaintenance`)
+Reihenfolge: Abgleich → 96-h-Löschung → Speicherlimit → Auto-Download. Läuft beim App-Start (nach dem Refresh), nach jedem
+Pull-to-Refresh, nach Änderung der Podcast-Einstellungen oder des Limits und über „Jetzt aufräumen" (Downloads-Tab, Optionen).
+Kein Hintergrund-Job. Gleichzeitige Aufrufe teilen sich einen Lauf.
+
+### Abgleich (`reconcile`)
+- Dateien ohne Eintrag (oder mit `failed`-Eintrag) → löschen (Waisen, Reste).
+- `done`-Eintrag ohne Datei → Eintrag entfernen, Folge wird wieder gestreamt.
+- `queued`/`running`-Eintrag, aber das Paket kennt die Aufgabe nicht mehr (App wurde beendet):
+  Datei da → `done` (Meldung verpasst); sonst → Eintrag entfernen.
+- Beim Abspielen: Fehlt die Datei plötzlich, wird der Eintrag entfernt und gestreamt.
+- Abo kündigen → laufende Downloads abbrechen, alle Dateien und Einträge des Podcasts löschen, Cover aus dem Cache.
 
 ### Caches
 - Cover-Bilder: `CoverCacheManager` (`lib/data/storage/cover_cache.dart`) mit fester Obergrenze: 300 Objekte, 30 Tage. ✅
@@ -43,7 +64,7 @@ Speicherlecks – im Arbeitsspeicher wie auf dem Datenträger – gelten als **F
 - Kopien des Datei-Pickers (OPML-Import) werden direkt nach dem Einlesen gelöscht. ✅
 
 ### Sichtbarkeit
-Einstellungen → „Speicher": Belegung gesamt und pro Podcast, Knopf „Jetzt aufräumen".
+Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetzt aufräumen". Optionen: Limit + „Jetzt aufräumen".
 
 ## Arbeitsspeicher
 - Jede `StreamSubscription`, jeder `Timer`, `AnimationController`, `TextEditingController`, `ScrollController`

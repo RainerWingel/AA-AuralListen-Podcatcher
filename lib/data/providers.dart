@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
+import '../audio/audio_providers.dart';
 import '../core/clock.dart';
 import 'db/app_database.dart';
 import 'directory/directory_search.dart';
@@ -8,8 +12,11 @@ import 'feed/feed_fetcher.dart';
 import 'opml_importer.dart';
 import 'playback_repository.dart';
 import 'podcast_repository.dart';
+import 'settings_keys.dart';
 import 'settings_repository.dart';
 import 'storage/cover_cache.dart';
+import 'storage/download_engine.dart';
+import 'storage/download_service.dart';
 
 // App-wide singletons (think: services registered in a DI container).
 // Each one closes its resources in ref.onDispose – see docs/eviction.md.
@@ -36,7 +43,49 @@ final podcastRepositoryProvider = Provider<PodcastRepository>(
     fetcher: FeedFetcher(ref.watch(httpClientProvider)),
     clock: ref.watch(clockProvider),
     coverCache: ref.watch(coverCacheProvider),
+    filesCleaner: ref.watch(downloadServiceProvider),
   ),
+);
+
+/// Native downloader; tests override it with a fake.
+final downloadEngineProvider = Provider<DownloadEngine>((ref) {
+  final engine = BackgroundDownloadEngine();
+  ref.onDispose(engine.dispose);
+  return engine;
+});
+
+/// Where downloaded episodes live (app-private, no permission needed).
+Future<Directory> defaultEpisodesDirectory() async =>
+    Directory('${(await getApplicationSupportDirectory()).path}/episodes');
+
+final episodesDirectoryProvider = Provider<Future<Directory> Function()>(
+  (ref) => defaultEpisodesDirectory,
+);
+
+final downloadServiceProvider = Provider<DownloadService>((ref) {
+  final service = DownloadService(
+    db: ref.watch(databaseProvider),
+    engine: ref.watch(downloadEngineProvider),
+    clock: ref.watch(clockProvider),
+    episodesDirectory: ref.watch(episodesDirectoryProvider),
+    currentEpisodeId: () => ref.read(audioHandlerProvider).currentEpisodeId,
+  );
+  ref.onDispose(service.dispose);
+  return service;
+});
+
+/// Download row per episode id (small: only downloaded episodes).
+final downloadStatesProvider = StreamProvider<Map<int, Download>>(
+  (ref) => ref.watch(downloadServiceProvider).watchStates(),
+);
+
+/// Progress 0…1 of running downloads by episode id.
+final downloadProgressProvider = StreamProvider.autoDispose<Map<int, double>>(
+  (ref) => ref.watch(downloadServiceProvider).progress,
+);
+
+final downloadItemsProvider = StreamProvider.autoDispose<List<DownloadItem>>(
+  (ref) => ref.watch(downloadServiceProvider).watchAll(),
 );
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(
@@ -91,3 +140,11 @@ final directorySearchResultsProvider = FutureProvider.autoDispose
     .family<DirectorySearchOutcome, String>(
       (ref, term) => ref.watch(directorySearchProvider).search(term),
     );
+
+/// Storage limit for downloads in bytes (setting, default 5 GB).
+final downloadLimitProvider = StreamProvider.autoDispose<int>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.downloadLimitBytes)
+      .map((v) => int.tryParse(v ?? '') ?? DownloadService.defaultLimitBytes),
+);

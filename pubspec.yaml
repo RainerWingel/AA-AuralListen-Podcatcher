@@ -50,6 +50,7 @@ dependencies:
   just_audio: ^0.10.6
   audio_service: ^0.18.19
   audio_session: ^0.2.4
+  background_downloader: ^9.5.9
 
 dev_dependencies:
   flutter_test:

@@ -280,4 +280,86 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsTitle => 'Einstellungen';
+
+  @override
+  String get download => 'Herunterladen';
+
+  @override
+  String get downloadCancel => 'Download abbrechen';
+
+  @override
+  String get downloadDelete => 'Download löschen';
+
+  @override
+  String get downloadRetry => 'Erneut herunterladen';
+
+  @override
+  String get downloadDone => 'Heruntergeladen';
+
+  @override
+  String get downloadFailed => 'Download fehlgeschlagen';
+
+  @override
+  String get downloadQueued => 'Wartet …';
+
+  @override
+  String get downloadWifiWaiting => 'Wartet auf WLAN …';
+
+  @override
+  String get downloadsEmpty => 'Keine Downloads';
+
+  @override
+  String get downloadsEmptyHint =>
+      'Folge lange drücken → „Herunterladen“, oder Auto-Download in den Podcast-Einstellungen aktivieren.';
+
+  @override
+  String downloadsUsage(String used, String limit) {
+    return '$used von $limit belegt';
+  }
+
+  @override
+  String get cleanUpNow => 'Jetzt aufräumen';
+
+  @override
+  String cleanUpResult(String freed) {
+    return '$freed freigegeben';
+  }
+
+  @override
+  String get cleanUpNothing => 'Alles aufgeräumt – nichts zu löschen.';
+
+  @override
+  String get podcastSettings => 'Podcast-Einstellungen';
+
+  @override
+  String get autoDownload => 'Automatisch herunterladen';
+
+  @override
+  String get autoDownloadOff => 'Aus';
+
+  @override
+  String get autoDownloadWifi => 'Nur WLAN';
+
+  @override
+  String get autoDownloadAlways => 'Immer';
+
+  @override
+  String get autoDownloadMax => 'Neueste ungespielte Folgen behalten';
+
+  @override
+  String get autoDeletePlayed => 'Gespielte Folgen löschen';
+
+  @override
+  String get autoDeletePlayedHint =>
+      '96 Stunden nachdem eine Folge zu 98 % gehört wurde';
+
+  @override
+  String get settingsSectionDownloads => 'Downloads';
+
+  @override
+  String get downloadLimit => 'Speicherlimit für Downloads';
+
+  @override
+  String get downloadLimitHint =>
+      'Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen.';
 }

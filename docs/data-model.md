@@ -1,7 +1,7 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 2** (v1: `podcasts`, `episodes`; v2: `settings`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+Aktuell **schemaVersion 3** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 1. Tabelle in `tables.dart` ändern/hinzufügen, `schemaVersion` erhöhen, Schritt in `onUpgrade` ergänzen (`if (from < N) …`).
@@ -16,12 +16,12 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 |---------|------------------|
 | `podcasts` ✅ | id, feedUrl (unique), title, author, description, imageUrl, websiteUrl, etag, lastModified, lastRefreshAt, lastError (null = ok), subscribedAt, autoDownloadMode (off/wifiOnly/always), autoDownloadMaxEpisodes (3), autoDeletePlayed (true), boostDb (null = global) |
 | `episodes` ✅ | id, podcastId (FK, ON DELETE CASCADE), guid (unique je Podcast), title, description (Klartext, max. 4000 Zeichen), audioUrl, audioMimeType, audioSizeBytes, durationMs, pubDate, imageUrl, chaptersUrl, status, positionMs, playedAt, addedAt |
-| `downloads` | episodeId (PK), relativePath, sizeBytes, state (queued/running/done/failed), completedAt |
+| `downloads` ✅ (v3) | episodeId (PK, FK → episodes, CASCADE), relativePath (`<id>.<ext>`), state (queued/running/done/failed), sizeBytes, wifiOnly, createdAt, completedAt. Regeln: `eviction.md` |
 | `playlists` | id, name, sortOrder |
 | `playlist_items` | playlistId, episodeId, position — (playlistId, episodeId) unique |
 | `chapters` | episodeId, startMs, title, imageUrl, url |
 | `bookmarks` | id, episodeId, positionMs, note, createdAt |
-| `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb` |
+| `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb`, `downloads.limitBytes` |
 | ~~`player_state`~~ | entfällt – letzte Folge steht in `settings`; aktive Playlist kommt in M5 ebenfalls dorthin |
 
 ## Episoden-Status

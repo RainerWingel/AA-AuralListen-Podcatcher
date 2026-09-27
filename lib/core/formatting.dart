@@ -30,3 +30,13 @@ String formatClock(Duration duration) {
       ? '$hours:${minutes.toString().padLeft(2, '0')}:$seconds'
       : '$minutes:$seconds';
 }
+
+/// "350 MB", "1,2 GB" (German decimal comma).
+String formatBytes(int bytes) {
+  const mb = 1024 * 1024;
+  const gb = 1024 * mb;
+  if (bytes >= gb) {
+    return '${NumberFormat('#,##0.0', 'de').format(bytes / gb)} GB';
+  }
+  return '${NumberFormat('#,##0', 'de').format((bytes / mb).ceil())} MB';
+}

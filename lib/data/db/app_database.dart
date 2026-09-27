@@ -12,7 +12,7 @@ part 'app_database.g.dart';
 typedef EpisodeWithPodcast = ({Episode episode, Podcast podcast});
 
 /// The single SQLite database of the app (think: EF Core DbContext).
-@DriftDatabase(tables: [Podcasts, Episodes, Settings])
+@DriftDatabase(tables: [Podcasts, Episodes, Settings, Downloads])
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
     : super(
@@ -28,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -37,6 +37,9 @@ class AppDatabase extends _$AppDatabase {
       // One step per version; each step is covered by test/data/db/migration_test.dart.
       if (from < 2) {
         await m.createTable(settings);
+      }
+      if (from < 3) {
+        await m.createTable(downloads);
       }
     },
     beforeOpen: (details) async {

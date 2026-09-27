@@ -32,3 +32,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Gespielte Folge erneut abspielen = wieder „angefangen" ab 0** · verhindert, dass eine Folge während des erneuten Hörens nach 96 h gelöscht wird.
 - 2026-09-27 · **`player_state`-Tabelle entfällt, stattdessen `settings`** · ein Key/Value-Speicher reicht für letzte Folge, Boost und später aktive Playlist.
 - 2026-09-27 · **Drift-Schema-Schnappschüsse + generierte Migrationstests** · jede künftige Migration (auch von ChatGPT) wird gegen die alten Schemata geprüft.
+- 2026-09-27 · **Paket background_downloader ohne dessen Task-Datenbank** · Downloads laufen im Hintergrund weiter (WorkManager); unsere `downloads`-Tabelle bleibt die einzige Buchführung.
+- 2026-09-27 · **Speicherlimit löscht nur gespielte Downloads** · Benutzerregel „unter 98 % nie automatisch löschen" hat Vorrang; bei vollem Speicher stoppt nur der Auto-Download (ersetzt die frühere Notiz „dann älteste ungespielte löschen").
+- 2026-09-27 · **Tab „Optionen" statt „Einstellungen"** · 5 Tabs + große Systemschrift auf dem S25 → Umbruch.
