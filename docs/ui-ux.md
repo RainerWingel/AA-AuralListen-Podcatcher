@@ -7,7 +7,10 @@ Vorbild: **Castbox**. Material 3, nur Deutsch, Hell/Dunkel (Dunkel ab M7).
 2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen
 3. **Playlists** – Liste der Playlists → Inhalt mit Drag & Drop
 4. **Downloads** – laufende und fertige Downloads
-5. **Einstellungen** – Sprünge, Boost-Standard, Speicher, OPML, Backup, Info
+5. **Optionen** (Bildschirmtitel „Einstellungen") – Sprünge, Boost-Standard, Speicher, OPML, Backup, Info
+
+Tab-Beschriftungen höchstens 9 Zeichen (Länge von „Downloads"): Bei 5 Tabs und großer Systemschrift brechen längere
+Wörter auf dem S25 um (Test: „layout fits a Galaxy S25 with enlarged font").
 
 Suche: Lupe oben rechts auf Start und Abos → Suchbildschirm (`/abos/suche`) mit Eingabefeld in der AppBar.
 Treffer: Cover, Titel, „Autor · N Folgen", rechts ⊕ (abonnieren) bzw. ✓ (abonniert). Nach dem Abonnieren
@@ -24,7 +27,8 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 - **Boost-Auswahl** (Bottom-Sheet): Aus / +3 / +6 / +9 / +12 dB, Schalter „Nur für diesen Podcast".
 
 ## Folgen-Elemente
-Cover, Titel, Datum, Dauer, Fortschritt (Balken), Status-Icon (Punkt = neu, Haken = gespielt, Equalizer = läuft gerade;
+Cover, Titel (max. 2 Zeilen), auf der Startseite der Podcast-Name in eigener Zeile, darunter **Datum · Dauer**
+(eigene Zeile, damit lange Podcast-Namen sie nie verdrängen), Fortschritt (Balken), Status-Icon (Punkt = neu, Haken = gespielt, Equalizer = läuft gerade;
 laufende Folge hervorgehoben). **Tippen = abspielen.** **Langes Drücken** = Menü: Abspielen, Als gespielt / ungespielt markieren.
 Später im Menü: Herunterladen/Löschen (M4), Zu Playlist (M5).
 

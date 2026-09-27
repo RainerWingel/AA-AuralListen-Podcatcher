@@ -73,8 +73,9 @@ class EpisodeTile extends ConsumerWidget {
     final now = ref.watch(clockProvider)();
     final isCurrent = ref.watch(mediaItemProvider).value?.id == '${episode.id}';
 
+    // Date and duration get their own line so a long podcast name can
+    // never push them out of view.
     final meta = [
-      if (showPodcastTitle) podcast.title,
       if (episode.pubDate case final date?) formatEpisodeDate(date, now: now),
       if (episode.durationMs case final ms?)
         formatEpisodeDuration(l10n, Duration(milliseconds: ms)),
@@ -103,6 +104,8 @@ class EpisodeTile extends ConsumerWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (showPodcastTitle)
+            Text(podcast.title, maxLines: 1, overflow: TextOverflow.ellipsis),
           Text(meta, maxLines: 1, overflow: TextOverflow.ellipsis),
           if (progress != null)
             Padding(

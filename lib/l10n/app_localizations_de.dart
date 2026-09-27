@@ -25,7 +25,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navDownloads => 'Downloads';
 
   @override
-  String get navSettings => 'Einstellungen';
+  String get navSettings => 'Optionen';
 
   @override
   String get placeholderComingSoon => 'Kommt bald';
@@ -277,4 +277,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get markUnplayed => 'Als ungespielt markieren';
+
+  @override
+  String get settingsTitle => 'Einstellungen';
 }
