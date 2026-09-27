@@ -80,7 +80,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Podcast-Umzug: `itunes:new-feed-url` beim Refresh/Abonnieren, Umzüge per Infobox, „Feed-Adresse ändern" (Benutzerwunsch)
 - [ ] Leak-Tests (Streams, Timer, Controller, Caches)
 - [ ] Soak-Test auf dem S25 (2 h Wiedergabe, Speicher beobachten)
-- [ ] Eigenes App-Symbol
+- [x] Eigenes App-Symbol (adaptiv, Designsymbol, Statusleiste)
 - [ ] Version 1.0.0, Release-APK
 
 ## Offene Punkte
