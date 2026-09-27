@@ -8,4 +8,12 @@ abstract final class AppTheme {
     colorScheme: ColorScheme.fromSeed(seedColor: _seed),
     useMaterial3: true,
   );
+
+  static ThemeData dark() => ThemeData(
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: _seed,
+      brightness: Brightness.dark,
+    ),
+    useMaterial3: true,
+  );
 }

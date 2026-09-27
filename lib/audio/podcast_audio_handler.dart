@@ -171,6 +171,19 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await _engine.setBoostDb(db);
   }
 
+  /// After a backup was restored: forget the current episode (its id may now
+  /// mean something else) and show the restored "last episode" instead.
+  Future<void> resetAfterRestore() async {
+    await stop();
+    _episodeId = null;
+    _activePlaylistId = null;
+    _playlistPosition = -1;
+    _setIdlePosition(Duration.zero);
+    mediaItem.add(null);
+    _broadcastState();
+    await restoreLastEpisode();
+  }
+
   /// Removes the podcast's own boost; the global default applies again.
   Future<void> clearPodcastBoost() async {
     final podcastId = _currentPodcastId;

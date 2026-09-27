@@ -10,6 +10,7 @@ import '../../data/settings_keys.dart';
 import '../../data/storage/download_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../downloads/downloads_screen.dart';
+import 'backup_flow.dart';
 import 'opml_import_flow.dart';
 
 /// Selectable storage limits for downloads.
@@ -70,6 +71,35 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         children: [
+          _SectionHeader(l10n.settingsSectionAppearance),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SegmentedButton<ThemeMode>(
+              segments: [
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  label: Text(l10n.themeSystem),
+                  icon: const Icon(Icons.brightness_auto),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  label: Text(l10n.themeLight),
+                  icon: const Icon(Icons.light_mode),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  label: Text(l10n.themeDark),
+                  icon: const Icon(Icons.dark_mode),
+                ),
+              ],
+              selected: {
+                ref.watch(themeModeProvider).value ?? ThemeMode.system,
+              },
+              onSelectionChanged: (v) => ref
+                  .read(settingsRepositoryProvider)
+                  .set(SettingsKeys.themeMode, v.single.name),
+            ),
+          ),
           _SectionHeader(l10n.settingsSectionListening),
           ListTile(
             leading: const Icon(Icons.bookmarks_outlined),
@@ -95,6 +125,25 @@ class SettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.cleaning_services_outlined),
             title: Text(l10n.cleanUpNow),
             onTap: () => cleanUpDownloads(context, ref),
+          ),
+          _SectionHeader(l10n.settingsSectionBackup),
+          ListTile(
+            leading: const Icon(Icons.ios_share),
+            title: Text(l10n.opmlExport),
+            subtitle: Text(l10n.opmlExportSubtitle),
+            onTap: () => exportOpml(context, ref),
+          ),
+          ListTile(
+            leading: const Icon(Icons.backup_outlined),
+            title: Text(l10n.backupCreate),
+            subtitle: Text(l10n.backupCreateSubtitle),
+            onTap: () => createBackup(context, ref),
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings_backup_restore),
+            title: Text(l10n.backupRestore),
+            subtitle: Text(l10n.backupRestoreSubtitle),
+            onTap: () => restoreBackup(context, ref),
           ),
         ],
       ),

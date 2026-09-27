@@ -549,4 +549,73 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get markAction => 'Markieren';
+
+  @override
+  String get settingsSectionAppearance => 'Darstellung';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'Hell';
+
+  @override
+  String get themeDark => 'Dunkel';
+
+  @override
+  String get settingsSectionBackup => 'Sicherung';
+
+  @override
+  String get opmlExport => 'Abos als OPML exportieren';
+
+  @override
+  String get opmlExportSubtitle => 'Für andere Podcast-Apps';
+
+  @override
+  String get opmlExported => 'Abos exportiert';
+
+  @override
+  String get backupCreate => 'Backup erstellen';
+
+  @override
+  String get backupCreateSubtitle =>
+      'Abos, Hörstand, Playlists, Lesezeichen, Einstellungen – ohne Audiodateien';
+
+  @override
+  String get backupCreated => 'Backup gespeichert';
+
+  @override
+  String get backupRestore => 'Backup wiederherstellen';
+
+  @override
+  String get backupRestoreSubtitle => 'Ersetzt alle aktuellen Daten';
+
+  @override
+  String get backupInvalid => 'Die Datei ist kein gültiges Backup dieser App.';
+
+  @override
+  String get backupTooNew => 'Das Backup stammt aus einer neueren App-Version.';
+
+  @override
+  String get backupConfirmTitle => 'Backup wiederherstellen?';
+
+  @override
+  String backupConfirmBody(
+    String date,
+    int podcasts,
+    int episodes,
+    int playlists,
+    int bookmarks,
+  ) {
+    return 'Backup vom $date:\n$podcasts Abos · $episodes Folgen · $playlists Playlists · $bookmarks Lesezeichen\n\nAlle aktuellen Daten werden ersetzt. Heruntergeladene Folgen werden gelöscht.';
+  }
+
+  @override
+  String get backupRestoreAction => 'Wiederherstellen';
+
+  @override
+  String get backupRestored => 'Backup wiederhergestellt';
+
+  @override
+  String get saveFailed => 'Speichern fehlgeschlagen';
 }

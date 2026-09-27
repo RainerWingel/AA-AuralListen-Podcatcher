@@ -5,6 +5,7 @@ Aktuell **schemaVersion 6** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `do
 v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
+0. Neue Tabelle? → auch in `BackupService._restoredTables` eintragen (`backup.md`).
 1. Tabelle in `tables.dart` ändern/hinzufügen, `schemaVersion` erhöhen, Schritt in `onUpgrade` ergänzen (`if (from < N) …`).
 2. `dart run build_runner build --delete-conflicting-outputs`
 3. `dart run drift_dev schema dump lib/data/db/app_database.dart drift_schemas/` (Schnappschuss `drift_schema_vN.json`)

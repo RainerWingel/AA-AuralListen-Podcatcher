@@ -72,6 +72,11 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] DB-Schema v6 inkl. Migrationstests
 - [ ] Praxistest auf dem S25 mit WRINT und Freak Show (Benutzer)
 ## M7 – OPML-Export, Backup/Restore, Dark Mode, Feinschliff
+- [x] OPML-Export über den Speichern-Dialog
+- [x] Backup (ZIP: Manifest + SQLite-Schnappschuss) und Wiederherstellung ohne Neustart, alte Backups werden migriert
+- [x] Dark Mode (System / Hell / Dunkel)
+- [ ] Praxistest auf dem S25: Backup erstellen → in Drive/Downloads speichern → wiederherstellen (Benutzer)
+- [ ] Eigenes App-Symbol (offen)
 ## M8 – Härtung: Leak-Tests, Soak-Test, Release-APK 1.0
 
 ## Offene Punkte

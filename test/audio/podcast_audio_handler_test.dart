@@ -322,6 +322,20 @@ void main() {
     },
   );
 
+  test('resetAfterRestore forgets the current episode and shows the '
+      'restored last episode', () async {
+    await handler.playEpisode(episodeId);
+    final other = await addEpisode('2');
+    // As if a backup was restored whose last episode is "other".
+    await settings.set(SettingsKeys.lastEpisodeId, '$other');
+
+    await handler.resetAfterRestore();
+    expect(handler.currentEpisodeId, other);
+    expect(handler.mediaItem.value!.title, 'Folge 2');
+    expect(handler.playbackState.value.playing, isFalse);
+    expect(engine.calls.last, 'stop');
+  });
+
   test('switching episodes saves the old position first', () async {
     final other = await addEpisode('2');
     await handler.playEpisode(episodeId);

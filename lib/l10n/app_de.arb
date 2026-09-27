@@ -361,5 +361,44 @@
       }
     }
   },
-  "markAction": "Markieren"
+  "markAction": "Markieren",
+  "settingsSectionAppearance": "Darstellung",
+  "themeSystem": "System",
+  "themeLight": "Hell",
+  "themeDark": "Dunkel",
+  "settingsSectionBackup": "Sicherung",
+  "opmlExport": "Abos als OPML exportieren",
+  "opmlExportSubtitle": "Für andere Podcast-Apps",
+  "opmlExported": "Abos exportiert",
+  "backupCreate": "Backup erstellen",
+  "backupCreateSubtitle": "Abos, Hörstand, Playlists, Lesezeichen, Einstellungen – ohne Audiodateien",
+  "backupCreated": "Backup gespeichert",
+  "backupRestore": "Backup wiederherstellen",
+  "backupRestoreSubtitle": "Ersetzt alle aktuellen Daten",
+  "backupInvalid": "Die Datei ist kein gültiges Backup dieser App.",
+  "backupTooNew": "Das Backup stammt aus einer neueren App-Version.",
+  "backupConfirmTitle": "Backup wiederherstellen?",
+  "backupConfirmBody": "Backup vom {date}:\n{podcasts} Abos · {episodes} Folgen · {playlists} Playlists · {bookmarks} Lesezeichen\n\nAlle aktuellen Daten werden ersetzt. Heruntergeladene Folgen werden gelöscht.",
+  "@backupConfirmBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "podcasts": {
+        "type": "int"
+      },
+      "episodes": {
+        "type": "int"
+      },
+      "playlists": {
+        "type": "int"
+      },
+      "bookmarks": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreAction": "Wiederherstellen",
+  "backupRestored": "Backup wiederhergestellt",
+  "saveFailed": "Speichern fehlgeschlagen"
 }

@@ -172,6 +172,13 @@ class DownloadService implements PodcastFilesCleaner {
     await _deleteRow(episodeId);
   }
 
+  /// Stops all running downloads (before a backup is restored).
+  Future<void> cancelAll() async {
+    for (final id in await _engine.activeEpisodeIds()) {
+      await _engine.cancel(id);
+    }
+  }
+
   /// Called before a podcast is unsubscribed.
   @override
   Future<void> deleteForPodcast(int podcastId) async {

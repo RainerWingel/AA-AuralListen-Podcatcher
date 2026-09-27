@@ -1,5 +1,7 @@
 import 'package:xml/xml.dart';
 
+import '../db/app_database.dart';
+
 import 'rss_parser.dart' show FeedFormatException;
 
 /// One subscription from an OPML file.
@@ -37,4 +39,42 @@ List<OpmlFeed> parseOpml(String xml) {
     );
   }
   return feeds;
+}
+
+/// OPML 2.0 with all subscriptions (for other apps or as a simple backup).
+String buildOpml(List<Podcast> podcasts, {required DateTime created}) {
+  final builder = XmlBuilder()
+    ..processing('xml', 'version="1.0" encoding="UTF-8"');
+  builder.element(
+    'opml',
+    attributes: {'version': '2.0'},
+    nest: () {
+      builder.element(
+        'head',
+        nest: () {
+          builder
+            ..element('title', nest: 'AA-PodcastGuru Abos')
+            ..element('dateCreated', nest: created.toUtc().toIso8601String());
+        },
+      );
+      builder.element(
+        'body',
+        nest: () {
+          for (final p in podcasts) {
+            builder.element(
+              'outline',
+              attributes: {
+                'type': 'rss',
+                'text': p.title,
+                'title': p.title,
+                'xmlUrl': p.feedUrl,
+                'htmlUrl': ?p.websiteUrl,
+              },
+            );
+          }
+        },
+      );
+    },
+  );
+  return builder.buildDocument().toXmlString(pretty: true);
 }
