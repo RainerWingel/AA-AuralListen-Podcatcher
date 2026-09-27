@@ -85,5 +85,8 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
 
 ## Tests
 - Unit-Tests für alle Regeln oben (mit fake `Clock` und temporärem Verzeichnis).
-- `leak_tracker` in Widget-Tests aktiv.
+- `leak_tracker` in Widget-Tests aktiv (`test/flutter_test_config.dart`, Paket `leak_tracker_flutter_testing`,
+  nur Dev-Abhängigkeit): Controller/Notifier, die ohne `dispose()` weggeräumt werden, lassen den Testlauf scheitern.
+  Bewusst **ohne** `createdByTestHelpers`-Ausnahme – mit ihr blieb ein absichtlich eingebautes Leck unentdeckt. ✅
+- Handler und DownloadService: Tests prüfen, dass `dispose()` alle eigenen Streams schließt bzw. abbestellt. ✅
 - Vor Release (M8): DevTools-Speicherprofil, Soak-Test 2 h Wiedergabe + 50 Refreshes, Speicher darf nicht wachsen.

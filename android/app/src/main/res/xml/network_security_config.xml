@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Many podcast feeds still link their audio as plain http:// (e.g. the CRE
+     mp3 feed, which then redirects to https). Android blocks cleartext by
+     default, so downloads and streams of such episodes would fail.
+     Podcasts are public content; allow http like other podcatchers do.
+     See docs/decisions.md. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

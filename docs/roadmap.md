@@ -82,7 +82,8 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 
 ## M8 – Härtung: Leak-Tests, Soak-Test, Release-APK 1.0
 - [x] Podcast-Umzug: `itunes:new-feed-url` beim Refresh/Abonnieren, Umzüge per Infobox, „Feed-Adresse ändern" (Benutzerwunsch)
-- [ ] Leak-Tests (Streams, Timer, Controller, Caches)
+- [x] Leak-Tests: leak_tracker in allen Widget-Tests, `dispose()`-Tests für Handler und Downloads
+- [x] Fix: Downloads von `http://`-Links (CRE) scheiterten an Androids Klartext-Sperre
 - [ ] Soak-Test auf dem S25 (2 h Wiedergabe, Speicher beobachten)
 - [x] Eigenes App-Symbol (adaptiv, Designsymbol, Statusleiste)
 - [ ] Version 1.0.0, Release-APK

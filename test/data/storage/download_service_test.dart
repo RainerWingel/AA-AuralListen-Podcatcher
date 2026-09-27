@@ -88,6 +88,25 @@ void main() {
     if (dir.existsSync()) dir.deleteSync(recursive: true);
   });
 
+  test(
+    'dispose releases the engine subscription and progress stream',
+    () async {
+      var progressDone = false;
+      final sub = service.progress.listen(
+        null,
+        onDone: () => progressDone = true,
+      );
+      await pumpEventQueue();
+      expect(engine.hasListener, isTrue);
+
+      await service.dispose();
+      await pumpEventQueue();
+      expect(engine.hasListener, isFalse);
+      expect(progressDone, isTrue);
+      await sub.cancel();
+    },
+  );
+
   group('download', () {
     test('queues, completes and provides the local file', () async {
       final id = await addEpisode('1');

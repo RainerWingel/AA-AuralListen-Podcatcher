@@ -346,6 +346,20 @@ void main() {
     expect(handler.mediaItem.value!.title, 'Folge 2');
   });
 
+  test('dispose ends every stream it owns (no leaks)', () async {
+    await handler.playEpisode(episodeId);
+    final done = <String>[];
+    handler.positionStream.listen(null, onDone: () => done.add('position'));
+    handler.chapterSkips
+        .watch(episodeId)
+        .listen(null, onDone: () => done.add('skips'));
+    await pumpEventQueue();
+
+    await handler.dispose();
+    await pumpEventQueue();
+    expect(done, unorderedEquals(['position', 'skips']));
+  });
+
   group('skipped chapters (in memory)', () {
     Future<void> skip(int startMin, int? endMin, [int? id]) =>
         handler.setChapterSkipped(

@@ -19,6 +19,9 @@ class FakeDownloadEngine implements DownloadEngine {
   @override
   Stream<DownloadEvent> get events => _events.stream;
 
+  /// Whether someone (the DownloadService) still listens – leak tests.
+  bool get hasListener => _events.hasListener;
+
   @override
   Future<void> start() async {}
 
