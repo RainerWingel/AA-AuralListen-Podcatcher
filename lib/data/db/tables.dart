@@ -3,6 +3,9 @@ import 'package:drift/drift.dart';
 /// Auto-download setting per podcast (used from M4 on).
 enum AutoDownloadMode { off, wifiOnly, always }
 
+/// Lifecycle of a download (see docs/eviction.md).
+enum DownloadState { queued, running, done, failed }
+
 /// Listening state of an episode. See docs/data-model.md.
 /// Stored by name (textEnum), so renaming a value needs a migration.
 enum EpisodeStatus { newEpisode, inProgress, played }
@@ -83,4 +86,25 @@ class Settings extends Table {
 
   @override
   Set<Column> get primaryKey => {key};
+}
+
+/// One row per downloaded (or downloading) episode – schema v3.
+/// The file lives at `<app support>/episodes/<relativePath>`.
+@DataClassName('Download')
+class Downloads extends Table {
+  IntColumn get episodeId =>
+      integer().references(Episodes, #id, onDelete: KeyAction.cascade)();
+
+  /// File name inside the episodes directory, e.g. `42.mp3`.
+  TextColumn get relativePath => text()();
+  TextColumn get state => textEnum<DownloadState>()();
+  IntColumn get sizeBytes => integer().nullable()();
+
+  /// Auto-downloads are queued with "Wi-Fi only" when the podcast says so.
+  BoolColumn get wifiOnly => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get completedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {episodeId};
 }

@@ -26,7 +26,37 @@ class EpisodeTile extends ConsumerWidget {
   Future<void> _showMenu(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final playback = ref.read(playbackRepositoryProvider);
+    final downloads = ref.read(downloadServiceProvider);
+    final download = ref.read(downloadStatesProvider).value?[episode.id];
     final played = episode.status == EpisodeStatus.played;
+
+    // Download entry depends on the current download state.
+    final (
+      IconData downloadIcon,
+      String downloadLabel,
+      VoidCallback onDownload,
+    ) = switch (download?.state) {
+      null => (
+        Icons.download,
+        l10n.download,
+        () => downloads.download(episode.id),
+      ),
+      DownloadState.failed => (
+        Icons.refresh,
+        l10n.downloadRetry,
+        () => downloads.download(episode.id),
+      ),
+      DownloadState.queued || DownloadState.running => (
+        Icons.close,
+        l10n.downloadCancel,
+        () => downloads.cancel(episode.id),
+      ),
+      DownloadState.done => (
+        Icons.delete_outline,
+        l10n.downloadDelete,
+        () => downloads.delete(episode.id),
+      ),
+    };
     return showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -48,6 +78,14 @@ class EpisodeTile extends ConsumerWidget {
               onTap: () {
                 Navigator.of(context).pop();
                 ref.read(audioHandlerProvider).playEpisode(episode.id);
+              },
+            ),
+            ListTile(
+              leading: Icon(downloadIcon),
+              title: Text(downloadLabel),
+              onTap: () {
+                Navigator.of(context).pop();
+                onDownload();
               },
             ),
             ListTile(
@@ -106,7 +144,14 @@ class EpisodeTile extends ConsumerWidget {
         children: [
           if (showPodcastTitle)
             Text(podcast.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-          Text(meta, maxLines: 1, overflow: TextOverflow.ellipsis),
+          Row(
+            children: [
+              _DownloadIndicator(episodeId: episode.id),
+              Expanded(
+                child: Text(meta, maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+            ],
+          ),
           if (progress != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -135,5 +180,43 @@ class EpisodeTile extends ConsumerWidget {
               EpisodeStatus.inProgress => null,
             },
     );
+  }
+}
+
+/// Small icon in front of the date: downloaded ✓, progress ring, or error.
+class _DownloadIndicator extends ConsumerWidget {
+  const _DownloadIndicator({required this.episodeId});
+
+  final int episodeId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(
+      downloadStatesProvider.select((s) => s.value?[episodeId]?.state),
+    );
+    if (state == null) return const SizedBox.shrink();
+
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final Widget icon = switch (state) {
+      DownloadState.done => Tooltip(
+        message: l10n.downloadDone,
+        child: Icon(Icons.download_done, size: 16, color: colors.primary),
+      ),
+      DownloadState.failed => Tooltip(
+        message: l10n.downloadFailed,
+        child: Icon(Icons.error_outline, size: 16, color: colors.error),
+      ),
+      DownloadState.queued || DownloadState.running => SizedBox.square(
+        dimension: 14,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          value: ref.watch(
+            downloadProgressProvider.select((p) => p.value?[episodeId]),
+          ),
+        ),
+      ),
+    };
+    return Padding(padding: const EdgeInsets.only(right: 6), child: icon);
   }
 }

@@ -41,9 +41,13 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [ ] Praxistest auf dem S25: Sperrbildschirm, Bluetooth, Anruf, 10-Min-Pause (Benutzer)
 
 ## M4 – Downloads & Eviction
-- [ ] Manueller Download, Auto-Download pro Podcast
-- [ ] Eviction komplett nach `eviction.md` inkl. Reconciliation beim Start
-- [ ] Speicher-Seite in den Einstellungen
+- [x] Manueller Download (langes Drücken), Abbrechen, Löschen, erneut versuchen
+- [x] Auto-Download pro Podcast (Aus / Nur WLAN / Immer, N Folgen) – Podcast-Einstellungen
+- [x] Eviction komplett nach `eviction.md`: 96-h-Regel, Speicherlimit, Abgleich beim Start, Abo kündigen
+- [x] Downloads-Tab mit Belegung, Optionen: Speicherlimit + „Jetzt aufräumen"
+- [x] Player spielt heruntergeladene Datei statt Stream
+- [x] DB-Schema v3 (`downloads`) inkl. Migrationstests
+- [ ] Praxistest auf dem S25: Download im Hintergrund, Offline-Wiedergabe, Auto-Download (Benutzer)
 
 ## M5 – Playlists (Castbox-Ersatz komplett)
 - [ ] Mehrere Playlists, Drag & Drop, Weiterspielen nach `playlists.md`

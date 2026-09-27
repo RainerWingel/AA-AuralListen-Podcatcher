@@ -24,6 +24,12 @@ class SubscribeException implements Exception {
 
 typedef RefreshSummary = ({int succeeded, int failed});
 
+/// Removes downloaded files of a podcast before it is unsubscribed
+/// (implemented by the DownloadService).
+abstract interface class PodcastFilesCleaner {
+  Future<void> deleteForPodcast(int podcastId);
+}
+
 /// Subscriptions, feed refresh and episode queries.
 class PodcastRepository {
   PodcastRepository({
@@ -32,6 +38,7 @@ class PodcastRepository {
     required this._clock,
     required this._coverCache,
     this._parser = const RssParser(),
+    this._filesCleaner,
   });
 
   final AppDatabase _db;
@@ -39,6 +46,7 @@ class PodcastRepository {
   final Clock _clock;
   final CoverCache _coverCache;
   final RssParser _parser;
+  final PodcastFilesCleaner? _filesCleaner;
 
   /// Parallel feed downloads during a refresh.
   static const refreshConcurrency = 4;
@@ -170,13 +178,29 @@ class PodcastRepository {
             .map((row) => row.read(_db.episodes.imageUrl)!)
             .get();
 
+    // Files first: afterwards the cascade delete removes the download rows.
+    await _filesCleaner?.deleteForPodcast(podcastId);
     await (_db.delete(_db.podcasts)..where((p) => p.id.equals(podcastId))).go();
 
-    // Downloaded audio files are deleted here from M4 on (docs/eviction.md).
     for (final url in {?podcast.imageUrl, ...episodeImages}) {
       await _coverCache.evict(url);
     }
   }
+
+  /// Per-podcast download settings (podcast settings sheet).
+  Future<void> updatePodcastSettings(
+    int podcastId, {
+    AutoDownloadMode? autoDownloadMode,
+    int? autoDownloadMaxEpisodes,
+    bool? autoDeletePlayed,
+  }) => _updatePodcast(
+    podcastId,
+    PodcastsCompanion(
+      autoDownloadMode: Value.absentIfNull(autoDownloadMode),
+      autoDownloadMaxEpisodes: Value.absentIfNull(autoDownloadMaxEpisodes),
+      autoDeletePlayed: Value.absentIfNull(autoDeletePlayed),
+    ),
+  );
 
   // ---------------------------------------------------------------- refresh
 

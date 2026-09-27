@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 
@@ -18,6 +19,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     required this._engine,
     required this._playback,
     required this._settings,
+    this._localAudioFile,
     this.stopAfterPause = const Duration(minutes: 10),
   }) {
     _subscriptions
@@ -35,6 +37,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   final PlayerEngine _engine;
   final PlaybackRepository _playback;
   final SettingsRepository _settings;
+
+  /// Returns the downloaded file of an episode, if any (DownloadService).
+  final Future<File?> Function(int episodeId)? _localAudioFile;
 
   static const rewindInterval = Duration(seconds: 15);
   static const fastForwardInterval = Duration(seconds: 30);
@@ -238,8 +243,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         : Duration.zero;
     _exactStart = false;
 
-    // M4: play the downloaded file instead, if there is one (docs/roadmap.md).
-    await _engine.load(Uri.parse(episode.audioUrl), initialPosition: start);
+    // Downloaded file first, otherwise stream.
+    final local = await _localAudioFile?.call(id);
+    final source = local != null
+        ? Uri.file(local.path)
+        : Uri.parse(episode.audioUrl);
+    await _engine.load(source, initialPosition: start);
     await _engine.setBoostDb(await _boostFor(row.podcast));
 
     _loaded = true;

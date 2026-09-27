@@ -30,7 +30,7 @@ lib/
     db/           # Drift-Datenbank, Tabellen, Migrationen
     feed/         # RSS-/OPML-Parser, Feed-Fetcher
     directory/    # iTunes, fyyd, Podcast Index
-    storage/      # Dateiverwaltung, Download-Service, Eviction
+    storage/      # cover_cache, download_engine (Paket-Kapsel), download_service (Downloads + Eviction)
   audio/          # PodcastAudioHandler (Logik), PlayerEngine (just_audio-Kapsel), audio_providers.dart
   features/       # je Feature: Screens, Widgets, Provider
     subscriptions/ search/ episodes/ player/ playlists/
@@ -60,6 +60,9 @@ test/             # spiegelt lib/
 - Einen Dialog daher nur über seinen eigenen `builder`-Context schließen – oder, wenn man es von außen tut, mit
   `Navigator.of(context, rootNavigator: true).pop()`. Ein `Navigator.of(screenContext).pop()` entfernt sonst die
   Seite des Tabs statt des Dialogs → schwarzer Bildschirm (Fehler beim OPML-Import, siehe Regressionstest in `test/widget_test.dart`).
+
+- Popup-Menüs: In `itemBuilder` den Parameter nicht `context` nennen (`(_) => …`) und in `onTap` den Context des
+  Bildschirms benutzen – der Context des Menüs verschwindet beim Schließen.
 
 ## Tests
 - Unit-Tests mit `NativeDatabase.memory()` und `MockClient` aus `package:http/testing.dart` (kein Netz).

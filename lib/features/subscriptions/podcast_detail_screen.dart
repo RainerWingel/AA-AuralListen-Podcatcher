@@ -8,6 +8,7 @@ import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../episodes/episode_tile.dart';
+import 'podcast_settings_sheet.dart';
 
 /// Podcast header plus its episode list.
 class PodcastDetailScreen extends ConsumerWidget {
@@ -73,7 +74,12 @@ class PodcastDetailScreen extends ConsumerWidget {
             title: Text(podcast.title),
             actions: [
               PopupMenuButton<void>(
-                itemBuilder: (context) => [
+                // Use the screen context: the menu's own context goes away on close.
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    onTap: () => showPodcastSettingsSheet(context, podcast.id),
+                    child: Text(l10n.podcastSettings),
+                  ),
                   PopupMenuItem(
                     onTap: () => _unsubscribe(context, ref, podcast),
                     child: Text(l10n.unsubscribe),

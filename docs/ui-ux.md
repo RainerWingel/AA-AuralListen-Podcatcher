@@ -30,7 +30,19 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 Cover, Titel (max. 2 Zeilen), auf der Startseite der Podcast-Name in eigener Zeile, darunter **Datum · Dauer**
 (eigene Zeile, damit lange Podcast-Namen sie nie verdrängen), Fortschritt (Balken), Status-Icon (Punkt = neu, Haken = gespielt, Equalizer = läuft gerade;
 laufende Folge hervorgehoben). **Tippen = abspielen.** **Langes Drücken** = Menü: Abspielen, Als gespielt / ungespielt markieren.
-Später im Menü: Herunterladen/Löschen (M4), Zu Playlist (M5).
+Menü außerdem: Herunterladen / Download abbrechen / Download löschen / Erneut herunterladen (je nach Zustand).
+Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Später: Zu Playlist (M5).
+
+## Downloads-Tab
+Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %" /
+„Wartet auf WLAN …" / „Download fehlgeschlagen"; rechts Löschen / Abbrechen / Erneut. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
+
+## Podcast-Einstellungen
+Podcast-Detail → ⋮ → „Podcast-Einstellungen" (Bottom-Sheet): Automatisch herunterladen (Aus / Nur WLAN / Immer),
+„Neueste ungespielte Folgen behalten" (1/2/3/5/10), Schalter „Gespielte Folgen löschen" (96 h nach 98 %).
+
+## Optionen
+Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
 
 ## Texte
 - Alle Texte in `lib/l10n/app_de.arb`, Du-Form, kurz.

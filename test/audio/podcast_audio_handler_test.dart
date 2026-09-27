@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
@@ -82,6 +84,20 @@ void main() {
     expect(item.album, 'Testpodcast');
     expect(item.artUri, Uri.parse('https://example.com/cover.jpg'));
     expect(await settings.getInt(SettingsKeys.lastEpisodeId), episodeId);
+  });
+
+  test('plays the downloaded file instead of streaming', () async {
+    await handler.dispose();
+    engine = FakePlayerEngine();
+    handler = PodcastAudioHandler(
+      engine: engine,
+      playback: PlaybackRepository(db, () => now),
+      settings: settings,
+      localAudioFile: (id) async =>
+          id == episodeId ? File('/data/episodes/$id.mp3') : null,
+    );
+    await handler.playEpisode(episodeId);
+    expect(engine.loadedUri, Uri.file('/data/episodes/$episodeId.mp3'));
   });
 
   test('stores the duration reported by the player', () async {

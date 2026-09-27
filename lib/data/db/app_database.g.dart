@@ -2082,12 +2082,493 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   }
 }
 
+class $DownloadsTable extends Downloads
+    with TableInfo<$DownloadsTable, Download> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DownloadsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _episodeIdMeta = const VerificationMeta(
+    'episodeId',
+  );
+  @override
+  late final GeneratedColumn<int> episodeId = GeneratedColumn<int>(
+    'episode_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES episodes (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _relativePathMeta = const VerificationMeta(
+    'relativePath',
+  );
+  @override
+  late final GeneratedColumn<String> relativePath = GeneratedColumn<String>(
+    'relative_path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DownloadState, String> state =
+      GeneratedColumn<String>(
+        'state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<DownloadState>($DownloadsTable.$converterstate);
+  static const VerificationMeta _sizeBytesMeta = const VerificationMeta(
+    'sizeBytes',
+  );
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+    'size_bytes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _wifiOnlyMeta = const VerificationMeta(
+    'wifiOnly',
+  );
+  @override
+  late final GeneratedColumn<bool> wifiOnly = GeneratedColumn<bool>(
+    'wifi_only',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("wifi_only" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
+    'completed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    episodeId,
+    relativePath,
+    state,
+    sizeBytes,
+    wifiOnly,
+    createdAt,
+    completedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'downloads';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Download> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('episode_id')) {
+      context.handle(
+        _episodeIdMeta,
+        episodeId.isAcceptableOrUnknown(data['episode_id']!, _episodeIdMeta),
+      );
+    }
+    if (data.containsKey('relative_path')) {
+      context.handle(
+        _relativePathMeta,
+        relativePath.isAcceptableOrUnknown(
+          data['relative_path']!,
+          _relativePathMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_relativePathMeta);
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(
+        _sizeBytesMeta,
+        sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta),
+      );
+    }
+    if (data.containsKey('wifi_only')) {
+      context.handle(
+        _wifiOnlyMeta,
+        wifiOnly.isAcceptableOrUnknown(data['wifi_only']!, _wifiOnlyMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {episodeId};
+  @override
+  Download map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Download(
+      episodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}episode_id'],
+      )!,
+      relativePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relative_path'],
+      )!,
+      state: $DownloadsTable.$converterstate.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}state'],
+        )!,
+      ),
+      sizeBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}size_bytes'],
+      ),
+      wifiOnly: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}wifi_only'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}completed_at'],
+      ),
+    );
+  }
+
+  @override
+  $DownloadsTable createAlias(String alias) {
+    return $DownloadsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<DownloadState, String, String> $converterstate =
+      const EnumNameConverter<DownloadState>(DownloadState.values);
+}
+
+class Download extends DataClass implements Insertable<Download> {
+  final int episodeId;
+
+  /// File name inside the episodes directory, e.g. `42.mp3`.
+  final String relativePath;
+  final DownloadState state;
+  final int? sizeBytes;
+
+  /// Auto-downloads are queued with "Wi-Fi only" when the podcast says so.
+  final bool wifiOnly;
+  final DateTime createdAt;
+  final DateTime? completedAt;
+  const Download({
+    required this.episodeId,
+    required this.relativePath,
+    required this.state,
+    this.sizeBytes,
+    required this.wifiOnly,
+    required this.createdAt,
+    this.completedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['episode_id'] = Variable<int>(episodeId);
+    map['relative_path'] = Variable<String>(relativePath);
+    {
+      map['state'] = Variable<String>(
+        $DownloadsTable.$converterstate.toSql(state),
+      );
+    }
+    if (!nullToAbsent || sizeBytes != null) {
+      map['size_bytes'] = Variable<int>(sizeBytes);
+    }
+    map['wifi_only'] = Variable<bool>(wifiOnly);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<DateTime>(completedAt);
+    }
+    return map;
+  }
+
+  DownloadsCompanion toCompanion(bool nullToAbsent) {
+    return DownloadsCompanion(
+      episodeId: Value(episodeId),
+      relativePath: Value(relativePath),
+      state: Value(state),
+      sizeBytes: sizeBytes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sizeBytes),
+      wifiOnly: Value(wifiOnly),
+      createdAt: Value(createdAt),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+    );
+  }
+
+  factory Download.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Download(
+      episodeId: serializer.fromJson<int>(json['episodeId']),
+      relativePath: serializer.fromJson<String>(json['relativePath']),
+      state: $DownloadsTable.$converterstate.fromJson(
+        serializer.fromJson<String>(json['state']),
+      ),
+      sizeBytes: serializer.fromJson<int?>(json['sizeBytes']),
+      wifiOnly: serializer.fromJson<bool>(json['wifiOnly']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'episodeId': serializer.toJson<int>(episodeId),
+      'relativePath': serializer.toJson<String>(relativePath),
+      'state': serializer.toJson<String>(
+        $DownloadsTable.$converterstate.toJson(state),
+      ),
+      'sizeBytes': serializer.toJson<int?>(sizeBytes),
+      'wifiOnly': serializer.toJson<bool>(wifiOnly),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'completedAt': serializer.toJson<DateTime?>(completedAt),
+    };
+  }
+
+  Download copyWith({
+    int? episodeId,
+    String? relativePath,
+    DownloadState? state,
+    Value<int?> sizeBytes = const Value.absent(),
+    bool? wifiOnly,
+    DateTime? createdAt,
+    Value<DateTime?> completedAt = const Value.absent(),
+  }) => Download(
+    episodeId: episodeId ?? this.episodeId,
+    relativePath: relativePath ?? this.relativePath,
+    state: state ?? this.state,
+    sizeBytes: sizeBytes.present ? sizeBytes.value : this.sizeBytes,
+    wifiOnly: wifiOnly ?? this.wifiOnly,
+    createdAt: createdAt ?? this.createdAt,
+    completedAt: completedAt.present ? completedAt.value : this.completedAt,
+  );
+  Download copyWithCompanion(DownloadsCompanion data) {
+    return Download(
+      episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
+      relativePath: data.relativePath.present
+          ? data.relativePath.value
+          : this.relativePath,
+      state: data.state.present ? data.state.value : this.state,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+      wifiOnly: data.wifiOnly.present ? data.wifiOnly.value : this.wifiOnly,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Download(')
+          ..write('episodeId: $episodeId, ')
+          ..write('relativePath: $relativePath, ')
+          ..write('state: $state, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('wifiOnly: $wifiOnly, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    episodeId,
+    relativePath,
+    state,
+    sizeBytes,
+    wifiOnly,
+    createdAt,
+    completedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Download &&
+          other.episodeId == this.episodeId &&
+          other.relativePath == this.relativePath &&
+          other.state == this.state &&
+          other.sizeBytes == this.sizeBytes &&
+          other.wifiOnly == this.wifiOnly &&
+          other.createdAt == this.createdAt &&
+          other.completedAt == this.completedAt);
+}
+
+class DownloadsCompanion extends UpdateCompanion<Download> {
+  final Value<int> episodeId;
+  final Value<String> relativePath;
+  final Value<DownloadState> state;
+  final Value<int?> sizeBytes;
+  final Value<bool> wifiOnly;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> completedAt;
+  const DownloadsCompanion({
+    this.episodeId = const Value.absent(),
+    this.relativePath = const Value.absent(),
+    this.state = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.wifiOnly = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
+  });
+  DownloadsCompanion.insert({
+    this.episodeId = const Value.absent(),
+    required String relativePath,
+    required DownloadState state,
+    this.sizeBytes = const Value.absent(),
+    this.wifiOnly = const Value.absent(),
+    required DateTime createdAt,
+    this.completedAt = const Value.absent(),
+  }) : relativePath = Value(relativePath),
+       state = Value(state),
+       createdAt = Value(createdAt);
+  static Insertable<Download> custom({
+    Expression<int>? episodeId,
+    Expression<String>? relativePath,
+    Expression<String>? state,
+    Expression<int>? sizeBytes,
+    Expression<bool>? wifiOnly,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? completedAt,
+  }) {
+    return RawValuesInsertable({
+      if (episodeId != null) 'episode_id': episodeId,
+      if (relativePath != null) 'relative_path': relativePath,
+      if (state != null) 'state': state,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (wifiOnly != null) 'wifi_only': wifiOnly,
+      if (createdAt != null) 'created_at': createdAt,
+      if (completedAt != null) 'completed_at': completedAt,
+    });
+  }
+
+  DownloadsCompanion copyWith({
+    Value<int>? episodeId,
+    Value<String>? relativePath,
+    Value<DownloadState>? state,
+    Value<int?>? sizeBytes,
+    Value<bool>? wifiOnly,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? completedAt,
+  }) {
+    return DownloadsCompanion(
+      episodeId: episodeId ?? this.episodeId,
+      relativePath: relativePath ?? this.relativePath,
+      state: state ?? this.state,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      wifiOnly: wifiOnly ?? this.wifiOnly,
+      createdAt: createdAt ?? this.createdAt,
+      completedAt: completedAt ?? this.completedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (episodeId.present) {
+      map['episode_id'] = Variable<int>(episodeId.value);
+    }
+    if (relativePath.present) {
+      map['relative_path'] = Variable<String>(relativePath.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(
+        $DownloadsTable.$converterstate.toSql(state.value),
+      );
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (wifiOnly.present) {
+      map['wifi_only'] = Variable<bool>(wifiOnly.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<DateTime>(completedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DownloadsCompanion(')
+          ..write('episodeId: $episodeId, ')
+          ..write('relativePath: $relativePath, ')
+          ..write('state: $state, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('wifiOnly: $wifiOnly, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $PodcastsTable podcasts = $PodcastsTable(this);
   late final $EpisodesTable episodes = $EpisodesTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
+  late final $DownloadsTable downloads = $DownloadsTable(this);
   late final Index episodesPubDate = Index(
     'episodes_pub_date',
     'CREATE INDEX episodes_pub_date ON episodes (pub_date)',
@@ -2100,6 +2581,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     podcasts,
     episodes,
     settings,
+    downloads,
     episodesPubDate,
   ];
   @override
@@ -2110,6 +2592,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('episodes', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'episodes',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('downloads', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -2684,6 +3173,24 @@ final class $$EpisodesTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$DownloadsTable, List<Download>>
+  _downloadsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.downloads,
+    aliasName: 'episodes__id__downloads__episode_id',
+  );
+
+  $$DownloadsTableProcessedTableManager get downloadsRefs {
+    final manager = $$DownloadsTableTableManager(
+      $_db,
+      $_db.downloads,
+    ).filter((f) => f.episodeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_downloadsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$EpisodesTableFilterComposer
@@ -2792,6 +3299,31 @@ class $$EpisodesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> downloadsRefs(
+    Expression<bool> Function($$DownloadsTableFilterComposer f) f,
+  ) {
+    final $$DownloadsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.downloads,
+      getReferencedColumn: (t) => t.episodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DownloadsTableFilterComposer(
+            $db: $db,
+            $table: $db.downloads,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -2991,6 +3523,31 @@ class $$EpisodesTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> downloadsRefs<T extends Object>(
+    Expression<T> Function($$DownloadsTableAnnotationComposer a) f,
+  ) {
+    final $$DownloadsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.downloads,
+      getReferencedColumn: (t) => t.episodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DownloadsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.downloads,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$EpisodesTableTableManager
@@ -3006,7 +3563,7 @@ class $$EpisodesTableTableManager
           $$EpisodesTableUpdateCompanionBuilder,
           (Episode, $$EpisodesTableReferences),
           Episode,
-          PrefetchHooks Function({bool podcastId})
+          PrefetchHooks Function({bool podcastId, bool downloadsRefs})
         > {
   $$EpisodesTableTableManager(_$AppDatabase db, $EpisodesTable table)
     : super(
@@ -3099,10 +3656,10 @@ class $$EpisodesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({podcastId = false}) {
+          prefetchHooksCallback: ({podcastId = false, downloadsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [],
+              explicitlyWatchedTables: [if (downloadsRefs) db.downloads],
               addJoins:
                   <
                     T extends TableManagerState<
@@ -3134,7 +3691,26 @@ class $$EpisodesTableTableManager
                     return state;
                   },
               getPrefetchedDataCallback: (items) async {
-                return [];
+                return [
+                  if (downloadsRefs)
+                    await $_getPrefetchedData<
+                      Episode,
+                      $EpisodesTable,
+                      Download
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EpisodesTableReferences
+                          ._downloadsRefsTable(db),
+                      managerFromTypedResult: (p0) => $$EpisodesTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).downloadsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.episodeId == item.id),
+                      typedResults: items,
+                    ),
+                ];
               },
             );
           },
@@ -3154,7 +3730,7 @@ typedef $$EpisodesTableProcessedTableManager =
       $$EpisodesTableUpdateCompanionBuilder,
       (Episode, $$EpisodesTableReferences),
       Episode,
-      PrefetchHooks Function({bool podcastId})
+      PrefetchHooks Function({bool podcastId, bool downloadsRefs})
     >;
 typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   required String key,
@@ -3290,6 +3866,356 @@ typedef $$SettingsTableProcessedTableManager =
       Setting,
       PrefetchHooks Function()
     >;
+typedef $$DownloadsTableCreateCompanionBuilder = DownloadsCompanion Function({
+  Value<int> episodeId,
+  required String relativePath,
+  required DownloadState state,
+  Value<int?> sizeBytes,
+  Value<bool> wifiOnly,
+  required DateTime createdAt,
+  Value<DateTime?> completedAt,
+});
+typedef $$DownloadsTableUpdateCompanionBuilder = DownloadsCompanion Function({
+  Value<int> episodeId,
+  Value<String> relativePath,
+  Value<DownloadState> state,
+  Value<int?> sizeBytes,
+  Value<bool> wifiOnly,
+  Value<DateTime> createdAt,
+  Value<DateTime?> completedAt,
+});
+
+final class $$DownloadsTableReferences
+    extends BaseReferences<_$AppDatabase, $DownloadsTable, Download> {
+  $$DownloadsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $EpisodesTable _episodeIdTable(_$AppDatabase db) =>
+      db.episodes.createAlias('downloads__episode_id__episodes__id');
+
+  $$EpisodesTableProcessedTableManager get episodeId {
+    final $_column = $_itemColumn<int>('episode_id')!;
+
+    final manager = $$EpisodesTableTableManager(
+      $_db,
+      $_db.episodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_episodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DownloadsTableFilterComposer
+    extends Composer<_$AppDatabase, $DownloadsTable> {
+  $$DownloadsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get relativePath => $composableBuilder(
+    column: $table.relativePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DownloadState, DownloadState, String>
+  get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get sizeBytes => $composableBuilder(
+    column: $table.sizeBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get wifiOnly => $composableBuilder(
+    column: $table.wifiOnly,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EpisodesTableFilterComposer get episodeId {
+    final $$EpisodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.episodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EpisodesTableFilterComposer(
+            $db: $db,
+            $table: $db.episodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DownloadsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DownloadsTable> {
+  $$DownloadsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get relativePath => $composableBuilder(
+    column: $table.relativePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sizeBytes => $composableBuilder(
+    column: $table.sizeBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get wifiOnly => $composableBuilder(
+    column: $table.wifiOnly,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EpisodesTableOrderingComposer get episodeId {
+    final $$EpisodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.episodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EpisodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.episodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DownloadsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DownloadsTable> {
+  $$DownloadsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get relativePath => $composableBuilder(
+    column: $table.relativePath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<DownloadState, String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<int> get sizeBytes =>
+      $composableBuilder(column: $table.sizeBytes, builder: (column) => column);
+
+  GeneratedColumn<bool> get wifiOnly =>
+      $composableBuilder(column: $table.wifiOnly, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+
+  $$EpisodesTableAnnotationComposer get episodeId {
+    final $$EpisodesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.episodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EpisodesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.episodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DownloadsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DownloadsTable,
+          Download,
+          $$DownloadsTableFilterComposer,
+          $$DownloadsTableOrderingComposer,
+          $$DownloadsTableAnnotationComposer,
+          $$DownloadsTableCreateCompanionBuilder,
+          $$DownloadsTableUpdateCompanionBuilder,
+          (Download, $$DownloadsTableReferences),
+          Download,
+          PrefetchHooks Function({bool episodeId})
+        > {
+  $$DownloadsTableTableManager(_$AppDatabase db, $DownloadsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DownloadsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DownloadsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DownloadsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> episodeId = const Value.absent(),
+                Value<String> relativePath = const Value.absent(),
+                Value<DownloadState> state = const Value.absent(),
+                Value<int?> sizeBytes = const Value.absent(),
+                Value<bool> wifiOnly = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+              }) => DownloadsCompanion(
+                episodeId: episodeId,
+                relativePath: relativePath,
+                state: state,
+                sizeBytes: sizeBytes,
+                wifiOnly: wifiOnly,
+                createdAt: createdAt,
+                completedAt: completedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> episodeId = const Value.absent(),
+                required String relativePath,
+                required DownloadState state,
+                Value<int?> sizeBytes = const Value.absent(),
+                Value<bool> wifiOnly = const Value.absent(),
+                required DateTime createdAt,
+                Value<DateTime?> completedAt = const Value.absent(),
+              }) => DownloadsCompanion.insert(
+                episodeId: episodeId,
+                relativePath: relativePath,
+                state: state,
+                sizeBytes: sizeBytes,
+                wifiOnly: wifiOnly,
+                createdAt: createdAt,
+                completedAt: completedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DownloadsTable, Download>(table),
+                  $$DownloadsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({episodeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (episodeId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.episodeId,
+                        referencedTable: $$DownloadsTableReferences
+                            ._episodeIdTable(db),
+                        referencedColumn: $$DownloadsTableReferences
+                            ._episodeIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DownloadsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DownloadsTable,
+      Download,
+      $$DownloadsTableFilterComposer,
+      $$DownloadsTableOrderingComposer,
+      $$DownloadsTableAnnotationComposer,
+      $$DownloadsTableCreateCompanionBuilder,
+      $$DownloadsTableUpdateCompanionBuilder,
+      (Download, $$DownloadsTableReferences),
+      Download,
+      PrefetchHooks Function({bool episodeId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3300,4 +4226,6 @@ class $AppDatabaseManager {
       $$EpisodesTableTableManager(_db, _db.episodes);
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db, _db.settings);
+  $$DownloadsTableTableManager get downloads =>
+      $$DownloadsTableTableManager(_db, _db.downloads);
 }
