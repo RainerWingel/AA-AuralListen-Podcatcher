@@ -659,6 +659,37 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets('dark mode can be chosen in Optionen', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    ThemeMode mode() =>
+        tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode!;
+    expect(mode(), ThemeMode.system);
+
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+    await settle(tester);
+    await tester.tap(find.text('Dunkel'));
+    await settle(tester);
+    expect(mode(), ThemeMode.dark);
+    expect(
+      Theme.of(tester.element(find.byType(NavigationBar))).brightness,
+      Brightness.dark,
+    );
+
+    // The backup section is further down – scroll there like a user.
+    await tester.scrollUntilVisible(find.text('Backup erstellen'), 300);
+    await settle(tester);
+    expect(find.text('Backup erstellen'), findsOneWidget);
+    expect(find.text('Abos als OPML exportieren'), findsOneWidget);
+
+    await disposeApp(tester);
+  });
 }
 
 Future<void> handlerSeek(

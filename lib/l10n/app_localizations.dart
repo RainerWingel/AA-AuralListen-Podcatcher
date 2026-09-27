@@ -957,6 +957,132 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Markieren'**
   String get markAction;
+
+  /// No description provided for @settingsSectionAppearance.
+  ///
+  /// In de, this message translates to:
+  /// **'Darstellung'**
+  String get settingsSectionAppearance;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In de, this message translates to:
+  /// **'System'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In de, this message translates to:
+  /// **'Hell'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In de, this message translates to:
+  /// **'Dunkel'**
+  String get themeDark;
+
+  /// No description provided for @settingsSectionBackup.
+  ///
+  /// In de, this message translates to:
+  /// **'Sicherung'**
+  String get settingsSectionBackup;
+
+  /// No description provided for @opmlExport.
+  ///
+  /// In de, this message translates to:
+  /// **'Abos als OPML exportieren'**
+  String get opmlExport;
+
+  /// No description provided for @opmlExportSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Für andere Podcast-Apps'**
+  String get opmlExportSubtitle;
+
+  /// No description provided for @opmlExported.
+  ///
+  /// In de, this message translates to:
+  /// **'Abos exportiert'**
+  String get opmlExported;
+
+  /// No description provided for @backupCreate.
+  ///
+  /// In de, this message translates to:
+  /// **'Backup erstellen'**
+  String get backupCreate;
+
+  /// No description provided for @backupCreateSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Abos, Hörstand, Playlists, Lesezeichen, Einstellungen – ohne Audiodateien'**
+  String get backupCreateSubtitle;
+
+  /// No description provided for @backupCreated.
+  ///
+  /// In de, this message translates to:
+  /// **'Backup gespeichert'**
+  String get backupCreated;
+
+  /// No description provided for @backupRestore.
+  ///
+  /// In de, this message translates to:
+  /// **'Backup wiederherstellen'**
+  String get backupRestore;
+
+  /// No description provided for @backupRestoreSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Ersetzt alle aktuellen Daten'**
+  String get backupRestoreSubtitle;
+
+  /// No description provided for @backupInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Datei ist kein gültiges Backup dieser App.'**
+  String get backupInvalid;
+
+  /// No description provided for @backupTooNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Das Backup stammt aus einer neueren App-Version.'**
+  String get backupTooNew;
+
+  /// No description provided for @backupConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Backup wiederherstellen?'**
+  String get backupConfirmTitle;
+
+  /// No description provided for @backupConfirmBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Backup vom {date}:\n{podcasts} Abos · {episodes} Folgen · {playlists} Playlists · {bookmarks} Lesezeichen\n\nAlle aktuellen Daten werden ersetzt. Heruntergeladene Folgen werden gelöscht.'**
+  String backupConfirmBody(
+    String date,
+    int podcasts,
+    int episodes,
+    int playlists,
+    int bookmarks,
+  );
+
+  /// No description provided for @backupRestoreAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Wiederherstellen'**
+  String get backupRestoreAction;
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In de, this message translates to:
+  /// **'Backup wiederhergestellt'**
+  String get backupRestored;
+
+  /// No description provided for @saveFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Speichern fehlgeschlagen'**
+  String get saveFailed;
 }
 
 class _AppLocalizationsDelegate

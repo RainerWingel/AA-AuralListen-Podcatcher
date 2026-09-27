@@ -45,3 +45,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **ID3-Kapitel per HTTP-Range statt ganzer Datei** · WRINT hat nur so Kapitel (JSON-Links liefern 404); der Tag ist 0,1–1 MB, die Folge oft 50+ MB.
 - 2026-09-27 · **Kapitel-Reihenfolge Feed → JSON → ID3, Ergebnis in der DB** · schnellste/zuverlässigste Quelle zuerst, Netzwerk nur einmal pro Folge.
 - 2026-09-27 · **Migration v6 erzwingt erneut einen Voll-Refresh** · damit Podlove-Kapitel vorhandener Folgen gespeichert werden.
+- 2026-09-27 · **Paket `archive` für Backup-ZIPs** · wie geplant.
+- 2026-09-27 · **Speichern über den Android-Speichern-Dialog (file_picker.saveFile)** · Benutzer wählt Ort (Downloads, Drive); kein Teilen-Paket nötig, keine Temp-Dateien.
+- 2026-09-27 · **Wiederherstellung per ATTACH + Tabellenkopie statt Datei-Austausch** · kein App-Neustart nötig (audio_service hält den Prozess am Leben, ein Neustart wäre unzuverlässig); alte Backups werden vorher migriert.
+- 2026-09-27 · **Downloads gehören nicht ins Backup** · Audiodateien sind groß und jederzeit neu ladbar.

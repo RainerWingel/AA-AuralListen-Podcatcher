@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import '../audio/audio_providers.dart';
 import '../core/clock.dart';
+import 'backup/backup_service.dart';
 import 'bookmark_repository.dart';
 import 'chapters/chapter_service.dart';
 import 'db/app_database.dart';
@@ -208,4 +210,32 @@ final episodeBookmarksProvider = StreamProvider.autoDispose
 
 final allBookmarksProvider = StreamProvider.autoDispose<List<BookmarkEntry>>(
   (ref) => ref.watch(bookmarkRepositoryProvider).watchAll(),
+);
+
+/// Directory for short-lived files (backup snapshots); overridden in tests.
+final tempDirectoryProvider = Provider<Future<Directory> Function()>(
+  (ref) =>
+      () async =>
+          Directory('${(await getTemporaryDirectory()).path}/aapodcastguru'),
+);
+
+final backupServiceProvider = Provider<BackupService>(
+  (ref) => BackupService(
+    db: ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+    tempDirectory: ref.watch(tempDirectoryProvider),
+  ),
+);
+
+/// Light/dark mode chosen in Optionen (default: follow the system).
+final themeModeProvider = StreamProvider<ThemeMode>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.themeMode)
+      .map(
+        (v) => ThemeMode.values.firstWhere(
+          (m) => m.name == v,
+          orElse: () => ThemeMode.system,
+        ),
+      ),
 );

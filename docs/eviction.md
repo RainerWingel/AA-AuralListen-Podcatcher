@@ -63,7 +63,9 @@ Kein Hintergrund-Job. Gleichzeitige Aufrufe teilen sich einen Lauf.
   Beim Abo-Kündigen werden Podcast- und Folgen-Cover aus dem Cache entfernt. ✅
 - HTTP-Antworten werden mit Größenlimit gelesen (30 MB), Feed-XML nach dem Parsen verworfen. ✅
 - Temporäre Dateien (Backup-ZIP, OPML-Export) nach dem Teilen löschen.
-- Kopien des Datei-Pickers (OPML-Import) werden direkt nach dem Einlesen gelöscht. ✅
+- Kopien des Datei-Pickers (OPML-Import, Backup-Wiederherstellung) werden direkt nach dem Einlesen gelöscht. ✅
+- Backup-Schnappschüsse und entpackte Sicherungen (App-Cache `aapodcastguru/`) werden im `finally` gelöscht. ✅
+- Export/Backup werden direkt über den Speichern-Dialog geschrieben – keine liegenbleibenden Dateien. ✅
 
 ### Sichtbarkeit
 Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetzt aufräumen". Optionen: Limit + „Jetzt aufräumen".

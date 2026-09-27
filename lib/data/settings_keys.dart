@@ -6,6 +6,9 @@ abstract final class SettingsKeys {
   /// Global loudness boost in dB (default 0 = off).
   static const boostDb = 'player.boostDb';
 
+  /// Light/dark mode: `system`, `light` or `dark` (ThemeMode names).
+  static const themeMode = 'ui.themeMode';
+
   /// Upper limit for all downloaded audio files in bytes (default 5 GB).
   static const downloadLimitBytes = 'downloads.limitBytes';
 

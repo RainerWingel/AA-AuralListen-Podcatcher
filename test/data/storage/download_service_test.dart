@@ -386,6 +386,16 @@ void main() {
     });
   });
 
+  test('cancelAll stops every running download', () async {
+    final a = await addEpisode('a');
+    final b = await addEpisode('b');
+    await service.download(a);
+    await service.download(b);
+    await service.cancelAll();
+    expect(engine.canceled, unorderedEquals([a, b]));
+    expect(engine.active, isEmpty);
+  });
+
   test(
     'deleteForPodcast cancels and deletes everything of a podcast',
     () async {

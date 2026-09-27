@@ -55,7 +55,9 @@ Name, „N Folgen · zuletzt …"; Knöpfe „Alle" / „Keine". Die Liste ist a
 (erst Themen wählen, dann einschalten – sonst startet sofort alles). Das Blatt scrollt.
 
 ## Optionen
+Abschnitt „Darstellung": System / Hell / Dunkel (`settings['ui.themeMode']`, Dark Mode aus derselben Grundfarbe).
 Abschnitt „Hören": Lesezeichen (alle). Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
+Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wiederherstellen (`backup.md`).
 
 ## Infoboxen (SnackBars)
 - **Nur** über `showInfoSnackBar` (`lib/core/widgets/info_snack_bar.dart`) – nie `showSnackBar` direkt.
