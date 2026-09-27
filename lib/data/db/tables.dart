@@ -73,3 +73,14 @@ class Episodes extends Table {
     {podcastId, guid},
   ];
 }
+
+/// Simple key/value store for app settings and player state (schema v2).
+/// Keys are defined in `lib/data/settings_keys.dart`.
+@DataClassName('Setting')
+class Settings extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+
+  @override
+  Set<Column> get primaryKey => {key};
+}

@@ -12,7 +12,7 @@ part 'app_database.g.dart';
 typedef EpisodeWithPodcast = ({Episode episode, Podcast podcast});
 
 /// The single SQLite database of the app (think: EF Core DbContext).
-@DriftDatabase(tables: [Podcasts, Episodes])
+@DriftDatabase(tables: [Podcasts, Episodes, Settings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
     : super(
@@ -28,11 +28,17 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      // One step per version; each step is covered by test/data/db/migration_test.dart.
+      if (from < 2) {
+        await m.createTable(settings);
+      }
+    },
     beforeOpen: (details) async {
       // SQLite ignores foreign keys (and ON DELETE CASCADE) unless enabled per connection.
       await customStatement('PRAGMA foreign_keys = ON');

@@ -32,10 +32,13 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [ ] Castbox-Export auf dem Handy importieren (Benutzer)
 
 ## M3 – Player → erste produktiv nutzbare Version
-- [ ] `audio_service`-Handler, Benachrichtigung, Sperrbildschirm, Bluetooth
-- [ ] Streaming, −15 s / +30 s, Hörposition, 98 %-Regel
-- [ ] Lautstärke-Boost
-- [ ] Mini-Player + Vollbild-Player
+- [x] `audio_service`-Handler, Benachrichtigung, Sperrbildschirm, Bluetooth
+- [x] Streaming, −15 s / +30 s, Hörposition, 98 %-Regel
+- [x] Lautstärke-Boost (global + pro Podcast)
+- [x] Mini-Player + Vollbild-Player
+- [x] Folge antippen = abspielen; langes Drücken: Menü (als gespielt / ungespielt markieren)
+- [x] DB-Schema v2 (`settings`) inkl. Migrationstest
+- [ ] Praxistest auf dem S25: Sperrbildschirm, Bluetooth, Anruf, 10-Min-Pause (Benutzer)
 
 ## M4 – Downloads & Eviction
 - [ ] Manueller Download, Auto-Download pro Podcast

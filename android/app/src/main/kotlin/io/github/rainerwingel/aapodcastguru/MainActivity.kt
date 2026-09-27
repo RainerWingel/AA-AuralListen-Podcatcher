@@ -1,5 +1,6 @@
 package io.github.rainerwingel.aapodcastguru
 
-import io.flutter.embedding.android.FlutterActivity
+import com.ryanheise.audioservice.AudioServiceActivity
 
-class MainActivity : FlutterActivity()
+// audio_service shares its FlutterEngine with this activity (background playback).
+class MainActivity : AudioServiceActivity()

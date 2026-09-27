@@ -40,5 +40,7 @@ Bei jedem Push/PR: `flutter pub get` → `dart format --set-exit-if-changed` →
   diesen Schalter hätte einen kleineren `versionCode` und ließe sich nicht mehr über die installierte App spielen (Downgrade).
 - `Execution failed for task ':app:compileFlutterBuildRelease' … problem occurred starting process 'flutter'`:
   hängender Gradle-Daemon → `cd android && ./gradlew --stop`, dann erneut bauen.
+- Fehlen im Release-Build Benachrichtigungs-Symbole („You must specify an icon resource id to build a CustomAction" im Log):
+  `res/raw/keep.xml` prüfen – der Resource-Shrinker entfernt sonst die `audio_service_*`-Drawables.
 - Die Internet-Berechtigung steht in `android/app/src/main/AndroidManifest.xml` (Flutter legt sie standardmäßig nur für Debug an).
 - WLAN-Debugging reißt ab, wenn das Handy in den Standby geht – Bildschirm beim Installieren anlassen.

@@ -2,9 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:aapodcastguru/app/app.dart';
+import 'package:aapodcastguru/audio/audio_providers.dart';
+import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/feed/opml.dart';
+import 'package:aapodcastguru/data/playback_repository.dart';
 import 'package:aapodcastguru/data/providers.dart';
+import 'package:aapodcastguru/data/settings_repository.dart';
+import 'package:aapodcastguru/features/player/mini_player.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
 import 'package:aapodcastguru/features/settings/settings_screen.dart';
 import 'package:drift/native.dart';
@@ -13,6 +18,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+
+import 'support/fake_player_engine.dart';
 
 // Feed without images, so no network image loading happens in widget tests.
 const _feed = '''
@@ -55,16 +62,30 @@ Future<void> settle(WidgetTester tester) async {
 
 void main() {
   late AppDatabase db;
+  late FakePlayerEngine engine;
+  late PodcastAudioHandler handler;
 
-  setUp(() => db = AppDatabase.forTesting(NativeDatabase.memory()));
+  setUp(() {
+    db = AppDatabase.forTesting(NativeDatabase.memory());
+    engine = FakePlayerEngine();
+    handler = PodcastAudioHandler(
+      engine: engine,
+      playback: PlaybackRepository(db, DateTime.now),
+      settings: SettingsRepository(db),
+    );
+  });
   // Closing inside the widget test's fake-async zone never completes.
-  tearDown(() => db.close());
+  tearDown(() async {
+    await handler.dispose();
+    await db.close();
+  });
 
   Future<void> pumpApp(WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(db),
+          audioHandlerProvider.overrideWithValue(handler),
           httpClientProvider.overrideWithValue(
             MockClient(
               (request) async => switch (request.url.host) {
@@ -87,6 +108,8 @@ void main() {
 
   Future<void> disposeApp(WidgetTester tester) async {
     // Unmount so drift stream subscriptions are cancelled (DB is closed in tearDown).
+    // Stop the player first: its 10-minute pause timer must not outlive the test.
+    await tester.runAsync(handler.stop);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(milliseconds: 10));
   }
@@ -229,4 +252,67 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'plays an episode via mini player and full player',
+    timeout: timeout,
+    (tester) async {
+      // Galaxy S25 screen, so the full player fits without scrolling.
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      // The mini player is always in the tree but empty until something plays.
+      final miniPlayerContent = find.descendant(
+        of: find.byType(MiniPlayer),
+        matching: find.byType(InkWell),
+      );
+      expect(miniPlayerContent, findsNothing);
+
+      // Subscribe (see test above) to get an episode.
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+
+      // Mini player shows the episode and a pause button.
+      expect(engine.loadedUri, Uri.parse('https://example.com/1.mp3'));
+      expect(
+        find.descendant(
+          of: find.byType(MiniPlayer),
+          matching: find.text('Erste Folge'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.byTooltip('Läuft gerade'), findsOneWidget);
+      expect(find.byTooltip('Pause'), findsOneWidget);
+
+      // Open the full player.
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      expect(find.byType(Slider), findsOneWidget);
+      expect(find.text('Boost: Aus'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('30 Sekunden vor'));
+      await settle(tester);
+      expect(handler.position, const Duration(seconds: 30));
+
+      await tester.tap(find.byTooltip('Pause').first);
+      await settle(tester);
+      expect(engine.calls.last, 'pause');
+      expect(find.byTooltip('Abspielen'), findsWidgets);
+
+      await tester.tap(find.byTooltip('Player schließen'));
+      await settle(tester);
+      expect(find.byType(Slider), findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
 }

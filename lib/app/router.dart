@@ -1,9 +1,10 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/downloads/downloads_screen.dart';
 import '../features/episodes/home_screen.dart';
+import '../features/player/player_screen.dart';
 import '../features/playlists/playlists_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -17,6 +18,22 @@ final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     initialLocation: Routes.home,
     routes: [
+      // Outside the shell: covers the bottom navigation, slides up like a sheet.
+      GoRoute(
+        path: Routes.player,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const PlayerScreen(),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              SlideTransition(
+                position: Tween(begin: const Offset(0, 1), end: Offset.zero)
+                    .animate(
+                      CurveTween(curve: Curves.easeOutCubic).animate(animation),
+                    ),
+                child: child,
+              ),
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             AppShell(navigationShell: navigationShell),

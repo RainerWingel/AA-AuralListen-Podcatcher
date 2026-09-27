@@ -142,5 +142,34 @@
       }
     }
   },
-  "opmlResultFailedList": "Nicht importiert:"
+  "opmlResultFailedList": "Nicht importiert:",
+  "playerPlay": "Abspielen",
+  "playerPause": "Pause",
+  "playerRewind": "15 Sekunden zurück",
+  "playerForward": "30 Sekunden vor",
+  "playerClose": "Player schließen",
+  "playerOpen": "Player öffnen",
+  "nowPlaying": "Läuft gerade",
+  "boostTitle": "Lautstärke-Boost",
+  "boostOff": "Aus",
+  "boostValue": "+{db} dB",
+  "@boostValue": {
+    "placeholders": {
+      "db": {
+        "type": "int"
+      }
+    }
+  },
+  "boostButton": "Boost: {value}",
+  "@boostButton": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "boostPerPodcast": "Nur für diesen Podcast",
+  "boostPerPodcastHint": "Sonst gilt der Wert für alle Podcasts ohne eigene Einstellung.",
+  "markPlayed": "Als gespielt markieren",
+  "markUnplayed": "Als ungespielt markieren"
 }

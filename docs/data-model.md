@@ -1,8 +1,15 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 1** (M1: `podcasts`, `episodes`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
-Jede Schema-Änderung = `schemaVersion` erhöhen + Migration in `migration` + Test.
+Aktuell **schemaVersion 2** (v1: `podcasts`, `episodes`; v2: `settings`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+
+### Schema ändern (Pflichtablauf)
+1. Tabelle in `tables.dart` ändern/hinzufügen, `schemaVersion` erhöhen, Schritt in `onUpgrade` ergänzen (`if (from < N) …`).
+2. `dart run build_runner build --delete-conflicting-outputs`
+3. `dart run drift_dev schema dump lib/data/db/app_database.dart drift_schemas/` (Schnappschuss `drift_schema_vN.json`)
+4. `dart run drift_dev schema generate drift_schemas/ test/generated_migrations/`
+5. Testfall in `test/data/db/migration_test.dart` ergänzen (Upgrade + Daten bleiben erhalten).
+Alte Schnappschüsse in `drift_schemas/` **nie** löschen oder ändern.
 Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-outputs` (erzeugt `app_database.g.dart`, wird committet).
 
 | Tabelle | Wichtige Spalten |
@@ -14,14 +21,15 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 | `playlist_items` | playlistId, episodeId, position — (playlistId, episodeId) unique |
 | `chapters` | episodeId, startMs, title, imageUrl, url |
 | `bookmarks` | id, episodeId, positionMs, note, createdAt |
-| `settings` | key, value |
-| `player_state` | aktive Folge, aktive Playlist (für Wiederaufnahme nach App-Neustart) |
+| `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb` |
+| ~~`player_state`~~ | entfällt – letzte Folge steht in `settings`; aktive Playlist kommt in M5 ebenfalls dorthin |
 
 ## Episoden-Status
 - `neu` → `angefangen` (Position > 0) → `gespielt`.
 - **Gespielt** = Hörposition ≥ **98 %** der Dauer (oder Ende erreicht). `playedAt` wird dabei gesetzt –
   daran hängt die 96-h-Löschregel (`eviction.md`).
-- Manuell „als gespielt / ungespielt markieren" ist möglich. „Ungespielt" setzt `playedAt` zurück.
+- Manuell „als gespielt / ungespielt markieren" (langes Drücken auf eine Folge). „Ungespielt" → `neu`, Position 0, `playedAt` = null.
+- Beim Gespielt-Werden wird `positionMs` auf 0 gesetzt; Details zur Wiedergabe in `playback.md`.
 - Enums werden als Text gespeichert (`textEnum`) – Umbenennen eines Enum-Werts braucht eine Migration.
 - Beim Refresh werden Feed-Felder bekannter Folgen aktualisiert, **nie** aber Hörzustand (status, positionMs, playedAt).
 - Folgen, die aus dem Feed verschwinden, bleiben in der DB (Historie, Hörposition).
