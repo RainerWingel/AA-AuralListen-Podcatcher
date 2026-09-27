@@ -9,5 +9,51 @@
   "placeholderComingSoon": "Kommt bald",
   "@placeholderComingSoon": {
     "description": "Temporary text on screens that are not implemented yet."
+  },
+  "cancel": "Abbrechen",
+  "loadError": "Fehler beim Laden",
+
+  "homeEmpty": "Noch keine Folgen",
+  "homeEmptyHint": "Abonniere Podcasts im Tab „Abos“.",
+
+  "subscriptionsEmpty": "Noch keine Abos",
+  "subscriptionsEmptyHint": "Füge deinen ersten Podcast per RSS-URL hinzu.",
+  "addFeedAction": "Per RSS-URL hinzufügen",
+  "addFeedTitle": "Podcast hinzufügen",
+  "addFeedLabel": "RSS-URL",
+  "addFeedHint": "https://beispiel.de/feed.xml",
+  "addFeedSubmit": "Abonnieren",
+  "subscribeErrorInvalidUrl": "Das ist keine gültige Adresse.",
+  "subscribeErrorAlreadySubscribed": "Diesen Podcast hast du schon abonniert.",
+  "subscribeErrorNetwork": "Der Feed konnte nicht geladen werden. Bitte Adresse und Internetverbindung prüfen.",
+  "subscribeErrorNotAFeed": "Unter dieser Adresse liegt kein Podcast-Feed.",
+
+  "refreshFailed": "{count, plural, =1{1 Feed konnte nicht aktualisiert werden.} other{{count} Feeds konnten nicht aktualisiert werden.}}",
+  "@refreshFailed": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "podcastNotFound": "Podcast nicht gefunden",
+  "podcastRefreshError": "Letzte Aktualisierung fehlgeschlagen",
+  "episodeCount": "{count, plural, =0{Keine Folgen} =1{1 Folge} other{{count} Folgen}}",
+  "@episodeCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "episodeNew": "Neu",
+  "episodePlayed": "Gespielt",
+  "durationHoursMinutes": "{hours} Std. {minutes} Min.",
+  "@durationHoursMinutes": {
+    "placeholders": { "hours": { "type": "int" }, "minutes": { "type": "int" } }
+  },
+  "durationMinutes": "{minutes} Min.",
+  "@durationMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+
+  "unsubscribe": "Abo kündigen",
+  "unsubscribeConfirmTitle": "Abo kündigen?",
+  "unsubscribeConfirmBody": "„{title}“ und alle Folgen werden aus der App entfernt.",
+  "@unsubscribeConfirmBody": {
+    "placeholders": { "title": { "type": "String" } }
   }
 }

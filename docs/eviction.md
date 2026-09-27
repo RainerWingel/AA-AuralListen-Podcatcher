@@ -35,7 +35,10 @@ Speicherlecks – im Arbeitsspeicher wie auf dem Datenträger – gelten als **F
 - Abo kündigen → alle Dateien, Downloads-Einträge und Cover-Cache-Einträge des Podcasts löschen.
 
 ### Caches
-- Cover-Bilder: eigener `CacheManager` mit fester Obergrenze (z. B. 300 Objekte, 30 Tage).
+- Cover-Bilder: `CoverCacheManager` (`lib/data/storage/cover_cache.dart`) mit fester Obergrenze: 300 Objekte, 30 Tage. ✅
+  Dekodiert wird nur in Anzeigegröße (`CoverImage`, `memCacheWidth`). ✅
+  Beim Abo-Kündigen werden Podcast- und Folgen-Cover aus dem Cache entfernt. ✅
+- HTTP-Antworten werden mit Größenlimit gelesen (30 MB), Feed-XML nach dem Parsen verworfen. ✅
 - Temporäre Dateien (Backup-ZIP, OPML-Export) nach dem Teilen löschen.
 
 ### Sichtbarkeit

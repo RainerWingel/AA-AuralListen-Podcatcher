@@ -47,5 +47,6 @@ dart run build_runner build --delete-conflicting-outputs   # Codegenerierung (Dr
 flutter analyze
 flutter test
 flutter run                   # auf dem verbundenen Galaxy S25 (WLAN-Debugging)
-flutter build apk --release   # signiert mit Release-Keystore, falls android/key.properties existiert
+flutter build apk --release --split-per-abi   # signiert mit Release-Keystore (android/key.properties)
+dart run tool/smoke_feeds.dart "Suchbegriff"  # Parser gegen echte Feeds testen
 ```

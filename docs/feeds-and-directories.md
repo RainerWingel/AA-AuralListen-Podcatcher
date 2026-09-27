@@ -12,12 +12,31 @@
   sondern in `config/secrets.json` (gitignored) und per `--dart-define-from-file` einbauen.
 
 ## RSS
-- Eigener Parser auf Basis von `xml`: RSS 2.0 + `itunes:` + `podcast:` (Podcasting 2.0) + `psc:` (Podlove Chapters).
+Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart`), Ablauf in `lib/data/podcast_repository.dart`.
+- Eigener Parser auf Basis von `xml`: RSS 2.0 + `itunes:` + `content:` + `podcast:` (Podcasting 2.0); `psc:` (Podlove Chapters) folgt in M6.
+- Namespaced Elemente werden über die Namespace-URI gefunden; fehlt die Deklaration im Feed, über den Präfix
+  (sonst würde ein undeklariertes `itunes:image` mit `<image>` verwechselt).
+- Nur Audio: Items ohne `enclosure` oder mit `video/*` werden übersprungen (reine Video-Feeds wie „tagesschau" haben daher 0 Folgen).
+- Doppelte guids im Feed: erstes Vorkommen gewinnt.
+- `pubDate`: RFC 822 inkl. üblicher Abweichungen (Zonennamen, 2-stellige Jahre, ohne Sekunden) + ISO 8601.
+- `itunes:duration`: Sekunden, `MM:SS`, `HH:MM:SS`.
+- Show-Notes werden zu Klartext (max. 4000 Zeichen).
 - Folgen-Identität: `guid`, Fallback `enclosure url`.
-- Conditional GET mit `ETag` / `If-Modified-Since`; 304 → nichts tun.
-- Redirects (301) → gespeicherte `feedUrl` aktualisieren.
-- Aktualisierung nur beim App-Start und per Pull-to-Refresh, parallel mit Begrenzung (z. B. 4 gleichzeitig).
-- Fehlerhafte Feeds brechen den Refresh der anderen nicht ab; Fehler werden am Podcast angezeigt.
+- Conditional GET mit `ETag` / `If-Modified-Since`; 304 → nur `lastRefreshAt` setzen.
+- Redirects werden manuell verfolgt (max. 5). Nur wenn **alle** permanent sind (301/308), wird die gespeicherte `feedUrl` ersetzt.
+- Schutz: Timeout 30 s, max. 30 MB pro Feed. Zeichensatz aus `Content-Type` bzw. XML-Deklaration (UTF-8, ISO-8859-1), BOM wird entfernt.
+- User-Agent: `AA-PodcastGuru/<version> (+Repo-URL)`.
+- Eingabe-URLs werden normalisiert: `https://` wird ergänzt, `feed://`/`itpc://`/`pcast://` → `https://`.
+- Aktualisierung nur beim App-Start (`main.dart`) und per Pull-to-Refresh, max. 4 Feeds parallel.
+  Gleichzeitige Aufrufe teilen sich einen Lauf.
+- Fehlerhafte Feeds brechen den Refresh der anderen nicht ab; Fehler landen in `podcasts.lastError` und werden
+  im Raster (rotes Symbol) und im Podcast-Detail angezeigt.
+
+## Smoke-Test gegen echte Feeds
+```bash
+dart run tool/smoke_feeds.dart "Lage der Nation" "Hotel Matze"
+```
+Sucht über iTunes, lädt und parst die Feeds und zeigt Anzahl Folgen / Datum / Dauer. Nach Parser-Änderungen ausführen.
 
 ## OPML
 - Import: Datei auswählen (Castbox → Einstellungen → OPML exportieren), alle `outline` mit `xmlUrl` übernehmen,
