@@ -124,10 +124,10 @@ abstract class AppLocalizations {
   /// **'Downloads'**
   String get navDownloads;
 
-  /// No description provided for @navSettings.
+  /// Short tab label (5 tabs must fit on a phone). The screen title is settingsTitle.
   ///
   /// In de, this message translates to:
-  /// **'Einstellungen'**
+  /// **'Optionen'**
   String get navSettings;
 
   /// Temporary text on screens that are not implemented yet.
@@ -531,6 +531,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Als ungespielt markieren'**
   String get markUnplayed;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Einstellungen'**
+  String get settingsTitle;
 }
 
 class _AppLocalizationsDelegate

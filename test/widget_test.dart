@@ -12,6 +12,7 @@ import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
 import 'package:aapodcastguru/features/settings/settings_screen.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -127,7 +128,7 @@ void main() {
         'Abos',
         'Playlists',
         'Downloads',
-        'Einstellungen',
+        'Optionen',
       ]) {
         expect(
           find.widgetWithText(NavigationDestination, label),
@@ -219,9 +220,7 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
-    await tester.tap(
-      find.widgetWithText(NavigationDestination, 'Einstellungen'),
-    );
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
     await settle(tester);
 
     // The file picker is a platform plugin; start the flow after picking.
@@ -315,4 +314,67 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  // Regression (screenshot from the S25): "Einstellungen" wrapped in the tab
+  // bar, and long podcast names pushed date/duration out of the episode row.
+  testWidgets('layout fits a Galaxy S25 with enlarged font', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.runAsync(() async {
+      final podcastId = await db
+          .into(db.podcasts)
+          .insert(
+            PodcastsCompanion.insert(
+              feedUrl: 'https://example.com/lang',
+              title: 'wrint: gespräche zum runterladen – ein sehr langer Name',
+              subscribedAt: DateTime(2026),
+            ),
+          );
+      await db
+          .into(db.episodes)
+          .insert(
+            EpisodesCompanion.insert(
+              podcastId: podcastId,
+              guid: 'x',
+              title: 'Stadt Land Ost West',
+              audioUrl: 'https://example.com/x.mp3',
+              pubDate: Value(DateTime(2025, 9, 26)),
+              durationMs: const Value(4 * 3600 * 1000 + 5 * 60 * 1000),
+              addedAt: DateTime(2026),
+            ),
+          );
+    });
+    await pumpApp(tester);
+
+    // Widget tests use a font whose glyphs are 1 em wide squares, so real line
+    // breaks cannot be measured here (the real look is checked on the S25).
+    // Rule instead: no tab label longer than "Downloads", which fits on the S25.
+    final labels = tester
+        .widgetList<NavigationDestination>(find.byType(NavigationDestination))
+        .map((d) => d.label);
+    expect(labels, hasLength(5));
+    for (final label in labels) {
+      expect(
+        label.length,
+        lessThanOrEqualTo('Downloads'.length),
+        reason: label,
+      );
+    }
+
+    // Date and duration have their own line, separate from the podcast name.
+    expect(find.text('26. September 2025 · 4 Std. 5 Min.'), findsOneWidget);
+    expect(
+      find.text('wrint: gespräche zum runterladen – ein sehr langer Name'),
+      findsOneWidget,
+    );
+
+    await disposeApp(tester);
+  });
 }

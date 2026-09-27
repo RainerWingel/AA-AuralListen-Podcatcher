@@ -5,7 +5,10 @@
   "navSubscriptions": "Abos",
   "navPlaylists": "Playlists",
   "navDownloads": "Downloads",
-  "navSettings": "Einstellungen",
+  "navSettings": "Optionen",
+  "@navSettings": {
+    "description": "Short tab label (5 tabs must fit on a phone). The screen title is settingsTitle."
+  },
   "placeholderComingSoon": "Kommt bald",
   "@placeholderComingSoon": {
     "description": "Temporary text on screens that are not implemented yet."
@@ -171,5 +174,6 @@
   "boostPerPodcast": "Nur für diesen Podcast",
   "boostPerPodcastHint": "Sonst gilt der Wert für alle Podcasts ohne eigene Einstellung.",
   "markPlayed": "Als gespielt markieren",
-  "markUnplayed": "Als ungespielt markieren"
+  "markUnplayed": "Als ungespielt markieren",
+  "settingsTitle": "Einstellungen"
 }
