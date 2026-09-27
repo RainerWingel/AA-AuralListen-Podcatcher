@@ -7,6 +7,7 @@ import '../../core/widgets/cover_image.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import 'boost_sheet.dart';
+import 'chapters_and_bookmarks.dart';
 import 'player_controls.dart';
 
 /// Full-screen player (opened from the mini player).
@@ -65,6 +66,8 @@ class PlayerScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 16),
                         _SeekBar(total: item.duration),
+                        if (item.extras?['episodeId'] case final int id)
+                          CurrentChapterLine(episodeId: id),
                         const SizedBox(height: 8),
                         const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -74,6 +77,8 @@ class PlayerScreen extends ConsumerWidget {
                             SkipButton.forward(),
                           ],
                         ),
+                        if (item.extras?['episodeId'] case final int id)
+                          ChapterBookmarkButtons(episodeId: id),
                         if (item.extras?['playlistId'] case final int id)
                           _PlaylistRow(playlistId: id),
                         const SizedBox(height: 8),

@@ -122,4 +122,40 @@ void main() {
       expect(feed.episodes.map((e) => e.theme), ['zum-thema', null]);
     });
   });
+
+  group('chapters in the feed', () {
+    test('Podlove simple chapters are parsed and sorted', () {
+      final feed = parser.parse('''
+<rss xmlns:psc="http://podlove.org/simple-chapters"><channel><title>T</title>
+  <item><title>A</title><guid>a</guid>
+    <enclosure url="https://example.com/a.mp3" type="audio/mpeg"/>
+    <psc:chapters version="1.2">
+      <psc:chapter title="Heimweh" start="00:03:20"/>
+      <psc:chapter title="Neueste Geschichte" start="00:00:00"/>
+      <psc:chapter title="Kurz" start="1:02.5" href="https://example.com"/>
+    </psc:chapters>
+  </item>
+</channel></rss>''');
+      final chapters = feed.episodes.single.chapters;
+      expect(chapters.map((c) => c.title), [
+        'Neueste Geschichte',
+        'Kurz',
+        'Heimweh',
+      ]);
+      expect(chapters[1].start, const Duration(milliseconds: 62500));
+      expect(chapters[1].url, 'https://example.com');
+      expect(chapters[2].start, const Duration(minutes: 3, seconds: 20));
+    });
+
+    test('podcast:chapters with href (Podigee) is understood', () {
+      final feed = parser.parse('''
+<rss xmlns:podcast="https://podcastindex.org/namespace/1.0"><channel><title>T</title>
+  <item><title>A</title><guid>a</guid>
+    <enclosure url="https://example.com/a.mp3" type="audio/mpeg"/>
+    <podcast:chapters href="https://example.com/c.json" type="application/json+chapters"/>
+  </item>
+</channel></rss>''');
+      expect(feed.episodes.single.chaptersUrl, 'https://example.com/c.json');
+    });
+  });
 }

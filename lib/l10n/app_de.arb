@@ -291,5 +291,44 @@
     }
   },
   "selectAll": "Alle",
-  "selectNone": "Keine"
+  "selectNone": "Keine",
+  "chapters": "Kapitel",
+  "chapterCurrent": "Kapitel {index}/{count}: {title}",
+  "@chapterCurrent": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "bookmarkAdd": "Lesezeichen setzen",
+  "bookmarkNote": "Notiz (optional)",
+  "bookmarkAdded": "Lesezeichen bei {time} gesetzt",
+  "@bookmarkAdded": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "bookmarks": "Lesezeichen",
+  "bookmarksCount": "Lesezeichen ({count})",
+  "@bookmarksCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bookmarksEmpty": "Keine Lesezeichen",
+  "bookmarksEmptyHint": "Im Player auf „Lesezeichen setzen“ tippen.",
+  "bookmarkDeleted": "Lesezeichen gelöscht",
+  "bookmarkEditNote": "Notiz bearbeiten",
+  "settingsSectionListening": "Hören"
 }

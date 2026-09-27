@@ -366,6 +366,63 @@ class PodcastRepository {
     int podcastId,
     List<ParsedEpisode> episodes,
     DateTime now,
+  ) async {
+    await _upsertEpisodeRows(podcastId, episodes, now);
+    await _storeFeedChapters(podcastId, episodes);
+  }
+
+  /// Podlove chapters from the feed – only for episodes without chapters yet,
+  /// so a refresh does not rewrite them every time.
+  Future<void> _storeFeedChapters(
+    int podcastId,
+    List<ParsedEpisode> episodes,
+  ) async {
+    final withChapters = {
+      for (final e in episodes)
+        if (e.chapters.isNotEmpty) e.guid: e.chapters,
+    };
+    if (withChapters.isEmpty) return;
+
+    final ids = {
+      for (final row
+          in await (_db.select(_db.episodes)..where(
+                (e) =>
+                    e.podcastId.equals(podcastId) &
+                    e.guid.isIn(withChapters.keys),
+              ))
+              .get())
+        row.guid: row.id,
+    };
+    final alreadyStored =
+        (await (_db.selectOnly(_db.chapters, distinct: true)
+                  ..addColumns([_db.chapters.episodeId])
+                  ..where(_db.chapters.episodeId.isIn(ids.values)))
+                .map((r) => r.read(_db.chapters.episodeId)!)
+                .get())
+            .toSet();
+
+    await _db.batch((batch) {
+      withChapters.forEach((guid, chapters) {
+        final id = ids[guid];
+        if (id == null || alreadyStored.contains(id)) return;
+        batch.insertAll(_db.chapters, [
+          for (final c in chapters)
+            ChaptersCompanion.insert(
+              episodeId: id,
+              startMs: c.start.inMilliseconds,
+              title: c.title,
+              url: Value(c.url),
+              imageUrl: Value(c.imageUrl),
+            ),
+        ]);
+      });
+    });
+  }
+
+  Future<void> _upsertEpisodeRows(
+    int podcastId,
+    List<ParsedEpisode> episodes,
+    DateTime now,
   ) => _db.batch((batch) {
     for (final e in episodes) {
       batch.insert(

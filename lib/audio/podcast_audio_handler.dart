@@ -120,23 +120,39 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _broadcastState();
   }
 
-  /// Starts [episodeId] (resuming at its saved position). With [playlistId]
+  /// Starts [episodeId] (resuming at its saved position, or exactly at
+  /// [startAt], e.g. a bookmark). With [playlistId]
   /// the playlist becomes active: when the episode ends, the next one of that
   /// playlist starts. Without it, playback stops at the end.
-  Future<void> playEpisode(int episodeId, {int? playlistId}) async {
+  Future<void> playEpisode(
+    int episodeId, {
+    int? playlistId,
+    Duration? startAt,
+  }) async {
     await _setActivePlaylist(episodeId, playlistId);
     if (episodeId == _episodeId && _loaded) {
       mediaItem.add(_withPlaylist(mediaItem.value));
+      if (startAt != null) await seek(startAt);
       return play();
     }
 
     await _saveCurrentPosition();
-    final row = await _playback.load(episodeId);
+    var row = await _playback.load(episodeId);
     if (row == null) return;
+
+    if (startAt != null) {
+      // E.g. from a bookmark: start exactly there (played episodes too).
+      if (row.episode.status == EpisodeStatus.played) {
+        await _playback.restartPlayed(episodeId);
+      }
+      await _playback.savePosition(episodeId, startAt);
+      row = await _playback.load(episodeId);
+      if (row == null) return;
+    }
 
     _episodeId = episodeId;
     _loaded = false;
-    _exactStart = false;
+    _exactStart = startAt != null;
     mediaItem.add(_withPlaylist(_toMediaItem(row)));
     _setIdlePosition(_savedPosition(row.episode));
     await _settings.set(SettingsKeys.lastEpisodeId, '$episodeId');

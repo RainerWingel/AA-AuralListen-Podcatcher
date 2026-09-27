@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/bookmarks/bookmarks_screen.dart';
 import '../features/downloads/downloads_screen.dart';
 import '../features/episodes/home_screen.dart';
 import '../features/player/player_screen.dart';
@@ -77,7 +78,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           _branch(Routes.downloads, const DownloadsScreen()),
-          _branch(Routes.settings, const SettingsScreen()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.settings,
+                builder: (context, state) => const SettingsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'lesezeichen',
+                    builder: (context, state) => const BookmarksScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     ],

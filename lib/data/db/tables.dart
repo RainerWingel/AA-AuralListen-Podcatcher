@@ -142,3 +142,30 @@ class PlaylistItems extends Table {
   @override
   Set<Column> get primaryKey => {playlistId, episodeId};
 }
+
+/// Chapters of an episode (schema v6). Sources: feed (Podlove), JSON file,
+/// ID3 tag of the MP3 – see docs/playback.md.
+@DataClassName('Chapter')
+class Chapters extends Table {
+  IntColumn get episodeId =>
+      integer().references(Episodes, #id, onDelete: KeyAction.cascade)();
+  IntColumn get startMs => integer()();
+  TextColumn get title => text()();
+  TextColumn get url => text().nullable()();
+  TextColumn get imageUrl => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {episodeId, startMs};
+}
+
+/// Bookmarks with an optional note (schema v6). Kept when the audio file is
+/// evicted; deleted with the episode (unsubscribe).
+@DataClassName('Bookmark')
+class Bookmarks extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get episodeId =>
+      integer().references(Episodes, #id, onDelete: KeyAction.cascade)();
+  IntColumn get positionMs => integer()();
+  TextColumn get note => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+}
