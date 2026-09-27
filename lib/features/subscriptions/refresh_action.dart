@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -15,8 +16,6 @@ Future<void> refreshAllFeeds(BuildContext context, WidgetRef ref) async {
   // New episodes may need auto-downloading; played ones may be due for deletion.
   unawaited(ref.read(downloadServiceProvider).runMaintenance());
   if (summary.failed > 0) {
-    messenger.showSnackBar(
-      SnackBar(content: Text(l10n.refreshFailed(summary.failed))),
-    );
+    showInfoSnackBar(messenger, l10n.refreshFailed(summary.failed));
   }
 }

@@ -5,6 +5,7 @@ import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../data/storage/download_service.dart';
@@ -15,14 +16,11 @@ Future<void> cleanUpDownloads(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   final result = await ref.read(downloadServiceProvider).runMaintenance();
-  messenger.showSnackBar(
-    SnackBar(
-      content: Text(
-        result.freedBytes > 0
-            ? l10n.cleanUpResult(formatBytes(result.freedBytes))
-            : l10n.cleanUpNothing,
-      ),
-    ),
+  showInfoSnackBar(
+    messenger,
+    result.freedBytes > 0
+        ? l10n.cleanUpResult(formatBytes(result.freedBytes))
+        : l10n.cleanUpNothing,
   );
 }
 

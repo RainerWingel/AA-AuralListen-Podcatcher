@@ -51,6 +51,13 @@ Podcast-Detail → ⋮ → „Podcast-Einstellungen" (Bottom-Sheet): Automatisch
 ## Optionen
 Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
 
+## Infoboxen (SnackBars)
+- **Nur** über `showInfoSnackBar` (`lib/core/widgets/info_snack_bar.dart`) – nie `showSnackBar` direkt.
+- Regel des Benutzers: **höchstens 7 Sekunden** sichtbar. Ohne Knopf 4 s, mit Knopf (z. B. „Rückgängig") 6 s.
+- Eine neue Meldung ersetzt die aktuelle sofort (keine Warteschlange).
+- Hintergrund: Flutter lässt SnackBars **mit** Knopf standardmäßig stehen, bis man sie wegwischt (`persist`); der Helfer
+  setzt `persist: false`. Test: `test/core/info_snack_bar_test.dart`.
+
 ## Texte
 - Alle Texte in `lib/l10n/app_de.arb`, Du-Form, kurz.
 - Fehlermeldungen verständlich, ohne Stacktraces („Feed konnte nicht geladen werden").

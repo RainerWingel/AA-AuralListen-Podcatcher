@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/routes.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/directory/directory_search.dart';
 import '../../data/podcast_repository.dart';
 import '../../data/providers.dart';
@@ -62,28 +63,23 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           .subscribe(result.feedUrl);
       if (!mounted) return;
       setState(() => _justSubscribed.add(result.feedUrl));
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.subscribedSnack(result.title)),
-          action: SnackBarAction(
-            label: l10n.open,
-            onPressed: () => context.go(Routes.podcast(id)),
-          ),
+      showInfoSnackBar(
+        messenger,
+        l10n.subscribedSnack(result.title),
+        action: SnackBarAction(
+          label: l10n.open,
+          onPressed: () => context.go(Routes.podcast(id)),
         ),
       );
     } on SubscribeException catch (e) {
       if (!mounted) return;
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(switch (e.error) {
-            SubscribeError.invalidUrl => l10n.subscribeErrorInvalidUrl,
-            SubscribeError.alreadySubscribed =>
-              l10n.subscribeErrorAlreadySubscribed,
-            SubscribeError.network => l10n.subscribeErrorNetwork,
-            SubscribeError.notAFeed => l10n.subscribeErrorNotAFeed,
-          }),
-        ),
-      );
+      showInfoSnackBar(messenger, switch (e.error) {
+        SubscribeError.invalidUrl => l10n.subscribeErrorInvalidUrl,
+        SubscribeError.alreadySubscribed =>
+          l10n.subscribeErrorAlreadySubscribed,
+        SubscribeError.network => l10n.subscribeErrorNetwork,
+        SubscribeError.notAFeed => l10n.subscribeErrorNotAFeed,
+      });
     } finally {
       if (mounted) setState(() => _busy.remove(result.feedUrl));
     }

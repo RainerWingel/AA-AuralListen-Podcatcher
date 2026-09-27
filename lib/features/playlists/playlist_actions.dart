@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/info_snack_bar.dart';
 import '../../core/widgets/text_input_dialog.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
@@ -117,11 +118,8 @@ Future<void> addToPlaylist(
 
   final added = await repo.add(chosen, episodeId);
   final name = (await repo.playlists()).firstWhere((p) => p.id == chosen).name;
-  messenger.showSnackBar(
-    SnackBar(
-      content: Text(
-        added ? l10n.addedToPlaylist(name) : l10n.alreadyInPlaylist(name),
-      ),
-    ),
+  showInfoSnackBar(
+    messenger,
+    added ? l10n.addedToPlaylist(name) : l10n.alreadyInPlaylist(name),
   );
 }
