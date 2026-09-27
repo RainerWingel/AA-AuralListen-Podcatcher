@@ -119,7 +119,19 @@ class _ChaptersSheet extends ConsumerWidget {
     final chapters = ref.watch(chaptersProvider(episodeId)).value ?? const [];
     final position = ref.watch(positionProvider).value ?? handler.position;
     final current = currentChapter(chapters, position);
+    final skipped =
+        ref.watch(skippedChaptersProvider(episodeId)).value ?? const {};
     final colors = Theme.of(context).colorScheme;
+
+    Future<void> setSkipped(int index, {required bool skip}) =>
+        handler.setChapterSkipped(
+          episodeId,
+          chapters[index].startMs,
+          endMs: index + 1 < chapters.length
+              ? chapters[index + 1].startMs
+              : null,
+          skipped: skip,
+        );
 
     return SafeArea(
       child: ConstrainedBox(
@@ -136,21 +148,37 @@ class _ChaptersSheet extends ConsumerWidget {
                 itemCount: chapters.length,
                 itemBuilder: (context, index) {
                   final c = chapters[index];
+                  final isSkipped = skipped.contains(c.startMs);
                   return ListTile(
                     selected: c == current,
                     selectedTileColor: colors.secondaryContainer,
                     leading: c.imageUrl == null
                         ? null
                         : CoverImage(url: c.imageUrl, size: 40),
-                    title: Text(c.title),
-                    trailing: Text(
+                    title: Text(
+                      c.title,
+                      style: isSkipped
+                          ? TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              color: colors.onSurfaceVariant,
+                            )
+                          : null,
+                    ),
+                    subtitle: Text(
                       formatClock(Duration(milliseconds: c.startMs)),
                     ),
-                    onTap: () {
+                    trailing: FilterChip(
+                      label: Text(l10n.chapterSkip),
+                      tooltip: l10n.chapterSkipHint,
+                      selected: isSkipped,
+                      onSelected: (skip) =>
+                          unawaited(setSkipped(index, skip: skip)),
+                    ),
+                    onTap: () async {
                       Navigator.of(context).pop();
-                      unawaited(
-                        handler.seek(Duration(milliseconds: c.startMs)),
-                      );
+                      // Choosing a chapter means: hear it after all.
+                      if (isSkipped) await setSkipped(index, skip: false);
+                      await handler.seek(Duration(milliseconds: c.startMs));
                     },
                   );
                 },

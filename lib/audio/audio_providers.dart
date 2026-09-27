@@ -25,6 +25,13 @@ final positionProvider = StreamProvider.autoDispose<Duration>(
   (ref) => ref.watch(audioHandlerProvider).positionStream,
 );
 
+/// Start times (ms) of the chapters marked "Skip" (in memory only).
+final skippedChaptersProvider = StreamProvider.autoDispose
+    .family<Set<int>, int>(
+      (ref, episodeId) =>
+          ref.watch(audioHandlerProvider).chapterSkips.watch(episodeId),
+    );
+
 final globalBoostProvider = StreamProvider.autoDispose<double>(
   (ref) => ref
       .watch(settingsRepositoryProvider)

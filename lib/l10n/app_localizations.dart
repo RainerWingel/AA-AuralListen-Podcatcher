@@ -1125,6 +1125,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{count, plural, =1{1 Podcast ist umgezogen – die Adresse wurde aktualisiert.} other{{count} Podcasts sind umgezogen – die Adressen wurden aktualisiert.}}'**
   String feedsMoved(int count);
+
+  /// No description provided for @chapterSkip.
+  ///
+  /// In de, this message translates to:
+  /// **'Skip'**
+  String get chapterSkip;
+
+  /// No description provided for @chapterSkipHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Kapitel beim Abspielen überspringen (gilt bis zum Neustart der App)'**
+  String get chapterSkipHint;
 }
 
 class _AppLocalizationsDelegate

@@ -84,6 +84,19 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
   aktuelles Kapitel hervorgehoben, Tippen springt dorthin.
 - Werkzeug: `dart run tool/smoke_chapters.dart <Feed-URL>` prüft ID3-Kapitel echter Folgen.
 
+### Kapitel überspringen („Skip", Benutzerwunsch)
+- In der Kapitel-Liste hat jedes Kapitel einen Umschalt-Chip **„Skip"**; übersprungene Kapitel sind durchgestrichen.
+- Nur im Arbeitsspeicher (`lib/audio/chapter_skips.dart`, gehört dem `PodcastAudioHandler`), **nicht** in der DB,
+  nicht im Backup; nach einem App-Neustart ist alles wieder normal. Höchstens 20 Folgen werden gemerkt (älteste fliegt).
+- Die Logik steckt im Handler (nicht in der UI), damit sie auch bei ausgeschaltetem Bildschirm greift:
+  Landet eine Positionsmeldung in einem übersprungenen Kapitel `[Start, nächster Start)`, springt der Player ans Ende;
+  mehrere übersprungene Kapitel hintereinander in einem Sprung.
+- Wird das **aktuelle** Kapitel auf Skip gesetzt, springt der Player sofort weiter.
+- Ist das **letzte** Kapitel übersprungen, endet die Folge dort wie regulär: „gespielt", raus aus allen Playlists,
+  nächste Playlist-Folge startet.
+- Tippen auf ein übersprungenes Kapitel in der Liste hebt Skip auf und springt dorthin („doch hören").
+- Auch −15 s aus dem Folgekapitel in ein übersprungenes Kapitel hinein wird wieder nach vorn gesprungen (gewollt).
+
 ## Lesezeichen (M6 ✅)
 - Vollbild-Player → „Lesezeichen setzen": merkt die Position **beim Tippen** (Wiedergabe läuft weiter), optional Notiz.
 - „Lesezeichen (n)" im Player: Liste der Folge, Tippen springt. Optionen → „Lesezeichen": alle, neueste zuerst;

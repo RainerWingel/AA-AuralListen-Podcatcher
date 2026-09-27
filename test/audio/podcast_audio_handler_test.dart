@@ -346,6 +346,59 @@ void main() {
     expect(handler.mediaItem.value!.title, 'Folge 2');
   });
 
+  group('skipped chapters (in memory)', () {
+    Future<void> skip(int startMin, int? endMin, [int? id]) =>
+        handler.setChapterSkipped(
+          id ?? episodeId,
+          startMin * 60000,
+          endMs: endMin == null ? null : endMin * 60000,
+          skipped: true,
+        );
+
+    test('entering a skipped chapter jumps to its end', () async {
+      await handler.playEpisode(episodeId);
+      await skip(2, 4);
+      engine.emitPosition(const Duration(minutes: 1, seconds: 59));
+      await pumpEventQueue();
+      expect(engine.position, const Duration(minutes: 1, seconds: 59));
+
+      engine.emitPosition(const Duration(minutes: 2));
+      await pumpEventQueue();
+      expect(engine.position, const Duration(minutes: 4));
+      expect((await episode()).positionMs, 4 * 60000);
+    });
+
+    test('skipping the current chapter jumps at once', () async {
+      await handler.playEpisode(episodeId); // starts at 0:57
+      await skip(0, 3);
+      expect(engine.position, const Duration(minutes: 3));
+    });
+
+    test('skipping the last chapter finishes the episode', () async {
+      final playlistId = (await db.select(db.playlists).getSingle()).id;
+      final ep2 = await addEpisode('2');
+      await playlists.add(playlistId, episodeId);
+      await playlists.add(playlistId, ep2);
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+
+      await skip(8, null);
+      engine.emitPosition(const Duration(minutes: 8, seconds: 1));
+      await pumpEventQueue();
+
+      expect((await episode()).status, EpisodeStatus.played);
+      expect(handler.currentEpisodeId, ep2);
+    });
+
+    test('skips only apply to their own episode', () async {
+      final ep2 = await addEpisode('2');
+      await skip(2, 4, ep2);
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 3));
+      await pumpEventQueue();
+      expect(engine.position, const Duration(minutes: 3));
+    });
+  });
+
   group('playlists (docs/playlists.md)', () {
     late int playlistId;
     late int ep2;

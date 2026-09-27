@@ -649,4 +649,11 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get chapterSkip => 'Skip';
+
+  @override
+  String get chapterSkipHint =>
+      'Kapitel beim Abspielen überspringen (gilt bis zum Neustart der App)';
 }

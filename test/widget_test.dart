@@ -602,6 +602,21 @@ void main() {
     expect(find.text('Lesezeichen bei 10:00 gesetzt'), findsOneWidget);
     expect(find.text('Lesezeichen (1)'), findsOneWidget);
 
+    // "Skip" marks a chapter in memory; choosing it later un-skips it.
+    await tester.ensureVisible(find.text('Kapitel (2)'));
+    await tester.tap(find.text('Kapitel (2)'));
+    await settle(tester);
+    await tester.tap(find.widgetWithText(FilterChip, 'Skip').first);
+    await settle(tester);
+    expect(handler.chapterSkips.skippedStarts(handler.currentEpisodeId!), {0});
+    await tester.tap(find.text('Begrüßung'));
+    await settle(tester);
+    expect(
+      handler.chapterSkips.skippedStarts(handler.currentEpisodeId!),
+      isEmpty,
+    );
+    expect(handler.position, Duration.zero);
+
     // Global list in Optionen → tap plays from the bookmark.
     await tester.tap(find.byTooltip('Player schließen'));
     await settle(tester);
