@@ -8,6 +8,7 @@ import '../data/playback_repository.dart';
 import '../data/playlist_repository.dart';
 import '../data/settings_keys.dart';
 import '../data/settings_repository.dart';
+import 'chapter_skips.dart';
 import 'player_engine.dart';
 
 /// The app's single player (see docs/playback.md).
@@ -74,6 +75,10 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   bool _loaded = false;
   bool _markedPlayed = false;
   bool _completing = false;
+  bool _skipping = false;
+
+  /// Chapters marked "Skip" – in memory only (docs/playback.md).
+  final chapterSkips = ChapterSkips();
   Duration _lastSaved = Duration.zero;
 
   /// Position shown while no audio is loaded (after app start, after stop).
@@ -184,6 +189,21 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await restoreLastEpisode();
   }
 
+  /// Marks a chapter as skipped (or not). If playback is inside it right
+  /// now, it jumps ahead at once. [endMs]: next chapter's start, null for
+  /// the last chapter (skipping it ends the episode).
+  Future<void> setChapterSkipped(
+    int episodeId,
+    int startMs, {
+    required int? endMs,
+    required bool skipped,
+  }) async {
+    chapterSkips.setSkipped(episodeId, startMs, endMs: endMs, skipped: skipped);
+    if (skipped && episodeId == _episodeId && _loaded) {
+      await _onPosition(_engine.position);
+    }
+  }
+
   /// Removes the podcast's own boost; the global default applies again.
   Future<void> clearPodcastBoost() async {
     final podcastId = _currentPodcastId;
@@ -273,6 +293,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     }
     _subscriptions.clear();
     await _positions.close();
+    await chapterSkips.dispose();
     await _engine.dispose();
   }
 
@@ -398,6 +419,10 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (id == null || !_loaded || _markedPlayed) return;
 
     final duration = _engine.duration;
+    if (!_skipping) {
+      final skip = chapterSkips.target(id, position);
+      if (skip != null) return _skipTo(skip.to, duration);
+    }
     if (duration != null &&
         duration > Duration.zero &&
         position.inMilliseconds >= duration.inMilliseconds * playedThreshold) {
@@ -408,6 +433,23 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if ((position - _lastSaved).abs() >= saveInterval) {
       _lastSaved = position;
       await _playback.savePosition(id, position);
+    }
+  }
+
+  /// Leaves a skipped chapter: seek behind it, or finish the episode if it
+  /// was the last one (counts as played, playlist continues).
+  Future<void> _skipTo(Duration? to, Duration? duration) async {
+    _skipping = true;
+    try {
+      if (to == null || (duration != null && to >= duration)) {
+        await _complete();
+      } else {
+        await _engine.seek(to);
+        await _saveCurrentPosition();
+        _broadcastState();
+      }
+    } finally {
+      _skipping = false;
     }
   }
 
@@ -423,22 +465,26 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   Future<void> _onEngineState(EngineState state) async {
     _broadcastState();
-    if (state.processing == EngineProcessing.completed && !_completing) {
-      _completing = true;
-      try {
-        final id = _episodeId;
-        if (id != null && !_markedPlayed) {
-          _markedPlayed = true;
-          await _markPlayed(id);
-        }
-        await stop();
-        final next = await _nextInPlaylist();
-        if (next != null) {
-          await playEpisode(next, playlistId: _activePlaylistId);
-        }
-      } finally {
-        _completing = false;
+    if (state.processing == EngineProcessing.completed) await _complete();
+  }
+
+  /// End of the episode: mark played, unload, continue with the playlist.
+  Future<void> _complete() async {
+    if (_completing) return;
+    _completing = true;
+    try {
+      final id = _episodeId;
+      if (id != null && !_markedPlayed) {
+        _markedPlayed = true;
+        await _markPlayed(id);
       }
+      await stop();
+      final next = await _nextInPlaylist();
+      if (next != null) {
+        await playEpisode(next, playlistId: _activePlaylistId);
+      }
+    } finally {
+      _completing = false;
     }
   }
 

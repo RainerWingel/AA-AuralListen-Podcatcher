@@ -80,7 +80,8 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
 - Positions-Updates des Players gedrosselt in die DB schreiben (alle 5 s + bei Pause/Seek/Stopp/Folgenwechsel). ✅
 - Lange Listen nur mit `ListView.builder`; Bilder mit `memCacheWidth`/`cacheWidth` dekodieren.
 - Feed-XML nach dem Parsen verwerfen; Beschreibungen gekürzt speichern.
-- Keine unbegrenzt wachsenden Listen/Maps in Services.
+- Keine unbegrenzt wachsenden Listen/Maps in Services. Beispiel: `ChapterSkips` merkt höchstens 20 Folgen,
+  sein Stream-Controller wird in `PodcastAudioHandler.dispose()` geschlossen. ✅
 
 ## Tests
 - Unit-Tests für alle Regeln oben (mit fake `Clock` und temporärem Verzeichnis).

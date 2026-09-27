@@ -414,5 +414,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "chapterSkip": "Skip",
+  "chapterSkipHint": "Kapitel beim Abspielen überspringen (gilt bis zum Neustart der App)"
 }
