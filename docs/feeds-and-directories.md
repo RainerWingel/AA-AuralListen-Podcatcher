@@ -34,6 +34,8 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
   Umzüge insgesamt: siehe „Podcast-Umzug" unten.
 - Schutz: Timeout 30 s, max. 30 MB pro Feed. Zeichensatz aus `Content-Type` bzw. XML-Deklaration (UTF-8, ISO-8859-1), BOM wird entfernt.
 - User-Agent: `AA-PodcastGuru/<version> (+Repo-URL)`.
+- Unverschlüsseltes `http://` ist erlaubt (`res/xml/network_security_config.xml`): viele Feeds verlinken Audio noch
+  per http (z. B. CRE-mp3-Feed, der dann auf https umleitet). Android blockiert das sonst – Downloads schlugen fehl.
 - Eingabe-URLs werden normalisiert: `https://` wird ergänzt, `feed://`/`itpc://`/`pcast://` → `https://`.
 - Aktualisierung nur beim App-Start (`main.dart`) und per Pull-to-Refresh, max. 4 Feeds parallel.
   Gleichzeitige Aufrufe teilen sich einen Lauf.

@@ -50,4 +50,5 @@ flutter test
 flutter run                   # auf dem verbundenen Galaxy S25 (WLAN-Debugging)
 flutter build apk --release --split-per-abi   # signiert mit Release-Keystore (android/key.properties)
 dart run tool/smoke_feeds.dart "Suchbegriff"  # Parser gegen echte Feeds testen
+flutter test --run-skipped --tags soak test/soak   # Speicher-Soak-Test (nicht in CI)
 ```
