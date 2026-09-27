@@ -64,6 +64,52 @@ class PlaybackRepository {
     )..where((i) => i.episodeId.equals(episodeId))).go();
   });
 
+  Expression<bool> _unplayedUntil(
+    $EpisodesTable e,
+    int podcastId,
+    DateTime until,
+  ) =>
+      e.podcastId.equals(podcastId) &
+      e.pubDate.isSmallerOrEqualValue(until) &
+      e.status.equalsValue(EpisodeStatus.played).not();
+
+  /// Number of not yet played episodes published up to [until] (inclusive).
+  Future<int> countUnplayedUntil(int podcastId, DateTime until) async {
+    final count = _db.episodes.id.count();
+    return await (_db.selectOnly(_db.episodes)
+              ..addColumns([count])
+              ..where(_unplayedUntil(_db.episodes, podcastId, until)))
+            .map((r) => r.read(count))
+            .getSingle() ??
+        0;
+  }
+
+  /// Marks all not yet played episodes published up to [until] (inclusive)
+  /// as played – same rules as [markPlayed]: removed from all playlists,
+  /// downloads are deleted 96 h later. Episodes without a date are skipped.
+  /// Returns the number of episodes marked.
+  Future<int> markPlayedUntil(int podcastId, DateTime until) =>
+      _db.transaction(() async {
+        final ids =
+            await (_db.selectOnly(_db.episodes)
+                  ..addColumns([_db.episodes.id])
+                  ..where(_unplayedUntil(_db.episodes, podcastId, until)))
+                .map((r) => r.read(_db.episodes.id)!)
+                .get();
+        if (ids.isEmpty) return 0;
+        await (_db.update(_db.episodes)..where((e) => e.id.isIn(ids))).write(
+          EpisodesCompanion(
+            status: const Value(EpisodeStatus.played),
+            playedAt: Value(_clock()),
+            positionMs: const Value(0),
+          ),
+        );
+        await (_db.delete(
+          _db.playlistItems,
+        )..where((i) => i.episodeId.isIn(ids))).go();
+        return ids.length;
+      });
+
   /// Manual "mark as unplayed": cancels the eviction timer.
   Future<void> markUnplayed(int episodeId) => _update(
     episodeId,

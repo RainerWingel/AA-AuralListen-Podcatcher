@@ -915,6 +915,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Hören'**
   String get settingsSectionListening;
+
+  /// No description provided for @markPlayedUntil.
+  ///
+  /// In de, this message translates to:
+  /// **'Als gehört markieren bis …'**
+  String get markPlayedUntil;
+
+  /// No description provided for @markPlayedUntilPick.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Folgen bis einschließlich'**
+  String get markPlayedUntilPick;
+
+  /// No description provided for @markPlayedUntilConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} bis einschließlich {date} als gehört markieren?'**
+  String markPlayedUntilConfirm(int count, String date);
+
+  /// No description provided for @markPlayedUntilHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Sie verschwinden aus den Playlists; heruntergeladene Folgen werden nach 96 Stunden gelöscht.'**
+  String get markPlayedUntilHint;
+
+  /// No description provided for @markPlayedUntilNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Bis {date} gibt es keine ungehörten Folgen.'**
+  String markPlayedUntilNone(String date);
+
+  /// No description provided for @markPlayedUntilDone.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als gehört markiert'**
+  String markPlayedUntilDone(int count);
+
+  /// No description provided for @markAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Markieren'**
+  String get markAction;
 }
 
 class _AppLocalizationsDelegate

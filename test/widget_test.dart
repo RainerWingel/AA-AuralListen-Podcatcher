@@ -617,6 +617,48 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets('marks all episodes up to a date as played', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://example.com/feed'),
+    );
+    await settle(tester);
+
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+    await settle(tester);
+    await tester.tap(find.text('Widget-Podcast'));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    await tester.tap(find.text('Als gehört markieren bis …'));
+    await settle(tester);
+
+    // Date picker opens on today; confirm it (the episode is from 2025).
+    await tester.tap(find.text('OK'));
+    await settle(tester);
+    expect(find.textContaining('1 Folge bis einschließlich'), findsOneWidget);
+    await tester.tap(find.text('Markieren'));
+    await settle(tester);
+
+    expect(find.text('1 Folge als gehört markiert'), findsOneWidget);
+    final episode = await tester.runAsync(
+      () => db.select(db.episodes).getSingle(),
+    );
+    expect(episode!.status, EpisodeStatus.played);
+    expect(find.byTooltip('Gespielt'), findsOneWidget);
+
+    await disposeApp(tester);
+  });
 }
 
 Future<void> handlerSeek(

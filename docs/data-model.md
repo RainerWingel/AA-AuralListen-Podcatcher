@@ -30,6 +30,10 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 - **Gespielt** = Hörposition ≥ **98 %** der Dauer (oder Ende erreicht). `playedAt` wird dabei gesetzt –
   daran hängt die 96-h-Löschregel (`eviction.md`).
 - Manuell „als gespielt / ungespielt markieren" (langes Drücken auf eine Folge). „Ungespielt" → `neu`, Position 0, `playedAt` = null.
+- Podcast → ⋮ → „Als gehört markieren bis …": alle **ungehörten** Folgen mit `pubDate` bis einschließlich des gewählten
+  Tages (lokale Zeit) werden `gespielt` – gleiche Regeln wie `markPlayed` (aus allen Playlists, `playedAt` = jetzt →
+  Downloads nach 96 h weg). Folgen ohne Datum und bereits gespielte (ihr `playedAt` bleibt) sind nicht betroffen.
+  Code: `PlaybackRepository.markPlayedUntil`, Tests: `test/data/playback_repository_test.dart`.
 - Beim Gespielt-Werden wird `positionMs` auf 0 gesetzt; Details zur Wiedergabe in `playback.md`.
 - Enums werden als Text gespeichert (`textEnum`) – Umbenennen eines Enum-Werts braucht eine Migration.
 - Beim Refresh werden Feed-Felder bekannter Folgen aktualisiert, **nie** aber Hörzustand (status, positionMs, playedAt).
