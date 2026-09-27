@@ -31,6 +31,7 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
 - Folgen-Identität: `guid`, Fallback `enclosure url`.
 - Conditional GET mit `ETag` / `If-Modified-Since`; 304 → nur `lastRefreshAt` setzen.
 - Redirects werden manuell verfolgt (max. 5). Nur wenn **alle** permanent sind (301/308), wird die gespeicherte `feedUrl` ersetzt.
+  Umzüge insgesamt: siehe „Podcast-Umzug" unten.
 - Schutz: Timeout 30 s, max. 30 MB pro Feed. Zeichensatz aus `Content-Type` bzw. XML-Deklaration (UTF-8, ISO-8859-1), BOM wird entfernt.
 - User-Agent: `AA-PodcastGuru/<version> (+Repo-URL)`.
 - Eingabe-URLs werden normalisiert: `https://` wird ergänzt, `feed://`/`itpc://`/`pcast://` → `https://`.
@@ -38,6 +39,24 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
   Gleichzeitige Aufrufe teilen sich einen Lauf.
 - Fehlerhafte Feeds brechen den Refresh der anderen nicht ab; Fehler landen in `podcasts.lastError` und werden
   im Raster (rotes Symbol) und im Podcast-Detail angezeigt.
+
+## Podcast-Umzug (neue Feed-Adresse)
+Wechselt ein Podcast den Hoster, gibt es drei Wege; in allen Fällen bleiben Hörstand, Playlists, Lesezeichen und Downloads
+erhalten, weil Folgen über ihre `guid` wiedererkannt werden (Hoster übernehmen die guids beim Umzug).
+1. **HTTP 301/308** auf die neue Adresse → wird beim Refresh übernommen (siehe RSS).
+2. **`<itunes:new-feed-url>`** im alten Feed (Apple-Standard, auch von Podigee, Libsyn usw. gesetzt):
+   Der Refresh lädt die neue Adresse; lädt und parst sie, wird sie gespeichert, ETag/Last-Modified kommen vom neuen Feed.
+   - Neue Adresse kaputt oder (noch) kein Feed → alter Feed wird normal verwendet, **kein** Fehler; nächster Refresh versucht es erneut.
+   - Neue Adresse gehört schon zu einem anderen Abo → kein Umzug (nie zwei Abos zusammenlegen).
+   - Neuer Feed zeigt per `new-feed-url` zurück → kein Umzug (sonst Ping-Pong).
+   - Pro Refresh nur ein Sprung; eine Kette A → B → C wird über mehrere Refreshes verfolgt.
+   - Beim Abonnieren einer alten Adresse wird direkt die neue gespeichert.
+3. **Manuell** (Umzug ohne Redirect/Ankündigung, alte Adresse tot): Podcast-Einstellungen → „Feed-Adresse ändern".
+   Die neue Adresse muss laden und ein Feed sein und darf nicht zu einem anderen Abo gehören (`changeFeedUrl`).
+
+`refreshAll` zählt Umzüge (`RefreshSummary.moved`); Pull-to-Refresh meldet sie per Infobox. Beim App-Start passiert es still.
+Nicht unterstützt: `<podcast:guid>`-basierte Umzugssuche über Podcast Index (kein Podcast Index, siehe `decisions.md`).
+Ändern sich beim Umzug die guids, entstehen die Folgen neu (alte bleiben mit Hörstand stehen).
 
 ## Smoke-Test gegen echte Feeds
 ```bash

@@ -22,6 +22,8 @@ void main() {
       expect(feed.description, 'Ein Podcast über Tests');
     });
 
+    test('has no announced move', () => expect(feed.newFeedUrl, isNull));
+
     test('prefers itunes:image over the RSS image', () {
       expect(feed.imageUrl, 'https://example.com/cover.jpg');
     });
@@ -157,5 +159,14 @@ void main() {
 </channel></rss>''');
       expect(feed.episodes.single.chaptersUrl, 'https://example.com/c.json');
     });
+  });
+
+  test('reads itunes:new-feed-url', () {
+    final feed = parser.parse('''
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"><channel>
+  <title>Umgezogen</title>
+  <itunes:new-feed-url> https://neu.example.com/feed </itunes:new-feed-url>
+</channel></rss>''');
+    expect(feed.newFeedUrl, 'https://neu.example.com/feed');
   });
 }

@@ -618,4 +618,35 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get saveFailed => 'Speichern fehlgeschlagen';
+
+  @override
+  String get feedUrl => 'Feed-Adresse';
+
+  @override
+  String get feedUrlChange => 'Feed-Adresse ändern';
+
+  @override
+  String get feedUrlChangeHint =>
+      'Nur nötig, wenn der Podcast umgezogen ist und die alte Adresse nicht mehr funktioniert. Hörstand und Downloads bleiben erhalten.';
+
+  @override
+  String get feedUrlChangeSubmit => 'Übernehmen';
+
+  @override
+  String get feedUrlChanged => 'Feed-Adresse geändert.';
+
+  @override
+  String get feedUrlTaken => 'Diese Adresse gehört schon zu einem anderen Abo.';
+
+  @override
+  String feedsMoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Podcasts sind umgezogen – die Adressen wurden aktualisiert.',
+      one: '1 Podcast ist umgezogen – die Adresse wurde aktualisiert.',
+    );
+    return '$_temp0';
+  }
 }

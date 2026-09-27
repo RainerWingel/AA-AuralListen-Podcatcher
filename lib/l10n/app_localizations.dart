@@ -1083,6 +1083,48 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Speichern fehlgeschlagen'**
   String get saveFailed;
+
+  /// No description provided for @feedUrl.
+  ///
+  /// In de, this message translates to:
+  /// **'Feed-Adresse'**
+  String get feedUrl;
+
+  /// No description provided for @feedUrlChange.
+  ///
+  /// In de, this message translates to:
+  /// **'Feed-Adresse ändern'**
+  String get feedUrlChange;
+
+  /// No description provided for @feedUrlChangeHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur nötig, wenn der Podcast umgezogen ist und die alte Adresse nicht mehr funktioniert. Hörstand und Downloads bleiben erhalten.'**
+  String get feedUrlChangeHint;
+
+  /// No description provided for @feedUrlChangeSubmit.
+  ///
+  /// In de, this message translates to:
+  /// **'Übernehmen'**
+  String get feedUrlChangeSubmit;
+
+  /// No description provided for @feedUrlChanged.
+  ///
+  /// In de, this message translates to:
+  /// **'Feed-Adresse geändert.'**
+  String get feedUrlChanged;
+
+  /// No description provided for @feedUrlTaken.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Adresse gehört schon zu einem anderen Abo.'**
+  String get feedUrlTaken;
+
+  /// No description provided for @feedsMoved.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Podcast ist umgezogen – die Adresse wurde aktualisiert.} other{{count} Podcasts sind umgezogen – die Adressen wurden aktualisiert.}}'**
+  String feedsMoved(int count);
 }
 
 class _AppLocalizationsDelegate

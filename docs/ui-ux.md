@@ -53,6 +53,9 @@ Podcast-Detail → ⋮ → „Podcast-Einstellungen" (Bottom-Sheet): Automatisch
 Bei Netzwerk-Feeds mit ≥ 2 Themen darunter „Themen für automatische Downloads": je Thema Checkbox, Bild der neuesten Folge,
 Name, „N Folgen · zuletzt …"; Knöpfe „Alle" / „Keine". Die Liste ist auch bei ausgeschaltetem Auto-Download bedienbar
 (erst Themen wählen, dann einschalten – sonst startet sofort alles). Das Blatt scrollt.
+Ganz unten „Feed-Adresse ändern" mit der aktuellen Adresse → Dialog (Hinweis, Textfeld mit alter Adresse, „Übernehmen");
+Fehler erscheinen im Textfeld, Erfolg als Infobox „Feed-Adresse geändert.".
+Hat ein Pull-to-Refresh Umzüge erkannt, meldet eine Infobox „N Podcast(s) umgezogen – die Adresse wurde aktualisiert."
 
 ## Optionen
 Abschnitt „Darstellung": System / Hell / Dunkel (`settings['ui.themeMode']`, Dark Mode aus derselben Grundfarbe).

@@ -23,7 +23,13 @@ class SubscribeException implements Exception {
   String toString() => 'SubscribeException: $error';
 }
 
-typedef RefreshSummary = ({int succeeded, int failed});
+/// [moved]: podcasts whose feed address changed (docs/feeds-and-directories.md).
+typedef RefreshSummary = ({int succeeded, int failed, int moved});
+
+enum RefreshOutcome { updated, moved, failed }
+
+/// A feed that was fetched and parsed, with the address to store for it.
+typedef _LoadedFeed = ({String url, FeedFetched fetched, ParsedFeed feed});
 
 /// One theme (sub-series) of a podcast with its newest episode's image.
 typedef PodcastTheme = ({
@@ -130,29 +136,27 @@ class PodcastRepository {
     if (url == null) throw const SubscribeException(SubscribeError.invalidUrl);
     await _throwIfSubscribed(url.toString());
 
-    final FeedFetched result;
+    _LoadedFeed loaded;
     try {
-      final fetched = await _fetcher.fetch(url);
-      // A fresh request without validators cannot return 304.
-      if (fetched is! FeedFetched) {
-        throw const SubscribeException(SubscribeError.network);
-      }
-      result = fetched;
+      loaded = await _loadFeed(url);
     } on FeedFetchException {
       throw const SubscribeException(SubscribeError.network);
-    }
-
-    final ParsedFeed feed;
-    try {
-      feed = _parser.parse(result.body);
     } on FeedFormatException {
       throw const SubscribeException(SubscribeError.notAFeed);
     }
-
-    final feedUrl = result.movedPermanently
-        ? result.finalUrl.toString()
-        : url.toString();
-    if (feedUrl != url.toString()) await _throwIfSubscribed(feedUrl);
+    // An old address whose feed announces a move: subscribe to the new one.
+    if (loaded.feed.newFeedUrl case final announced?) {
+      final target = normalizeFeedUrl(announced);
+      if (target != null && target.toString() != loaded.url) {
+        try {
+          loaded = await _loadFeed(target);
+        } on Exception {
+          // New address not working (yet): keep the old one.
+        }
+      }
+    }
+    if (loaded.url != url.toString()) await _throwIfSubscribed(loaded.url);
+    final (url: feedUrl, fetched: result, :feed) = loaded;
 
     final now = _clock();
     return _db.transaction(() async {
@@ -284,23 +288,30 @@ class PodcastRepository {
     final queue = podcasts.iterator;
     var succeeded = 0;
     var failed = 0;
+    var moved = 0;
 
     Future<void> worker() async {
       while (queue.moveNext()) {
-        if (await refreshPodcast(queue.current)) {
-          succeeded++;
-        } else {
-          failed++;
+        switch (await refreshPodcast(queue.current)) {
+          case RefreshOutcome.updated:
+            succeeded++;
+          case RefreshOutcome.moved:
+            succeeded++;
+            moved++;
+          case RefreshOutcome.failed:
+            failed++;
         }
       }
     }
 
     await Future.wait([for (var i = 0; i < refreshConcurrency; i++) worker()]);
-    return (succeeded: succeeded, failed: failed);
+    return (succeeded: succeeded, failed: failed, moved: moved);
   }
 
-  /// Refreshes one feed. Returns false (and stores the error) on failure.
-  Future<bool> refreshPodcast(Podcast podcast) async {
+  /// Refreshes one feed and follows a move of the podcast: permanent HTTP
+  /// redirects and `<itunes:new-feed-url>`. Never throws; on failure the
+  /// error is stored in `lastError`.
+  Future<RefreshOutcome> refreshPodcast(Podcast podcast) async {
     final now = _clock();
     try {
       final result = await _fetcher.fetch(
@@ -318,41 +329,128 @@ class PodcastRepository {
               lastError: const Value(null),
             ),
           );
+          return RefreshOutcome.updated;
         case FeedFetched():
-          final feed = _parser.parse(result.body);
-          final newUrl = result.movedPermanently
-              ? result.finalUrl.toString()
-              : null;
-          final urlIsFree =
-              newUrl != null &&
-              !await _isSubscribed(newUrl, except: podcast.id);
-          await _db.transaction(() async {
-            await _updatePodcast(
-              podcast.id,
-              PodcastsCompanion(
-                feedUrl: urlIsFree ? Value(newUrl) : const Value.absent(),
-                title: Value(feed.title),
-                author: Value(feed.author),
-                description: Value(feed.description),
-                imageUrl: Value(feed.imageUrl),
-                websiteUrl: Value(feed.websiteUrl),
-                etag: Value(result.etag),
-                lastModified: Value(result.lastModified),
-                lastRefreshAt: Value(now),
-                lastError: const Value(null),
-              ),
+          final original = (
+            url: result.movedPermanently
+                ? result.finalUrl.toString()
+                : podcast.feedUrl,
+            fetched: result,
+            feed: _parser.parse(result.body),
+          );
+          var loaded =
+              await _followAnnouncedMove(podcast, original) ?? original;
+          // Never take over the address of another subscription.
+          if (loaded.url != podcast.feedUrl &&
+              await _isSubscribed(loaded.url, except: podcast.id)) {
+            loaded = (
+              url: podcast.feedUrl,
+              fetched: original.fetched,
+              feed: original.feed,
             );
-            await _upsertEpisodes(podcast.id, feed.episodes, now);
-          });
+          }
+          final moved = loaded.url != podcast.feedUrl;
+          await _storeFeed(podcast.id, loaded, now);
+          return moved ? RefreshOutcome.moved : RefreshOutcome.updated;
       }
-      return true;
     } on Exception catch (e) {
       await _updatePodcast(
         podcast.id,
         PodcastsCompanion(lastError: Value('$e')),
       );
-      return false;
+      return RefreshOutcome.failed;
     }
+  }
+
+  /// Loads the feed announced in `<itunes:new-feed-url>`, or returns null
+  /// when there is no usable announcement. If the new address does not work
+  /// (yet), the old feed stays in use and the move is retried next time.
+  Future<_LoadedFeed?> _followAnnouncedMove(
+    Podcast podcast,
+    _LoadedFeed current,
+  ) async {
+    final announced = current.feed.newFeedUrl;
+    if (announced == null) return null;
+    final target = normalizeFeedUrl(announced);
+    if (target == null || target.toString() == current.url) return null;
+    if (await _isSubscribed(target.toString(), except: podcast.id)) {
+      return null;
+    }
+    try {
+      final loaded = await _loadFeed(target);
+      // A new feed pointing back would make the podcast jump back and forth.
+      final back = loaded.feed.newFeedUrl;
+      if (back != null &&
+          {
+            podcast.feedUrl,
+            current.url,
+          }.contains(normalizeFeedUrl(back)?.toString())) {
+        return null;
+      }
+      return loaded;
+    } on Exception {
+      return null;
+    }
+  }
+
+  /// Fetches and parses [url] without validators; follows permanent
+  /// redirects. Throws [FeedFetchException] or [FeedFormatException].
+  Future<_LoadedFeed> _loadFeed(Uri url) async {
+    final fetched = await _fetcher.fetch(url);
+    // A request without validators cannot return 304.
+    if (fetched is! FeedFetched) {
+      throw const FeedFetchException('Unexpected 304');
+    }
+    return (
+      url: fetched.movedPermanently
+          ? fetched.finalUrl.toString()
+          : url.toString(),
+      fetched: fetched,
+      feed: _parser.parse(fetched.body),
+    );
+  }
+
+  /// Writes feed metadata and episodes (listening state stays untouched).
+  Future<void> _storeFeed(int podcastId, _LoadedFeed loaded, DateTime now) =>
+      _db.transaction(() async {
+        final feed = loaded.feed;
+        await _updatePodcast(
+          podcastId,
+          PodcastsCompanion(
+            feedUrl: Value(loaded.url),
+            title: Value(feed.title),
+            author: Value(feed.author),
+            description: Value(feed.description),
+            imageUrl: Value(feed.imageUrl),
+            websiteUrl: Value(feed.websiteUrl),
+            etag: Value(loaded.fetched.etag),
+            lastModified: Value(loaded.fetched.lastModified),
+            lastRefreshAt: Value(now),
+            lastError: const Value(null),
+          ),
+        );
+        await _upsertEpisodes(podcastId, feed.episodes, now);
+      });
+
+  /// Manually points a subscription to a new feed address (the publisher
+  /// moved without redirect or announcement). The new feed must load;
+  /// episodes are matched by guid, so the listening state stays.
+  /// Throws [SubscribeException].
+  Future<void> changeFeedUrl(int podcastId, String rawUrl) async {
+    final url = normalizeFeedUrl(rawUrl);
+    if (url == null) throw const SubscribeException(SubscribeError.invalidUrl);
+    await _throwIfSubscribed(url.toString(), except: podcastId);
+
+    final _LoadedFeed loaded;
+    try {
+      loaded = await _loadFeed(url);
+    } on FeedFetchException {
+      throw const SubscribeException(SubscribeError.network);
+    } on FeedFormatException {
+      throw const SubscribeException(SubscribeError.notAFeed);
+    }
+    await _throwIfSubscribed(loaded.url, except: podcastId);
+    await _storeFeed(podcastId, loaded, _clock());
   }
 
   // ---------------------------------------------------------------- helpers
@@ -468,10 +566,11 @@ class PodcastRepository {
     return (await query.get()).isNotEmpty;
   }
 
-  Future<void> _throwIfSubscribed(String feedUrl) async {
-    final existing = await (_db.select(
-      _db.podcasts,
-    )..where((p) => p.feedUrl.equals(feedUrl))).getSingleOrNull();
+  Future<void> _throwIfSubscribed(String feedUrl, {int? except}) async {
+    final query = _db.select(_db.podcasts)
+      ..where((p) => p.feedUrl.equals(feedUrl));
+    if (except != null) query.where((p) => p.id.equals(except).not());
+    final existing = await query.getSingleOrNull();
     if (existing != null) {
       throw SubscribeException(
         SubscribeError.alreadySubscribed,
