@@ -22,6 +22,7 @@ Sideload per APK. Nur Deutsch. Alle Daten nur lokal.
 ## Zusatz (nach M5, Wunsch des Benutzers)
 | # | Funktion | Details |
 |---|----------|---------|
+| F19 | Als gehört markieren bis Datum | pro Abo, Kalender + Rückfrage → `data-model.md` |
 | F18 | Auto-Download nach Thema | Netzwerk-Feeds wie WRINT: nur angehakte Themen laden → `feeds-and-directories.md` |
 
 ## Soll (M6–M7)

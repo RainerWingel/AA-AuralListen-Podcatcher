@@ -44,6 +44,9 @@ Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskrei
 Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %" /
 „Wartet auf WLAN …" / „Download fehlgeschlagen"; rechts Löschen / Abbrechen / Erneut. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
 
+## Podcast-Menü (⋮ im Podcast-Detail)
+Podcast-Einstellungen · Als gehört markieren bis … (Kalender → Rückfrage mit Anzahl → Infobox) · Abo kündigen.
+
 ## Podcast-Einstellungen
 Podcast-Detail → ⋮ → „Podcast-Einstellungen" (Bottom-Sheet): Automatisch herunterladen (Aus / Nur WLAN / Immer),
 „Neueste ungespielte Folgen behalten" (1/2/3/5/10), Schalter „Gespielte Folgen löschen" (96 h nach 98 %).

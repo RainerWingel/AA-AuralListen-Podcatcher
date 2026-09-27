@@ -62,6 +62,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Checkbox-Liste in den Podcast-Einstellungen, Filter im Auto-Download
 - [ ] Praxistest mit dem WRINT-Feed (Benutzer)
 
+## Zusatz – Als gehört markieren bis Datum
+- [x] Podcast-Menü → Kalender → Rückfrage mit Anzahl; Regeln wie „gespielt"
+
 ## M6 – Kapitel & Lesezeichen
 - [x] Kapitel aus Feed (Podlove), JSON (url/href) und ID3-CHAP (lokal oder nur Tag per HTTP-Range)
 - [x] Kapitelanzeige und -liste im Vollbild-Player, Sprung per Tippen

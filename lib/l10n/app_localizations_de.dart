@@ -509,4 +509,44 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsSectionListening => 'Hören';
+
+  @override
+  String get markPlayedUntil => 'Als gehört markieren bis …';
+
+  @override
+  String get markPlayedUntilPick => 'Alle Folgen bis einschließlich';
+
+  @override
+  String markPlayedUntilConfirm(int count, String date) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen',
+      one: '1 Folge',
+    );
+    return '$_temp0 bis einschließlich $date als gehört markieren?';
+  }
+
+  @override
+  String get markPlayedUntilHint =>
+      'Sie verschwinden aus den Playlists; heruntergeladene Folgen werden nach 96 Stunden gelöscht.';
+
+  @override
+  String markPlayedUntilNone(String date) {
+    return 'Bis $date gibt es keine ungehörten Folgen.';
+  }
+
+  @override
+  String markPlayedUntilDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen',
+      one: '1 Folge',
+    );
+    return '$_temp0 als gehört markiert';
+  }
+
+  @override
+  String get markAction => 'Markieren';
 }

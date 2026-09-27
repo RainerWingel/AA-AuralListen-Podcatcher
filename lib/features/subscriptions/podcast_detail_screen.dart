@@ -8,6 +8,7 @@ import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../episodes/episode_tile.dart';
+import 'mark_played_until.dart';
 import 'podcast_settings_sheet.dart';
 
 /// Podcast header plus its episode list.
@@ -79,6 +80,11 @@ class PodcastDetailScreen extends ConsumerWidget {
                   PopupMenuItem(
                     onTap: () => showPodcastSettingsSheet(context, podcast.id),
                     child: Text(l10n.podcastSettings),
+                  ),
+                  PopupMenuItem(
+                    onTap: () =>
+                        markPlayedUntilFlow(context, ref, podcast, items),
+                    child: Text(l10n.markPlayedUntil),
                   ),
                   PopupMenuItem(
                     onTap: () => _unsubscribe(context, ref, podcast),

@@ -330,5 +330,36 @@
   "bookmarksEmptyHint": "Im Player auf „Lesezeichen setzen“ tippen.",
   "bookmarkDeleted": "Lesezeichen gelöscht",
   "bookmarkEditNote": "Notiz bearbeiten",
-  "settingsSectionListening": "Hören"
+  "settingsSectionListening": "Hören",
+  "markPlayedUntil": "Als gehört markieren bis …",
+  "markPlayedUntilPick": "Alle Folgen bis einschließlich",
+  "markPlayedUntilConfirm": "{count, plural, =1{1 Folge} other{{count} Folgen}} bis einschließlich {date} als gehört markieren?",
+  "@markPlayedUntilConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "markPlayedUntilHint": "Sie verschwinden aus den Playlists; heruntergeladene Folgen werden nach 96 Stunden gelöscht.",
+  "markPlayedUntilNone": "Bis {date} gibt es keine ungehörten Folgen.",
+  "@markPlayedUntilNone": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "markPlayedUntilDone": "{count, plural, =1{1 Folge} other{{count} Folgen}} als gehört markiert",
+  "@markPlayedUntilDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "markAction": "Markieren"
 }
