@@ -19,6 +19,11 @@ Sideload per APK. Nur Deutsch. Alle Daten nur lokal.
 | F11 | Eviction | automatisches Löschen, keine Lecks → `eviction.md` |
 | F12 | Playlists | mehrere, manuell, Weiterspielen → `playlists.md` |
 
+## Zusatz (nach M5, Wunsch des Benutzers)
+| # | Funktion | Details |
+|---|----------|---------|
+| F18 | Auto-Download nach Thema | Netzwerk-Feeds wie WRINT: nur angehakte Themen laden → `feeds-and-directories.md` |
+
 ## Soll (M6–M7)
 | # | Funktion | Details |
 |---|----------|---------|

@@ -85,4 +85,41 @@ void main() {
       throwsA(isA<FeedFormatException>()),
     );
   });
+
+  group('themes of network feeds (WRINT)', () {
+    test('theme comes from the episode link', () {
+      expect(
+        episodeThemeFromLink(
+          'https://wrint.network.podigee.io/podcast/85079-zum-thema/173-stadt-land',
+        ),
+        'zum-thema',
+      );
+      expect(
+        episodeThemeFromLink(
+          'https://wrint.network.podigee.io/podcast/85056-die-wrintheit/151-x',
+        ),
+        'die-wrintheit',
+      );
+      expect(episodeThemeFromLink('https://example.com/folge-1'), isNull);
+      expect(episodeThemeFromLink(null), isNull);
+    });
+
+    test('display names', () {
+      expect(themeDisplayName('die-wrintheit'), 'Die Wrintheit');
+      expect(themeDisplayName('zum-thema'), 'Zum Thema');
+      expect(themeDisplayName('geschichtsunterricht'), 'Geschichtsunterricht');
+    });
+
+    test('parser fills the theme', () {
+      final feed = parser.parse('''
+<rss><channel><title>WRINT</title>
+  <item><title>A</title><guid>a</guid>
+    <link>https://wrint.network.podigee.io/podcast/85079-zum-thema/1-a</link>
+    <enclosure url="https://example.com/a.mp3" type="audio/mpeg"/></item>
+  <item><title>B</title><guid>b</guid>
+    <enclosure url="https://example.com/b.mp3" type="audio/mpeg"/></item>
+</channel></rss>''');
+      expect(feed.episodes.map((e) => e.theme), ['zum-thema', null]);
+    });
+  });
 }

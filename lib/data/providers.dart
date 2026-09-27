@@ -167,3 +167,9 @@ final downloadLimitProvider = StreamProvider.autoDispose<int>(
       .watch(SettingsKeys.downloadLimitBytes)
       .map((v) => int.tryParse(v ?? '') ?? DownloadService.defaultLimitBytes),
 );
+
+final podcastThemesProvider = StreamProvider.autoDispose
+    .family<List<PodcastTheme>, int>(
+      (ref, podcastId) =>
+          ref.watch(podcastRepositoryProvider).watchThemes(podcastId),
+    );

@@ -813,6 +813,36 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Zum Verschieben ziehen'**
   String get dragToReorder;
+
+  /// No description provided for @autoDownloadThemes.
+  ///
+  /// In de, this message translates to:
+  /// **'Themen für automatische Downloads'**
+  String get autoDownloadThemes;
+
+  /// No description provided for @autoDownloadThemesHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur angehakte Themen werden automatisch geladen. Neue Themen erst, wenn du sie hier anhakst.'**
+  String get autoDownloadThemesHint;
+
+  /// No description provided for @themeSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} · zuletzt {date}'**
+  String themeSubtitle(int count, String date);
+
+  /// No description provided for @selectAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle'**
+  String get selectAll;
+
+  /// No description provided for @selectNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine'**
+  String get selectNone;
 }
 
 class _AppLocalizationsDelegate

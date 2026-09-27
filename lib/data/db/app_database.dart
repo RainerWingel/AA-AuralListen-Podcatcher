@@ -30,7 +30,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -60,6 +60,15 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(playlists);
         await m.createTable(playlistItems);
         await _createDefaultPlaylist();
+      }
+      if (from < 5) {
+        await m.addColumn(episodes, episodes.theme);
+        await m.addColumn(podcasts, podcasts.autoDownloadThemes);
+        // Forget HTTP validators so the next refresh re-reads every feed
+        // and fills in the new `theme` column for existing episodes.
+        await customStatement(
+          'UPDATE podcasts SET etag = NULL, last_modified = NULL',
+        );
       }
     },
     beforeOpen: (details) async {

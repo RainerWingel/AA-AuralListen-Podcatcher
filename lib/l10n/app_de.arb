@@ -276,5 +276,20 @@
       }
     }
   },
-  "dragToReorder": "Zum Verschieben ziehen"
+  "dragToReorder": "Zum Verschieben ziehen",
+  "autoDownloadThemes": "Themen für automatische Downloads",
+  "autoDownloadThemesHint": "Nur angehakte Themen werden automatisch geladen. Neue Themen erst, wenn du sie hier anhakst.",
+  "themeSubtitle": "{count, plural, =1{1 Folge} other{{count} Folgen}} · zuletzt {date}",
+  "@themeSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "selectAll": "Alle",
+  "selectNone": "Keine"
 }

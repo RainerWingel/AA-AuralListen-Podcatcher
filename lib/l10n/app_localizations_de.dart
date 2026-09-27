@@ -443,4 +443,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get dragToReorder => 'Zum Verschieben ziehen';
+
+  @override
+  String get autoDownloadThemes => 'Themen für automatische Downloads';
+
+  @override
+  String get autoDownloadThemesHint =>
+      'Nur angehakte Themen werden automatisch geladen. Neue Themen erst, wenn du sie hier anhakst.';
+
+  @override
+  String themeSubtitle(int count, String date) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen',
+      one: '1 Folge',
+    );
+    return '$_temp0 · zuletzt $date';
+  }
+
+  @override
+  String get selectAll => 'Alle';
+
+  @override
+  String get selectNone => 'Keine';
 }
