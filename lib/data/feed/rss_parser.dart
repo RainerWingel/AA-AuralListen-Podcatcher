@@ -1,6 +1,7 @@
 import 'package:xml/xml.dart';
 
 import '../../core/text_utils.dart';
+import '../chapters/parsed_chapter.dart';
 import 'feed_dates.dart';
 
 /// Result of parsing an RSS feed – plain data, independent of the database.
@@ -35,6 +36,7 @@ class ParsedEpisode {
     this.imageUrl,
     this.chaptersUrl,
     this.theme,
+    this.chapters = const [],
   });
 
   final String guid;
@@ -50,6 +52,9 @@ class ParsedEpisode {
 
   /// Sub-series key (see [episodeThemeFromLink]).
   final String? theme;
+
+  /// Podlove Simple Chapters embedded in the feed (`<psc:chapters>`).
+  final List<ParsedChapter> chapters;
 }
 
 final RegExp _networkLink = RegExp(r'/podcast/(?:\d+-)?([a-z0-9-]+)/');
@@ -155,9 +160,29 @@ class RssParser {
       duration: parseFeedDuration(_text(_ns(item, _Ns.itunes, 'duration'))),
       pubDate: parseFeedDate(_text(item.getElement('pubDate'))),
       imageUrl: _attr(_ns(item, _Ns.itunes, 'image'), 'href'),
-      chaptersUrl: _attr(_ns(item, _Ns.podcast, 'chapters'), 'url'),
+      // The spec says `url`; Podigee writes `href`.
+      chaptersUrl:
+          _attr(_ns(item, _Ns.podcast, 'chapters'), 'url') ??
+          _attr(_ns(item, _Ns.podcast, 'chapters'), 'href'),
       theme: episodeThemeFromLink(_text(item.getElement('link'))),
+      chapters: _pscChapters(item),
     );
+  }
+
+  List<ParsedChapter> _pscChapters(XmlElement item) {
+    final container = _ns(item, _Ns.psc, 'chapters');
+    if (container == null) return const [];
+    return normalizeChapters([
+      for (final c in container.childElements)
+        if (c.name.local == 'chapter')
+          if (parseChapterTime(c.getAttribute('start')) case final start?)
+            ParsedChapter(
+              start: start,
+              title: (c.getAttribute('title') ?? '').trim(),
+              url: _attr(c, 'href'),
+              imageUrl: _attr(c, 'image'),
+            ),
+    ]);
   }
 
   /// Finds a namespaced child element. Matches by namespace URI; if the feed
@@ -188,7 +213,8 @@ class RssParser {
 enum _Ns {
   itunes('itunes', 'itunes.com/dtds'),
   content('content', 'purl.org/rss/1.0/modules/content'),
-  podcast('podcast', 'podcastindex.org/namespace');
+  podcast('podcast', 'podcastindex.org/namespace'),
+  psc('psc', 'podlove.org/simple-chapters');
 
   const _Ns(this.prefix, this.uriFragment);
 

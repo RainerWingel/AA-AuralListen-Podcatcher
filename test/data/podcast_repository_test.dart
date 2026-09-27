@@ -266,4 +266,31 @@ void main() {
     podcast = (await repo.watchPodcast(id).first)!;
     expect(autoDownloadThemesOf(podcast), isNull);
   });
+
+  test('Podlove chapters from the feed are stored once', () async {
+    String feed(String firstTitle) =>
+        '''
+<rss xmlns:psc="http://podlove.org/simple-chapters"><channel><title>P</title>
+  <item><title>A</title><guid>a</guid>
+    <enclosure url="https://example.com/a.mp3" type="audio/mpeg"/>
+    <psc:chapters><psc:chapter title="$firstTitle" start="0"/>
+      <psc:chapter title="Zwei" start="00:01:00"/></psc:chapters>
+  </item>
+</channel></rss>''';
+    server['https://example.com/psc'] = () => http.Response(feed('Eins'), 200);
+    await repo.subscribe('https://example.com/psc');
+    expect(
+      (await db.select(db.chapters).get()).map((c) => c.title),
+      unorderedEquals(['Eins', 'Zwei']),
+    );
+
+    // A later refresh does not rewrite existing chapters.
+    server['https://example.com/psc'] = () =>
+        http.Response(feed('Geändert'), 200);
+    await repo.refreshAll();
+    expect(
+      (await db.select(db.chapters).get()).map((c) => c.title),
+      unorderedEquals(['Eins', 'Zwei']),
+    );
+  });
 }

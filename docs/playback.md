@@ -67,12 +67,27 @@ Regressionstest: „switching episodes while playing reports "playing"".
   Eigener Podcast-Wert gewinnt. Ändert man den globalen Wert, wird der Podcast-Wert des aktuellen Podcasts entfernt.
 - iOS: nicht verfügbar (die Engine ignoriert den Wert).
 
-## Kapitel (M6)
-- Quellen in dieser Reihenfolge: Podcasting 2.0 `<podcast:chapters>` (JSON-URL) → Podlove Simple Chapters
-  `<psc:chapters>` im Feed → ID3-CHAP-Frames in heruntergeladenen MP3s (später).
-- Anzeige im Vollbild-Player als Liste, Tippen springt zum Kapitel; aktuelles Kapitel hervorgehoben.
+## Kapitel (M6 ✅)
+Code: `lib/data/chapters/` (Parser, `ChapterService`, `remote_id3.dart`), UI: `lib/features/player/chapters_and_bookmarks.dart`.
+Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergebnis wird in `chapters` gespeichert:
+1. **Podlove Simple Chapters** (`<psc:chapters>`) im Feed – beim Refresh gespeichert (nur wenn die Folge noch keine
+   Kapitel hat, damit Refreshes nichts umschreiben). Zeitformat `HH:MM:SS.mmm`, `MM:SS` oder Sekunden.
+2. **Podcasting 2.0 JSON** (`<podcast:chapters url=…>`; Podigee schreibt `href=…`, beides wird gelesen).
+   `"toc": false`-Einträge werden übersprungen. Bei WRINT liefern diese Links **404** (HTML-Seite) → nächste Quelle.
+3. **ID3-CHAP im MP3** (v2.3/v2.4, Titel aus `TIT2`, Link aus `WXXX`): heruntergeladene Datei lokal lesen, sonst per
+   HTTP-Range nur den Tag holen (erst 10 Byte Header, dann genau die Tag-Länge, max. 4 MB) – nie die Audiodaten.
+   Ignoriert der Server die Range, wird nach der Tag-Länge abgebrochen. Kaputte Tags → keine Kapitel, nie ein Fehler.
+   (M4A/AAC-Kapitel werden nicht gelesen.)
+- Geladen wird erst, wenn der Vollbild-Player die Folge zeigt (`chaptersProvider` → `ensureLoaded`), pro App-Sitzung
+  höchstens ein Versuch pro Folge (auch ohne Ergebnis).
+- Anzeige: unter dem Slider „Kapitel 3/7: Titel" (tippen → Liste); Knopf „Kapitel (n)" → Liste mit Startzeit,
+  aktuelles Kapitel hervorgehoben, Tippen springt dorthin.
+- Werkzeug: `dart run tool/smoke_chapters.dart <Feed-URL>` prüft ID3-Kapitel echter Folgen.
 
-## Lesezeichen (M6)
-- Knopf im Player speichert aktuelle Position, optional mit Notiz.
-- Liste pro Folge und global; Tippen spielt Folge ab dieser Stelle.
-- Lesezeichen bleiben erhalten, auch wenn die Audiodatei per Eviction gelöscht wurde (dann wird gestreamt).
+## Lesezeichen (M6 ✅)
+- Vollbild-Player → „Lesezeichen setzen": merkt die Position **beim Tippen** (Wiedergabe läuft weiter), optional Notiz.
+- „Lesezeichen (n)" im Player: Liste der Folge, Tippen springt. Optionen → „Lesezeichen": alle, neueste zuerst;
+  Tippen spielt die Folge **genau** ab dieser Stelle (`playEpisode(startAt:)`, auch wenn sie schon gespielt war).
+- Langes Drücken bearbeitet die Notiz, Papierkorb löscht (Infobox).
+- Lesezeichen bleiben erhalten, wenn die Audiodatei per Eviction gelöscht wurde (dann wird gestreamt); beim Abo-Kündigen
+  werden sie mit den Folgen gelöscht.

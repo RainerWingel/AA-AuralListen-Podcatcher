@@ -23,7 +23,7 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
   dünner Fortschrittsbalken, Cover, Titel, Podcast, Play/Pause (Kreisel beim Puffern). Tippen → Vollbild-Player.
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast,
   Slider mit „verstrichen" / „-verbleibend", −15 s / Play / +30 s, „Boost: …" (öffnet Auswahl). Pfeil nach unten schließt.
-  Später: Kapitel, Lesezeichen-Knopf, „Zu Playlist".
+  Darunter „Kapitel x/n: Titel" (falls vorhanden) und Knöpfe „Kapitel (n)", „Lesezeichen setzen", „Lesezeichen (n)".
 - **Boost-Auswahl** (Bottom-Sheet): Aus / +3 / +6 / +9 / +12 dB, Schalter „Nur für diesen Podcast".
 
 ## Folgen-Elemente
@@ -52,7 +52,7 @@ Name, „N Folgen · zuletzt …"; Knöpfe „Alle" / „Keine". Die Liste ist a
 (erst Themen wählen, dann einschalten – sonst startet sofort alles). Das Blatt scrollt.
 
 ## Optionen
-Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
+Abschnitt „Hören": Lesezeichen (alle). Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
 
 ## Infoboxen (SnackBars)
 - **Nur** über `showInfoSnackBar` (`lib/core/widgets/info_snack_bar.dart`) – nie `showSnackBar` direkt.

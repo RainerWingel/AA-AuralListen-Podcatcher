@@ -1,8 +1,8 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 5** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
-v5: `episodes.theme`, `podcasts.autoDownloadThemes`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+Aktuell **schemaVersion 6** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
+v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 1. Tabelle in `tables.dart` ändern/hinzufügen, `schemaVersion` erhöhen, Schritt in `onUpgrade` ergänzen (`if (from < N) …`).
@@ -20,8 +20,8 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 | `downloads` ✅ (v3) | episodeId (PK, FK → episodes, CASCADE), relativePath (`<id>.<ext>`), state (queued/running/done/failed), sizeBytes, wifiOnly, createdAt, completedAt. Regeln: `eviction.md` |
 | `playlists` ✅ (v4) | id, name, sortOrder, createdAt. Standard-Playlist „Wiedergabeliste" (`AppDatabase.defaultPlaylistName`) |
 | `playlist_items` ✅ (v4) | PK (playlistId, episodeId), beide FK mit CASCADE, position (aufsteigend, neu = max + 1), addedAt |
-| `chapters` | episodeId, startMs, title, imageUrl, url |
-| `bookmarks` | id, episodeId, positionMs, note, createdAt |
+| `chapters` ✅ (v6) | PK (episodeId, startMs), FK CASCADE, title, url, imageUrl. Quellen: `playback.md` |
+| `bookmarks` ✅ (v6) | id, episodeId (FK CASCADE), positionMs, note (null = keine), createdAt |
 | `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb`, `player.activePlaylistId`, `downloads.limitBytes` |
 | ~~`player_state`~~ | entfällt – letzte Folge und aktive Playlist stehen in `settings` |
 

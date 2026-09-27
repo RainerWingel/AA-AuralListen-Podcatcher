@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../app/routes.dart';
 
 import '../../core/formatting.dart';
 import '../../data/providers.dart';
@@ -67,6 +70,12 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         children: [
+          _SectionHeader(l10n.settingsSectionListening),
+          ListTile(
+            leading: const Icon(Icons.bookmarks_outlined),
+            title: Text(l10n.bookmarks),
+            onTap: () => context.go(Routes.bookmarks),
+          ),
           _SectionHeader(l10n.settingsSectionSubscriptions),
           ListTile(
             leading: const Icon(Icons.file_upload_outlined),

@@ -63,6 +63,11 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [ ] Praxistest mit dem WRINT-Feed (Benutzer)
 
 ## M6 – Kapitel & Lesezeichen
+- [x] Kapitel aus Feed (Podlove), JSON (url/href) und ID3-CHAP (lokal oder nur Tag per HTTP-Range)
+- [x] Kapitelanzeige und -liste im Vollbild-Player, Sprung per Tippen
+- [x] Lesezeichen mit Notiz, Liste pro Folge und global, Abspielen ab Lesezeichen
+- [x] DB-Schema v6 inkl. Migrationstests
+- [ ] Praxistest auf dem S25 mit WRINT und Freak Show (Benutzer)
 ## M7 – OPML-Export, Backup/Restore, Dark Mode, Feinschliff
 ## M8 – Härtung: Leak-Tests, Soak-Test, Release-APK 1.0
 

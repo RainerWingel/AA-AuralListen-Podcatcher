@@ -27,7 +27,8 @@ import 'support/fake_player_engine.dart';
 
 // Feed without images, so no network image loading happens in widget tests.
 const _feed = '''
-<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:psc="http://podlove.org/simple-chapters">
   <channel>
     <title>Widget-Podcast</title>
     <itunes:author>Tester</itunes:author>
@@ -37,6 +38,10 @@ const _feed = '''
       <pubDate>Tue, 10 Jun 2025 04:00:00 +0000</pubDate>
       <enclosure url="https://example.com/1.mp3" type="audio/mpeg"/>
       <itunes:duration>3900</itunes:duration>
+      <psc:chapters>
+        <psc:chapter title="Begrüßung" start="00:00:00"/>
+        <psc:chapter title="Hauptteil" start="00:10:00"/>
+      </psc:chapters>
     </item>
   </channel>
 </rss>''';
@@ -114,7 +119,9 @@ void main() {
           httpClientProvider.overrideWithValue(
             MockClient(
               (request) async => switch (request.url.host) {
-                'example.com' => http.Response(_feed, 200),
+                // UTF-8 bytes like a real server (the String constructor
+                // would send Latin-1 and break umlauts).
+                'example.com' => http.Response.bytes(utf8.encode(_feed), 200),
                 'wrint.example.com' => http.Response.bytes(
                   utf8.encode(_themedFeed),
                   200,
@@ -556,4 +563,67 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets('chapters and bookmarks in the player', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://example.com/feed'),
+    );
+    await settle(tester);
+    await tester.tap(find.text('Erste Folge'));
+    await settle(tester);
+    await tester.tap(find.byType(MiniPlayer));
+    await settle(tester);
+
+    // Chapters from the feed.
+    expect(find.text('Kapitel 1/2: Begrüßung'), findsOneWidget);
+    await tester.tap(find.text('Kapitel (2)'));
+    await settle(tester);
+    await tester.tap(find.text('Hauptteil'));
+    await settle(tester);
+    expect(handler.position, const Duration(minutes: 10));
+
+    // Bookmark with a note.
+    await tester.ensureVisible(find.text('Lesezeichen setzen'));
+    await tester.tap(find.text('Lesezeichen setzen'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'Gute Stelle');
+    await tester.tap(find.text('Speichern'));
+    await settle(tester);
+    expect(find.text('Lesezeichen bei 10:00 gesetzt'), findsOneWidget);
+    expect(find.text('Lesezeichen (1)'), findsOneWidget);
+
+    // Global list in Optionen → tap plays from the bookmark.
+    await tester.tap(find.byTooltip('Player schließen'));
+    await settle(tester);
+    await handlerSeek(tester, handler, Duration.zero);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+    await settle(tester);
+    await tester.tap(find.text('Lesezeichen'));
+    await settle(tester);
+    expect(find.text('Gute Stelle'), findsOneWidget);
+    await tester.tap(find.text('Gute Stelle'));
+    await settle(tester);
+    expect(handler.position, const Duration(minutes: 10));
+
+    await disposeApp(tester);
+  });
+}
+
+Future<void> handlerSeek(
+  WidgetTester tester,
+  PodcastAudioHandler handler,
+  Duration position,
+) async {
+  await tester.runAsync(() => handler.seek(position));
+  await settle(tester);
 }

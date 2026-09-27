@@ -78,6 +78,21 @@ Duration _zoneOffset(String? zone) {
   return Duration(hours: _zones[zone.toUpperCase()] ?? 0);
 }
 
+/// Podlove chapter time: "01:02:03.500", "02:03", "3.5" (seconds).
+Duration? parseChapterTime(String? raw) {
+  final value = raw?.trim();
+  if (value == null || value.isEmpty) return null;
+  final parts = value.split(':');
+  if (parts.length > 3) return null;
+  var ms = 0.0;
+  for (final part in parts) {
+    final n = double.tryParse(part);
+    if (n == null || n < 0) return null;
+    ms = ms * 60 + n;
+  }
+  return Duration(milliseconds: (ms * 1000).round());
+}
+
 /// Parses `itunes:duration`: "3600", "3600.5", "59:30" or "1:02:03".
 Duration? parseFeedDuration(String? raw) {
   final value = raw?.trim();

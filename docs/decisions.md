@@ -42,3 +42,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Merge nur mit expliziter CI-Prüfung** · PR #9 wurde versehentlich bei laufender CI gemergt (die CI war danach grün bzw. wird geprüft).
 - 2026-09-27 · **Themen über den Folgen-Link statt über das Bild** · im WRINT-Feed hat jede Folge eine eigene Bild-URL; der Link enthält die Sendereihe zuverlässig.
 - 2026-09-27 · **Themen-Filter als Positivliste; alle angehakt = null** · neue Themen kommen nicht ungefragt dazu; „alle" bleibt offen für Folgen ohne erkanntes Thema.
+- 2026-09-27 · **ID3-Kapitel per HTTP-Range statt ganzer Datei** · WRINT hat nur so Kapitel (JSON-Links liefern 404); der Tag ist 0,1–1 MB, die Folge oft 50+ MB.
+- 2026-09-27 · **Kapitel-Reihenfolge Feed → JSON → ID3, Ergebnis in der DB** · schnellste/zuverlässigste Quelle zuerst, Netzwerk nur einmal pro Folge.
+- 2026-09-27 · **Migration v6 erzwingt erneut einen Voll-Refresh** · damit Podlove-Kapitel vorhandener Folgen gespeichert werden.

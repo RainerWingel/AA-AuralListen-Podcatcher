@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 
 import '../audio/audio_providers.dart';
 import '../core/clock.dart';
+import 'bookmark_repository.dart';
+import 'chapters/chapter_service.dart';
 import 'db/app_database.dart';
 import 'directory/directory_search.dart';
 import 'feed/feed_fetcher.dart';
@@ -173,3 +176,36 @@ final podcastThemesProvider = StreamProvider.autoDispose
       (ref, podcastId) =>
           ref.watch(podcastRepositoryProvider).watchThemes(podcastId),
     );
+
+final chapterServiceProvider = Provider<ChapterService>(
+  (ref) => ChapterService(
+    db: ref.watch(databaseProvider),
+    client: ref.watch(httpClientProvider),
+    localFile: (id) => ref.read(downloadServiceProvider).localFile(id),
+  ),
+);
+
+/// Chapters of an episode; triggers loading from JSON/ID3 on first use.
+final chaptersProvider = StreamProvider.autoDispose.family<List<Chapter>, int>((
+  ref,
+  episodeId,
+) {
+  final service = ref.watch(chapterServiceProvider);
+  unawaited(service.ensureLoaded(episodeId));
+  return service.watch(episodeId);
+});
+
+final bookmarkRepositoryProvider = Provider<BookmarkRepository>(
+  (ref) =>
+      BookmarkRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+);
+
+final episodeBookmarksProvider = StreamProvider.autoDispose
+    .family<List<Bookmark>, int>(
+      (ref, episodeId) =>
+          ref.watch(bookmarkRepositoryProvider).watchForEpisode(episodeId),
+    );
+
+final allBookmarksProvider = StreamProvider.autoDispose<List<BookmarkEntry>>(
+  (ref) => ref.watch(bookmarkRepositoryProvider).watchAll(),
+);

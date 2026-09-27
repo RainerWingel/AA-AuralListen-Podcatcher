@@ -467,4 +467,46 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get selectNone => 'Keine';
+
+  @override
+  String get chapters => 'Kapitel';
+
+  @override
+  String chapterCurrent(int index, int count, String title) {
+    return 'Kapitel $index/$count: $title';
+  }
+
+  @override
+  String get bookmarkAdd => 'Lesezeichen setzen';
+
+  @override
+  String get bookmarkNote => 'Notiz (optional)';
+
+  @override
+  String bookmarkAdded(String time) {
+    return 'Lesezeichen bei $time gesetzt';
+  }
+
+  @override
+  String get bookmarks => 'Lesezeichen';
+
+  @override
+  String bookmarksCount(int count) {
+    return 'Lesezeichen ($count)';
+  }
+
+  @override
+  String get bookmarksEmpty => 'Keine Lesezeichen';
+
+  @override
+  String get bookmarksEmptyHint => 'Im Player auf „Lesezeichen setzen“ tippen.';
+
+  @override
+  String get bookmarkDeleted => 'Lesezeichen gelöscht';
+
+  @override
+  String get bookmarkEditNote => 'Notiz bearbeiten';
+
+  @override
+  String get settingsSectionListening => 'Hören';
 }

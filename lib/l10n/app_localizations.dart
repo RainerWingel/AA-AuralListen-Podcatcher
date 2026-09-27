@@ -843,6 +843,78 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Keine'**
   String get selectNone;
+
+  /// No description provided for @chapters.
+  ///
+  /// In de, this message translates to:
+  /// **'Kapitel'**
+  String get chapters;
+
+  /// No description provided for @chapterCurrent.
+  ///
+  /// In de, this message translates to:
+  /// **'Kapitel {index}/{count}: {title}'**
+  String chapterCurrent(int index, int count, String title);
+
+  /// No description provided for @bookmarkAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Lesezeichen setzen'**
+  String get bookmarkAdd;
+
+  /// No description provided for @bookmarkNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Notiz (optional)'**
+  String get bookmarkNote;
+
+  /// No description provided for @bookmarkAdded.
+  ///
+  /// In de, this message translates to:
+  /// **'Lesezeichen bei {time} gesetzt'**
+  String bookmarkAdded(String time);
+
+  /// No description provided for @bookmarks.
+  ///
+  /// In de, this message translates to:
+  /// **'Lesezeichen'**
+  String get bookmarks;
+
+  /// No description provided for @bookmarksCount.
+  ///
+  /// In de, this message translates to:
+  /// **'Lesezeichen ({count})'**
+  String bookmarksCount(int count);
+
+  /// No description provided for @bookmarksEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Lesezeichen'**
+  String get bookmarksEmpty;
+
+  /// No description provided for @bookmarksEmptyHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Im Player auf „Lesezeichen setzen“ tippen.'**
+  String get bookmarksEmptyHint;
+
+  /// No description provided for @bookmarkDeleted.
+  ///
+  /// In de, this message translates to:
+  /// **'Lesezeichen gelöscht'**
+  String get bookmarkDeleted;
+
+  /// No description provided for @bookmarkEditNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Notiz bearbeiten'**
+  String get bookmarkEditNote;
+
+  /// No description provided for @settingsSectionListening.
+  ///
+  /// In de, this message translates to:
+  /// **'Hören'**
+  String get settingsSectionListening;
 }
 
 class _AppLocalizationsDelegate

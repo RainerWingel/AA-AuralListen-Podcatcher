@@ -301,6 +301,27 @@ void main() {
     expect(handler.playbackState.value.playing, isTrue);
   });
 
+  test(
+    'startAt (bookmark) starts exactly there, also for played episodes',
+    () async {
+      await PlaybackRepository(db, () => now).markPlayed(episodeId);
+      await handler.playEpisode(
+        episodeId,
+        startAt: const Duration(seconds: 42),
+      );
+      expect(engine.loadedAt, const Duration(seconds: 42));
+      expect((await episode()).status, EpisodeStatus.inProgress);
+
+      // Same episode already loaded → just seek.
+      await handler.playEpisode(
+        episodeId,
+        startAt: const Duration(seconds: 99),
+      );
+      expect(handler.position, const Duration(seconds: 99));
+      expect(engine.calls.where((c) => c == 'load'), hasLength(1));
+    },
+  );
+
   test('switching episodes saves the old position first', () async {
     final other = await addEpisode('2');
     await handler.playEpisode(episodeId);

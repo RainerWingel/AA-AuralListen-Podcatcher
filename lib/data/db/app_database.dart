@@ -13,7 +13,16 @@ typedef EpisodeWithPodcast = ({Episode episode, Podcast podcast});
 
 /// The single SQLite database of the app (think: EF Core DbContext).
 @DriftDatabase(
-  tables: [Podcasts, Episodes, Settings, Downloads, Playlists, PlaylistItems],
+  tables: [
+    Podcasts,
+    Episodes,
+    Settings,
+    Downloads,
+    Playlists,
+    PlaylistItems,
+    Chapters,
+    Bookmarks,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
@@ -30,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -66,6 +75,14 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(podcasts, podcasts.autoDownloadThemes);
         // Forget HTTP validators so the next refresh re-reads every feed
         // and fills in the new `theme` column for existing episodes.
+        await customStatement(
+          'UPDATE podcasts SET etag = NULL, last_modified = NULL',
+        );
+      }
+      if (from < 6) {
+        await m.createTable(chapters);
+        await m.createTable(bookmarks);
+        // Re-read feeds once more so Podlove chapters in the feed get stored.
         await customStatement(
           'UPDATE podcasts SET etag = NULL, last_modified = NULL',
         );
