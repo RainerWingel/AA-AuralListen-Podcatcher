@@ -167,7 +167,7 @@ void main() {
           http.Response(updatedFeed, 200);
 
       final summary = await repo.refreshAll();
-      expect(summary, (succeeded: 1, failed: 0));
+      expect(summary, (succeeded: 1, failed: 0, moved: 0));
 
       final episodes = await repo.watchEpisodes(id).first;
       expect(episodes, hasLength(3));
@@ -182,11 +182,11 @@ void main() {
       final id = await repo.subscribe('https://example.com/feed');
 
       server['https://example.com/feed'] = () => http.Response('', 500);
-      expect(await repo.refreshAll(), (succeeded: 0, failed: 1));
+      expect(await repo.refreshAll(), (succeeded: 0, failed: 1, moved: 0));
       expect((await repo.watchPodcast(id).first)!.lastError, contains('500'));
 
       server['https://example.com/feed'] = () => http.Response('', 304);
-      expect(await repo.refreshAll(), (succeeded: 1, failed: 0));
+      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 0));
       expect((await repo.watchPodcast(id).first)!.lastError, isNull);
     });
 
@@ -201,6 +201,156 @@ void main() {
 
       await Future.wait([repo.refreshAll(), repo.refreshAll()]);
       expect(requests, 1);
+    });
+  });
+
+  group('podcast moves', () {
+    const oldUrl = 'https://old.example.com/feed';
+    const newUrl = 'https://new.example.com/feed';
+
+    /// basicFeed announcing a move to [target] (`<itunes:new-feed-url>`).
+    String announcing(String target) => basicFeed.replaceFirst(
+      '<title>Testpodcast</title>',
+      '<title>Testpodcast</title><itunes:new-feed-url>$target</itunes:new-feed-url>',
+    );
+
+    /// basicFeed on the new host with one more episode.
+    final movedFeed = basicFeed.replaceFirst(
+      '<item>',
+      '<item><title>Folge 3</title><guid>ep-3</guid>'
+          '<enclosure url="https://example.com/ep3.mp3" type="audio/mpeg"/></item><item>',
+    );
+
+    Future<int> subscribeOld() async {
+      server[oldUrl] = () => http.Response(basicFeed, 200);
+      final id = await repo.subscribe(oldUrl);
+      await (db.update(db.episodes)..where((e) => e.guid.equals('ep-2'))).write(
+        const EpisodesCompanion(
+          status: Value(EpisodeStatus.inProgress),
+          positionMs: Value(60000),
+        ),
+      );
+      return id;
+    }
+
+    Future<Podcast> podcast(int id) async =>
+        (await repo.watchPodcast(id).first)!;
+
+    test('refresh follows itunes:new-feed-url and keeps the state', () async {
+      final id = await subscribeOld();
+      server[oldUrl] = () => http.Response(announcing(newUrl), 200);
+      server[newUrl] = () =>
+          http.Response(movedFeed, 200, headers: {'etag': '"neu"'});
+
+      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 1));
+
+      final p = await podcast(id);
+      expect(p.feedUrl, newUrl);
+      expect(p.etag, '"neu"');
+      final episodes = await repo.watchEpisodes(id).first;
+      expect(episodes, hasLength(3));
+      expect(episodes.singleWhere((e) => e.guid == 'ep-2').positionMs, 60000);
+
+      // Next refresh asks only the new address.
+      server.remove(oldUrl);
+      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 0));
+    });
+
+    test('a permanent redirect counts as a move', () async {
+      final id = await subscribeOld();
+      server[oldUrl] = () =>
+          http.Response('', 301, headers: {'location': newUrl});
+      server[newUrl] = () => http.Response(basicFeed, 200);
+
+      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 1));
+      expect((await podcast(id)).feedUrl, newUrl);
+    });
+
+    test('broken new address: keeps the old one without error', () async {
+      final id = await subscribeOld();
+      server[oldUrl] = () => http.Response(announcing(newUrl), 200);
+      server[newUrl] = () => http.Response('', 500);
+
+      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 0));
+      final p = await podcast(id);
+      expect(p.feedUrl, oldUrl);
+      expect(p.lastError, isNull);
+    });
+
+    test('never takes over the address of another subscription', () async {
+      final id = await subscribeOld();
+      server[newUrl] = () =>
+          http.Response(basicFeed.replaceFirst('Testpodcast', 'Anderer'), 200);
+      await repo.subscribe(newUrl);
+      server[oldUrl] = () => http.Response(announcing(newUrl), 200);
+
+      expect(await repo.refreshAll(), (succeeded: 2, failed: 0, moved: 0));
+      final p = await podcast(id);
+      expect(p.feedUrl, oldUrl);
+      expect(p.title, 'Testpodcast');
+    });
+
+    test('ignores feeds that point at each other', () async {
+      final id = await subscribeOld();
+      server[oldUrl] = () => http.Response(announcing(newUrl), 200);
+      server[newUrl] = () => http.Response(announcing(oldUrl), 200);
+
+      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 0));
+      expect((await podcast(id)).feedUrl, oldUrl);
+    });
+
+    test('subscribing to the old address uses the new one', () async {
+      server[oldUrl] = () => http.Response(announcing(newUrl), 200);
+      server[newUrl] = () => http.Response(movedFeed, 200);
+
+      final id = await repo.subscribe(oldUrl);
+      expect((await podcast(id)).feedUrl, newUrl);
+      expect(await repo.watchEpisodes(id).first, hasLength(3));
+    });
+
+    test('changeFeedUrl switches the address and keeps the state', () async {
+      final id = await subscribeOld();
+      server[newUrl] = () => http.Response(movedFeed, 200);
+
+      await repo.changeFeedUrl(id, 'new.example.com/feed');
+
+      expect((await podcast(id)).feedUrl, newUrl);
+      final episodes = await repo.watchEpisodes(id).first;
+      expect(episodes, hasLength(3));
+      expect(
+        episodes.singleWhere((e) => e.guid == 'ep-2').status,
+        EpisodeStatus.inProgress,
+      );
+    });
+
+    test('changeFeedUrl rejects bad addresses, keeps the old one', () async {
+      final id = await subscribeOld();
+      server['https://other.example.com/feed'] = () =>
+          http.Response(basicFeed.replaceFirst('Testpodcast', 'Anderer'), 200);
+      await repo.subscribe('https://other.example.com/feed');
+      server['https://example.com/page'] = () =>
+          http.Response('<html></html>', 200);
+
+      Future<SubscribeError?> errorOf(String url) async {
+        try {
+          await repo.changeFeedUrl(id, url);
+          return null;
+        } on SubscribeException catch (e) {
+          return e.error;
+        }
+      }
+
+      expect(await errorOf('kein url'), SubscribeError.invalidUrl);
+      expect(
+        await errorOf('https://other.example.com/feed'),
+        SubscribeError.alreadySubscribed,
+      );
+      expect(await errorOf('https://example.com/404'), SubscribeError.network);
+      expect(
+        await errorOf('https://example.com/page'),
+        SubscribeError.notAFeed,
+      );
+      expect((await podcast(id)).feedUrl, oldUrl);
     });
   });
 

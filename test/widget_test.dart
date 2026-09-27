@@ -690,6 +690,48 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets('feed address can be changed after a move', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://example.com/feed'),
+    );
+    await settle(tester);
+
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+    await settle(tester);
+    await tester.tap(find.text('Widget-Podcast'));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    await tester.tap(find.text('Podcast-Einstellungen'));
+    await settle(tester);
+    await tester.ensureVisible(find.text('Feed-Adresse ändern'));
+    await settle(tester);
+    await tester.tap(find.text('Feed-Adresse ändern'));
+    await settle(tester);
+
+    await tester.enterText(find.byType(TextField), 'example.com/neu');
+    await tester.tap(find.text('Übernehmen'));
+    await settle(tester);
+
+    expect(find.text('Feed-Adresse geändert.'), findsOneWidget);
+    final podcast = await tester.runAsync(
+      () => db.select(db.podcasts).getSingle(),
+    );
+    expect(podcast!.feedUrl, 'https://example.com/neu');
+
+    await disposeApp(tester);
+  });
 }
 
 Future<void> handlerSeek(

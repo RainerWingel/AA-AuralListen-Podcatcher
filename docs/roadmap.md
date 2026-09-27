@@ -76,8 +76,12 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Backup (ZIP: Manifest + SQLite-Schnappschuss) und Wiederherstellung ohne Neustart, alte Backups werden migriert
 - [x] Dark Mode (System / Hell / Dunkel)
 - [ ] Praxistest auf dem S25: Backup erstellen → in Drive/Downloads speichern → wiederherstellen (Benutzer)
-- [ ] Eigenes App-Symbol (offen)
 ## M8 – Härtung: Leak-Tests, Soak-Test, Release-APK 1.0
+- [x] Podcast-Umzug: `itunes:new-feed-url` beim Refresh/Abonnieren, Umzüge per Infobox, „Feed-Adresse ändern" (Benutzerwunsch)
+- [ ] Leak-Tests (Streams, Timer, Controller, Caches)
+- [ ] Soak-Test auf dem S25 (2 h Wiedergabe, Speicher beobachten)
+- [ ] Eigenes App-Symbol
+- [ ] Version 1.0.0, Release-APK
 
 ## Offene Punkte
 - keine

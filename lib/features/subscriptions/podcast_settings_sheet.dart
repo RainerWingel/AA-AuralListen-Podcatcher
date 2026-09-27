@@ -6,11 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/clock.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/feed/rss_parser.dart' show themeDisplayName;
 import '../../data/podcast_repository.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import 'change_feed_url_dialog.dart';
 
 /// Choices for "keep the newest N unplayed episodes".
 const autoDownloadCounts = <int>[1, 2, 3, 5, 10];
@@ -110,6 +112,24 @@ class _PodcastSettingsSheet extends ConsumerWidget {
             // first, then switch it on – otherwise everything starts at once.
             if (themes.length >= 2)
               _ThemeFilter(podcast: podcast, themes: themes),
+            const Divider(height: 24),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.rss_feed),
+              title: Text(l10n.feedUrlChange),
+              subtitle: Text(
+                podcast.feedUrl,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                if (await showChangeFeedUrlDialog(context, podcast)) {
+                  showInfoSnackBar(messenger, l10n.feedUrlChanged);
+                  unawaited(ref.read(downloadServiceProvider).runMaintenance());
+                }
+              },
+            ),
           ],
         ),
       ),

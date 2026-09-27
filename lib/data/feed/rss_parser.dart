@@ -13,6 +13,7 @@ class ParsedFeed {
     this.description,
     this.imageUrl,
     this.websiteUrl,
+    this.newFeedUrl,
   });
 
   final String title;
@@ -20,6 +21,10 @@ class ParsedFeed {
   final String? description;
   final String? imageUrl;
   final String? websiteUrl;
+
+  /// Announced new address of the feed (`<itunes:new-feed-url>`), set by the
+  /// publisher when the podcast moves to another host.
+  final String? newFeedUrl;
   final List<ParsedEpisode> episodes;
 }
 
@@ -129,6 +134,7 @@ class RssParser {
           _attr(_ns(channel, _Ns.itunes, 'image'), 'href') ??
           _text(channel.getElement('image')?.getElement('url')),
       websiteUrl: _text(channel.getElement('link')),
+      newFeedUrl: _text(_ns(channel, _Ns.itunes, 'new-feed-url')),
       episodes: episodes,
     );
   }
