@@ -22,7 +22,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }) {
     _subscriptions
       ..add(_engine.stateStream.listen(_onEngineState))
-      ..add(_engine.positionStream.listen(_onPosition))
+      ..add(
+        _engine.positionStream.listen((p) {
+          if (_loaded) _positions.add(p);
+          _onPosition(p);
+        }),
+      )
       ..add(_engine.durationStream.listen(_onDuration));
     _broadcastState();
   }
@@ -55,12 +60,26 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   bool _completing = false;
   Duration _lastSaved = Duration.zero;
 
+  /// Position shown while no audio is loaded (after app start, after stop).
+  Duration _idlePosition = Duration.zero;
+
+  /// The user moved the position while unloaded: start exactly there
+  /// instead of [resumeRewind] earlier.
+  bool _exactStart = false;
+
+  final _positions = StreamController<Duration>.broadcast();
+
   int? get currentEpisodeId => _episodeId;
 
-  /// Position updates for progress bars (only while something is loaded).
-  Stream<Duration> get positionStream => _engine.positionStream;
+  /// Current position – also correct while no audio is loaded.
+  Duration get position => _loaded ? _engine.position : _idlePosition;
 
-  Duration get position => _engine.position;
+  /// Position updates for progress bars. Starts with the current position,
+  /// so a freshly opened player shows the right place immediately.
+  Stream<Duration> get positionStream async* {
+    yield position;
+    yield* _positions.stream;
+  }
 
   // ------------------------------------------------------------ public API
 
@@ -73,6 +92,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (row == null) return;
     _episodeId = id;
     mediaItem.add(_toMediaItem(row));
+    _setIdlePosition(_savedPosition(row.episode));
     _broadcastState();
   }
 
@@ -86,7 +106,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
     _episodeId = episodeId;
     _loaded = false;
+    _exactStart = false;
     mediaItem.add(_toMediaItem(row));
+    _setIdlePosition(_savedPosition(row.episode));
     await _settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
     await play();
   }
@@ -134,22 +156,33 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> seek(Duration position) async {
-    if (!_loaded) return;
-    await _engine.seek(position);
-    await _saveCurrentPosition();
+    final id = _episodeId;
+    if (id == null) return;
+    if (_loaded) {
+      await _engine.seek(position);
+      await _saveCurrentPosition();
+      return;
+    }
+    // Nothing loaded (e.g. after app start): just move the saved position.
+    final target = _clamp(position);
+    _exactStart = true;
+    _setIdlePosition(target);
+    _broadcastState();
+    await _playback.savePosition(id, target);
   }
 
   @override
-  Future<void> rewind() => seek(_clamp(_engine.position - rewindInterval));
+  Future<void> rewind() => seek(_clamp(position - rewindInterval));
 
   @override
-  Future<void> fastForward() =>
-      seek(_clamp(_engine.position + fastForwardInterval));
+  Future<void> fastForward() => seek(_clamp(position + fastForwardInterval));
 
   @override
   Future<void> stop() async {
     _pauseTimer?.cancel();
     await _saveCurrentPosition();
+    // Keep showing where playback stopped (0 if the episode was finished).
+    _setIdlePosition(_markedPlayed ? Duration.zero : _engine.position);
     await _engine.stop();
     _loaded = false;
     _broadcastState();
@@ -168,6 +201,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       await s.cancel();
     }
     _subscriptions.clear();
+    await _positions.close();
     await _engine.dispose();
   }
 
@@ -176,7 +210,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   int? get _currentPodcastId => mediaItem.value?.extras?['podcastId'] as int?;
 
   Duration _clamp(Duration position) {
-    final max = _engine.duration;
+    final max = _loaded ? _engine.duration : mediaItem.value?.duration;
     if (position < Duration.zero) return Duration.zero;
     if (max != null && position > max) return max;
     return position;
@@ -197,7 +231,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     }
 
     final saved = Duration(milliseconds: episode.positionMs);
-    final start = saved > resumeRewind ? saved - resumeRewind : Duration.zero;
+    final start = _exactStart
+        ? saved
+        : saved > resumeRewind
+        ? saved - resumeRewind
+        : Duration.zero;
+    _exactStart = false;
 
     // M4: play the downloaded file instead, if there is one (docs/roadmap.md).
     await _engine.load(Uri.parse(episode.audioUrl), initialPosition: start);
@@ -206,6 +245,17 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _loaded = true;
     _markedPlayed = false;
     _lastSaved = start;
+  }
+
+  /// Where playback would continue; played episodes start over.
+  Duration _savedPosition(Episode episode) =>
+      episode.status == EpisodeStatus.played
+      ? Duration.zero
+      : Duration(milliseconds: episode.positionMs);
+
+  void _setIdlePosition(Duration position) {
+    _idlePosition = position;
+    if (!_positions.isClosed) _positions.add(position);
   }
 
   Future<double> _boostFor(Podcast podcast) async =>
@@ -293,7 +343,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
                 EngineProcessing.completed => AudioProcessingState.completed,
               },
         playing: playing,
-        updatePosition: _engine.position,
+        updatePosition: position,
         bufferedPosition: _engine.bufferedPosition,
       ),
     );

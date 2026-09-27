@@ -49,6 +49,10 @@ UI (Mini-/Vollbild-Player, EpisodeTile)      Benachrichtigung / Sperrbildschirm 
 - Die vom Player gemeldete Dauer wird in `episodes.durationMs` übernommen (genauer als die Feed-Angabe).
 - Letzte Folge: `settings['player.lastEpisodeId']`; nach App-Start zeigt der Mini-Player sie an, **ohne** Audio zu laden
   (kein Netzverkehr, bis Play gedrückt wird).
+- **Ruheposition:** Solange kein Audio geladen ist (nach App-Start, nach Stopp/Pause-Timeout), zeigen Mini-/Vollbild-Player
+  die gespeicherte Position (`handler.position` / `positionStream` liefern sie). Slider und −15/+30 s verschieben dann nur die
+  gespeicherte Position (sofort in der DB); Play startet danach **exakt** dort (ohne 3-s-Rückblick).
+  Regressionstests: Gruppe „before audio is loaded" in `test/audio/podcast_audio_handler_test.dart`.
 
 ## Lautstärke-Boost
 - Android `LoudnessEnhancer` über `just_audio` (`AndroidLoudnessEnhancer`), Zielverstärkung in dB; 0 = aus.

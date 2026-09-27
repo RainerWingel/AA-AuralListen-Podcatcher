@@ -216,6 +216,54 @@ void main() {
     expect(handler.playbackState.value.playing, isFalse);
   });
 
+  // Regression: after a phone restart the player showed 0:00 instead of the
+  // saved position until play was pressed.
+  group('before audio is loaded (after app start)', () {
+    setUp(() async {
+      await settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
+      await handler.restoreLastEpisode(); // saved position: 60 s
+    });
+
+    test('shows the saved position', () async {
+      expect(handler.position, const Duration(seconds: 60));
+      expect(await handler.positionStream.first, const Duration(seconds: 60));
+      expect(
+        handler.playbackState.value.updatePosition,
+        const Duration(seconds: 60),
+      );
+    });
+
+    test('skip buttons move and store the position without loading', () async {
+      await handler.fastForward();
+      expect(handler.position, const Duration(seconds: 90));
+      await handler.rewind();
+      await handler.rewind();
+      expect(handler.position, const Duration(seconds: 60));
+      expect(engine.calls, isEmpty);
+      expect((await episode()).positionMs, 60000);
+    });
+
+    test('after an explicit seek, play starts exactly there', () async {
+      await handler.seek(const Duration(seconds: 120));
+      await handler.play();
+      expect(engine.loadedAt, const Duration(seconds: 120));
+    });
+
+    test('without a seek, play resumes 3 s earlier', () async {
+      await handler.play();
+      expect(engine.loadedAt, const Duration(seconds: 57));
+    });
+  });
+
+  test('keeps showing the position after the pause timeout', () async {
+    await handler.playEpisode(episodeId);
+    engine.emitPosition(const Duration(seconds: 200));
+    await handler.pause();
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    expect(engine.calls.last, 'stop');
+    expect(handler.position, const Duration(seconds: 200));
+  });
+
   test('switching episodes saves the old position first', () async {
     final other = await addEpisode('2');
     await handler.playEpisode(episodeId);
