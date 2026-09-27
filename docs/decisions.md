@@ -12,8 +12,9 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **„Gespielt" = ≥ 98 %; Auto-Löschen 96 h nach Gespielt** · Vorgabe des Benutzers. Unter 98 % wird nie automatisch gelöscht.
 - 2026-09-27 · **Playlists: gespielte Folge verschwindet, nächste startet, dynamisch aus DB** · Vorgabe des Benutzers (Castbox-Verhalten).
 - 2026-09-27 · **Nur interner app-spezifischer Speicher** · Galaxy S25 hat keinen SD-Slot; keine Speicher-Berechtigung nötig.
-- 2026-09-27 · **Podcast-Index-Key via `--dart-define-from-file`** · Repo ist öffentlich; Key nie im Code.
 - 2026-09-27 · **Eigener RSS-Parser auf `xml`** · volle Kontrolle über Podcasting-2.0-/Podlove-Namespaces.
 - 2026-09-27 · **Überspringen ≠ gespielt; gespielte Folge verlässt alle Playlists** · Vorgabe des Benutzers.
 - 2026-09-27 · **Anonyme Commit-Identität (GitHub-noreply)** · öffentliches Repo; keine Verknüpfung mit echtem Namen.
-- 2026-09-27 · **Podcast Index zurückgestellt** · Registrierung verlangt Nicht-Freemail-Adresse; iTunes + fyyd reichen für den Start.
+- 2026-09-27 · **Kein Podcast Index** · Registrierung verlangt Nicht-Freemail-Adresse; Arbeitsadresse soll nicht genutzt werden. iTunes + fyyd reichen.
+- 2026-09-27 · **Generierte l10n-Dateien werden committet** · Agenten ohne Flutter-SDK sehen so die fertigen Getter.
+- 2026-09-27 · **CI pinnt die Flutter-Version** · reproduzierbare Builds; bei Upgrade Workflow anpassen.

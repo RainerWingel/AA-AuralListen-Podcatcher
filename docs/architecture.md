@@ -3,7 +3,7 @@
 ## Tech-Stack
 | Bereich | Wahl | C#-Analogie |
 |---------|------|-------------|
-| Framework | Flutter stable (3.47.x), Dart 3.13 | – |
+| Framework | Flutter stable 3.47.5, Dart 3.13 | – |
 | State / DI | Riverpod | DI-Container + ViewModels |
 | Datenbank | Drift (SQLite, typisiert, Migrationen, reaktive Queries) | EF Core |
 | HTTP | `http` | HttpClient |

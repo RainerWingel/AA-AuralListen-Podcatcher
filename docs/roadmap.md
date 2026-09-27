@@ -8,12 +8,13 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] AGENTS.md, CLAUDE.md (`@AGENTS.md`), Themen-Doku unter `docs/`
 - [x] `.gitignore` für Secrets / SSH / Keystore
 - [x] GitHub-Repo `RainerWingel/aa-podcast-guru` (öffentlich), erster Push
-- [ ] Lints verschärfen (`analysis_options.yaml`)
-- [ ] Grundpakete + Ordnerstruktur laut `architecture.md`, Beispiel-Counter entfernen
-- [ ] gen-l10n mit `app_de.arb`
-- [ ] GitHub Actions: analyze → test → debug-APK
-- [ ] Release-Keystore erzeugen und sichern (siehe `build-and-release.md`)
-- [ ] App startet auf dem Galaxy S25
+- [x] Lints verschärfen (`analysis_options.yaml`)
+- [x] Grundpakete (Riverpod, go_router, intl) + App-Gerüst mit 5 Tabs, Beispiel-Counter entfernt
+- [x] gen-l10n mit `app_de.arb`
+- [x] GitHub Actions: analyze → test → debug-APK
+- [x] Release-Keystore erzeugt
+- [ ] Keystore + `key.properties` extern sichern (Benutzer)
+- [x] App startet auf dem Galaxy S25 (Release-APK)
 
 ## M1 – Abos & Feeds
 - [ ] Drift-Schema v1 (`data-model.md`)
@@ -23,7 +24,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [ ] Refresh bei App-Start + Pull-to-Refresh (ETag/Last-Modified)
 
 ## M2 – Suche & Import
-- [ ] Suche: iTunes, fyyd (Podcast Index optional, falls Key vorhanden)
+- [ ] Suche: iTunes, fyyd
 - [ ] OPML-Import (Castbox-Export)
 
 ## M3 – Player → erste produktiv nutzbare Version
@@ -45,5 +46,4 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 ## M8 – Härtung: Leak-Tests, Soak-Test, Release-APK 1.0
 
 ## Offene Punkte
-- [ ] Podcast-Index-API-Key (zurückgestellt: braucht Nicht-Freemail-Adresse mit Postfach)
-- [ ] USB-Debugging am Galaxy S25 aktivieren (Benutzer)
+- keine
