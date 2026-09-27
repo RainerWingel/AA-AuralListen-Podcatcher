@@ -52,6 +52,13 @@ test/             # spiegelt lib/
   die UI aktualisiert sich automatisch bei DB-Änderungen, und die Abfrage endet, wenn niemand mehr zuhört.
 - Aktionen (abonnieren, refresh) ruft die UI direkt am Repository auf: `ref.read(podcastRepositoryProvider).…`.
 
+## Navigation & Dialoge (Stolperfalle!)
+- Jeder Tab hat einen **eigenen, verschachtelten Navigator** (`StatefulShellRoute`). `showDialog` legt Dialoge dagegen
+  auf den **Root-Navigator**.
+- Einen Dialog daher nur über seinen eigenen `builder`-Context schließen – oder, wenn man es von außen tut, mit
+  `Navigator.of(context, rootNavigator: true).pop()`. Ein `Navigator.of(screenContext).pop()` entfernt sonst die
+  Seite des Tabs statt des Dialogs → schwarzer Bildschirm (Fehler beim OPML-Import, siehe Regressionstest in `test/widget_test.dart`).
+
 ## Tests
 - Unit-Tests mit `NativeDatabase.memory()` und `MockClient` aus `package:http/testing.dart` (kein Netz).
 - Widget-Tests mit Drift: **nicht** `pumpAndSettle` (hängt, solange ein Ladekreis auf SQLite wartet), sondern den

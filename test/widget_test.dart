@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:aapodcastguru/app/app.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
+import 'package:aapodcastguru/data/feed/opml.dart';
 import 'package:aapodcastguru/data/providers.dart';
+import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
+import 'package:aapodcastguru/features/settings/settings_screen.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -185,4 +189,44 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  // Regression: closing the progress dialog popped the tab's nested navigator
+  // instead of the dialog → black screen after the import.
+  testWidgets('OPML import returns to the settings screen', timeout: timeout, (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tester.tap(
+      find.widgetWithText(NavigationDestination, 'Einstellungen'),
+    );
+    await settle(tester);
+
+    // The file picker is a platform plugin; start the flow after picking.
+    // The widget's element doubles as its WidgetRef.
+    final element = tester.element(find.byType(SettingsScreen));
+    final ref = element as WidgetRef;
+    unawaited(
+      confirmAndImportOpml(element, ref, const [
+        OpmlFeed(url: 'https://example.com/feed', title: 'Widget-Podcast'),
+        OpmlFeed(url: 'https://kaputt.test/feed', title: 'Kaputt'),
+      ]),
+    );
+    await settle(tester);
+    expect(find.text('Abos importieren?'), findsOneWidget);
+
+    await tester.tap(find.text('Importieren'));
+    await settle(tester);
+    expect(find.text('Import abgeschlossen'), findsOneWidget);
+    expect(find.textContaining('Neu: 1'), findsOneWidget);
+    expect(find.text('• Kaputt'), findsOneWidget);
+
+    await tester.tap(find.text('OK'));
+    await settle(tester);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.widgetWithText(AppBar, 'Einstellungen'), findsOneWidget);
+    expect(find.text('OPML-Datei importieren'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsOneWidget);
+
+    await disposeApp(tester);
+  });
 }

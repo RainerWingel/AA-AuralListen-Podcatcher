@@ -46,7 +46,18 @@ Future<void> runOpmlImport(BuildContext context, WidgetRef ref) async {
     return;
   }
   if (!context.mounted) return;
+  await confirmAndImportOpml(context, ref, feeds);
+}
 
+/// Confirm → import with progress dialog → summary. Split from [runOpmlImport]
+/// so it can be tested without the platform file picker.
+@visibleForTesting
+Future<void> confirmAndImportOpml(
+  BuildContext context,
+  WidgetRef ref,
+  List<OpmlFeed> feeds,
+) async {
+  final l10n = AppLocalizations.of(context);
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
@@ -67,7 +78,10 @@ Future<void> runOpmlImport(BuildContext context, WidgetRef ref) async {
   if (confirmed != true || !context.mounted) return;
 
   final progress = ValueNotifier<int>(0);
-  final navigator = Navigator.of(context);
+  // Dialogs live on the ROOT navigator, while this screen sits in a tab's nested
+  // navigator. Popping the nested one would remove the settings page itself and
+  // leave a black screen behind the dialog.
+  final dialogNavigator = Navigator.of(context, rootNavigator: true);
   final OpmlImportResult result;
   try {
     // Non-dismissible progress dialog; closed below when the import is done.
@@ -94,7 +108,7 @@ Future<void> runOpmlImport(BuildContext context, WidgetRef ref) async {
     result = await ref
         .read(opmlImporterProvider)
         .import(feeds, onProgress: (done, _) => progress.value = done);
-    navigator.pop();
+    dialogNavigator.pop();
     await dialog;
   } finally {
     progress.dispose();
