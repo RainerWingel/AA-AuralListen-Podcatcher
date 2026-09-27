@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:drift/drift.dart';
 
@@ -23,6 +24,21 @@ class SubscribeException implements Exception {
 }
 
 typedef RefreshSummary = ({int succeeded, int failed});
+
+/// One theme (sub-series) of a podcast with its newest episode's image.
+typedef PodcastTheme = ({
+  String theme,
+  int count,
+  String? imageUrl,
+  DateTime? latest,
+});
+
+/// Themes selected for auto-download; null = all (column is JSON).
+Set<String>? autoDownloadThemesOf(Podcast podcast) {
+  final json = podcast.autoDownloadThemes;
+  if (json == null) return null;
+  return {...(jsonDecode(json) as List<Object?>).whereType<String>()};
+}
 
 /// Removes downloaded files of a podcast before it is unsubscribed
 /// (implemented by the DownloadService).
@@ -187,6 +203,60 @@ class PodcastRepository {
     }
   }
 
+  /// Themes of a podcast, newest first (only for network feeds with themes).
+  Stream<List<PodcastTheme>> watchThemes(int podcastId) {
+    final query = _db.selectOnly(_db.episodes)
+      ..addColumns([
+        _db.episodes.theme,
+        _db.episodes.imageUrl,
+        _db.episodes.pubDate,
+      ])
+      ..where(
+        _db.episodes.podcastId.equals(podcastId) &
+            _db.episodes.theme.isNotNull(),
+      )
+      ..orderBy([
+        OrderingTerm(
+          expression: _db.episodes.pubDate,
+          mode: OrderingMode.desc,
+          nulls: NullsOrder.last,
+        ),
+      ]);
+    return query.watch().map((rows) {
+      // Rows come newest first: the first row per theme has its latest image.
+      final themes = <String, PodcastTheme>{};
+      for (final row in rows) {
+        final theme = row.read(_db.episodes.theme)!;
+        final known = themes[theme];
+        themes[theme] = known == null
+            ? (
+                theme: theme,
+                count: 1,
+                imageUrl: row.read(_db.episodes.imageUrl),
+                latest: row.read(_db.episodes.pubDate),
+              )
+            : (
+                theme: theme,
+                count: known.count + 1,
+                imageUrl: known.imageUrl,
+                latest: known.latest,
+              );
+      }
+      return themes.values.toList();
+    });
+  }
+
+  /// Auto-download only these themes; null = all.
+  Future<void> setAutoDownloadThemes(int podcastId, Set<String>? themes) =>
+      _updatePodcast(
+        podcastId,
+        PodcastsCompanion(
+          autoDownloadThemes: Value(
+            themes == null ? null : jsonEncode(themes.toList()..sort()),
+          ),
+        ),
+      );
+
   /// Per-podcast download settings (podcast settings sheet).
   Future<void> updatePodcastSettings(
     int podcastId, {
@@ -312,6 +382,7 @@ class PodcastRepository {
           pubDate: Value(e.pubDate),
           imageUrl: Value(e.imageUrl),
           chaptersUrl: Value(e.chaptersUrl),
+          theme: Value(e.theme),
           addedAt: now,
         ),
         onConflict: DoUpdate(
@@ -325,6 +396,7 @@ class PodcastRepository {
             pubDate: Value(e.pubDate),
             imageUrl: Value(e.imageUrl),
             chaptersUrl: Value(e.chaptersUrl),
+            theme: Value(e.theme),
           ),
           target: [_db.episodes.podcastId, _db.episodes.guid],
         ),

@@ -280,6 +280,45 @@ void main() {
       expect(await service.autoDownload(), 0);
     });
 
+    test('only selected themes are auto-downloaded', () async {
+      await setPodcast(
+        const PodcastsCompanion(
+          autoDownloadMode: Value(AutoDownloadMode.always),
+          autoDownloadMaxEpisodes: Value(2),
+          autoDownloadThemes: Value('["zum-thema"]'),
+        ),
+      );
+      Future<int> themed(String guid, String? theme, int day) async {
+        final id = await addEpisode(guid, pubDate: DateTime(2026, 9, day));
+        await (db.update(db.episodes)..where((e) => e.id.equals(id))).write(
+          EpisodesCompanion(theme: Value(theme)),
+        );
+        return id;
+      }
+
+      final wanted1 = await themed('1', 'zum-thema', 1);
+      final wanted2 = await themed('2', 'zum-thema', 2);
+      final other = await themed('3', 'die-wrintheit', 3);
+      final noTheme = await themed('4', null, 4);
+      // A manual download of another theme does not count against the limit.
+      await downloaded(other);
+
+      expect(await service.autoDownload(), 2);
+      expect(engine.active.keys, unorderedEquals([wanted1, wanted2]));
+      expect(engine.active, isNot(contains(noTheme)));
+    });
+
+    test('an empty theme selection downloads nothing', () async {
+      await setPodcast(
+        const PodcastsCompanion(
+          autoDownloadMode: Value(AutoDownloadMode.always),
+          autoDownloadThemes: Value('[]'),
+        ),
+      );
+      await addEpisode('1');
+      expect(await service.autoDownload(), 0);
+    });
+
     test('stops at the storage limit', () async {
       await db
           .into(db.settings)

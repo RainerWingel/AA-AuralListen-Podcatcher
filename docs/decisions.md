@@ -40,3 +40,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **„Rückgängig" beim Entfernen fügt am Ende ein** · alte Position wiederherzustellen lohnt den Aufwand nicht.
 - 2026-09-27 · **Infoboxen max. 7 s, zentraler Helfer** · Vorgabe des Benutzers; Flutter-Standard ließ Boxen mit Knopf unbegrenzt stehen.
 - 2026-09-27 · **Merge nur mit expliziter CI-Prüfung** · PR #9 wurde versehentlich bei laufender CI gemergt (die CI war danach grün bzw. wird geprüft).
+- 2026-09-27 · **Themen über den Folgen-Link statt über das Bild** · im WRINT-Feed hat jede Folge eine eigene Bild-URL; der Link enthält die Sendereihe zuverlässig.
+- 2026-09-27 · **Themen-Filter als Positivliste; alle angehakt = null** · neue Themen kommen nicht ungefragt dazu; „alle" bleibt offen für Folgen ohne erkanntes Thema.

@@ -41,6 +41,19 @@ const _feed = '''
   </channel>
 </rss>''';
 
+// Network feed with two themes (like WRINT), without images.
+const _themedFeed = '''
+<rss><channel><title>WRINT</title>
+  <item><title>Thema A</title><guid>1</guid>
+    <pubDate>Thu, 17 Sep 2026 08:00:00 +0000</pubDate>
+    <link>https://wrint.network.podigee.io/podcast/85079-zum-thema/1-a</link>
+    <enclosure url="https://example.com/a.mp3" type="audio/mpeg"/></item>
+  <item><title>Wrintheit A</title><guid>2</guid>
+    <pubDate>Wed, 16 Sep 2026 08:00:00 +0000</pubDate>
+    <link>https://wrint.network.podigee.io/podcast/85056-die-wrintheit/1-a</link>
+    <enclosure url="https://example.com/b.mp3" type="audio/mpeg"/></item>
+</channel></rss>''';
+
 // Search result without artwork (no image loading in widget tests).
 final _itunesJson = jsonEncode({
   'results': [
@@ -102,6 +115,10 @@ void main() {
             MockClient(
               (request) async => switch (request.url.host) {
                 'example.com' => http.Response(_feed, 200),
+                'wrint.example.com' => http.Response.bytes(
+                  utf8.encode(_themedFeed),
+                  200,
+                ),
                 'itunes.apple.com' => http.Response.bytes(
                   utf8.encode(_itunesJson),
                   200,
@@ -486,4 +503,57 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets('theme checkboxes limit auto-download', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    final podcastId = await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://wrint.example.com/feed'),
+    );
+    await settle(tester);
+
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+    await settle(tester);
+    await tester.tap(find.text('WRINT'));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    await tester.tap(find.text('Podcast-Einstellungen'));
+    await settle(tester);
+
+    expect(find.text('Themen für automatische Downloads'), findsOneWidget);
+    expect(find.text('Zum Thema'), findsOneWidget);
+    expect(find.text('Die Wrintheit'), findsOneWidget);
+
+    // First choose the themes (below the fold – scroll like a user would),
+    // then switch auto-download on.
+    await tester.ensureVisible(find.text('Die Wrintheit'));
+    await settle(tester);
+    await tester.tap(find.text('Die Wrintheit'));
+    await settle(tester);
+    await tester.ensureVisible(find.text('Immer'));
+    await settle(tester);
+    await tester.tap(find.text('Immer'));
+    await settle(tester);
+
+    final podcast = await tester.runAsync(
+      () => (db.select(
+        db.podcasts,
+      )..where((p) => p.id.equals(podcastId!))).getSingle(),
+    );
+    expect(podcast!.autoDownloadThemes, '["zum-thema"]');
+    expect(podcast.autoDownloadMode, AutoDownloadMode.always);
+    // Only the selected theme was queued.
+    expect(downloadEngine.active, hasLength(1));
+
+    await disposeApp(tester);
+  });
 }

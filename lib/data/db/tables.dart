@@ -34,6 +34,10 @@ class Podcasts extends Table {
   TextColumn get autoDownloadMode => textEnum<AutoDownloadMode>().withDefault(
     Constant(AutoDownloadMode.off.name),
   )();
+
+  /// Themes that are auto-downloaded (JSON list of theme keys, v5);
+  /// null = all episodes regardless of theme.
+  TextColumn get autoDownloadThemes => text().nullable()();
   IntColumn get autoDownloadMaxEpisodes =>
       integer().withDefault(const Constant(3))();
   BoolColumn get autoDeletePlayed =>
@@ -63,6 +67,9 @@ class Episodes extends Table {
   DateTimeColumn get pubDate => dateTime().nullable()();
   TextColumn get imageUrl => text().nullable()();
   TextColumn get chaptersUrl => text().nullable()();
+
+  /// Sub-series of a network feed, e.g. `zum-thema` (v5). See feeds-and-directories.md.
+  TextColumn get theme => text().nullable()();
 
   TextColumn get status => textEnum<EpisodeStatus>().withDefault(
     Constant(EpisodeStatus.newEpisode.name),

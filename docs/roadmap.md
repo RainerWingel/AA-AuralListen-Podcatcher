@@ -57,6 +57,11 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] DB-Schema v4 inkl. Migrationstests
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Zusatz – Auto-Download nach Thema (WRINT)
+- [x] Thema aus dem Folgen-Link, Schema v5, Migration mit erzwungenem Voll-Refresh
+- [x] Checkbox-Liste in den Podcast-Einstellungen, Filter im Auto-Download
+- [ ] Praxistest mit dem WRINT-Feed (Benutzer)
+
 ## M6 – Kapitel & Lesezeichen
 ## M7 – OPML-Export, Backup/Restore, Dark Mode, Feinschliff
 ## M8 – Härtung: Leak-Tests, Soak-Test, Release-APK 1.0

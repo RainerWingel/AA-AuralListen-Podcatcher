@@ -47,6 +47,9 @@ Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Co
 ## Podcast-Einstellungen
 Podcast-Detail → ⋮ → „Podcast-Einstellungen" (Bottom-Sheet): Automatisch herunterladen (Aus / Nur WLAN / Immer),
 „Neueste ungespielte Folgen behalten" (1/2/3/5/10), Schalter „Gespielte Folgen löschen" (96 h nach 98 %).
+Bei Netzwerk-Feeds mit ≥ 2 Themen darunter „Themen für automatische Downloads": je Thema Checkbox, Bild der neuesten Folge,
+Name, „N Folgen · zuletzt …"; Knöpfe „Alle" / „Keine". Die Liste ist auch bei ausgeschaltetem Auto-Download bedienbar
+(erst Themen wählen, dann einschalten – sonst startet sofort alles). Das Blatt scrollt.
 
 ## Optionen
 Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".

@@ -45,6 +45,16 @@ dart run tool/smoke_feeds.dart "Lage der Nation" "Hotel Matze"
 ```
 Sucht über iTunes, lädt und parst die Feeds und zeigt Anzahl Folgen / Datum / Dauer. Nach Parser-Änderungen ausführen.
 
+## Themen in Netzwerk-Feeds (z. B. WRINT)
+Manche Feeds bündeln mehrere Sendereihen („Die Wrintheit", „Zum Thema" …) mit eigenem Bild.
+- Das Bild taugt **nicht** zur Erkennung: Jede Folge hat eine eigene Bild-URL, auch wenn die Bilder gleich aussehen.
+- Erkannt wird das Thema am **Folgen-Link**: `…/podcast/85079-zum-thema/173-…` → Schlüssel `zum-thema`
+  (`episodeThemeFromLink`, Podigee-Netzwerke). Anzeigename per `themeDisplayName` („Zum Thema"; Umlaute fehlen,
+  weil der Link keine enthält, z. B. „Realitatsabgleich").
+- Gespeichert in `episodes.theme` (Schema v5). Feeds ohne solche Links haben kein Thema; die Themen-Auswahl erscheint
+  erst ab 2 Themen.
+- Beim Update auf v5 werden ETag/Last-Modified gelöscht, damit der nächste Refresh alle Folgen neu liest und das Thema nachträgt.
+
 ## OPML
 Code: `lib/data/feed/opml.dart` (Parser), `lib/data/opml_importer.dart` (Import), `lib/features/settings/opml_import_flow.dart` (UI).
 - Import: Einstellungen → „OPML-Datei importieren" (auch im leeren Abos-Tab). Datei auswählen

@@ -229,4 +229,41 @@ void main() {
     expect(latest.map((e) => e.episode.title), ['Folge 2', 'Folge 1']);
     expect(latest.first.podcast.title, 'Testpodcast');
   });
+
+  test('themes: count, newest image, filter round trip', () async {
+    server['https://example.com/wrint'] = () => http.Response('''
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"><channel>
+  <title>WRINT</title>
+  <item><title>Neu Thema</title><guid>1</guid>
+    <pubDate>Thu, 17 Sep 2026 08:00:00 +0000</pubDate>
+    <link>https://wrint.network.podigee.io/podcast/85079-zum-thema/2-b</link>
+    <itunes:image href="https://img.example.com/thema-neu.jpg"/>
+    <enclosure url="https://example.com/1.mp3" type="audio/mpeg"/></item>
+  <item><title>Wrintheit</title><guid>2</guid>
+    <pubDate>Wed, 16 Sep 2026 08:00:00 +0000</pubDate>
+    <link>https://wrint.network.podigee.io/podcast/85056-die-wrintheit/1-a</link>
+    <enclosure url="https://example.com/2.mp3" type="audio/mpeg"/></item>
+  <item><title>Alt Thema</title><guid>3</guid>
+    <pubDate>Tue, 15 Sep 2026 08:00:00 +0000</pubDate>
+    <link>https://wrint.network.podigee.io/podcast/85079-zum-thema/1-a</link>
+    <itunes:image href="https://img.example.com/thema-alt.jpg"/>
+    <enclosure url="https://example.com/3.mp3" type="audio/mpeg"/></item>
+</channel></rss>''', 200);
+    final id = await repo.subscribe('https://example.com/wrint');
+
+    final themes = await repo.watchThemes(id).first;
+    expect(themes.map((t) => (t.theme, t.count)), [
+      ('zum-thema', 2),
+      ('die-wrintheit', 1),
+    ]);
+    expect(themes.first.imageUrl, 'https://img.example.com/thema-neu.jpg');
+
+    await repo.setAutoDownloadThemes(id, {'zum-thema'});
+    var podcast = (await repo.watchPodcast(id).first)!;
+    expect(autoDownloadThemesOf(podcast), {'zum-thema'});
+
+    await repo.setAutoDownloadThemes(id, null);
+    podcast = (await repo.watchPodcast(id).first)!;
+    expect(autoDownloadThemesOf(podcast), isNull);
+  });
 }

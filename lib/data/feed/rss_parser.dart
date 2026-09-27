@@ -34,6 +34,7 @@ class ParsedEpisode {
     this.pubDate,
     this.imageUrl,
     this.chaptersUrl,
+    this.theme,
   });
 
   final String guid;
@@ -46,7 +47,27 @@ class ParsedEpisode {
   final DateTime? pubDate;
   final String? imageUrl;
   final String? chaptersUrl;
+
+  /// Sub-series key (see [episodeThemeFromLink]).
+  final String? theme;
 }
+
+final RegExp _networkLink = RegExp(r'/podcast/(?:\d+-)?([a-z0-9-]+)/');
+
+/// Theme of an episode in a "network" feed that bundles several shows, taken
+/// from the episode link, e.g. `…/podcast/85079-zum-thema/173-…` → `zum-thema`
+/// (Podigee networks such as WRINT). Null if the link has no such segment.
+String? episodeThemeFromLink(String? link) {
+  if (link == null) return null;
+  return _networkLink.firstMatch(link.toLowerCase())?.group(1);
+}
+
+/// Readable name for a theme key: `die-wrintheit` → `Die Wrintheit`.
+String themeDisplayName(String theme) => theme
+    .split('-')
+    .where((w) => w.isNotEmpty)
+    .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
+    .join(' ');
 
 /// Thrown when a document is not a usable podcast feed.
 class FeedFormatException implements Exception {
@@ -135,6 +156,7 @@ class RssParser {
       pubDate: parseFeedDate(_text(item.getElement('pubDate'))),
       imageUrl: _attr(_ns(item, _Ns.itunes, 'image'), 'href'),
       chaptersUrl: _attr(_ns(item, _Ns.podcast, 'chapters'), 'url'),
+      theme: episodeThemeFromLink(_text(item.getElement('link'))),
     );
   }
 

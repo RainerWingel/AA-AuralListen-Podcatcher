@@ -5,7 +5,8 @@ import 'package:drift/drift.dart';
 
 import '../../core/clock.dart';
 import '../db/app_database.dart';
-import '../podcast_repository.dart' show PodcastFilesCleaner;
+import '../podcast_repository.dart'
+    show PodcastFilesCleaner, autoDownloadThemesOf;
 import '../settings_keys.dart';
 import 'download_engine.dart';
 
@@ -291,8 +292,15 @@ class DownloadService implements PodcastFilesCleaner {
 
     var queued = 0;
     for (final podcast in podcasts) {
+      // Optional theme filter (network feeds): only selected sub-series.
+      final themes = autoDownloadThemesOf(podcast);
+      if (themes != null && themes.isEmpty) continue;
+      Expression<bool> inThemes(GeneratedColumn<String> column) =>
+          themes == null ? const Constant(true) : column.isIn(themes);
+
       final existing = await _rowsWhere(
         _db.episodes.podcastId.equals(podcast.id) &
+            inThemes(_db.episodes.theme) &
             _db.episodes.status.equalsValue(EpisodeStatus.played).not() &
             _db.downloads.state.equalsValue(DownloadState.failed).not(),
       );
@@ -304,6 +312,7 @@ class DownloadService implements PodcastFilesCleaner {
                 ..where(
                   (e) =>
                       e.podcastId.equals(podcast.id) &
+                      inThemes(e.theme) &
                       e.status.equalsValue(EpisodeStatus.newEpisode) &
                       e.id.isNotInQuery(
                         _db.selectOnly(_db.downloads)
