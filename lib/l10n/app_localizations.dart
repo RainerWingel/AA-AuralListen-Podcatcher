@@ -291,6 +291,156 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'„{title}“ und alle Folgen werden aus der App entfernt.'**
   String unsubscribeConfirmBody(String title);
+
+  /// No description provided for @search.
+  ///
+  /// In de, this message translates to:
+  /// **'Suchen'**
+  String get search;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Podcast suchen'**
+  String get searchHint;
+
+  /// No description provided for @searchStart.
+  ///
+  /// In de, this message translates to:
+  /// **'Suche nach Titel, Thema oder Autor'**
+  String get searchStart;
+
+  /// No description provided for @searchStartHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Durchsucht Apple Podcasts und fyyd.de'**
+  String get searchStartHint;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Podcasts gefunden'**
+  String get searchNoResults;
+
+  /// No description provided for @searchFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Suche fehlgeschlagen. Bitte Internetverbindung prüfen.'**
+  String get searchFailed;
+
+  /// No description provided for @searchPartialFailure.
+  ///
+  /// In de, this message translates to:
+  /// **'{names} nicht erreichbar – Ergebnisse unvollständig'**
+  String searchPartialFailure(String names);
+
+  /// No description provided for @subscribed.
+  ///
+  /// In de, this message translates to:
+  /// **'Abonniert'**
+  String get subscribed;
+
+  /// No description provided for @subscribeAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Abonnieren'**
+  String get subscribeAction;
+
+  /// No description provided for @subscribedSnack.
+  ///
+  /// In de, this message translates to:
+  /// **'„{title}“ abonniert'**
+  String subscribedSnack(String title);
+
+  /// No description provided for @open.
+  ///
+  /// In de, this message translates to:
+  /// **'Öffnen'**
+  String get open;
+
+  /// No description provided for @ok.
+  ///
+  /// In de, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @settingsSectionSubscriptions.
+  ///
+  /// In de, this message translates to:
+  /// **'Abos'**
+  String get settingsSectionSubscriptions;
+
+  /// No description provided for @opmlImport.
+  ///
+  /// In de, this message translates to:
+  /// **'OPML-Datei importieren'**
+  String get opmlImport;
+
+  /// No description provided for @opmlImportSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Abos aus einer anderen App übernehmen (z. B. Castbox)'**
+  String get opmlImportSubtitle;
+
+  /// No description provided for @opmlInvalid.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Datei ist keine gültige OPML-Datei.'**
+  String get opmlInvalid;
+
+  /// No description provided for @opmlTooLarge.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Datei ist zu groß.'**
+  String get opmlTooLarge;
+
+  /// No description provided for @opmlEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'In der Datei wurden keine Podcasts gefunden.'**
+  String get opmlEmpty;
+
+  /// No description provided for @opmlConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Abos importieren?'**
+  String get opmlConfirmTitle;
+
+  /// No description provided for @opmlConfirmBody.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Podcast gefunden.} other{{count} Podcasts gefunden.}} Bereits vorhandene Abos werden übersprungen.'**
+  String opmlConfirmBody(int count);
+
+  /// No description provided for @opmlImportAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Importieren'**
+  String get opmlImportAction;
+
+  /// No description provided for @opmlProgress.
+  ///
+  /// In de, this message translates to:
+  /// **'Importiere {done} von {total} …'**
+  String opmlProgress(int done, int total);
+
+  /// No description provided for @opmlResultTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Import abgeschlossen'**
+  String get opmlResultTitle;
+
+  /// No description provided for @opmlResultBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Neu: {added}\nBereits vorhanden: {already}\nFehlgeschlagen: {failed}'**
+  String opmlResultBody(int added, int already, int failed);
+
+  /// No description provided for @opmlResultFailedList.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht importiert:'**
+  String get opmlResultFailedList;
 }
 
 class _AppLocalizationsDelegate

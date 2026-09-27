@@ -22,3 +22,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Show-Notes als Klartext, max. 4000 Zeichen** · hält die DB klein (Eviction); formatierte Show-Notes ggf. später.
 - 2026-09-27 · **Folgen, die aus dem Feed verschwinden, bleiben erhalten** · Hörposition/Lesezeichen gehen nicht verloren.
 - 2026-09-27 · **Pakete M1: drift, drift_flutter, http, xml, path_provider, cached_network_image, flutter_cache_manager** · wie in `architecture.md` geplant.
+- 2026-09-27 · **Paket `file_picker` für OPML-Import** · Systemdialog zur Dateiauswahl, keine Speicher-Berechtigung nötig.
+- 2026-09-27 · **Suchergebnisse abwechselnd zusammenführen** · beide Rankings bleiben erhalten; Dubletten per URL-Schlüssel oder Titel+Autor.
+- 2026-09-27 · **PRs merged der Agent selbst, sobald CI grün** · Vorgabe des Benutzers. GitHub-Auto-Merge ist im Repo deaktiviert → `gh pr merge <n> --merge --delete-branch`.

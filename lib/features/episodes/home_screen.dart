@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/routes.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
@@ -17,7 +19,16 @@ class HomeScreen extends ConsumerWidget {
     final episodes = ref.watch(latestEpisodesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.appTitle)),
+      appBar: AppBar(
+        title: Text(l10n.appTitle),
+        actions: [
+          IconButton(
+            tooltip: l10n.search,
+            icon: const Icon(Icons.search),
+            onPressed: () => context.go(Routes.search),
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () => refreshAllFeeds(context, ref),
         child: episodes.when(

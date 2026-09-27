@@ -3,11 +3,18 @@
 ## Verzeichnis-Suche
 | Dienst | Key nötig | Zweck |
 |--------|-----------|-------|
-| iTunes Search API | nein | große internationale Abdeckung |
-| fyyd.de | nein | deutsches Verzeichnis, gute Abdeckung deutschsprachiger Podcasts |
+| Apple Podcasts (iTunes Search API) | nein | große internationale Abdeckung; `country=DE`, max. 25 Treffer |
+| fyyd.de (`/0.2/search/podcast?term=`) | nein | deutsches Verzeichnis, gute Abdeckung deutschsprachiger Podcasts; max. 25 Treffer |
 
-- Die Suche fragt alle aktiven Dienste parallel, führt Ergebnisse zusammen und dedupliziert per Feed-URL.
-- Fällt ein Dienst aus, werden die anderen trotzdem angezeigt.
+Code: `lib/data/directory/directory_search.dart`, UI: `lib/features/search/search_screen.dart`.
+- Beide Dienste werden parallel gefragt (Timeout 15 s). Ergebnisse werden **abwechselnd** zusammengeführt
+  (Platz 1 iTunes, Platz 1 fyyd, Platz 2 iTunes …), damit das Ranking beider Dienste erhalten bleibt.
+- Dubletten fliegen raus: gleiche Feed-URL (Vergleich über `feedUrlKey`: ohne Schema, `www.`, Groß/Klein, End-Slash)
+  **oder** gleicher Titel + Autor. Das erste Vorkommen gewinnt.
+- Fällt ein Dienst aus, werden die anderen trotzdem angezeigt (Hinweis-Banner „… nicht erreichbar").
+- iTunes-Treffer ohne `feedUrl` (Apple-exklusive Podcasts) werden übersprungen.
+- Suche startet 600 ms nach dem Tippen (ab 3 Zeichen) oder sofort per Enter/Lupe.
+- Bereits abonnierte Treffer zeigen ein Häkchen (Vergleich per `feedUrlKey`).
 - **Podcast Index wird nicht genutzt** (siehe `decisions.md`). Falls später doch: Key nie im Code (Repo ist öffentlich),
   sondern in `config/secrets.json` (gitignored) und per `--dart-define-from-file` einbauen.
 
@@ -39,6 +46,11 @@ dart run tool/smoke_feeds.dart "Lage der Nation" "Hotel Matze"
 Sucht über iTunes, lädt und parst die Feeds und zeigt Anzahl Folgen / Datum / Dauer. Nach Parser-Änderungen ausführen.
 
 ## OPML
-- Import: Datei auswählen (Castbox → Einstellungen → OPML exportieren), alle `outline` mit `xmlUrl` übernehmen,
-  vorhandene Abos überspringen, Ergebnis anzeigen („8 neu, 2 bereits vorhanden, 0 fehlerhaft").
+Code: `lib/data/feed/opml.dart` (Parser), `lib/data/opml_importer.dart` (Import), `lib/features/settings/opml_import_flow.dart` (UI).
+- Import: Einstellungen → „OPML-Datei importieren" (auch im leeren Abos-Tab). Datei auswählen
+  (Castbox → Einstellungen → OPML exportieren), bestätigen, Fortschritt „x von n", Ergebnis „Neu / Bereits vorhanden / Fehlgeschlagen" + Namen.
+- Alle `outline`-Elemente mit `xmlUrl` werden gelesen, auch verschachtelte (Castbox legt einen Ordner „feeds" an). Doppelte URLs werden entfernt.
+- 4 Feeds werden parallel abonniert. Vorhandene Abos werden übersprungen.
+- Dateiauswahl mit `FileType.any` (Android kennt keinen MIME-Typ für `.opml`); max. 5 MB.
+- Nach dem Einlesen wird die temporäre Kopie des Datei-Pickers gelöscht (`FilePicker.clearTemporaryFiles`).
 - Export (M7): OPML 2.0, über Teilen-Dialog.

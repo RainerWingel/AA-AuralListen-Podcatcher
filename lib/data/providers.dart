@@ -3,7 +3,9 @@ import 'package:http/http.dart' as http;
 
 import '../core/clock.dart';
 import 'db/app_database.dart';
+import 'directory/directory_search.dart';
 import 'feed/feed_fetcher.dart';
+import 'opml_importer.dart';
 import 'podcast_repository.dart';
 import 'storage/cover_cache.dart';
 
@@ -35,6 +37,15 @@ final podcastRepositoryProvider = Provider<PodcastRepository>(
   ),
 );
 
+final directorySearchProvider = Provider<DirectorySearch>((ref) {
+  final client = ref.watch(httpClientProvider);
+  return DirectorySearch([ItunesDirectory(client), FyydDirectory(client)]);
+});
+
+final opmlImporterProvider = Provider<OpmlImporter>(
+  (ref) => OpmlImporter(ref.watch(podcastRepositoryProvider)),
+);
+
 // Screen-level data streams. autoDispose cancels the DB query when no
 // widget listens any more.
 
@@ -55,4 +66,17 @@ final podcastEpisodesProvider = StreamProvider.autoDispose
 final latestEpisodesProvider =
     StreamProvider.autoDispose<List<EpisodeWithPodcast>>(
       (ref) => ref.watch(podcastRepositoryProvider).watchLatestEpisodes(),
+    );
+
+/// Comparison keys of all subscribed feed URLs (see [feedUrlKey]),
+/// used to mark search results as "already subscribed".
+final subscribedFeedKeysProvider = Provider.autoDispose<Set<String>>((ref) {
+  final podcasts = ref.watch(podcastsProvider).value ?? const <Podcast>[];
+  return {for (final p in podcasts) feedUrlKey(p.feedUrl)};
+});
+
+/// Directory search for one term; cached while the search screen shows it.
+final directorySearchResultsProvider = FutureProvider.autoDispose
+    .family<DirectorySearchOutcome, String>(
+      (ref, term) => ref.watch(directorySearchProvider).search(term),
     );

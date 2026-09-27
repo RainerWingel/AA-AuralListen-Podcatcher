@@ -8,6 +8,7 @@ import '../../core/widgets/empty_state.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../settings/opml_import_flow.dart';
 import 'add_feed_dialog.dart';
 import 'refresh_action.dart';
 
@@ -32,6 +33,11 @@ class SubscriptionsScreen extends ConsumerWidget {
         title: Text(l10n.navSubscriptions),
         actions: [
           IconButton(
+            tooltip: l10n.search,
+            icon: const Icon(Icons.search),
+            onPressed: () => context.go(Routes.search),
+          ),
+          IconButton(
             tooltip: l10n.addFeedAction,
             icon: const Icon(Icons.add),
             onPressed: () => _add(context),
@@ -46,10 +52,26 @@ class SubscriptionsScreen extends ConsumerWidget {
                 icon: Icons.podcasts,
                 title: l10n.subscriptionsEmpty,
                 hint: l10n.subscriptionsEmptyHint,
-                action: FilledButton.icon(
-                  onPressed: () => _add(context),
-                  icon: const Icon(Icons.add),
-                  label: Text(l10n.addFeedAction),
+                action: Column(
+                  children: [
+                    FilledButton.icon(
+                      onPressed: () => context.go(Routes.search),
+                      icon: const Icon(Icons.search),
+                      label: Text(l10n.searchHint),
+                    ),
+                    const SizedBox(height: 8),
+                    OutlinedButton.icon(
+                      onPressed: () => _add(context),
+                      icon: const Icon(Icons.add),
+                      label: Text(l10n.addFeedAction),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      onPressed: () => runOpmlImport(context, ref),
+                      icon: const Icon(Icons.file_upload_outlined),
+                      label: Text(l10n.opmlImport),
+                    ),
+                  ],
                 ),
               )
             : RefreshIndicator(

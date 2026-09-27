@@ -6,5 +6,7 @@ abstract final class Routes {
   static const downloads = '/downloads';
   static const settings = '/einstellungen';
 
+  static const search = '$subscriptions/suche';
+
   static String podcast(int id) => '$subscriptions/podcast/$id';
 }

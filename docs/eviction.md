@@ -40,6 +40,7 @@ Speicherlecks – im Arbeitsspeicher wie auf dem Datenträger – gelten als **F
   Beim Abo-Kündigen werden Podcast- und Folgen-Cover aus dem Cache entfernt. ✅
 - HTTP-Antworten werden mit Größenlimit gelesen (30 MB), Feed-XML nach dem Parsen verworfen. ✅
 - Temporäre Dateien (Backup-ZIP, OPML-Export) nach dem Teilen löschen.
+- Kopien des Datei-Pickers (OPML-Import) werden direkt nach dem Einlesen gelöscht. ✅
 
 ### Sichtbarkeit
 Einstellungen → „Speicher": Belegung gesamt und pro Podcast, Knopf „Jetzt aufräumen".
