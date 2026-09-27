@@ -48,15 +48,21 @@ class PlaybackRepository {
             ),
           );
 
-  /// Marks as played (≥ 98 % or finished). `playedAt` starts the 96 h eviction timer.
-  Future<void> markPlayed(int episodeId) => _update(
-    episodeId,
-    EpisodesCompanion(
-      status: const Value(EpisodeStatus.played),
-      playedAt: Value(_clock()),
-      positionMs: const Value(0),
-    ),
-  );
+  /// Marks as played (≥ 98 % or finished) and removes the episode from ALL
+  /// playlists (docs/playlists.md). `playedAt` starts the 96 h eviction timer.
+  Future<void> markPlayed(int episodeId) => _db.transaction(() async {
+    await _update(
+      episodeId,
+      EpisodesCompanion(
+        status: const Value(EpisodeStatus.played),
+        playedAt: Value(_clock()),
+        positionMs: const Value(0),
+      ),
+    );
+    await (_db.delete(
+      _db.playlistItems,
+    )..where((i) => i.episodeId.equals(episodeId))).go();
+  });
 
   /// Manual "mark as unplayed": cancels the eviction timer.
   Future<void> markUnplayed(int episodeId) => _update(

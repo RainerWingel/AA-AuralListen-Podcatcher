@@ -9,5 +9,7 @@ abstract final class Routes {
 
   static const search = '$subscriptions/suche';
 
+  static String playlist(int id) => '$playlists/$id';
+
   static String podcast(int id) => '$subscriptions/podcast/$id';
 }

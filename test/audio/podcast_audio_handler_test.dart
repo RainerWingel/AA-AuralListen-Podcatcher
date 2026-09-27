@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
+import 'package:aapodcastguru/data/playlist_repository.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:audio_service/audio_service.dart';
@@ -16,6 +17,7 @@ void main() {
   late AppDatabase db;
   late FakePlayerEngine engine;
   late SettingsRepository settings;
+  late PlaylistRepository playlists;
   late PodcastAudioHandler handler;
   late int podcastId;
   late int episodeId;
@@ -47,10 +49,12 @@ void main() {
     db = AppDatabase.forTesting(NativeDatabase.memory());
     engine = FakePlayerEngine();
     settings = SettingsRepository(db);
+    playlists = PlaylistRepository(db, () => now);
     handler = PodcastAudioHandler(
       engine: engine,
       playback: PlaybackRepository(db, () => now),
       settings: settings,
+      playlists: playlists,
       stopAfterPause: const Duration(milliseconds: 50),
     );
     podcastId = await db
@@ -305,5 +309,124 @@ void main() {
 
     expect((await episode()).positionMs, 100000);
     expect(handler.mediaItem.value!.title, 'Folge 2');
+  });
+
+  group('playlists (docs/playlists.md)', () {
+    late int playlistId;
+    late int ep2;
+    late int ep3;
+
+    Future<List<int>> itemsOf(int id) async =>
+        (await playlists.entries(id)).map((e) => e.episode.id).toList();
+
+    setUp(() async {
+      playlistId = (await db.select(db.playlists).getSingle()).id;
+      ep2 = await addEpisode('2');
+      ep3 = await addEpisode('3');
+      for (final id in [episodeId, ep2, ep3]) {
+        await playlists.add(playlistId, id);
+      }
+    });
+
+    test(
+      'finished episode is played, removed and the next one starts',
+      () async {
+        await handler.playEpisode(episodeId, playlistId: playlistId);
+        engine.complete();
+        await pumpEventQueue();
+
+        expect((await episode()).status, EpisodeStatus.played);
+        expect(await itemsOf(playlistId), [ep2, ep3]);
+        expect(handler.currentEpisodeId, ep2);
+        expect(engine.loadedUri, Uri.parse('https://example.com/2.mp3'));
+        expect(handler.playbackState.value.playing, isTrue);
+      },
+    );
+
+    test('98 % already removes the episode from the playlist', () async {
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      engine.emitPosition(const Duration(minutes: 9, seconds: 50));
+      await pumpEventQueue();
+      expect(await itemsOf(playlistId), [ep2, ep3]);
+
+      // The end still continues with the episode that followed it.
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep2);
+    });
+
+    test('an episode added during playback is played too', () async {
+      await handler.playEpisode(ep3, playlistId: playlistId);
+      final added = await addEpisode('4');
+      await playlists.add(playlistId, added);
+
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, added);
+    });
+
+    test('starts after the played episode, not at the top', () async {
+      await handler.playEpisode(ep2, playlistId: playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep3);
+    });
+
+    test('playback stops at the end of the playlist', () async {
+      await handler.playEpisode(ep3, playlistId: playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep3);
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(await itemsOf(playlistId), [episodeId, ep2]);
+    });
+
+    test('outside a playlist nothing follows', () async {
+      await handler.playEpisode(episodeId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, episodeId);
+      expect(handler.playbackState.value.playing, isFalse);
+      // Played episodes leave all playlists, even when played elsewhere.
+      expect(await itemsOf(playlistId), [ep2, ep3]);
+    });
+
+    test('skip: next starts, skipped stays unplayed in the playlist', () async {
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      expect(
+        handler.playbackState.value.controls,
+        contains(MediaControl.skipToNext),
+      );
+      await handler.skipToNext();
+
+      expect(handler.currentEpisodeId, ep2);
+      expect((await episode()).status, isNot(EpisodeStatus.played));
+      expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+    });
+
+    test('played episode leaves ALL playlists', () async {
+      final other = await playlists.create('Unterwegs');
+      await playlists.add(other, episodeId);
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(await itemsOf(other), isEmpty);
+    });
+
+    test('active playlist survives an app restart', () async {
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      await handler.stop();
+
+      final restarted = PodcastAudioHandler(
+        engine: FakePlayerEngine(),
+        playback: PlaybackRepository(db, () => now),
+        settings: settings,
+        playlists: playlists,
+      );
+      addTearDown(restarted.dispose);
+      await restarted.restoreLastEpisode();
+      expect(restarted.activePlaylistId, playlistId);
+      expect(restarted.mediaItem.value!.extras!['playlistId'], playlistId);
+    });
   });
 }

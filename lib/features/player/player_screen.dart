@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import 'boost_sheet.dart';
 import 'player_controls.dart';
@@ -73,7 +74,9 @@ class PlayerScreen extends ConsumerWidget {
                             SkipButton.forward(),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        if (item.extras?['playlistId'] case final int id)
+                          _PlaylistRow(playlistId: id),
+                        const SizedBox(height: 8),
                         if (podcastId != null) _BoostButton(podcastId),
                         const SizedBox(height: 16),
                       ],
@@ -154,6 +157,39 @@ class _BoostButton extends ConsumerWidget {
       onPressed: () => showBoostSheet(context, podcastId),
       icon: Icon(boost.db > 0 ? Icons.volume_up : Icons.volume_down),
       label: Text(l10n.boostButton(value)),
+    );
+  }
+}
+
+/// "Aus Playlist „X“" plus the "next episode" button.
+class _PlaylistRow extends ConsumerWidget {
+  const _PlaylistRow({required this.playlistId});
+
+  final int playlistId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final name = ref.watch(playlistProvider(playlistId)).value?.name;
+    if (name == null) return const SizedBox.shrink();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.playlist_play, size: 20),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            l10n.playingFromPlaylist(name),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        IconButton(
+          tooltip: l10n.playerNext,
+          icon: const Icon(Icons.skip_next),
+          onPressed: ref.read(audioHandlerProvider).skipToNext,
+        ),
+      ],
     );
   }
 }

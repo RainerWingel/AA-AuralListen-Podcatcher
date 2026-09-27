@@ -1,11 +1,17 @@
 # Playlists
 
-Vorbild: Castbox. Mehrere Playlists, manuell befüllt.
+Vorbild: Castbox. Mehrere Playlists, manuell befüllt. **Umgesetzt in M5 ✅**
+
+Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/podcast_audio_handler.dart`
+(aktive Playlist, Weiterspielen, „Weiter"), `lib/features/playlists/` (UI). Tests: Gruppe „playlists" in
+`test/audio/podcast_audio_handler_test.dart`, `test/data/playlist_repository_test.dart`.
 
 ## Verwaltung
-- Playlists anlegen, umbenennen, löschen, sortieren. Beim ersten Start existiert eine Playlist „Wiedergabeliste".
-- Folge hinzufügen über Folgen-Menü („Zu Playlist hinzufügen…") – ans Ende der gewählten Playlist.
-- Reihenfolge per Drag & Drop, Entfernen per Wischen.
+- Playlists anlegen, umbenennen, löschen, sortieren (Griff ≡ ziehen). Beim ersten Start – und beim Update auf Schema v4 –
+  wird die Playlist „Wiedergabeliste" angelegt. Löschen einer Playlist löscht nur die Einträge, nicht die Folgen.
+- Folge hinzufügen über Folgen-Menü („Zu Playlist hinzufügen…") – ans Ende der gewählten Playlist. Gibt es nur eine
+  Playlist, wird direkt hinzugefügt; sonst Auswahl-Sheet (inkl. „Neue Playlist").
+- Reihenfolge per Drag & Drop (Griff ≡), Entfernen per Wischen nach links (mit „Rückgängig" – fügt am Ende wieder ein).
 - Eine Folge kann in mehreren Playlists stehen, in einer Playlist aber nur einmal.
 
 ## Abspielverhalten
@@ -18,7 +24,18 @@ Vorbild: Castbox. Mehrere Playlists, manuell befüllt.
   Dadurch wird eine Folge, die während der Wiedergabe hinzugefügt wurde, automatisch mitgespielt.
 - Ist die Playlist leer, stoppt die Wiedergabe.
 - Wird eine Folge **außerhalb** einer Playlist gestartet, gibt es keine aktive Playlist; nach dem Ende stoppt die Wiedergabe.
-- Überspringt der Benutzer eine Folge manuell („Weiter"), wird sie **nicht** als gespielt markiert und **bleibt** in der Playlist.
+- Überspringt der Benutzer eine Folge manuell („Weiter" ⏭ im Vollbild-Player bzw. in der Benachrichtigung), wird sie
+  **nicht** als gespielt markiert und **bleibt** in der Playlist.
+- Auch manuelles „Als gespielt markieren" entfernt die Folge aus allen Playlists (Regel sitzt zentral in `markPlayed`).
+
+### Umsetzungsdetails
+- Die Folge verschwindet bereits bei **98 %** aus den Playlists (dann wird sie „gespielt"); gestartet wird die nächste
+  aber erst am **Ende** der Datei.
+- Der Handler merkt sich die **Position** der laufenden Folge in der aktiven Playlist. Die nächste Folge ist der Eintrag
+  mit der kleinsten Position **größer** als diese – gelesen im Moment des Wechsels. Vor dem Entfernen (98 %) wird die
+  Position neu gelesen, falls der Benutzer inzwischen umsortiert hat.
+- Aktive Playlist + Position stehen in `settings['player.activePlaylistId']` (`"<id>:<position>"`) und überleben einen
+  App-Neustart. Die Playlist-ID steht auch in `mediaItem.extras['playlistId']` (für den Vollbild-Player).
 
 ## Tests
 Unit-Tests für: Weiterspielen, Hinzufügen während der Wiedergabe, leere Playlist, Überspringen (bleibt drin, ungespielt),

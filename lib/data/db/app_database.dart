@@ -12,7 +12,9 @@ part 'app_database.g.dart';
 typedef EpisodeWithPodcast = ({Episode episode, Podcast podcast});
 
 /// The single SQLite database of the app (think: EF Core DbContext).
-@DriftDatabase(tables: [Podcasts, Episodes, Settings, Downloads])
+@DriftDatabase(
+  tables: [Podcasts, Episodes, Settings, Downloads, Playlists, PlaylistItems],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
     : super(
@@ -28,11 +30,24 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
+
+  /// Name of the playlist that exists from the first start on (German-only app).
+  static const defaultPlaylistName = 'Wiedergabeliste';
+
+  Future<void> _createDefaultPlaylist() => into(playlists).insert(
+    PlaylistsCompanion.insert(
+      name: defaultPlaylistName,
+      createdAt: DateTime.now(),
+    ),
+  );
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (m) => m.createAll(),
+    onCreate: (m) async {
+      await m.createAll();
+      await _createDefaultPlaylist();
+    },
     onUpgrade: (m, from, to) async {
       // One step per version; each step is covered by test/data/db/migration_test.dart.
       if (from < 2) {
@@ -40,6 +55,11 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 3) {
         await m.createTable(downloads);
+      }
+      if (from < 4) {
+        await m.createTable(playlists);
+        await m.createTable(playlistItems);
+        await _createDefaultPlaylist();
       }
     },
     beforeOpen: (details) async {

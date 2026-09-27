@@ -35,3 +35,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Paket background_downloader ohne dessen Task-Datenbank** · Downloads laufen im Hintergrund weiter (WorkManager); unsere `downloads`-Tabelle bleibt die einzige Buchführung.
 - 2026-09-27 · **Speicherlimit löscht nur gespielte Downloads** · Benutzerregel „unter 98 % nie automatisch löschen" hat Vorrang; bei vollem Speicher stoppt nur der Auto-Download (ersetzt die frühere Notiz „dann älteste ungespielte löschen").
 - 2026-09-27 · **Tab „Optionen" statt „Einstellungen"** · 5 Tabs + große Systemschrift auf dem S25 → Umbruch.
+- 2026-09-27 · **Gespielt-Regel „aus allen Playlists" zentral in `markPlayed`** · gilt für 98 %, Dateiende und manuelles Markieren gleich.
+- 2026-09-27 · **Nächste Folge = kleinste Position größer als die der laufenden** · dynamisch gelesen; Position wird vor dem Entfernen aktualisiert (Umsortieren während der Wiedergabe).
+- 2026-09-27 · **„Rückgängig" beim Entfernen fügt am Ende ein** · alte Position wiederherzustellen lohnt den Aufwand nicht.

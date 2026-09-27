@@ -8,4 +8,7 @@ abstract final class SettingsKeys {
 
   /// Upper limit for all downloaded audio files in bytes (default 5 GB).
   static const downloadLimitBytes = 'downloads.limitBytes';
+
+  /// Playlist the current episode was started from (null = none).
+  static const activePlaylistId = 'player.activePlaylistId';
 }

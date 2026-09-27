@@ -362,4 +362,85 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get downloadLimitHint =>
       'Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen.';
+
+  @override
+  String get playlistNew => 'Neue Playlist';
+
+  @override
+  String get playlistName => 'Name';
+
+  @override
+  String get playlistRename => 'Umbenennen';
+
+  @override
+  String get playlistDelete => 'Playlist löschen';
+
+  @override
+  String playlistDeleteConfirm(String name) {
+    return '„$name“ löschen? Die Folgen selbst bleiben erhalten.';
+  }
+
+  @override
+  String get delete => 'Löschen';
+
+  @override
+  String get save => 'Speichern';
+
+  @override
+  String get create => 'Anlegen';
+
+  @override
+  String get playlistsEmpty => 'Keine Playlists';
+
+  @override
+  String get playlistEmpty => 'Diese Playlist ist leer';
+
+  @override
+  String get playlistEmptyHint =>
+      'Folge lange drücken → „Zu Playlist hinzufügen…“';
+
+  @override
+  String playlistSummary(int count, String duration) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen',
+      one: '1 Folge',
+      zero: 'Leer',
+    );
+    return '$_temp0$duration';
+  }
+
+  @override
+  String get playlistPlay => 'Playlist abspielen';
+
+  @override
+  String get addToPlaylist => 'Zu Playlist hinzufügen…';
+
+  @override
+  String addedToPlaylist(String name) {
+    return 'Zu „$name“ hinzugefügt';
+  }
+
+  @override
+  String alreadyInPlaylist(String name) {
+    return 'Schon in „$name“';
+  }
+
+  @override
+  String get removedFromPlaylist => 'Aus der Playlist entfernt';
+
+  @override
+  String get undo => 'Rückgängig';
+
+  @override
+  String get playerNext => 'Nächste Folge';
+
+  @override
+  String playingFromPlaylist(String name) {
+    return 'Aus Playlist „$name“';
+  }
+
+  @override
+  String get dragToReorder => 'Zum Verschieben ziehen';
 }

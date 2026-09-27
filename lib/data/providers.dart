@@ -11,6 +11,7 @@ import 'directory/directory_search.dart';
 import 'feed/feed_fetcher.dart';
 import 'opml_importer.dart';
 import 'playback_repository.dart';
+import 'playlist_repository.dart';
 import 'podcast_repository.dart';
 import 'settings_keys.dart';
 import 'settings_repository.dart';
@@ -96,6 +97,24 @@ final playbackRepositoryProvider = Provider<PlaybackRepository>(
   (ref) =>
       PlaybackRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
 );
+
+final playlistRepositoryProvider = Provider<PlaylistRepository>(
+  (ref) =>
+      PlaylistRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+);
+
+final playlistsProvider = StreamProvider.autoDispose<List<PlaylistSummary>>(
+  (ref) => ref.watch(playlistRepositoryProvider).watchPlaylists(),
+);
+
+final playlistProvider = StreamProvider.autoDispose.family<Playlist?, int>(
+  (ref, id) => ref.watch(playlistRepositoryProvider).watchPlaylist(id),
+);
+
+final playlistEntriesProvider = StreamProvider.autoDispose
+    .family<List<PlaylistEntry>, int>(
+      (ref, id) => ref.watch(playlistRepositoryProvider).watchEntries(id),
+    );
 
 final directorySearchProvider = Provider<DirectorySearch>((ref) {
   final client = ref.watch(httpClientProvider);

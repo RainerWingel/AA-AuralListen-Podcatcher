@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 
 import '../data/db/app_database.dart';
 import '../data/playback_repository.dart';
+import '../data/playlist_repository.dart';
 import '../data/settings_keys.dart';
 import '../data/settings_repository.dart';
 import 'player_engine.dart';
@@ -20,6 +21,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     required this._playback,
     required this._settings,
     this._localAudioFile,
+    this._playlists,
     this.stopAfterPause = const Duration(minutes: 10),
   }) {
     _subscriptions
@@ -41,6 +43,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Returns the downloaded file of an episode, if any (DownloadService).
   final Future<File?> Function(int episodeId)? _localAudioFile;
 
+  /// Needed for "continue with the next playlist episode" (docs/playlists.md).
+  final PlaylistRepository? _playlists;
+
   static const rewindInterval = Duration(seconds: 15);
   static const fastForwardInterval = Duration(seconds: 30);
 
@@ -60,6 +65,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   Timer? _pauseTimer;
 
   int? _episodeId;
+
+  /// Playlist the current episode was started from, and the episode's
+  /// position in it (kept after the episode was removed at 98 %).
+  int? _activePlaylistId;
+  int _playlistPosition = -1;
+
   bool _loaded = false;
   bool _markedPlayed = false;
   bool _completing = false;
@@ -75,6 +86,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   final _positions = StreamController<Duration>.broadcast();
 
   int? get currentEpisodeId => _episodeId;
+
+  int? get activePlaylistId => _activePlaylistId;
 
   /// Current position – also correct while no audio is loaded.
   Duration get position => _loaded ? _engine.position : _idlePosition;
@@ -96,14 +109,26 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final row = await _playback.load(id);
     if (row == null) return;
     _episodeId = id;
-    mediaItem.add(_toMediaItem(row));
+    final saved = (await _settings.get(SettingsKeys.activePlaylistId))
+        ?.split(':');
+    if (saved != null && saved.length == 2) {
+      _activePlaylistId = int.tryParse(saved[0]);
+      _playlistPosition = int.tryParse(saved[1]) ?? -1;
+    }
+    mediaItem.add(_withPlaylist(_toMediaItem(row)));
     _setIdlePosition(_savedPosition(row.episode));
     _broadcastState();
   }
 
-  /// Starts [episodeId] (resuming at its saved position).
-  Future<void> playEpisode(int episodeId) async {
-    if (episodeId == _episodeId && _loaded) return play();
+  /// Starts [episodeId] (resuming at its saved position). With [playlistId]
+  /// the playlist becomes active: when the episode ends, the next one of that
+  /// playlist starts. Without it, playback stops at the end.
+  Future<void> playEpisode(int episodeId, {int? playlistId}) async {
+    await _setActivePlaylist(episodeId, playlistId);
+    if (episodeId == _episodeId && _loaded) {
+      mediaItem.add(_withPlaylist(mediaItem.value));
+      return play();
+    }
 
     await _saveCurrentPosition();
     final row = await _playback.load(episodeId);
@@ -112,7 +137,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _episodeId = episodeId;
     _loaded = false;
     _exactStart = false;
-    mediaItem.add(_toMediaItem(row));
+    mediaItem.add(_withPlaylist(_toMediaItem(row)));
     _setIdlePosition(_savedPosition(row.episode));
     await _settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
     await play();
@@ -141,6 +166,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   // ------------------------------------------------ audio_service overrides
+
+  /// "Next" in the notification / full player: next playlist episode. The
+  /// current one is NOT marked as played and stays in the playlist.
+  @override
+  Future<void> skipToNext() async {
+    final next = await _nextInPlaylist();
+    if (next != null) await playEpisode(next, playlistId: _activePlaylistId);
+  }
 
   @override
   Future<void> play() async {
@@ -215,6 +248,54 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   // --------------------------------------------------------------- internals
+
+  Future<void> _setActivePlaylist(int episodeId, int? playlistId) async {
+    final position = playlistId == null
+        ? null
+        : await _playlists?.positionOf(playlistId, episodeId);
+    if (playlistId == null || position == null) {
+      _activePlaylistId = null;
+      _playlistPosition = -1;
+      await _settings.remove(SettingsKeys.activePlaylistId);
+    } else {
+      _activePlaylistId = playlistId;
+      _playlistPosition = position;
+      await _settings.set(
+        SettingsKeys.activePlaylistId,
+        '$playlistId:$position',
+      );
+    }
+  }
+
+  /// Marks as played (also removes it from all playlists). The playlist
+  /// position is refreshed first, in case the user reordered meanwhile.
+  Future<void> _markPlayed(int episodeId) async {
+    final playlistId = _activePlaylistId;
+    if (playlistId != null) {
+      final position = await _playlists?.positionOf(playlistId, episodeId);
+      if (position != null) _playlistPosition = position;
+    }
+    await _playback.markPlayed(episodeId);
+  }
+
+  /// Next episode of the active playlist, read from the DB right now.
+  Future<int?> _nextInPlaylist() async {
+    final playlistId = _activePlaylistId;
+    final current = _episodeId;
+    if (playlistId == null || _playlists == null) return null;
+    if (current != null) {
+      final position = await _playlists.positionOf(playlistId, current);
+      if (position != null) _playlistPosition = position;
+    }
+    return (await _playlists.nextAfter(
+      playlistId,
+      _playlistPosition,
+    ))?.episodeId;
+  }
+
+  MediaItem? _withPlaylist(MediaItem? item) => item?.copyWith(
+    extras: {...?item.extras, 'playlistId': _activePlaylistId},
+  );
 
   int? get _currentPodcastId => mediaItem.value?.extras?['podcastId'] as int?;
 
@@ -292,7 +373,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         duration > Duration.zero &&
         position.inMilliseconds >= duration.inMilliseconds * playedThreshold) {
       _markedPlayed = true;
-      await _playback.markPlayed(id);
+      await _markPlayed(id);
       return;
     }
     if ((position - _lastSaved).abs() >= saveInterval) {
@@ -319,10 +400,13 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         final id = _episodeId;
         if (id != null && !_markedPlayed) {
           _markedPlayed = true;
-          await _playback.markPlayed(id);
+          await _markPlayed(id);
         }
-        // M5: continue with the next playlist episode here.
         await stop();
+        final next = await _nextInPlaylist();
+        if (next != null) {
+          await playEpisode(next, playlistId: _activePlaylistId);
+        }
       } finally {
         _completing = false;
       }
@@ -338,6 +422,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
           MediaControl.rewind,
           if (playing) MediaControl.pause else MediaControl.play,
           MediaControl.fastForward,
+          if (_activePlaylistId != null) MediaControl.skipToNext,
         ],
         systemActions: const {
           MediaAction.seek,
@@ -345,6 +430,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
           MediaAction.seekBackward,
           MediaAction.rewind,
           MediaAction.fastForward,
+          MediaAction.skipToNext,
         },
         androidCompactActionIndices: const [0, 1, 2],
         processingState: !_loaded

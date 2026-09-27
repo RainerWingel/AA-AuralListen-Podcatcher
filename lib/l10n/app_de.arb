@@ -217,5 +217,64 @@
   "autoDeletePlayedHint": "96 Stunden nachdem eine Folge zu 98 % gehört wurde",
   "settingsSectionDownloads": "Downloads",
   "downloadLimit": "Speicherlimit für Downloads",
-  "downloadLimitHint": "Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen."
+  "downloadLimitHint": "Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen.",
+  "playlistNew": "Neue Playlist",
+  "playlistName": "Name",
+  "playlistRename": "Umbenennen",
+  "playlistDelete": "Playlist löschen",
+  "playlistDeleteConfirm": "„{name}“ löschen? Die Folgen selbst bleiben erhalten.",
+  "@playlistDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "delete": "Löschen",
+  "save": "Speichern",
+  "create": "Anlegen",
+  "playlistsEmpty": "Keine Playlists",
+  "playlistEmpty": "Diese Playlist ist leer",
+  "playlistEmptyHint": "Folge lange drücken → „Zu Playlist hinzufügen…“",
+  "playlistSummary": "{count, plural, =0{Leer} =1{1 Folge} other{{count} Folgen}}{duration}",
+  "@playlistSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistPlay": "Playlist abspielen",
+  "addToPlaylist": "Zu Playlist hinzufügen…",
+  "addedToPlaylist": "Zu „{name}“ hinzugefügt",
+  "@addedToPlaylist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "alreadyInPlaylist": "Schon in „{name}“",
+  "@alreadyInPlaylist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removedFromPlaylist": "Aus der Playlist entfernt",
+  "undo": "Rückgängig",
+  "playerNext": "Nächste Folge",
+  "playingFromPlaylist": "Aus Playlist „{name}“",
+  "@playingFromPlaylist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dragToReorder": "Zum Verschieben ziehen"
 }

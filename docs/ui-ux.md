@@ -31,7 +31,14 @@ Cover, Titel (max. 2 Zeilen), auf der Startseite der Podcast-Name in eigener Zei
 (eigene Zeile, damit lange Podcast-Namen sie nie verdrängen), Fortschritt (Balken), Status-Icon (Punkt = neu, Haken = gespielt, Equalizer = läuft gerade;
 laufende Folge hervorgehoben). **Tippen = abspielen.** **Langes Drücken** = Menü: Abspielen, Als gespielt / ungespielt markieren.
 Menü außerdem: Herunterladen / Download abbrechen / Download löschen / Erneut herunterladen (je nach Zustand).
-Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Später: Zu Playlist (M5).
+Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Außerdem „Zu Playlist hinzufügen…".
+
+## Playlists
+- **Playlists-Tab:** Liste mit Name und „N Folgen · Dauer", Griff ≡ zum Sortieren, ⋮ (Umbenennen, Löschen),
+  AppBar „Neue Playlist". Tippen öffnet die Playlist.
+- **Playlist:** Folgen in Reihenfolge (mit Podcast-Name), Griff ≡ zum Verschieben, nach links wischen = entfernen
+  (Snackbar mit „Rückgängig"). Tippen spielt ab und macht die Playlist aktiv. AppBar: ▶ „Playlist abspielen" (ab oben), ⋮.
+- **Vollbild-Player:** Bei aktiver Playlist Zeile „Aus Playlist „X"" mit ⏭ „Nächste Folge".
 
 ## Downloads-Tab
 Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %" /

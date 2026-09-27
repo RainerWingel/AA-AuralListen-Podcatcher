@@ -8,6 +8,7 @@ import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/feed/opml.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
+import 'package:aapodcastguru/data/playlist_repository.dart';
 import 'package:aapodcastguru/data/providers.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
@@ -79,6 +80,7 @@ void main() {
       engine: engine,
       playback: PlaybackRepository(db, DateTime.now),
       settings: SettingsRepository(db),
+      playlists: PlaylistRepository(db, DateTime.now),
     );
   });
   // Closing inside the widget test's fake-async zone never completes.
@@ -428,4 +430,60 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'adds to a playlist, plays from it, swipes it away',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+
+      // Only the default playlist exists → added directly.
+      await tester.longPress(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.text('Zu Playlist hinzufügen…'));
+      await settle(tester);
+      expect(find.text('Zu „Wiedergabeliste“ hinzugefügt'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Playlists'));
+      await settle(tester);
+      expect(find.text('1 Folge · 1 Std. 5 Min.'), findsOneWidget);
+
+      await tester.tap(find.text('Wiedergabeliste'));
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      expect(handler.activePlaylistId, isNotNull);
+
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      expect(find.text('Aus Playlist „Wiedergabeliste“'), findsOneWidget);
+      expect(find.byTooltip('Nächste Folge'), findsOneWidget);
+      await tester.tap(find.byTooltip('Player schließen'));
+      await settle(tester);
+
+      // The mini player shows the title too – swipe the playlist row.
+      await tester.drag(
+        find.descendant(
+          of: find.byType(Dismissible),
+          matching: find.text('Erste Folge'),
+        ),
+        const Offset(-600, 0),
+      );
+      await settle(tester);
+      expect(find.text('Aus der Playlist entfernt'), findsOneWidget);
+      expect(find.text('Diese Playlist ist leer'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
 }
