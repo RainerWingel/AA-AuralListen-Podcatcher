@@ -4,6 +4,9 @@ import 'package:aapodcastguru/audio/player_engine.dart';
 
 /// Scriptable [PlayerEngine] for tests: records calls, lets the test emit
 /// positions, durations and completion.
+///
+/// Mimics just_audio where it matters: loading a new source keeps the
+/// "playing" flag, and play() while already playing emits no state event.
 class FakePlayerEngine implements PlayerEngine {
   final _state = StreamController<EngineState>.broadcast(sync: true);
   final _position = StreamController<Duration>.broadcast(sync: true);
@@ -58,7 +61,7 @@ class FakePlayerEngine implements PlayerEngine {
     loadedAt = initialPosition;
     _pos = initialPosition;
     _dur = fakeDuration;
-    _setState(false, EngineProcessing.ready);
+    _setState(_current.playing, EngineProcessing.ready);
     _duration.add(fakeDuration);
     return fakeDuration;
   }
@@ -66,7 +69,7 @@ class FakePlayerEngine implements PlayerEngine {
   @override
   Future<void> play() async {
     calls.add('play');
-    _setState(true, EngineProcessing.ready);
+    if (!_current.playing) _setState(true, EngineProcessing.ready);
   }
 
   @override

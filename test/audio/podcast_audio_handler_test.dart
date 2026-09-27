@@ -280,6 +280,23 @@ void main() {
     expect(handler.position, const Duration(seconds: 200));
   });
 
+  // Regression: switching episodes while playing left the play button on
+  // "play" (and pressing it did nothing) until the user seeked.
+  test('switching episodes while playing reports "playing"', () async {
+    final other = await addEpisode('2');
+    await handler.playEpisode(episodeId);
+    expect(handler.playbackState.value.playing, isTrue);
+
+    await handler.playEpisode(other);
+    expect(handler.playbackState.value.playing, isTrue);
+    expect(handler.playbackState.value.controls, contains(MediaControl.pause));
+
+    await handler.pause();
+    expect(handler.playbackState.value.playing, isFalse);
+    await handler.play();
+    expect(handler.playbackState.value.playing, isTrue);
+  });
+
   test('switching episodes saves the old position first', () async {
     final other = await addEpisode('2');
     await handler.playEpisode(episodeId);
