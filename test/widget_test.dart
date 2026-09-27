@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:aapodcastguru/app/app.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/providers.dart';
@@ -24,6 +26,18 @@ const _feed = '''
   </channel>
 </rss>''';
 
+// Search result without artwork (no image loading in widget tests).
+final _itunesJson = jsonEncode({
+  'results': [
+    {
+      'collectionName': 'Widget-Podcast',
+      'artistName': 'Tester',
+      'feedUrl': 'https://example.com/feed',
+      'trackCount': 1,
+    },
+  ],
+});
+
 /// Like pumpAndSettle, but also lets real async work (SQLite, mocked HTTP) run.
 /// pumpAndSettle alone never settles while a loading spinner waits for drift.
 Future<void> settle(WidgetTester tester) async {
@@ -49,9 +63,15 @@ void main() {
           databaseProvider.overrideWithValue(db),
           httpClientProvider.overrideWithValue(
             MockClient(
-              (request) async => request.url.host == 'example.com'
-                  ? http.Response(_feed, 200)
-                  : http.Response('', 404),
+              (request) async => switch (request.url.host) {
+                'example.com' => http.Response(_feed, 200),
+                'itunes.apple.com' => http.Response.bytes(
+                  utf8.encode(_itunesJson),
+                  200,
+                ),
+                'api.fyyd.de' => http.Response('', 500),
+                _ => http.Response('', 404),
+              },
             ),
           ),
         ],
@@ -129,6 +149,38 @@ void main() {
       await tester.tap(find.widgetWithText(NavigationDestination, 'Start'));
       await settle(tester);
       expect(find.text('Erste Folge'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'searches directories and subscribes from the results',
+    timeout: timeout,
+    (tester) async {
+      await pumpApp(tester);
+      await tester.tap(find.byTooltip('Suchen'));
+      await settle(tester);
+      expect(find.text('Suche nach Titel, Thema oder Autor'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'widget');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await settle(tester);
+
+      // fyyd is down (HTTP 500), Apple still delivers.
+      expect(find.textContaining('fyyd nicht erreichbar'), findsOneWidget);
+      expect(find.text('Widget-Podcast'), findsOneWidget);
+      expect(find.text('Tester · 1 Folge'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Abonnieren'));
+      await settle(tester);
+      expect(find.text('„Widget-Podcast“ abonniert'), findsOneWidget);
+      expect(find.byTooltip('Abonniert'), findsOneWidget);
+
+      final podcasts = await tester.runAsync(
+        () => db.select(db.podcasts).get(),
+      );
+      expect(podcasts!.single.title, 'Widget-Podcast');
 
       await disposeApp(tester);
     },

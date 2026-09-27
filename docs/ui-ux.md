@@ -9,7 +9,11 @@ Vorbild: **Castbox**. Material 3, nur Deutsch, Hell/Dunkel (Dunkel ab M7).
 4. **Downloads** – laufende und fertige Downloads
 5. **Einstellungen** – Sprünge, Boost-Standard, Speicher, OPML, Backup, Info
 
-Suche: Lupe oben rechts auf Start und Abos; zusätzlich „Per RSS-URL hinzufügen".
+Suche: Lupe oben rechts auf Start und Abos → Suchbildschirm (`/abos/suche`) mit Eingabefeld in der AppBar.
+Treffer: Cover, Titel, „Autor · N Folgen", rechts ⊕ (abonnieren) bzw. ✓ (abonniert). Nach dem Abonnieren
+Snackbar „„X" abonniert" mit Aktion „Öffnen".
+Abos-Tab: Lupe + „+" (RSS-URL). Leerer Abos-Tab bietet: Suchen · Per RSS-URL hinzufügen · OPML-Datei importieren.
+Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 
 ## Player
 - **Mini-Player** über der Navigationsleiste: Cover, Titel, Play/Pause, Fortschrittsbalken.

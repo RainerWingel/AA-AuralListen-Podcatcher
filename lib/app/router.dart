@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/downloads/downloads_screen.dart';
 import '../features/episodes/home_screen.dart';
 import '../features/playlists/playlists_screen.dart';
+import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/subscriptions/podcast_detail_screen.dart';
 import '../features/subscriptions/subscriptions_screen.dart';
@@ -27,6 +28,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: Routes.subscriptions,
                 builder: (context, state) => const SubscriptionsScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'suche',
+                    builder: (context, state) => const SearchScreen(),
+                  ),
                   GoRoute(
                     path: 'podcast/:id',
                     builder: (context, state) => PodcastDetailScreen(

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+  <head><title>Castbox Subscriptions</title></head>
+  <body>
+    <outline text="feeds">
+      <outline type="rss" text="Podcast A" title="Podcast A" xmlUrl="https://a.example.com/feed"/>
+      <outline type="rss" text="Podcast B" xmlUrl="https://b.example.com/feed"/>
+      <outline type="rss" text="Kaputt" xmlUrl="https://broken.example.com/feed"/>
+      <outline type="rss" text="A doppelt" xmlUrl="https://a.example.com/feed"/>
+    </outline>
+    <outline text="Ordner ohne Feed"/>
+  </body>
+</opml>

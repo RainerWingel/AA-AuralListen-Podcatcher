@@ -13,6 +13,8 @@
 - `main` ist immer lauffähig, CI grün.
 - Arbeit auf `feature/<kurz>`, `fix/<kurz>`, `chore/<kurz>`, `docs/<kurz>`.
 - Ein Meilenstein bzw. eine abgeschlossene Aufgabe = ein Pull Request.
+- Der Agent merged seinen PR selbst, sobald die CI grün ist: `gh pr merge <n> --merge --delete-branch`
+  (GitHub-Auto-Merge ist im Repo nicht aktiviert).
 
 ## Commits
 - Conventional Commits auf Englisch: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`, `ci:`.

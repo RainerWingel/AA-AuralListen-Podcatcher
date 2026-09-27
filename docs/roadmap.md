@@ -26,8 +26,10 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Begrenzter Cover-Cache (300 Bilder / 30 Tage)
 
 ## M2 – Suche & Import
-- [ ] Suche: iTunes, fyyd
-- [ ] OPML-Import (Castbox-Export)
+- [x] Suche: Apple Podcasts (iTunes) + fyyd, parallel, zusammengeführt, ohne Dubletten
+- [x] Abonnieren direkt aus den Suchergebnissen
+- [x] OPML-Import (Castbox-Export) mit Fortschritt und Ergebnis-Übersicht
+- [ ] Castbox-Export auf dem Handy importieren (Benutzer)
 
 ## M3 – Player → erste produktiv nutzbare Version
 - [ ] `audio_service`-Handler, Benachrichtigung, Sperrbildschirm, Bluetooth

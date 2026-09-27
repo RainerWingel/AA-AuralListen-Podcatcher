@@ -134,4 +134,97 @@ class AppLocalizationsDe extends AppLocalizations {
   String unsubscribeConfirmBody(String title) {
     return '„$title“ und alle Folgen werden aus der App entfernt.';
   }
+
+  @override
+  String get search => 'Suchen';
+
+  @override
+  String get searchHint => 'Podcast suchen';
+
+  @override
+  String get searchStart => 'Suche nach Titel, Thema oder Autor';
+
+  @override
+  String get searchStartHint => 'Durchsucht Apple Podcasts und fyyd.de';
+
+  @override
+  String get searchNoResults => 'Keine Podcasts gefunden';
+
+  @override
+  String get searchFailed =>
+      'Suche fehlgeschlagen. Bitte Internetverbindung prüfen.';
+
+  @override
+  String searchPartialFailure(String names) {
+    return '$names nicht erreichbar – Ergebnisse unvollständig';
+  }
+
+  @override
+  String get subscribed => 'Abonniert';
+
+  @override
+  String get subscribeAction => 'Abonnieren';
+
+  @override
+  String subscribedSnack(String title) {
+    return '„$title“ abonniert';
+  }
+
+  @override
+  String get open => 'Öffnen';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get settingsSectionSubscriptions => 'Abos';
+
+  @override
+  String get opmlImport => 'OPML-Datei importieren';
+
+  @override
+  String get opmlImportSubtitle =>
+      'Abos aus einer anderen App übernehmen (z. B. Castbox)';
+
+  @override
+  String get opmlInvalid => 'Die Datei ist keine gültige OPML-Datei.';
+
+  @override
+  String get opmlTooLarge => 'Die Datei ist zu groß.';
+
+  @override
+  String get opmlEmpty => 'In der Datei wurden keine Podcasts gefunden.';
+
+  @override
+  String get opmlConfirmTitle => 'Abos importieren?';
+
+  @override
+  String opmlConfirmBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Podcasts gefunden.',
+      one: '1 Podcast gefunden.',
+    );
+    return '$_temp0 Bereits vorhandene Abos werden übersprungen.';
+  }
+
+  @override
+  String get opmlImportAction => 'Importieren';
+
+  @override
+  String opmlProgress(int done, int total) {
+    return 'Importiere $done von $total …';
+  }
+
+  @override
+  String get opmlResultTitle => 'Import abgeschlossen';
+
+  @override
+  String opmlResultBody(int added, int already, int failed) {
+    return 'Neu: $added\nBereits vorhanden: $already\nFehlgeschlagen: $failed';
+  }
+
+  @override
+  String get opmlResultFailedList => 'Nicht importiert:';
 }

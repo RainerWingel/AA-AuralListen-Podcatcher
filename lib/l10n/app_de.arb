@@ -12,10 +12,8 @@
   },
   "cancel": "Abbrechen",
   "loadError": "Fehler beim Laden",
-
   "homeEmpty": "Noch keine Folgen",
   "homeEmptyHint": "Abonniere Podcasts im Tab „Abos“.",
-
   "subscriptionsEmpty": "Noch keine Abos",
   "subscriptionsEmptyHint": "Füge deinen ersten Podcast per RSS-URL hinzu.",
   "addFeedAction": "Per RSS-URL hinzufügen",
@@ -27,33 +25,122 @@
   "subscribeErrorAlreadySubscribed": "Diesen Podcast hast du schon abonniert.",
   "subscribeErrorNetwork": "Der Feed konnte nicht geladen werden. Bitte Adresse und Internetverbindung prüfen.",
   "subscribeErrorNotAFeed": "Unter dieser Adresse liegt kein Podcast-Feed.",
-
   "refreshFailed": "{count, plural, =1{1 Feed konnte nicht aktualisiert werden.} other{{count} Feeds konnten nicht aktualisiert werden.}}",
   "@refreshFailed": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-
   "podcastNotFound": "Podcast nicht gefunden",
   "podcastRefreshError": "Letzte Aktualisierung fehlgeschlagen",
   "episodeCount": "{count, plural, =0{Keine Folgen} =1{1 Folge} other{{count} Folgen}}",
   "@episodeCount": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "episodeNew": "Neu",
   "episodePlayed": "Gespielt",
   "durationHoursMinutes": "{hours} Std. {minutes} Min.",
   "@durationHoursMinutes": {
-    "placeholders": { "hours": { "type": "int" }, "minutes": { "type": "int" } }
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
   "durationMinutes": "{minutes} Min.",
   "@durationMinutes": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
-
   "unsubscribe": "Abo kündigen",
   "unsubscribeConfirmTitle": "Abo kündigen?",
   "unsubscribeConfirmBody": "„{title}“ und alle Folgen werden aus der App entfernt.",
   "@unsubscribeConfirmBody": {
-    "placeholders": { "title": { "type": "String" } }
-  }
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "search": "Suchen",
+  "searchHint": "Podcast suchen",
+  "searchStart": "Suche nach Titel, Thema oder Autor",
+  "searchStartHint": "Durchsucht Apple Podcasts und fyyd.de",
+  "searchNoResults": "Keine Podcasts gefunden",
+  "searchFailed": "Suche fehlgeschlagen. Bitte Internetverbindung prüfen.",
+  "searchPartialFailure": "{names} nicht erreichbar – Ergebnisse unvollständig",
+  "@searchPartialFailure": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "subscribed": "Abonniert",
+  "subscribeAction": "Abonnieren",
+  "subscribedSnack": "„{title}“ abonniert",
+  "@subscribedSnack": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "open": "Öffnen",
+  "ok": "OK",
+  "settingsSectionSubscriptions": "Abos",
+  "opmlImport": "OPML-Datei importieren",
+  "opmlImportSubtitle": "Abos aus einer anderen App übernehmen (z. B. Castbox)",
+  "opmlInvalid": "Die Datei ist keine gültige OPML-Datei.",
+  "opmlTooLarge": "Die Datei ist zu groß.",
+  "opmlEmpty": "In der Datei wurden keine Podcasts gefunden.",
+  "opmlConfirmTitle": "Abos importieren?",
+  "opmlConfirmBody": "{count, plural, =1{1 Podcast gefunden.} other{{count} Podcasts gefunden.}} Bereits vorhandene Abos werden übersprungen.",
+  "@opmlConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "opmlImportAction": "Importieren",
+  "opmlProgress": "Importiere {done} von {total} …",
+  "@opmlProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "opmlResultTitle": "Import abgeschlossen",
+  "opmlResultBody": "Neu: {added}\nBereits vorhanden: {already}\nFehlgeschlagen: {failed}",
+  "@opmlResultBody": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "already": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "opmlResultFailedList": "Nicht importiert:"
 }
