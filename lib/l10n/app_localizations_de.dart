@@ -750,4 +750,23 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get sleepTimerCustom => 'Eigene Zeit…';
+
+  @override
+  String sleepTimerCustomSet(int minutes) {
+    return 'Eigene Zeit: $minutes Minuten';
+  }
+
+  @override
+  String get sleepTimerCustomLabel => 'Minuten';
+
+  @override
+  String sleepTimerCustomRange(int min, int max) {
+    return '$min bis $max Minuten';
+  }
+
+  @override
+  String get sleepTimerStart => 'Starten';
 }

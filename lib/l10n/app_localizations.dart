@@ -1251,6 +1251,36 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{count, plural, =0{Alle Folgen waren schon in „{playlist}“ – Wiedergabe startet.} =1{1 Folge zu „{playlist}“ hinzugefügt.} other{{count} Folgen zu „{playlist}“ hinzugefügt.}}'**
   String episodesAddedToPlaylist(int count, String playlist);
+
+  /// No description provided for @sleepTimerCustom.
+  ///
+  /// In de, this message translates to:
+  /// **'Eigene Zeit…'**
+  String get sleepTimerCustom;
+
+  /// No description provided for @sleepTimerCustomSet.
+  ///
+  /// In de, this message translates to:
+  /// **'Eigene Zeit: {minutes} Minuten'**
+  String sleepTimerCustomSet(int minutes);
+
+  /// No description provided for @sleepTimerCustomLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Minuten'**
+  String get sleepTimerCustomLabel;
+
+  /// No description provided for @sleepTimerCustomRange.
+  ///
+  /// In de, this message translates to:
+  /// **'{min} bis {max} Minuten'**
+  String sleepTimerCustomRange(int min, int max);
+
+  /// No description provided for @sleepTimerStart.
+  ///
+  /// In de, this message translates to:
+  /// **'Starten'**
+  String get sleepTimerStart;
 }
 
 class _AppLocalizationsDelegate
