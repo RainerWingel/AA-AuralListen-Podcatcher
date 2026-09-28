@@ -667,7 +667,7 @@ abstract class AppLocalizations {
   /// No description provided for @autoDeletePlayedHint.
   ///
   /// In de, this message translates to:
-  /// **'96 Stunden nachdem eine Folge zu 98 % gehört wurde'**
+  /// **'96 Stunden nachdem eine Folge zu 98 % gespielt wurde'**
   String get autoDeletePlayedHint;
 
   /// No description provided for @settingsSectionDownloads.
@@ -919,7 +919,7 @@ abstract class AppLocalizations {
   /// No description provided for @markPlayedUntil.
   ///
   /// In de, this message translates to:
-  /// **'Als gehört markieren bis …'**
+  /// **'Als gespielt markieren bis …'**
   String get markPlayedUntil;
 
   /// No description provided for @markPlayedUntilPick.
@@ -931,7 +931,7 @@ abstract class AppLocalizations {
   /// No description provided for @markPlayedUntilConfirm.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} bis einschließlich {date} als gehört markieren?'**
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} bis einschließlich {date} als gespielt markieren?'**
   String markPlayedUntilConfirm(int count, String date);
 
   /// No description provided for @markPlayedUntilHint.
@@ -943,13 +943,13 @@ abstract class AppLocalizations {
   /// No description provided for @markPlayedUntilNone.
   ///
   /// In de, this message translates to:
-  /// **'Bis {date} gibt es keine ungehörten Folgen.'**
+  /// **'Bis {date} gibt es keine ungespielten Folgen.'**
   String markPlayedUntilNone(String date);
 
   /// No description provided for @markPlayedUntilDone.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als gehört markiert'**
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als gespielt markiert'**
   String markPlayedUntilDone(int count);
 
   /// No description provided for @markAction.
@@ -1309,19 +1309,19 @@ abstract class AppLocalizations {
   /// No description provided for @markUnplayedSince.
   ///
   /// In de, this message translates to:
-  /// **'Als ungehört markieren seit …'**
+  /// **'Als ungespielt markieren seit …'**
   String get markUnplayedSince;
 
   /// No description provided for @markUnplayedSincePick.
   ///
   /// In de, this message translates to:
-  /// **'Alle gehörten Folgen seit einschließlich'**
+  /// **'Alle gespielten Folgen seit einschließlich'**
   String get markUnplayedSincePick;
 
   /// No description provided for @markUnplayedSinceConfirm.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =1{1 gehörte Folge} other{{count} gehörte Folgen}} seit einschließlich {date} als ungehört markieren?'**
+  /// **'{count, plural, =1{1 gespielte Folge} other{{count} gespielte Folgen}} seit einschließlich {date} als ungespielt markieren?'**
   String markUnplayedSinceConfirm(int count, String date);
 
   /// No description provided for @markUnplayedSinceHint.
@@ -1333,13 +1333,13 @@ abstract class AppLocalizations {
   /// No description provided for @markUnplayedSinceNone.
   ///
   /// In de, this message translates to:
-  /// **'Seit dem {date} gibt es keine gehörten Folgen.'**
+  /// **'Seit dem {date} gibt es keine gespielten Folgen.'**
   String markUnplayedSinceNone(String date);
 
   /// No description provided for @markUnplayedSinceDone.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als ungehört markiert'**
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als ungespielt markiert'**
   String markUnplayedSinceDone(int count);
 }
 

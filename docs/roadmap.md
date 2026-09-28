@@ -63,8 +63,8 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Checkbox-Liste in den Podcast-Einstellungen, Filter im Auto-Download
 - [ ] Praxistest mit dem WRINT-Feed (Benutzer)
 
-## Zusatz – Als gehört markieren bis Datum / als ungehört seit Datum
-- [x] „Als ungehört markieren seit …" (gehörte Folgen ab Datum → neu; angefangene bleiben)
+## Zusatz – Als gespielt markieren bis Datum / als ungespielt seit Datum
+- [x] „Als ungespielt markieren seit …" (gespielte Folgen ab Datum → neu; angefangene bleiben)
 - [x] Podcast-Menü → Kalender → Rückfrage mit Anzahl; Regeln wie „gespielt"
 
 ## M6 – Kapitel & Lesezeichen

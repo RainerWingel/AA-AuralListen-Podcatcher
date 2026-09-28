@@ -130,7 +130,7 @@ class PlaybackRepository {
         0;
   }
 
-  /// "Als ungehört markieren seit …": played episodes published at or after
+  /// "Als ungespielt markieren seit …": played episodes published at or after
   /// [since] become new again (like [markUnplayed]: position 0, no eviction).
   /// Episodes in progress keep their position; undated ones are skipped.
   /// Returns the number of episodes changed.

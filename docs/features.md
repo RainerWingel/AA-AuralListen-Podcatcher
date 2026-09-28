@@ -22,8 +22,8 @@ Sideload per APK. Nur Deutsch. Alle Daten nur lokal.
 ## Zusatz (nach M5, Wunsch des Benutzers)
 | # | Funktion | Details |
 |---|----------|---------|
-| F19 | Als gehört markieren bis Datum | pro Abo, Kalender + Rückfrage → `data-model.md` |
-| F27 | Als ungehört markieren seit Datum | pro Abo, nur gehörte Folgen, Kalender + Rückfrage → `data-model.md` |
+| F19 | Als gespielt markieren bis Datum | pro Abo, Kalender + Rückfrage → `data-model.md` |
+| F27 | Als ungespielt markieren seit Datum | pro Abo, nur gespielte Folgen, Kalender + Rückfrage → `data-model.md` |
 | F26 | Podcast komplett abspielen | Abos: langes Drücken → alle neuen (96 h) / ungespielte seit Datum / alle ungespielten Folgen in eine Playlist → `playlists.md` |
 | F25 | Fehlerarten beim Abspielen | kaputter Download → streamen · Folge gelöscht · Format nicht abspielbar · Netz → `playback.md` |
 | F24 | Sleep-Timer | 5/15/30/60 min oder eigene Zeit (1–3600 min) Spielzeit oder bis Folgenende, Knopf neben „Lesezeichen setzen" → `playback.md` |

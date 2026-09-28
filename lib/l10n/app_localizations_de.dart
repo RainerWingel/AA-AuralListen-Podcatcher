@@ -351,7 +351,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get autoDeletePlayedHint =>
-      '96 Stunden nachdem eine Folge zu 98 % gehört wurde';
+      '96 Stunden nachdem eine Folge zu 98 % gespielt wurde';
 
   @override
   String get settingsSectionDownloads => 'Downloads';
@@ -511,7 +511,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSectionListening => 'Hören';
 
   @override
-  String get markPlayedUntil => 'Als gehört markieren bis …';
+  String get markPlayedUntil => 'Als gespielt markieren bis …';
 
   @override
   String get markPlayedUntilPick => 'Alle Folgen bis einschließlich';
@@ -524,7 +524,7 @@ class AppLocalizationsDe extends AppLocalizations {
       other: '$count Folgen',
       one: '1 Folge',
     );
-    return '$_temp0 bis einschließlich $date als gehört markieren?';
+    return '$_temp0 bis einschließlich $date als gespielt markieren?';
   }
 
   @override
@@ -533,7 +533,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String markPlayedUntilNone(String date) {
-    return 'Bis $date gibt es keine ungehörten Folgen.';
+    return 'Bis $date gibt es keine ungespielten Folgen.';
   }
 
   @override
@@ -544,7 +544,7 @@ class AppLocalizationsDe extends AppLocalizations {
       other: '$count Folgen',
       one: '1 Folge',
     );
-    return '$_temp0 als gehört markiert';
+    return '$_temp0 als gespielt markiert';
   }
 
   @override
@@ -785,21 +785,21 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get markUnplayedSince => 'Als ungehört markieren seit …';
+  String get markUnplayedSince => 'Als ungespielt markieren seit …';
 
   @override
   String get markUnplayedSincePick =>
-      'Alle gehörten Folgen seit einschließlich';
+      'Alle gespielten Folgen seit einschließlich';
 
   @override
   String markUnplayedSinceConfirm(int count, String date) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count gehörte Folgen',
-      one: '1 gehörte Folge',
+      other: '$count gespielte Folgen',
+      one: '1 gespielte Folge',
     );
-    return '$_temp0 seit einschließlich $date als ungehört markieren?';
+    return '$_temp0 seit einschließlich $date als ungespielt markieren?';
   }
 
   @override
@@ -808,7 +808,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String markUnplayedSinceNone(String date) {
-    return 'Seit dem $date gibt es keine gehörten Folgen.';
+    return 'Seit dem $date gibt es keine gespielten Folgen.';
   }
 
   @override
@@ -819,6 +819,6 @@ class AppLocalizationsDe extends AppLocalizations {
       other: '$count Folgen',
       one: '1 Folge',
     );
-    return '$_temp0 als ungehört markiert';
+    return '$_temp0 als ungespielt markiert';
   }
 }

@@ -31,11 +31,11 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 - **Gespielt** = Hörposition ≥ **98 %** der Dauer (oder Ende erreicht). `playedAt` wird dabei gesetzt –
   daran hängt die 96-h-Löschregel (`eviction.md`).
 - Manuell „als gespielt / ungespielt markieren" (langes Drücken auf eine Folge). „Ungespielt" → `neu`, Position 0, `playedAt` = null.
-- Podcast → ⋮ → „Als gehört markieren bis …": alle **ungehörten** Folgen mit `pubDate` bis einschließlich des gewählten
+- Podcast → ⋮ → „Als gespielt markieren bis …": alle **ungespielten** Folgen mit `pubDate` bis einschließlich des gewählten
   Tages (lokale Zeit) werden `gespielt` – gleiche Regeln wie `markPlayed` (aus allen Playlists, `playedAt` = jetzt →
   Downloads nach 96 h weg). Folgen ohne Datum und bereits gespielte (ihr `playedAt` bleibt) sind nicht betroffen.
   Code: `PlaybackRepository.markPlayedUntil`, Tests: `test/data/playback_repository_test.dart`.
-- Podcast → ⋮ → „Als ungehört markieren seit …" (Benutzerwunsch 2026-09-28): alle **gehörten** Folgen mit `pubDate` ab
+- Podcast → ⋮ → „Als ungespielt markieren seit …" (Benutzerwunsch 2026-09-28): alle **gespielten** Folgen mit `pubDate` ab
   Beginn des gewählten Tags werden `newEpisode` (Position 0, `playedAt` = null → keine Eviction). Angefangene Folgen
   bleiben unverändert (Hörposition), Folgen ohne Datum werden übersprungen. Kalender → Rückfrage mit Anzahl → Infobox.
   Sie kommen **nicht** automatisch zurück in Playlists.

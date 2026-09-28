@@ -8,7 +8,7 @@ import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Podcast menu → "Als gehört markieren bis …": pick a date, confirm with the
+/// Podcast menu → "Als gespielt markieren bis …": pick a date, confirm with the
 /// number of affected episodes, mark them as played.
 Future<void> markPlayedUntilFlow(
   BuildContext context,
@@ -80,7 +80,7 @@ Future<void> markPlayedUntilFlow(
   showInfoSnackBar(messenger, l10n.markPlayedUntilDone(marked));
 }
 
-/// Podcast menu → "Als ungehört markieren seit …": pick a date, confirm with
+/// Podcast menu → "Als ungespielt markieren seit …": pick a date, confirm with
 /// the number of played episodes published since then, mark them unplayed.
 Future<void> markUnplayedSinceFlow(
   BuildContext context,

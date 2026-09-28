@@ -659,7 +659,7 @@ void main() {
     await settle(tester);
     await tester.tap(find.byType(PopupMenuButton<void>));
     await settle(tester);
-    await tester.tap(find.text('Als gehört markieren bis …'));
+    await tester.tap(find.text('Als gespielt markieren bis …'));
     await settle(tester);
 
     // Date picker opens on today; confirm it (the episode is from 2025).
@@ -669,7 +669,7 @@ void main() {
     await tester.tap(find.text('Markieren'));
     await settle(tester);
 
-    expect(find.text('1 Folge als gehört markiert'), findsOneWidget);
+    expect(find.text('1 Folge als gespielt markiert'), findsOneWidget);
     final episode = await tester.runAsync(
       () => db.select(db.episodes).getSingle(),
     );
@@ -1328,22 +1328,22 @@ void main() {
       await settle(tester);
       await tester.tap(find.byType(PopupMenuButton<void>));
       await settle(tester);
-      // Right below "Als gehört markieren bis …".
-      expect(find.text('Als gehört markieren bis …'), findsOneWidget);
-      await tester.tap(find.text('Als ungehört markieren seit …'));
+      // Right below "Als gespielt markieren bis …".
+      expect(find.text('Als gespielt markieren bis …'), findsOneWidget);
+      await tester.tap(find.text('Als ungespielt markieren seit …'));
       await settle(tester);
 
       // Calendar opens on today: confirm.
       await tester.tap(find.text('OK'));
       await settle(tester);
       expect(
-        find.textContaining('1 gehörte Folge seit einschließlich'),
+        find.textContaining('1 gespielte Folge seit einschließlich'),
         findsOneWidget,
       );
       await tester.tap(find.text('Markieren'));
       await settle(tester);
 
-      expect(find.text('1 Folge als ungehört markiert'), findsOneWidget);
+      expect(find.text('1 Folge als ungespielt markiert'), findsOneWidget);
       final episode = await tester.runAsync(
         () => (db.select(
           db.episodes,

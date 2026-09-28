@@ -214,7 +214,7 @@
   "autoDownloadAlways": "Immer",
   "autoDownloadMax": "Neueste ungespielte Folgen behalten",
   "autoDeletePlayed": "Gespielte Folgen löschen",
-  "autoDeletePlayedHint": "96 Stunden nachdem eine Folge zu 98 % gehört wurde",
+  "autoDeletePlayedHint": "96 Stunden nachdem eine Folge zu 98 % gespielt wurde",
   "settingsSectionDownloads": "Downloads",
   "downloadLimit": "Speicherlimit für Downloads",
   "downloadLimitHint": "Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen.",
@@ -331,9 +331,9 @@
   "bookmarkDeleted": "Lesezeichen gelöscht",
   "bookmarkEditNote": "Notiz bearbeiten",
   "settingsSectionListening": "Hören",
-  "markPlayedUntil": "Als gehört markieren bis …",
+  "markPlayedUntil": "Als gespielt markieren bis …",
   "markPlayedUntilPick": "Alle Folgen bis einschließlich",
-  "markPlayedUntilConfirm": "{count, plural, =1{1 Folge} other{{count} Folgen}} bis einschließlich {date} als gehört markieren?",
+  "markPlayedUntilConfirm": "{count, plural, =1{1 Folge} other{{count} Folgen}} bis einschließlich {date} als gespielt markieren?",
   "@markPlayedUntilConfirm": {
     "placeholders": {
       "count": {
@@ -345,7 +345,7 @@
     }
   },
   "markPlayedUntilHint": "Sie verschwinden aus den Playlists; heruntergeladene Folgen werden nach 96 Stunden gelöscht.",
-  "markPlayedUntilNone": "Bis {date} gibt es keine ungehörten Folgen.",
+  "markPlayedUntilNone": "Bis {date} gibt es keine ungespielten Folgen.",
   "@markPlayedUntilNone": {
     "placeholders": {
       "date": {
@@ -353,7 +353,7 @@
       }
     }
   },
-  "markPlayedUntilDone": "{count, plural, =1{1 Folge} other{{count} Folgen}} als gehört markiert",
+  "markPlayedUntilDone": "{count, plural, =1{1 Folge} other{{count} Folgen}} als gespielt markiert",
   "@markPlayedUntilDone": {
     "placeholders": {
       "count": {
@@ -507,9 +507,9 @@
       }
     }
   },
-  "markUnplayedSince": "Als ungehört markieren seit …",
-  "markUnplayedSincePick": "Alle gehörten Folgen seit einschließlich",
-  "markUnplayedSinceConfirm": "{count, plural, =1{1 gehörte Folge} other{{count} gehörte Folgen}} seit einschließlich {date} als ungehört markieren?",
+  "markUnplayedSince": "Als ungespielt markieren seit …",
+  "markUnplayedSincePick": "Alle gespielten Folgen seit einschließlich",
+  "markUnplayedSinceConfirm": "{count, plural, =1{1 gespielte Folge} other{{count} gespielte Folgen}} seit einschließlich {date} als ungespielt markieren?",
   "@markUnplayedSinceConfirm": {
     "placeholders": {
       "count": {
@@ -521,7 +521,7 @@
     }
   },
   "markUnplayedSinceHint": "Sie beginnen wieder von vorn und werden nicht mehr automatisch gelöscht. Angefangene Folgen bleiben, wie sie sind.",
-  "markUnplayedSinceNone": "Seit dem {date} gibt es keine gehörten Folgen.",
+  "markUnplayedSinceNone": "Seit dem {date} gibt es keine gespielten Folgen.",
   "@markUnplayedSinceNone": {
     "placeholders": {
       "date": {
@@ -529,7 +529,7 @@
       }
     }
   },
-  "markUnplayedSinceDone": "{count, plural, =1{1 Folge} other{{count} Folgen}} als ungehört markiert",
+  "markUnplayedSinceDone": "{count, plural, =1{1 Folge} other{{count} Folgen}} als ungespielt markiert",
   "@markUnplayedSinceDone": {
     "placeholders": {
       "count": {
