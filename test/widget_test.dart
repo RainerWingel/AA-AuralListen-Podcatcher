@@ -1170,6 +1170,38 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets(
+    'typing a date offers a keyboard with "." (Samsung)',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 2; // the text-input dialog needs some height
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.longPress(find.text('Widget-Podcast'));
+      await settle(tester);
+      await tester.tap(find.text('Ungespielte Episoden seit … spielen'));
+      await settle(tester);
+      await tester.tap(find.byIcon(Icons.edit_outlined));
+      await settle(tester);
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.keyboardType, TextInputType.text);
+
+      await tester.tap(find.text('Abbrechen'));
+      await settle(tester);
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(

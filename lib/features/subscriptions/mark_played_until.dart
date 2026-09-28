@@ -31,6 +31,9 @@ Future<void> markPlayedUntilFlow(
   final picked = await showDatePicker(
     context: context,
     helpText: l10n.markPlayedUntilPick,
+    // Text input (pencil): Samsung's date keyboard has no "." key, so the
+    // German date "tt.mm.jjjj" could not be typed – use the full keyboard.
+    keyboardType: TextInputType.text,
     initialDate: today,
     firstDate: firstDate.isAfter(today) ? today : firstDate,
     lastDate: today,

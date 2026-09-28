@@ -77,3 +77,8 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
 ## Texte
 - Alle Texte in `lib/l10n/app_de.arb`, Du-Form, kurz.
 - Fehlermeldungen verständlich, ohne Stacktraces („Feed konnte nicht geladen werden").
+
+## Datumsauswahl
+Kalender („Als gehört markieren bis …", „Ungespielte Episoden seit …"): Im Texteingabe-Modus (Stift) wird die
+**normale Tastatur** angefordert (`keyboardType: TextInputType.text`) – Samsungs Datums-Tastatur hat keinen Punkt,
+„tt.mm.jjjj" ließ sich sonst nicht eintippen.
