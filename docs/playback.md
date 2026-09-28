@@ -82,6 +82,10 @@ Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell
   - Geprüft im Emulator mit einem lokalen Test-Feed (404-Folge, Text-statt-Audio-Folge).
 - Infoboxen: Jede Meldung ist ein eigenes Objekt (`PlaybackProblemNotice`), sonst zeigte ein Provider die gleiche
   Meldung beim zweiten Mal nicht mehr an.
+- **Position bei Fehlern = letzte gemeldete Position** (`_knownPosition` aus dem Positions-Strom), nicht
+  just_audios `position`: Nach einem Fehler rechnet just_audio vom letzten *Zustandswechsel* – im Hintergrund kann das
+  Minuten oder den ganzen Folgenanfang zurückliegen (Bug 2026-09-28: Neustart von vorn). Nachgestellt im Emulator mit
+  `cmd connectivity airplane-mode enable` (hartes Trennen; `svc wifi disable` lässt offene Streams weiterlaufen).
 - Nie zwei Ladevorgänge gleichzeitig: Play während eines laufenden Neu-Ladens wartet auf dasselbe Laden (`_loadInFlight`).
 - **Kein just_audio-Proxy** (`useProxyForRequestHeaders: false`): Der User-Agent geht direkt über ExoPlayer. Mit Proxy lief
   jeder Stream über einen HTTP-Server in der App (Mehraufwand, unbehandelte Fehler offline, Timeouts gegen den Proxy).
