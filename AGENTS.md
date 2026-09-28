@@ -26,7 +26,7 @@ Alles Fachliche steht in Themen-Dateien unter `docs/`.
 | `docs/ui-ux.md` | Navigation, Screens, Castbox-Vorbild, Texte | UI-Arbeit |
 | `docs/backup.md` | Backup/Restore (ZIP + SQLite), OPML-Export | neuen Tabellen (!), Backup-Code |
 | `docs/build-and-release.md` | Gerät, Signatur, CI, Secrets, Installation | Build, CI, Release |
-| `docs/git-workflow.md` | Branches, Commits, PRs, Übergabe zwischen Agenten | jedem Commit |
+| `docs/git-workflow.md` | Nur `main` (keine Branches/PRs), Commits, Übergabe zwischen Agenten | jedem Commit |
 | `docs/decisions.md` | Entscheidungslog | vor Architektur-/Umfangsänderungen |
 
 ## Grundregeln (immer gültig)

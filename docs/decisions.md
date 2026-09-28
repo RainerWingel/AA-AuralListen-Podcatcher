@@ -55,3 +55,4 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-28 · **Akku-Ausnahme per eigenem MethodChannel statt `permission_handler`** · zwei Android-Aufrufe rechtfertigen kein Paket; System-Dialog nur einmal automatisch, danach nur auf Wunsch.
 - 2026-09-28 · **Sleep-Timer doch umgesetzt** (Benutzerwunsch, hebt „bewusst nicht" auf) · Minuten zählen nur Spielzeit; „Bis Ende der Folge" stoppt ohne Playlist-Weiterspielen; nur im Arbeitsspeicher.
 - 2026-09-28 · **just_audio ohne lokalen Proxy** (`useProxyForRequestHeaders: false`) · User-Agent nativ über ExoPlayer; Proxy verursachte Timeouts/unbehandelte Fehler offline und kostet Ressourcen.
+- 2026-09-28 · **Nur noch direkt auf `main` committen** (Benutzerwunsch) · keine Feature-Branches/PRs mehr; lokale Prüfungen (format, analyze, test) vor jedem Push, CI auf `main` als Nachkontrolle.
