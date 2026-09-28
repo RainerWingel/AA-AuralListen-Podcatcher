@@ -13,7 +13,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] gen-l10n mit `app_de.arb`
 - [x] GitHub Actions: analyze → test → debug-APK
 - [x] Release-Keystore erzeugt
-- [ ] Keystore + `key.properties` extern sichern (Benutzer)
+- [x] Keystore + `key.properties` extern gesichert (Benutzer, 2026-09-27)
 - [x] App startet auf dem Galaxy S25 (Release-APK)
 
 ## M1 – Abos & Feeds
@@ -29,7 +29,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Suche: Apple Podcasts (iTunes) + fyyd, parallel, zusammengeführt, ohne Dubletten
 - [x] Abonnieren direkt aus den Suchergebnissen
 - [x] OPML-Import (Castbox-Export) mit Fortschritt und Ergebnis-Übersicht
-- [ ] Castbox-Export auf dem Handy importieren (Benutzer)
+- [x] Castbox-Export auf dem Handy importiert (Benutzer, 2026-09-27)
 
 ## M3 – Player → erste produktiv nutzbare Version
 - [x] `audio_service`-Handler, Benachrichtigung, Sperrbildschirm, Bluetooth
@@ -75,10 +75,10 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] OPML-Export über den Speichern-Dialog
 - [x] Backup (ZIP: Manifest + SQLite-Schnappschuss) und Wiederherstellung ohne Neustart, alte Backups werden migriert
 - [x] Dark Mode (System / Hell / Dunkel)
-- [ ] Praxistest auf dem S25: Backup erstellen → in Drive/Downloads speichern → wiederherstellen (Benutzer)
+- [x] Praxistest Backup/Restore auf dem S25 (Benutzer, 2026-09-28)
 ## Zusatz – Kapitel überspringen
 - [x] Chip „Skip" in der Kapitel-Liste, Sprung im Player-Handler, nur im Arbeitsspeicher
-- [ ] Praxistest auf dem S25 (Benutzer)
+- [x] Praxistest auf dem S25 (Benutzer, 2026-09-28)
 
 ## M8 – Härtung: Leak-Tests, Soak-Test, Release-APK 1.0
 - [x] Podcast-Umzug: `itunes:new-feed-url` beim Refresh/Abonnieren, Umzüge per Infobox, „Feed-Adresse ändern" (Benutzerwunsch)
@@ -92,23 +92,23 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 ## Zusatz – Akku-Optimierung
 - [x] Ursache Abbruch im Dauertest: App war „Optimiert" (Samsung beendete sie nach ~40 min, Bildschirm aus)
 - [x] System-Dialog „Nicht eingeschränkt" einmal beim ersten Abspielen, Status + Knopf unter Optionen → Hören
-- [ ] Praxistest auf dem S25 (Benutzer)
+- [x] Praxistest auf dem S25 (Benutzer, 2026-09-28)
 
 ## Zusatz – Ungespielt-Zähler
 - [x] Rotes Abzeichen mit Anzahl ungespielter Folgen an jeder Abo-Kachel, „99+" ab 100
 
 ## Zusatz – Hänger-Erkennung
 - [x] Watchdog nur während der Wiedergabe, Neu-Laden an gleicher Stelle, Infobox bei Aufgabe / Ladefehler
-- [ ] Praxistest: Streamen, dann WLAN/Mobilfunk kurz aus (Benutzer)
+- [x] Praxistest: Streamen, dann WLAN/Mobilfunk kurz aus (Benutzer, 2026-09-28)
 
 ## Zusatz – Sleep-Timer
 - [x] Stoppuhr-Knopf neben „Lesezeichen setzen": Aus / 5 / 15 / 30 / 60 min (Spielzeit) / Bis Ende der Folge
 - [x] Eigene Zeit 1–3600 Minuten
-- [ ] Praxistest auf dem S25 (Benutzer)
+- [x] Praxistest auf dem S25 inkl. eigener Zeit (Benutzer, 2026-09-28)
 
 ## Bugfix – Zeitanzeige eingefroren nach Netzausfall
 - [x] Player-Fehler → Player freigeben und frisch laden; keine parallelen Ladevorgänge; kein just_audio-Proxy
-- [ ] Praxistest auf dem S25 (Benutzer)
+- [x] Praxistest auf dem S25 (Benutzer, 2026-09-28)
 
 ## Zusatz – Fehlerarten beim Abspielen
 - [x] Kaputter Download → löschen + streamen; 404/410 → „nicht mehr verfügbar"; Format → Meldung; keine sinnlosen Wiederholungen
@@ -116,7 +116,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 
 ## Bugfix – Neustart von vorn nach Netzausfall im Hintergrund
 - [x] Wiederherstellung nutzt die zuletzt gemeldete Position statt just_audios veralteter
-- [ ] Praxistest auf dem S25 (Benutzer)
+- [x] Praxistest auf dem S25 (Benutzer, 2026-09-28)
 
 ## Zusatz – Alle neuen / ungespielten Episoden spielen
 - [x] Langes Drücken auf Abo-Kachel, „frisch" = Refresh < 96 h (ohne Abo-Import), Playlist-Wahl, älteste zuerst
