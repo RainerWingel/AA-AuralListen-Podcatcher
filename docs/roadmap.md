@@ -132,6 +132,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 
 ## Zusatz – Playlist-Menü
 - [x] Sortieren nach Datum ↑/↓ und Namen ↑, Alles downloaden mit Rückfrage
+- [x] Downloads-Liste: jede Folge „Zu Playlist hinzufügen…"
 - [ ] Praxistest auf dem S25 (Benutzer)
 
 ## Offene Punkte

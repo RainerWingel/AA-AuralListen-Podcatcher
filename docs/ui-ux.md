@@ -49,7 +49,8 @@ Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskrei
 
 ## Downloads-Tab
 Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %" /
-„Wartet auf WLAN …" / „Download fehlgeschlagen"; rechts Löschen / Abbrechen / Erneut. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
+„Wartet auf WLAN …" / „Download fehlgeschlagen"; rechts „Zu Playlist hinzufügen…" (bei mehreren Playlists die bekannte
+Auswahl) und Löschen / Abbrechen / Erneut. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
 
 ## Podcast-Menü (⋮ im Podcast-Detail)
 Podcast-Einstellungen · Als gespielt markieren bis … · Als ungespielt markieren seit … (je Kalender → Rückfrage mit Anzahl →

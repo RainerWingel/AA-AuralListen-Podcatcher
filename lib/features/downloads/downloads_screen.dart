@@ -10,6 +10,7 @@ import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../data/storage/download_service.dart';
 import '../../l10n/app_localizations.dart';
+import '../playlists/playlist_actions.dart';
 
 /// Runs the eviction rules now and reports the freed space.
 Future<void> cleanUpDownloads(BuildContext context, WidgetRef ref) async {
@@ -168,7 +169,18 @@ class _DownloadTile extends ConsumerWidget {
             ),
         ],
       ),
-      trailing: action,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: l10n.addToPlaylist,
+            icon: const Icon(Icons.playlist_add),
+            // One playlist → added directly, otherwise the known chooser.
+            onPressed: () => addToPlaylist(context, ref, episodeId),
+          ),
+          action,
+        ],
+      ),
     );
   }
 }

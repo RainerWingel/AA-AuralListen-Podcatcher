@@ -1450,6 +1450,56 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'a download can be added to a chosen playlist',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final second = await tester.runAsync(
+        () => container.read(playlistRepositoryProvider).create('Unterwegs'),
+      );
+      await settle(tester);
+
+      await tester.longPress(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.text('Herunterladen'));
+      await settle(tester);
+      final episodeId = downloadEngine.active.keys.single;
+      await tester.runAsync(
+        () => downloadEngine.finish(episodeId, bytes: 2048),
+      );
+      await settle(tester);
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Downloads'));
+      await settle(tester);
+      await tester.tap(find.byTooltip('Zu Playlist hinzufügen…'));
+      await settle(tester);
+      // Two playlists: the known chooser.
+      await tester.tap(find.text('Unterwegs'));
+      await settle(tester);
+
+      expect(find.text('Zu „Unterwegs“ hinzugefügt'), findsOneWidget);
+      final entries = await tester.runAsync(
+        () => container.read(playlistRepositoryProvider).entries(second!),
+      );
+      expect(entries!.map((e) => e.episode.id), [episodeId]);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(
