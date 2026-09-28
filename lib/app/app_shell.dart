@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 
 import '../audio/audio_providers.dart';
 import '../audio/battery_optimization.dart';
+import '../audio/podcast_audio_handler.dart';
+import '../core/widgets/info_snack_bar.dart';
 import '../data/providers.dart';
 import '../features/player/mini_player.dart';
 import '../l10n/app_localizations.dart';
@@ -32,6 +34,14 @@ class AppShell extends ConsumerWidget {
           ),
         );
       }
+    });
+    ref.listen(playbackProblemsProvider, (_, next) {
+      final problem = next.value;
+      if (problem == null) return;
+      showInfoSnackBar(ScaffoldMessenger.of(context), switch (problem) {
+        PlaybackProblem.loadFailed => l10n.playbackLoadFailed,
+        PlaybackProblem.stalled => l10n.playbackStalled,
+      });
     });
     return Scaffold(
       body: navigationShell,

@@ -97,5 +97,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 ## Zusatz – Ungespielt-Zähler
 - [x] Rotes Abzeichen mit Anzahl ungespielter Folgen an jeder Abo-Kachel, „99+" ab 100
 
+## Zusatz – Hänger-Erkennung
+- [x] Watchdog nur während der Wiedergabe, Neu-Laden an gleicher Stelle, Infobox bei Aufgabe / Ladefehler
+- [ ] Praxistest: Streamen, dann WLAN/Mobilfunk kurz aus (Benutzer)
+
 ## Offene Punkte
 - keine

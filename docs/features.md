@@ -23,6 +23,7 @@ Sideload per APK. Nur Deutsch. Alle Daten nur lokal.
 | # | Funktion | Details |
 |---|----------|---------|
 | F19 | Als gehört markieren bis Datum | pro Abo, Kalender + Rückfrage → `data-model.md` |
+| F23 | Hänger-Erkennung | Wiedergabe steht 30 s → an gleicher Stelle neu laden, max. 3 Versuche → `playback.md` |
 | F22 | Ungespielt-Zähler | rotes Abzeichen je Abo-Kachel, „99+" ab 100 → `ui-ux.md` |
 | F21 | Kapitel überspringen | Chip „Skip" je Kapitel, nur im Arbeitsspeicher → `playback.md` |
 | F20 | Podcast-Umzug | 301/308, `itunes:new-feed-url`, manuell „Feed-Adresse ändern" → `feeds-and-directories.md` |

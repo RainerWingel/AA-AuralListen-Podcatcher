@@ -75,6 +75,8 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
   wird in `dispose()` bzw. `ref.onDispose` freigegeben.
 - Genau eine Player-Instanz (`PodcastAudioHandler`, erstellt in `main()`). Keine Player-Objekte in Widgets anlegen. ✅
 - Nach 10 Minuten Pause gibt der Handler den Player (Decoder, Netzwerkpuffer) frei. ✅
+- Hänger-Erkennung: Timer existiert nur während der Wiedergabe; Timer und `problems`-Stream werden in `dispose()`
+  beendet (Test `the watchdog only runs while playing`). ✅
 - Der Live-Positions-Stream wird nur abonniert, solange Mini-/Vollbild-Player sichtbar sind (`autoDispose`). ✅
 - `audio_service` nutzt für Benachrichtigungs-Cover den begrenzten `CoverCacheManager` (kein zweiter Cache). ✅
 - Positions-Updates des Players gedrosselt in die DB schreiben (alle 5 s + bei Pause/Seek/Stopp/Folgenwechsel). ✅
