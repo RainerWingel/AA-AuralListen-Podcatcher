@@ -1155,6 +1155,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern.'**
   String get backgroundPlaybackRestricted;
+
+  /// No description provided for @unplayedCount.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 ungespielte Folge} other{{count} ungespielte Folgen}}'**
+  String unplayedCount(int count);
 }
 
 class _AppLocalizationsDelegate

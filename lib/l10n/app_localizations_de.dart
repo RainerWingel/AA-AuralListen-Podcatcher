@@ -667,4 +667,15 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get backgroundPlaybackRestricted =>
       'Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern.';
+
+  @override
+  String unplayedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ungespielte Folgen',
+      one: '1 ungespielte Folge',
+    );
+    return '$_temp0';
+  }
 }

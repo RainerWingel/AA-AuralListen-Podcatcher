@@ -99,6 +99,23 @@ class PodcastRepository {
             ]))
           .watch();
 
+  /// Unplayed episodes (new or in progress) per podcast id, for the badges
+  /// in the subscriptions grid. One grouped query for all podcasts; podcasts
+  /// without unplayed episodes are missing from the map.
+  Stream<Map<int, int>> watchUnplayedCounts() {
+    final count = _db.episodes.id.count();
+    final query = _db.selectOnly(_db.episodes)
+      ..addColumns([_db.episodes.podcastId, count])
+      ..where(_db.episodes.status.equalsValue(EpisodeStatus.played).not())
+      ..groupBy([_db.episodes.podcastId]);
+    return query.watch().map(
+      (rows) => {
+        for (final row in rows)
+          row.read(_db.episodes.podcastId)!: row.read(count) ?? 0,
+      },
+    );
+  }
+
   /// Newest episodes across all subscriptions (home screen).
   Stream<List<EpisodeWithPodcast>> watchLatestEpisodes({int limit = 100}) {
     final query =

@@ -790,6 +790,59 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets(
+    'subscription tiles show unplayed episodes, 99+ above 99',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final podcastId = await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      final episodes = await tester.runAsync(
+        () => db.select(db.episodes).get(),
+      );
+      expect(find.widgetWithText(Badge, '${episodes!.length}'), findsOneWidget);
+
+      await tester.runAsync(
+        () => db.batch(
+          (b) => b.insertAll(db.episodes, [
+            for (var i = 0; i < 120; i++)
+              EpisodesCompanion.insert(
+                podcastId: podcastId!,
+                guid: 'extra-$i',
+                title: 'Extra $i',
+                audioUrl: 'https://example.com/extra-$i.mp3',
+                addedAt: DateTime.utc(2026, 9, 28),
+              ),
+          ]),
+        ),
+      );
+      await settle(tester);
+      expect(find.widgetWithText(Badge, '99+'), findsOneWidget);
+
+      // All played: the badge disappears.
+      await tester.runAsync(
+        () => db
+            .update(db.episodes)
+            .write(
+              const EpisodesCompanion(status: Value(EpisodeStatus.played)),
+            ),
+      );
+      await settle(tester);
+      expect(find.byType(Badge), findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(
