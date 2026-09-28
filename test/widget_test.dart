@@ -1103,6 +1103,73 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets(
+    'long press → unplayed episodes since a chosen date',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      final podcastId = await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      // Two more episodes: the day before this month began, and today.
+      final today = DateTime.now();
+      final monthStart = DateTime(today.year, today.month);
+      await tester.runAsync(
+        () => db.batch(
+          (b) => b.insertAll(db.episodes, [
+            for (final (guid, date) in [
+              ('alt', monthStart.subtract(const Duration(days: 1))),
+              ('neu', DateTime(today.year, today.month, today.day)),
+            ])
+              EpisodesCompanion.insert(
+                podcastId: podcastId!,
+                guid: guid,
+                title: 'Folge $guid',
+                audioUrl: 'https://example.com/$guid.mp3',
+                pubDate: Value(date),
+                addedAt: today,
+              ),
+          ]),
+        ),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+
+      await tester.longPress(find.text('Widget-Podcast'));
+      await settle(tester);
+      await tester.tap(find.text('Ungespielte Episoden seit … spielen'));
+      await settle(tester);
+
+      // The calendar opens on this month: pick its first day.
+      await tester.tap(find.text('1').last);
+      await settle(tester);
+      await tester.tap(find.text('OK'));
+      await settle(tester);
+
+      // Only one playlist exists: no chooser, straight into it.
+      final playlist = await tester.runAsync(
+        () => db.select(db.playlists).getSingle(),
+      );
+      final entries = await tester.runAsync(
+        () => container.read(playlistRepositoryProvider).entries(playlist!.id),
+      );
+      expect(entries!.map((e) => e.episode.guid), ['neu']);
+      expect(handler.playbackState.value.playing, isTrue);
+      expect(find.textContaining('1 Folge zu'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../audio/audio_providers.dart';
+import '../../core/clock.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
 
-/// Long press on a subscription tile: "Alle neuen / ungespielten Episoden
+enum _PlayChoice { fresh, since, all }
+
+/// Long press on a subscription tile: "Alle neuen Episoden spielen",
+/// "Ungespielte Episoden seit … spielen", "Alle ungespielten Episoden
 /// spielen" (docs/playlists.md).
 Future<void> showPodcastPlayMenu(
   BuildContext context,
@@ -21,45 +26,116 @@ Future<void> showPodcastPlayMenu(
   final unplayed = await repo.unplayedEpisodes(podcast.id, freshOnly: false);
   if (!context.mounted) return;
   // The sheet's own context is gone once it closes: the flow uses [context].
-  final freshOnly = await showModalBottomSheet<bool>(
+  final choice = await showModalBottomSheet<_PlayChoice>(
     context: context,
     showDragHandle: true,
+    // Own height, scrollable: three entries with subtitles do not fit the
+    // default sheet height with large fonts.
+    isScrollControlled: true,
     builder: (sheetContext) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: Text(
-              podcast.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(sheetContext).textTheme.titleMedium,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                podcast.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(sheetContext).textTheme.titleMedium,
+              ),
             ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.fiber_new_outlined),
-            title: Text(l10n.playNewEpisodes),
-            subtitle: Text(l10n.playNewEpisodesHint(fresh.length)),
-            enabled: fresh.isNotEmpty,
-            onTap: () => Navigator.of(sheetContext).pop(true),
-          ),
-          ListTile(
-            leading: const Icon(Icons.playlist_play),
-            title: Text(l10n.playUnplayedEpisodes),
-            subtitle: Text(l10n.episodeCount(unplayed.length)),
-            enabled: unplayed.isNotEmpty,
-            onTap: () => Navigator.of(sheetContext).pop(false),
-          ),
-        ],
+            ListTile(
+              leading: const Icon(Icons.fiber_new_outlined),
+              title: Text(l10n.playNewEpisodes),
+              subtitle: Text(l10n.playNewEpisodesHint(fresh.length)),
+              enabled: fresh.isNotEmpty,
+              onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.fresh),
+            ),
+            ListTile(
+              leading: const Icon(Icons.event_outlined),
+              title: Text(l10n.playUnplayedSince),
+              subtitle: Text(l10n.playUnplayedSinceHint),
+              enabled: unplayed.isNotEmpty,
+              onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.since),
+            ),
+            ListTile(
+              leading: const Icon(Icons.playlist_play),
+              title: Text(l10n.playUnplayedEpisodes),
+              subtitle: Text(l10n.episodeCount(unplayed.length)),
+              enabled: unplayed.isNotEmpty,
+              onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.all),
+            ),
+          ],
+        ),
       ),
     ),
   );
-  if (freshOnly == null || !context.mounted) return;
+  if (choice == null || !context.mounted) return;
+  switch (choice) {
+    case _PlayChoice.fresh:
+      await playPodcastEpisodes(
+        context,
+        ref,
+        fresh,
+        title: l10n.playNewEpisodes,
+      );
+    case _PlayChoice.all:
+      await playPodcastEpisodes(
+        context,
+        ref,
+        unplayed,
+        title: l10n.playUnplayedEpisodes,
+      );
+    case _PlayChoice.since:
+      await _playUnplayedSince(context, ref, podcast, unplayed);
+  }
+}
+
+/// Date picker → unplayed episodes published on or after that day.
+Future<void> _playUnplayedSince(
+  BuildContext context,
+  WidgetRef ref,
+  Podcast podcast,
+  List<Episode> unplayed,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final now = ref.read(clockProvider)();
+  final today = DateTime(now.year, now.month, now.day);
+  final dates = unplayed.map((e) => e.pubDate).nonNulls.map((d) => d.toLocal());
+  final oldest = dates.isEmpty
+      ? today
+      : dates.reduce((a, b) => a.isBefore(b) ? a : b);
+  final firstDate = DateTime(oldest.year, oldest.month, oldest.day);
+
+  final picked = await showDatePicker(
+    context: context,
+    helpText: l10n.playUnplayedSincePick,
+    initialDate: today,
+    firstDate: firstDate.isAfter(today) ? today : firstDate,
+    lastDate: today,
+  );
+  if (picked == null || !context.mounted) return;
+
+  // From the start of the picked day (local time) on.
+  final since = DateTime(picked.year, picked.month, picked.day);
+  final episodes = await ref
+      .read(podcastRepositoryProvider)
+      .unplayedEpisodes(podcast.id, freshOnly: false, since: since);
+  if (!context.mounted) return;
+  if (episodes.isEmpty) {
+    showInfoSnackBar(
+      messenger,
+      l10n.playUnplayedSinceNone(DateFormat.yMMMMd('de').format(picked)),
+    );
+    return;
+  }
   await playPodcastEpisodes(
     context,
     ref,
-    freshOnly ? fresh : unplayed,
-    title: freshOnly ? l10n.playNewEpisodes : l10n.playUnplayedEpisodes,
+    episodes,
+    title: l10n.playUnplayedSince,
   );
 }
 

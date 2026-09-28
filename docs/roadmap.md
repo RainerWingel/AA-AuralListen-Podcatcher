@@ -38,7 +38,8 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Mini-Player + Vollbild-Player
 - [x] Folge antippen = abspielen; langes Drücken: Menü (als gespielt / ungespielt markieren)
 - [x] DB-Schema v2 (`settings`) inkl. Migrationstest
-- [ ] Praxistest auf dem S25: Sperrbildschirm, Bluetooth, Anruf, 10-Min-Pause (Benutzer)
+- [x] Praxistest auf dem S25: Sperrbildschirm, Bluetooth, Anruf (Benutzer, 2026-09-28)
+- [ ] Praxistest: 10 Minuten Pause → Benachrichtigung verschwindet, Play setzt an gleicher Stelle fort (Benutzer)
 
 ## M4 – Downloads & Eviction
 - [x] Manueller Download (langes Drücken), Abbrechen, Löschen, erneut versuchen
@@ -70,7 +71,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Kapitelanzeige und -liste im Vollbild-Player, Sprung per Tippen
 - [x] Lesezeichen mit Notiz, Liste pro Folge und global, Abspielen ab Lesezeichen
 - [x] DB-Schema v6 inkl. Migrationstests
-- [ ] Praxistest auf dem S25 mit WRINT und Freak Show (Benutzer)
+- [x] Praxistest Kapitel auf dem S25 (Benutzer, 2026-09-28)
 ## M7 – OPML-Export, Backup/Restore, Dark Mode, Feinschliff
 - [x] OPML-Export über den Speichern-Dialog
 - [x] Backup (ZIP: Manifest + SQLite-Schnappschuss) und Wiederherstellung ohne Neustart, alte Backups werden migriert
@@ -120,6 +121,10 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 
 ## Zusatz – Alle neuen / ungespielten Episoden spielen
 - [x] Langes Drücken auf Abo-Kachel, „frisch" = Refresh < 96 h (ohne Abo-Import), Playlist-Wahl, älteste zuerst
+- [ ] Praxistest auf dem S25 (Benutzer)
+
+## Zusatz – Ungespielte Episoden seit … spielen
+- [x] Abo-Menü: Kalender, ungespielte Folgen ab dem gewählten Tag in eine Playlist
 - [ ] Praxistest auf dem S25 (Benutzer)
 
 ## Offene Punkte

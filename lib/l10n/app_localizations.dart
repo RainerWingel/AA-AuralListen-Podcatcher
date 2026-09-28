@@ -1281,6 +1281,30 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Starten'**
   String get sleepTimerStart;
+
+  /// No description provided for @playUnplayedSince.
+  ///
+  /// In de, this message translates to:
+  /// **'Ungespielte Episoden seit … spielen'**
+  String get playUnplayedSince;
+
+  /// No description provided for @playUnplayedSinceHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Datum wählen'**
+  String get playUnplayedSinceHint;
+
+  /// No description provided for @playUnplayedSincePick.
+  ///
+  /// In de, this message translates to:
+  /// **'Ungespielte Folgen seit'**
+  String get playUnplayedSincePick;
+
+  /// No description provided for @playUnplayedSinceNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine ungespielten Folgen seit dem {date}.'**
+  String playUnplayedSinceNone(String date);
 }
 
 class _AppLocalizationsDelegate

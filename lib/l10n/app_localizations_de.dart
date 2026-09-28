@@ -769,4 +769,18 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get sleepTimerStart => 'Starten';
+
+  @override
+  String get playUnplayedSince => 'Ungespielte Episoden seit … spielen';
+
+  @override
+  String get playUnplayedSinceHint => 'Datum wählen';
+
+  @override
+  String get playUnplayedSincePick => 'Ungespielte Folgen seit';
+
+  @override
+  String playUnplayedSinceNone(String date) {
+    return 'Keine ungespielten Folgen seit dem $date.';
+  }
 }

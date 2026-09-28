@@ -106,9 +106,12 @@ class PodcastRepository {
   /// "Alle ungespielten Episoden spielen". With [freshOnly] only those a
   /// refresh fetched within [freshFor] ("Alle neuen Episoden spielen"); the
   /// initial import when subscribing never counts as fresh (docs/playlists.md).
+  /// With [since] only those published at or after it ("Ungespielte Episoden
+  /// seit … spielen"); episodes without a date are left out then.
   Future<List<Episode>> unplayedEpisodes(
     int podcastId, {
     required bool freshOnly,
+    DateTime? since,
   }) async {
     final podcast = await (_db.select(
       _db.podcasts,
@@ -124,6 +127,9 @@ class PodcastRepository {
         (e) => OrderingTerm(expression: e.pubDate, nulls: NullsOrder.first),
         (e) => OrderingTerm.asc(e.id),
       ]);
+    if (since != null) {
+      query.where((e) => e.pubDate.isBiggerOrEqualValue(since));
+    }
     if (freshOnly) {
       query.where(
         (e) =>
