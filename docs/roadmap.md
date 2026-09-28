@@ -117,5 +117,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Wiederherstellung nutzt die zuletzt gemeldete Position statt just_audios veralteter
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Zusatz – Alle neuen / ungespielten Episoden spielen
+- [x] Langes Drücken auf Abo-Kachel, „frisch" = Refresh < 24 h (ohne Abo-Import), Playlist-Wahl, älteste zuerst
+- [ ] Praxistest auf dem S25 (Benutzer)
+
 ## Offene Punkte
 - keine

@@ -1227,6 +1227,30 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann.'**
   String get playbackUnsupported;
+
+  /// No description provided for @playNewEpisodes.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle neuen Episoden spielen'**
+  String get playNewEpisodes;
+
+  /// No description provided for @playNewEpisodesHint.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Keine neuen Folgen in den letzten 24 Stunden} =1{1 Folge aus den letzten 24 Stunden} other{{count} Folgen aus den letzten 24 Stunden}}'**
+  String playNewEpisodesHint(int count);
+
+  /// No description provided for @playUnplayedEpisodes.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle ungespielten Episoden spielen'**
+  String get playUnplayedEpisodes;
+
+  /// No description provided for @episodesAddedToPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Alle Folgen waren schon in „{playlist}“ – Wiedergabe startet.} =1{1 Folge zu „{playlist}“ hinzugefügt.} other{{count} Folgen zu „{playlist}“ hinzugefügt.}}'**
+  String episodesAddedToPlaylist(int count, String playlist);
 }
 
 class _AppLocalizationsDelegate

@@ -1018,6 +1018,60 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets(
+    'long press on a subscription plays its unplayed episodes',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final second = await tester.runAsync(
+        () => container.read(playlistRepositoryProvider).create('Unterwegs'),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+
+      await tester.longPress(find.text('Widget-Podcast'));
+      await settle(tester);
+      expect(find.text('Alle neuen Episoden spielen'), findsOneWidget);
+      // Only the initial import so far: nothing is "new".
+      expect(
+        find.text('Keine neuen Folgen in den letzten 24 Stunden'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Alle ungespielten Episoden spielen'));
+      await settle(tester);
+      // Two playlists: the user chooses.
+      await tester.tap(find.text('Unterwegs'));
+      await settle(tester);
+
+      final entries = await tester.runAsync(
+        () => container.read(playlistRepositoryProvider).entries(second!),
+      );
+      final episodes = await tester.runAsync(
+        () => db.select(db.episodes).get(),
+      );
+      expect(entries, hasLength(episodes!.length));
+      expect(handler.currentEpisodeId, entries!.first.episode.id);
+      expect(handler.activePlaylistId, second);
+      expect(handler.playbackState.value.playing, isTrue);
+      expect(find.textContaining('zu „Unterwegs“ hinzugefügt'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(

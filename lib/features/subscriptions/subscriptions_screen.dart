@@ -10,6 +10,7 @@ import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/opml_import_flow.dart';
 import 'add_feed_dialog.dart';
+import 'play_podcast_episodes.dart';
 import 'refresh_action.dart';
 
 /// Grid of all subscribed podcasts (Castbox-like).
@@ -116,6 +117,7 @@ class _PodcastGrid extends ConsumerWidget {
             return InkWell(
               borderRadius: BorderRadius.circular(10),
               onTap: () => context.go(Routes.podcast(podcast.id)),
+              onLongPress: () => showPodcastPlayMenu(context, ref, podcast),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

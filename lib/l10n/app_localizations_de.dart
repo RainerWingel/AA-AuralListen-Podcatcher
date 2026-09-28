@@ -720,4 +720,34 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get playbackUnsupported =>
       'Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann.';
+
+  @override
+  String get playNewEpisodes => 'Alle neuen Episoden spielen';
+
+  @override
+  String playNewEpisodesHint(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen aus den letzten 24 Stunden',
+      one: '1 Folge aus den letzten 24 Stunden',
+      zero: 'Keine neuen Folgen in den letzten 24 Stunden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get playUnplayedEpisodes => 'Alle ungespielten Episoden spielen';
+
+  @override
+  String episodesAddedToPlaylist(int count, String playlist) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen zu „$playlist“ hinzugefügt.',
+      one: '1 Folge zu „$playlist“ hinzugefügt.',
+      zero: 'Alle Folgen waren schon in „$playlist“ – Wiedergabe startet.',
+    );
+    return '$_temp0';
+  }
 }

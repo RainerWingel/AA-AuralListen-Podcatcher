@@ -23,10 +23,12 @@ void main() {
   late Map<String, http.Response Function()> server;
   late PodcastRepository repo;
   final now = DateTime.utc(2026, 9, 27, 12);
+  late DateTime clockNow; // movable for time-based rules
 
   final basicFeed = File('test/fixtures/feed_basic.xml').readAsStringSync();
 
   setUp(() {
+    clockNow = now;
     db = AppDatabase.forTesting(NativeDatabase.memory());
     coverCache = _FakeCoverCache();
     server = {};
@@ -37,7 +39,7 @@ void main() {
     repo = PodcastRepository(
       db: db,
       fetcher: FeedFetcher(client),
-      clock: () => now,
+      clock: () => clockNow,
       coverCache: coverCache,
     );
   });
@@ -386,6 +388,54 @@ void main() {
         .write(const EpisodesCompanion(status: Value(EpisodeStatus.played)));
     expect(await repo.watchUnplayedCounts().first, isEmpty);
   });
+
+  test(
+    'fresh = fetched by a refresh within 24 h, never the initial import',
+    () async {
+      server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
+      final id = await repo.subscribe('https://example.com/feed');
+      Future<List<String>> guids({required bool freshOnly}) async => [
+        for (final e in await repo.unplayedEpisodes(id, freshOnly: freshOnly))
+          e.guid,
+      ];
+      expect(await guids(freshOnly: true), isEmpty);
+
+      // A refresh an hour later brings two new episodes; one is heard at once.
+      clockNow = now.add(const Duration(hours: 1));
+      String item(String guid, String date) =>
+          '<item><title>$guid</title><guid>$guid</guid>'
+          '<pubDate>$date</pubDate>'
+          '<enclosure url="https://example.com/$guid.mp3" type="audio/mpeg"/>'
+          '</item>';
+      server['https://example.com/feed'] = () => http.Response(
+        basicFeed.replaceFirst(
+          '<item>',
+          '${item('ep-4', 'Sat, 26 Sep 2026 10:00:00 +0000')}'
+              '${item('ep-3', 'Fri, 25 Sep 2026 10:00:00 +0000')}<item>',
+        ),
+        200,
+      );
+      await repo.refreshAll();
+      await (db.update(db.episodes)..where((e) => e.guid.equals('ep-4'))).write(
+        const EpisodesCompanion(status: Value(EpisodeStatus.played)),
+      );
+
+      expect(await guids(freshOnly: true), ['ep-3']);
+      // Oldest first; in progress counts as unplayed, played does not.
+      await (db.update(db.episodes)..where((e) => e.guid.equals('ep-2'))).write(
+        const EpisodesCompanion(status: Value(EpisodeStatus.inProgress)),
+      );
+      expect(await guids(freshOnly: false), [
+        'https://example.com/ep1.mp3',
+        'ep-2',
+        'ep-3',
+      ]);
+
+      // 24 h after that refresh it is no longer fresh.
+      clockNow = now.add(const Duration(hours: 25, seconds: 1));
+      expect(await guids(freshOnly: true), isEmpty);
+    },
+  );
 
   test('latest episodes across podcasts are sorted by date', () async {
     server['https://example.com/feed'] = () => http.Response(basicFeed, 200);

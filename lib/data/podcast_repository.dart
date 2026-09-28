@@ -99,6 +99,41 @@ class PodcastRepository {
             ]))
           .watch();
 
+  /// How long an episode counts as "fresh" after it was first fetched.
+  static const freshFor = Duration(hours: 24);
+
+  /// Unplayed episodes (new or in progress) of a podcast, oldest first – for
+  /// "Alle ungespielten Episoden spielen". With [freshOnly] only those a
+  /// refresh fetched within [freshFor] ("Alle neuen Episoden spielen"); the
+  /// initial import when subscribing never counts as fresh (docs/playlists.md).
+  Future<List<Episode>> unplayedEpisodes(
+    int podcastId, {
+    required bool freshOnly,
+  }) async {
+    final podcast = await (_db.select(
+      _db.podcasts,
+    )..where((p) => p.id.equals(podcastId))).getSingleOrNull();
+    if (podcast == null) return const [];
+    final query = _db.select(_db.episodes)
+      ..where(
+        (e) =>
+            e.podcastId.equals(podcastId) &
+            e.status.equalsValue(EpisodeStatus.played).not(),
+      )
+      ..orderBy([
+        (e) => OrderingTerm(expression: e.pubDate, nulls: NullsOrder.first),
+        (e) => OrderingTerm.asc(e.id),
+      ]);
+    if (freshOnly) {
+      query.where(
+        (e) =>
+            e.addedAt.isBiggerOrEqualValue(_clock().subtract(freshFor)) &
+            e.addedAt.isBiggerThanValue(podcast.subscribedAt),
+      );
+    }
+    return query.get();
+  }
+
   /// Unplayed episodes (new or in progress) per podcast id, for the badges
   /// in the subscriptions grid. One grouped query for all podcasts; podcasts
   /// without unplayed episodes are missing from the map.
