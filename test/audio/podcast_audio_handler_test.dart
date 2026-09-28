@@ -538,6 +538,19 @@ void main() {
       expect(seen.last, const Duration(minutes: 7, seconds: 1));
     });
 
+    test('error in the background: resumes where it really was', () async {
+      await handler.playEpisode(episodeId);
+      // Background playback: positions stream in, but just_audio's own
+      // position after the error is its last state change (start).
+      engine.emitPosition(const Duration(minutes: 4, seconds: 22));
+      engine.staleAfterError = const Duration(seconds: 57);
+      engine.emitError();
+      await pumpEventQueue();
+
+      expect(engine.loadedAt, const Duration(minutes: 4, seconds: 22));
+      expect((await episode()).positionMs, (4 * 60 + 22) * 1000);
+    });
+
     test(
       'player error while offline: retries until the network is back',
       () async {

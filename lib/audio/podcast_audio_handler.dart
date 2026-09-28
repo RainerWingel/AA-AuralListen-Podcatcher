@@ -36,7 +36,10 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       ..add(_engine.stateStream.listen(_onEngineState))
       ..add(
         _engine.positionStream.listen((p) {
-          if (_loaded) _positions.add(p);
+          if (_loaded) {
+            _knownPosition = p;
+            _positions.add(p);
+          }
           _onPosition(p);
         }),
       )
@@ -140,6 +143,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Chapters marked "Skip" – in memory only (docs/playback.md).
   final chapterSkips = ChapterSkips();
   Duration _lastSaved = Duration.zero;
+
+  /// Last position the player reported while loaded. After a playback error
+  /// just_audio's own `position` falls back to its last *state* change –
+  /// in the background that can be minutes (or the whole episode) earlier
+  /// (bug 2026-09-28: recovery restarted from the beginning).
+  Duration _knownPosition = Duration.zero;
 
   /// Position shown while no audio is loaded (after app start, after stop).
   Duration _idlePosition = Duration.zero;
@@ -361,6 +370,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final id = _episodeId;
     if (id == null) return;
     if (_loaded) {
+      _knownPosition = position;
       try {
         await _engine.seek(position);
       } on Exception {
@@ -509,6 +519,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _source = source;
     _sourceIsLocal = local != null;
     await _engine.load(source, initialPosition: start);
+    _knownPosition = start;
     _retriedReachable = false;
     await _engine.setBoostDb(await _boostFor(row.podcast));
 
@@ -688,7 +699,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (id == null || !_loaded || _recovering) return;
     // Read before just_audio pauses itself in reaction to the error.
     final wasPlaying = _engine.state.playing || _watchdog != null;
-    final position = _engine.position;
+    final position = _knownPosition;
     if (!_markedPlayed) await _playback.savePosition(id, position);
     await _engine.stop();
     _loaded = false;
@@ -789,7 +800,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         return;
       }
       _recoveries++;
-      final position = _loaded ? _engine.position : _idlePosition;
+      final position = _loaded ? _knownPosition : _idlePosition;
       if (!_markedPlayed) await _playback.savePosition(id, position);
       await _engine.stop();
       _loaded = false;

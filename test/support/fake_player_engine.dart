@@ -70,13 +70,17 @@ class FakePlayerEngine implements PlayerEngine {
   }
 
   /// Simulates a playback error like just_audio: error event, then the
-  /// player is idle and paused.
+  /// player is idle and paused. [staleAfterError]: what just_audio's
+  /// `position` then reports – its last state change, not the real place.
+  Duration? staleAfterError;
+
   void emitError([
     EngineException error = const EngineException(
       EngineErrorKind.source,
       'SocketTimeoutException',
     ),
   ]) {
+    if (staleAfterError case final stale?) _pos = stale;
     _errors.add(error);
     _setState(false, EngineProcessing.idle);
   }
