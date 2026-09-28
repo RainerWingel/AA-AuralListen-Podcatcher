@@ -65,19 +65,17 @@ Future<bool> deletePlaylist(
   return true;
 }
 
-/// "Zu Playlist hinzufügen…": with one playlist it adds directly, otherwise
-/// a sheet lets the user choose (or create a new one).
-Future<void> addToPlaylist(
+/// Picks a playlist: with exactly one it is used directly, otherwise a
+/// sheet lets the user choose (or create a new one). Null = cancelled.
+Future<Playlist?> choosePlaylist(
   BuildContext context,
-  WidgetRef ref,
-  int episodeId,
-) async {
+  WidgetRef ref, {
+  required String title,
+}) async {
   final l10n = AppLocalizations.of(context);
-  final messenger = ScaffoldMessenger.of(context);
   final repo = ref.read(playlistRepositoryProvider);
   final playlists = await repo.playlists();
-  if (!context.mounted) return;
-
+  if (!context.mounted) return null;
   int? chosen;
   if (playlists.length == 1) {
     chosen = playlists.single.id;
@@ -91,7 +89,7 @@ Future<void> addToPlaylist(
           children: [
             ListTile(
               title: Text(
-                l10n.addToPlaylist,
+                title,
                 style: Theme.of(sheetContext).textTheme.titleMedium,
               ),
             ),
@@ -114,12 +112,32 @@ Future<void> addToPlaylist(
       chosen = await createPlaylist(context, ref);
     }
   }
-  if (chosen == null || chosen < 0) return;
+  if (chosen == null || chosen < 0) return null;
+  final id = chosen;
+  return (await repo.playlists()).firstWhere((p) => p.id == id);
+}
 
-  final added = await repo.add(chosen, episodeId);
-  final name = (await repo.playlists()).firstWhere((p) => p.id == chosen).name;
+/// "Zu Playlist hinzufügen…" for one episode.
+Future<void> addToPlaylist(
+  BuildContext context,
+  WidgetRef ref,
+  int episodeId,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final playlist = await choosePlaylist(
+    context,
+    ref,
+    title: l10n.addToPlaylist,
+  );
+  if (playlist == null) return;
+  final added = await ref
+      .read(playlistRepositoryProvider)
+      .add(playlist.id, episodeId);
   showInfoSnackBar(
     messenger,
-    added ? l10n.addedToPlaylist(name) : l10n.alreadyInPlaylist(name),
+    added
+        ? l10n.addedToPlaylist(playlist.name)
+        : l10n.alreadyInPlaylist(playlist.name),
   );
 }

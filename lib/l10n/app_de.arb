@@ -452,5 +452,26 @@
   },
   "playbackBrokenDownload": "Der Download war beschädigt und wurde gelöscht. Die Folge wird jetzt gestreamt.",
   "playbackEpisodeGone": "Diese Folge ist beim Anbieter nicht mehr verfügbar.",
-  "playbackUnsupported": "Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann."
+  "playbackUnsupported": "Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann.",
+  "playNewEpisodes": "Alle neuen Episoden spielen",
+  "playNewEpisodesHint": "{count, plural, =0{Keine neuen Folgen in den letzten 96 Stunden} =1{1 Folge aus den letzten 96 Stunden} other{{count} Folgen aus den letzten 96 Stunden}}",
+  "@playNewEpisodesHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playUnplayedEpisodes": "Alle ungespielten Episoden spielen",
+  "episodesAddedToPlaylist": "{count, plural, =0{Alle Folgen waren schon in „{playlist}“ – Wiedergabe startet.} =1{1 Folge zu „{playlist}“ hinzugefügt.} other{{count} Folgen zu „{playlist}“ hinzugefügt.}}",
+  "@episodesAddedToPlaylist": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "playlist": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -70,6 +70,21 @@ void main() {
     expect((await repo.playlists()).last.name, 'Unterwegs');
   });
 
+  test('addAll appends in order and skips episodes already there', () async {
+    final playlistId = (await db.select(db.playlists).getSingle()).id;
+    final a = await addEpisode('a');
+    final b = await addEpisode('b');
+    final c = await addEpisode('c');
+    await repo.add(playlistId, b);
+
+    expect(await repo.addAll(playlistId, [a, b, c]), [a, c]);
+    expect((await repo.entries(playlistId)).map((e) => e.episode.id), [
+      b,
+      a,
+      c,
+    ]);
+  });
+
   test('summary counts episodes and sums durations', () async {
     final list = (await repo.playlists()).single.id;
     await repo.add(list, await addEpisode('A', durationMs: 60000));

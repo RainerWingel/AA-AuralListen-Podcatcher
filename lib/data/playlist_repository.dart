@@ -176,6 +176,17 @@ class PlaylistRepository {
     return true;
   }
 
+  /// Appends [episodeIds] in this order, skipping those already in the
+  /// playlist. Returns the ids actually added.
+  Future<List<int>> addAll(int playlistId, List<int> episodeIds) =>
+      _db.transaction(() async {
+        final added = <int>[];
+        for (final id in episodeIds) {
+          if (await add(playlistId, id)) added.add(id);
+        }
+        return added;
+      });
+
   Future<void> remove(int playlistId, int episodeId) =>
       (_db.delete(_db.playlistItems)..where(
             (i) =>
