@@ -17,12 +17,15 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
 ## Ganze Podcasts in eine Playlist (Benutzerwunsch 2026-09-28)
 Abos-Tab → **langes Drücken** auf eine Kachel → Menü (`play_podcast_episodes.dart`):
 1. **„Alle neuen Episoden spielen"** – nur **frische** Folgen.
-2. **„Alle ungespielten Episoden spielen"** – alle Folgen mit Status neu oder angefangen.
+2. **„Ungespielte Episoden seit … spielen"** – Kalender (öffnet auf heute, frühestes Datum = älteste ungespielte
+   Folge): ungespielte Folgen mit Veröffentlichungsdatum **ab Beginn des gewählten Tags**; Folgen ohne Datum zählen
+   nicht. Keine passenden → Infobox „Keine ungespielten Folgen seit dem …".
+3. **„Alle ungespielten Episoden spielen"** – alle Folgen mit Status neu oder angefangen.
 - **Frisch** ist kein eigener Status (kein Enum/Feld): berechnet aus `episodes.addedAt` (erster Abruf, spätere Refreshes
   ändern es nicht) – jünger als 96 h (`PodcastRepository.freshFor`; zuerst 24 h, auf Wunsch 96 h) **und** nicht beim Abonnieren mitgekommen
   (`addedAt > podcasts.subscribedAt`; sonst wären nach dem Abo alle 200 Altfolgen „neu"). Gespielte zählen nie.
   Ein gespeicherter Zustand müsste nach 96 h von selbst umkippen – dafür gäbe es ohne Hintergrunddienst keinen Auslöser.
-- Menü zeigt die Anzahl; Einträge ohne passende Folgen sind ausgegraut.
+- Menü zeigt die Anzahl; Einträge ohne passende Folgen sind ausgegraut. Das Menü scrollt (große Schrift).
 - Playlist: bei genau einer direkt, sonst Auswahl (`choosePlaylist`, auch „Neue Playlist"). Folgen werden **älteste
   zuerst** angehängt (`PlaylistRepository.addAll`), schon enthaltene übersprungen. Dann startet die **älteste** dieser
   Folgen in der Playlist (angefangene an ihrer Position), danach geht es nach den Regeln unten weiter.

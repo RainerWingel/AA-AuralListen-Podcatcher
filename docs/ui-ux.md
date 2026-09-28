@@ -17,7 +17,7 @@ Wörter auf dem S25 um (Test: „layout fits a Galaxy S25 with enlarged font").
 Suche: Lupe oben rechts auf Start und Abos → Suchbildschirm (`/abos/suche`) mit Eingabefeld in der AppBar.
 Treffer: Cover, Titel, „Autor · N Folgen", rechts ⊕ (abonnieren) bzw. ✓ (abonniert). Nach dem Abonnieren
 Snackbar „„X" abonniert" mit Aktion „Öffnen".
-Abos-Tab: Lupe + „+" (RSS-URL). Langes Drücken auf eine Kachel → „Alle neuen / ungespielten Episoden spielen" (→ `playlists.md`). Leerer Abos-Tab bietet: Suchen · Per RSS-URL hinzufügen · OPML-Datei importieren.
+Abos-Tab: Lupe + „+" (RSS-URL). Langes Drücken auf eine Kachel → „Alle neuen / seit … / alle ungespielten Episoden spielen" (→ `playlists.md`). Leerer Abos-Tab bietet: Suchen · Per RSS-URL hinzufügen · OPML-Datei importieren.
 Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 
 ## Player

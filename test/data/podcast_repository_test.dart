@@ -439,6 +439,26 @@ void main() {
     },
   );
 
+  test('unplayed since a date: from that moment on, oldest first', () async {
+    server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
+    final id = await repo.subscribe('https://example.com/feed');
+    Future<List<String>> since(DateTime date) async => [
+      for (final e in await repo.unplayedEpisodes(
+        id,
+        freshOnly: false,
+        since: date,
+      ))
+        e.guid,
+    ];
+    // Folge 1: 3 Jun 2025, Folge 2: 10 Jun 2025.
+    expect(await since(DateTime.utc(2025, 6, 4)), ['ep-2']);
+    expect(await since(DateTime.utc(2025, 6)), [
+      'https://example.com/ep1.mp3',
+      'ep-2',
+    ]);
+    expect(await since(DateTime.utc(2025, 7)), isEmpty);
+  });
+
   test('latest episodes across podcasts are sorted by date', () async {
     server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
     await repo.subscribe('https://example.com/feed');

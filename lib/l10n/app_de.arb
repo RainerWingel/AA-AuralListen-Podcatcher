@@ -495,5 +495,16 @@
       }
     }
   },
-  "sleepTimerStart": "Starten"
+  "sleepTimerStart": "Starten",
+  "playUnplayedSince": "Ungespielte Episoden seit … spielen",
+  "playUnplayedSinceHint": "Datum wählen",
+  "playUnplayedSincePick": "Ungespielte Folgen seit",
+  "playUnplayedSinceNone": "Keine ungespielten Folgen seit dem {date}.",
+  "@playUnplayedSinceNone": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }
