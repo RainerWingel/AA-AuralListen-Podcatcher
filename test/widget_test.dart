@@ -970,7 +970,38 @@ void main() {
       await settle(tester);
       expect(find.text('Bis Folgenende'), findsOneWidget);
 
+      // Own number of minutes: 1 to 3600.
       await tester.tap(find.text('Bis Folgenende'));
+      await settle(tester);
+      await tester.tap(find.text('Eigene Zeit…'));
+      await settle(tester);
+      FilledButton start() => tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Starten'),
+      );
+      for (final invalid in ['0', '3601']) {
+        await tester.enterText(find.byType(TextField), invalid);
+        await settle(tester);
+        expect(start().onPressed, isNull, reason: invalid);
+        expect(find.text('1 bis 3600 Minuten'), findsNWidgets(1));
+      }
+      await tester.enterText(find.byType(TextField), '45');
+      await settle(tester);
+      await tester.tap(find.text('Starten'));
+      await settle(tester);
+      expect(find.text('noch 45:00'), findsOneWidget);
+
+      await tester.tap(find.text('noch 45:00'));
+      await settle(tester);
+      expect(find.text('Eigene Zeit: 45 Minuten'), findsOneWidget);
+      await tester.tap(find.text('Eigene Zeit: 45 Minuten'));
+      await settle(tester);
+      await tester.enterText(find.byType(TextField), '3600');
+      await settle(tester);
+      await tester.tap(find.text('Starten'));
+      await settle(tester);
+      expect(find.text('noch 60:00:00'), findsOneWidget);
+
+      await tester.tap(find.text('noch 60:00:00'));
       await settle(tester);
       await tester.tap(find.text('Aus'));
       await settle(tester);

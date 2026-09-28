@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../audio/audio_providers.dart';
@@ -107,11 +108,23 @@ class SleepTimerButton extends ConsumerWidget {
 
   static const minuteChoices = [5, 15, 30, 60];
 
+  /// Limits for "Eigene Zeit" (user request: 1 to 3600 minutes).
+  static const customMin = 1;
+  static const customMax = 3600;
+
   Future<void> _choose(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final handler = ref.read(audioHandlerProvider);
-    final current = switch (handler.sleepTimerState.timer) {
+    final timer = handler.sleepTimerState.timer;
+    final customMinutes = switch (timer) {
+      SleepTimerAfter(:final duration)
+          when !minuteChoices.contains(duration.inMinutes) =>
+        duration.inMinutes,
+      _ => null,
+    };
+    final current = switch (timer) {
       SleepTimerOff() => 'off',
+      SleepTimerAfter() when customMinutes != null => 'custom',
       SleepTimerAfter(:final duration) => '${duration.inMinutes}',
       SleepTimerAtEpisodeEnd() => 'end',
     };
@@ -120,19 +133,36 @@ class SleepTimerButton extends ConsumerWidget {
       builder: (context) => SimpleDialog(
         title: Text(l10n.sleepTimer),
         children: [
+          // Tapping the selected entry counts too (toggleable reports it as
+          // null): e.g. to change "Eigene Zeit" or restart the countdown.
           RadioGroup<String>(
             groupValue: current,
-            onChanged: (v) => Navigator.of(context).pop(v),
+            onChanged: (v) => Navigator.of(context).pop(v ?? current),
             child: Column(
               children: [
-                RadioListTile(value: 'off', title: Text(l10n.sleepTimerOff)),
+                RadioListTile(
+                  value: 'off',
+                  toggleable: true,
+                  title: Text(l10n.sleepTimerOff),
+                ),
                 for (final m in minuteChoices)
                   RadioListTile(
                     value: '$m',
+                    toggleable: true,
                     title: Text(l10n.sleepTimerMinutes(m)),
                   ),
                 RadioListTile(
+                  value: 'custom',
+                  toggleable: true,
+                  title: Text(
+                    customMinutes == null
+                        ? l10n.sleepTimerCustom
+                        : l10n.sleepTimerCustomSet(customMinutes),
+                  ),
+                ),
+                RadioListTile(
                   value: 'end',
+                  toggleable: true,
                   title: Text(l10n.sleepTimerEpisodeEnd),
                 ),
               ],
@@ -142,6 +172,16 @@ class SleepTimerButton extends ConsumerWidget {
       ),
     );
     if (chosen == null) return;
+    if (chosen == 'custom') {
+      if (!context.mounted) return;
+      final minutes = await showDialog<int>(
+        context: context,
+        builder: (_) => _CustomMinutesDialog(initial: customMinutes),
+      );
+      if (minutes == null) return;
+      handler.setSleepTimer(SleepTimerAfter(Duration(minutes: minutes)));
+      return;
+    }
     handler.setSleepTimer(switch (chosen) {
       'off' => const SleepTimerOff(),
       'end' => const SleepTimerAtEpisodeEnd(),
@@ -165,6 +205,88 @@ class SleepTimerButton extends ConsumerWidget {
       onPressed: () => _choose(context, ref),
       icon: Icon(state.isActive ? Icons.timer : Icons.timer_outlined),
       label: Text(label),
+    );
+  }
+}
+
+/// Number field for "Eigene Zeit": whole minutes from
+/// [SleepTimerButton.customMin] to [SleepTimerButton.customMax].
+class _CustomMinutesDialog extends StatefulWidget {
+  const _CustomMinutesDialog({this.initial});
+
+  final int? initial;
+
+  @override
+  State<_CustomMinutesDialog> createState() => _CustomMinutesDialogState();
+}
+
+class _CustomMinutesDialogState extends State<_CustomMinutesDialog> {
+  late final _controller = TextEditingController(
+    text: widget.initial?.toString() ?? '',
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  /// The entered minutes if valid, otherwise null.
+  int? get _minutes {
+    final value = int.tryParse(_controller.text);
+    if (value == null ||
+        value < SleepTimerButton.customMin ||
+        value > SleepTimerButton.customMax) {
+      return null;
+    }
+    return value;
+  }
+
+  void _submit() {
+    final minutes = _minutes;
+    if (minutes != null) Navigator.of(context).pop(minutes);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final valid = _minutes != null;
+    return AlertDialog(
+      title: Text(l10n.sleepTimerCustom),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(4),
+        ],
+        decoration: InputDecoration(
+          labelText: l10n.sleepTimerCustomLabel,
+          helperText: l10n.sleepTimerCustomRange(
+            SleepTimerButton.customMin,
+            SleepTimerButton.customMax,
+          ),
+          errorText: _controller.text.isEmpty || valid
+              ? null
+              : l10n.sleepTimerCustomRange(
+                  SleepTimerButton.customMin,
+                  SleepTimerButton.customMax,
+                ),
+        ),
+        onChanged: (_) => setState(() {}),
+        onSubmitted: (_) => _submit(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: valid ? _submit : null,
+          child: Text(l10n.sleepTimerStart),
+        ),
+      ],
     );
   }
 }

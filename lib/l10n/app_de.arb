@@ -473,5 +473,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "sleepTimerCustom": "Eigene Zeit…",
+  "sleepTimerCustomSet": "Eigene Zeit: {minutes} Minuten",
+  "@sleepTimerCustomSet": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepTimerCustomLabel": "Minuten",
+  "sleepTimerCustomRange": "{min} bis {max} Minuten",
+  "@sleepTimerCustomRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepTimerStart": "Starten"
 }

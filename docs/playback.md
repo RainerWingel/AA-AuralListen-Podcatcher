@@ -39,7 +39,10 @@ Regressionstest: „switching episodes while playing reports "playing"".
 ### Sleep-Timer (Benutzerwunsch 2026-09-28)
 Code: `lib/audio/sleep_timer.dart` (Einstellung), `PodcastAudioHandler` (Abschnitt „sleep timer"),
 Knopf `SleepTimerButton` rechts neben „Lesezeichen setzen" im Vollbild-Player.
-- Auswahl: Aus · 5 · 15 · 30 · 60 Minuten · Bis Ende der Folge. Nur im Arbeitsspeicher, nicht gespeichert.
+- Auswahl: Aus · 5 · 15 · 30 · 60 Minuten · **Eigene Zeit…** (Zahlenfeld, ganze Minuten 1–3600, „Starten" nur bei
+  gültigem Wert; gesetzt steht dort „Eigene Zeit: n Minuten") · Bis Ende der Folge. Nur im Arbeitsspeicher.
+- Auch der schon gewählte Eintrag reagiert auf Tippen (`toggleable`): „Eigene Zeit" lässt sich so ändern, eine feste
+  Zeit startet neu.
 - **Minuten = Spielzeit:** Eine `Stopwatch` läuft nur während der Wiedergabe; in der Pause steht der Countdown.
   Dazu genau ein `Timer` bis zum Ablauf, nur während der Wiedergabe (kein Sekunden-Takt; die Anzeige „noch mm:ss"
   rechnet beim Neuzeichnen, das der Positions-Stream ohnehin auslöst).
