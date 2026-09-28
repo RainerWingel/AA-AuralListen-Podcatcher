@@ -1202,6 +1202,53 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets('the "Neu" dot marks only fresh episodes', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    final podcastId = await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://example.com/feed'),
+    );
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+    await settle(tester);
+    await tester.tap(find.text('Widget-Podcast'));
+    await settle(tester);
+    // Only the initial import: unplayed, but not fresh → no dot.
+    expect(find.text('Erste Folge'), findsOneWidget);
+    expect(find.byTooltip('Neu'), findsNothing);
+
+    // A later refresh brings a new episode → dot.
+    final podcast = await tester.runAsync(
+      () => db.select(db.podcasts).getSingle(),
+    );
+    await tester.runAsync(
+      () => db
+          .into(db.episodes)
+          .insert(
+            EpisodesCompanion.insert(
+              podcastId: podcastId!,
+              guid: 'frisch',
+              title: 'Frische Folge',
+              audioUrl: 'https://example.com/frisch.mp3',
+              pubDate: Value(DateTime.now()),
+              addedAt: podcast!.subscribedAt.add(const Duration(minutes: 1)),
+            ),
+          ),
+    );
+    await settle(tester);
+    expect(find.text('Frische Folge'), findsOneWidget);
+    expect(find.byTooltip('Neu'), findsOneWidget);
+
+    await disposeApp(tester);
+  });
 }
 
 Future<void> handlerSeek(

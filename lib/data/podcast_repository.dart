@@ -46,6 +46,13 @@ Set<String>? autoDownloadThemesOf(Podcast podcast) {
   return {...(jsonDecode(json) as List<Object?>).whereType<String>()};
 }
 
+/// "Fresh": fetched by a refresh within [PodcastRepository.freshFor]; the
+/// initial import when subscribing never counts (docs/playlists.md). Same
+/// rule as the SQL in [PodcastRepository.unplayedEpisodes].
+bool isFreshEpisode(Episode episode, Podcast podcast, DateTime now) =>
+    episode.addedAt.isAfter(podcast.subscribedAt) &&
+    !episode.addedAt.isBefore(now.subtract(PodcastRepository.freshFor));
+
 /// Removes downloaded files of a podcast before it is unsubscribed
 /// (implemented by the DownloadService).
 abstract interface class PodcastFilesCleaner {

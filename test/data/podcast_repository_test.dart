@@ -459,6 +459,48 @@ void main() {
     expect(await since(DateTime.utc(2025, 7)), isEmpty);
   });
 
+  test('isFreshEpisode: refresh within 96 h, never the initial import', () {
+    final subscribed = DateTime.utc(2026, 9, 1);
+    final podcast = Podcast(
+      id: 1,
+      feedUrl: 'https://example.com/feed',
+      title: 'P',
+      subscribedAt: subscribed,
+      autoDownloadMode: AutoDownloadMode.off,
+      autoDownloadMaxEpisodes: 3,
+      autoDeletePlayed: true,
+    );
+    Episode added(DateTime at) => Episode(
+      id: 1,
+      podcastId: 1,
+      guid: 'g',
+      title: 't',
+      audioUrl: 'https://example.com/a.mp3',
+      positionMs: 0,
+      status: EpisodeStatus.newEpisode,
+      addedAt: at,
+    );
+    final refreshAt = subscribed.add(const Duration(days: 3));
+    expect(isFreshEpisode(added(subscribed), podcast, subscribed), isFalse);
+    expect(isFreshEpisode(added(refreshAt), podcast, refreshAt), isTrue);
+    expect(
+      isFreshEpisode(
+        added(refreshAt),
+        podcast,
+        refreshAt.add(const Duration(hours: 96)),
+      ),
+      isTrue,
+    );
+    expect(
+      isFreshEpisode(
+        added(refreshAt),
+        podcast,
+        refreshAt.add(const Duration(hours: 96, seconds: 1)),
+      ),
+      isFalse,
+    );
+  });
+
   test('latest episodes across podcasts are sorted by date', () async {
     server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
     await repo.subscribe('https://example.com/feed');

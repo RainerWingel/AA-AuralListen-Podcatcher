@@ -6,6 +6,7 @@ import '../../core/clock.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../data/db/app_database.dart';
+import '../../data/podcast_repository.dart' show isFreshEpisode;
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
@@ -194,6 +195,11 @@ class EpisodeTile extends ConsumerWidget {
               child: Icon(Icons.graphic_eq, color: theme.colorScheme.primary),
             )
           : switch (episode.status) {
+              // The dot marks only fresh episodes (like "Alle neuen
+              // Episoden spielen"), not everything never played.
+              EpisodeStatus.newEpisode
+                  when !isFreshEpisode(episode, podcast, now) =>
+                null,
               EpisodeStatus.newEpisode => Tooltip(
                 message: l10n.episodeNew,
                 child: Icon(
