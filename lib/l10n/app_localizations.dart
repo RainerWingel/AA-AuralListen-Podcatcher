@@ -1341,6 +1341,78 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als ungespielt markiert'**
   String markUnplayedSinceDone(int count);
+
+  /// No description provided for @playlistSortDateAscending.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufsteigend nach Datum sortieren'**
+  String get playlistSortDateAscending;
+
+  /// No description provided for @playlistSortDateDescending.
+  ///
+  /// In de, this message translates to:
+  /// **'Absteigend nach Datum sortieren'**
+  String get playlistSortDateDescending;
+
+  /// No description provided for @playlistSortNameAscending.
+  ///
+  /// In de, this message translates to:
+  /// **'Aufsteigend nach Namen sortieren'**
+  String get playlistSortNameAscending;
+
+  /// No description provided for @playlistSortedDateAscending.
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ nach Datum sortiert (älteste zuerst).'**
+  String playlistSortedDateAscending(String name);
+
+  /// No description provided for @playlistSortedDateDescending.
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ nach Datum sortiert (neueste zuerst).'**
+  String playlistSortedDateDescending(String name);
+
+  /// No description provided for @playlistSortedName.
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ nach Namen sortiert (A–Z).'**
+  String playlistSortedName(String name);
+
+  /// No description provided for @playlistDownloadAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Alles downloaden'**
+  String get playlistDownloadAll;
+
+  /// No description provided for @playlistDownloadAllConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} aus „{name}“ herunterladen?'**
+  String playlistDownloadAllConfirm(int count, String name);
+
+  /// No description provided for @playlistDownloadAllSize.
+  ///
+  /// In de, this message translates to:
+  /// **'(ca. {size})'**
+  String playlistDownloadAllSize(String size);
+
+  /// No description provided for @playlistDownloadAllHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Downloads starten sofort, auch über mobile Daten. Schon heruntergeladene Folgen werden übersprungen.'**
+  String get playlistDownloadAllHint;
+
+  /// No description provided for @playlistDownloadAllNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Folgen dieser Playlist sind schon heruntergeladen.'**
+  String get playlistDownloadAllNone;
+
+  /// No description provided for @playlistDownloadAllStarted.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Download gestartet.} other{{count} Downloads gestartet.}}'**
+  String playlistDownloadAllStarted(int count);
 }
 
 class _AppLocalizationsDelegate

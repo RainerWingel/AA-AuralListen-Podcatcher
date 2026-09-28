@@ -130,5 +130,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Abo-Menü: Kalender, ungespielte Folgen ab dem gewählten Tag in eine Playlist
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Zusatz – Playlist-Menü
+- [x] Sortieren nach Datum ↑/↓ und Namen ↑, Alles downloaden mit Rückfrage
+- [ ] Praxistest auf dem S25 (Benutzer)
+
 ## Offene Punkte
 - keine

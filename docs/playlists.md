@@ -13,6 +13,17 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
   Playlist, wird direkt hinzugefügt; sonst Auswahl-Sheet (inkl. „Neue Playlist").
 - Reihenfolge per Drag & Drop (Griff ≡), Entfernen per Wischen nach links (mit „Rückgängig" – fügt am Ende wieder ein).
 - Eine Folge kann in mehreren Playlists stehen, in einer Playlist aber nur einmal.
+- **Playlist-Menü ⋮** (Übersicht und geöffnete Playlist, gemeinsam: `playlistMenuItems`), Benutzerwunsch 2026-09-29:
+  - **Aufsteigend / Absteigend nach Datum sortieren** (Pfeil ↑/↓): Veröffentlichungsdatum; Folgen ohne Datum stehen in
+    beiden Richtungen am Ende.
+  - **Aufsteigend nach Namen sortieren** (↑): Folgentitel, ohne Groß/Klein, Umlaute wie Grundbuchstabe, Zahlen nach
+    Wert („Folge 2" vor „Folge 10", `compareTitles`).
+  - Sortieren schreibt die Reihenfolge einmal neu (`PlaylistRepository.sort`), danach ist sie wie gewohnt per Drag &
+    Drop änderbar; Infobox bestätigt. Eine laufende Playlist spielt nach der neuen Reihenfolge weiter.
+  - **Alles downloaden**: Rückfrage mit Anzahl der fehlenden Folgen und ungefährer Größe; lädt sofort (auch mobil),
+    überspringt fertige/laufende Downloads, wiederholt fehlgeschlagene. Ungespielte Downloads zählen nicht zum
+    automatischen Aufräumen (siehe `eviction.md`).
+  - Umbenennen, Playlist löschen.
 
 ## Ganze Podcasts in eine Playlist (Benutzerwunsch 2026-09-28)
 Abos-Tab → **langes Drücken** auf eine Kachel → Menü (`play_podcast_episodes.dart`):

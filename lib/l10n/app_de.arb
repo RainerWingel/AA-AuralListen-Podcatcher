@@ -536,5 +536,62 @@
         "type": "int"
       }
     }
+  },
+  "playlistSortDateAscending": "Aufsteigend nach Datum sortieren",
+  "playlistSortDateDescending": "Absteigend nach Datum sortieren",
+  "playlistSortNameAscending": "Aufsteigend nach Namen sortieren",
+  "playlistSortedDateAscending": "„{name}“ nach Datum sortiert (älteste zuerst).",
+  "@playlistSortedDateAscending": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistSortedDateDescending": "„{name}“ nach Datum sortiert (neueste zuerst).",
+  "@playlistSortedDateDescending": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistSortedName": "„{name}“ nach Namen sortiert (A–Z).",
+  "@playlistSortedName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistDownloadAll": "Alles downloaden",
+  "playlistDownloadAllConfirm": "{count, plural, =1{1 Folge} other{{count} Folgen}} aus „{name}“ herunterladen?",
+  "@playlistDownloadAllConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistDownloadAllSize": "(ca. {size})",
+  "@playlistDownloadAllSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistDownloadAllHint": "Die Downloads starten sofort, auch über mobile Daten. Schon heruntergeladene Folgen werden übersprungen.",
+  "playlistDownloadAllNone": "Alle Folgen dieser Playlist sind schon heruntergeladen.",
+  "playlistDownloadAllStarted": "{count, plural, =1{1 Download gestartet.} other{{count} Downloads gestartet.}}",
+  "@playlistDownloadAllStarted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

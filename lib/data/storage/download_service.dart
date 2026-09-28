@@ -69,6 +69,11 @@ class DownloadService implements PodcastFilesCleaner {
 
   // ---------------------------------------------------------------- queries
 
+  /// Download row per episode id, read once (e.g. "Alles downloaden").
+  Future<Map<int, Download>> states() async => {
+    for (final r in await _db.select(_db.downloads).get()) r.episodeId: r,
+  };
+
   Stream<Map<int, Download>> watchStates() => _db
       .select(_db.downloads)
       .watch()

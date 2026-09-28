@@ -1354,6 +1354,102 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets('playlist menu: sort and download everything', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(NavigationBar)),
+    );
+    final podcastId = await tester.runAsync(
+      () => container
+          .read(podcastRepositoryProvider)
+          .subscribe('https://example.com/feed'),
+    );
+    final playlistId = (await tester.runAsync(
+      () => db.select(db.playlists).getSingle(),
+    ))!.id;
+    // One write only: a second statement inside runAsync would wait for the
+    // database lock held by the app's live queries in the paused fake time.
+    await tester.runAsync(
+      () => db.batch((b) {
+        for (final (i, (guid, year)) in [
+          ('Alt', 2020),
+          ('Neu', 2026),
+        ].indexed) {
+          b
+            ..insert(
+              db.episodes,
+              EpisodesCompanion.insert(
+                id: Value(1000 + i),
+                podcastId: podcastId!,
+                guid: guid,
+                title: 'Folge $guid',
+                audioUrl: 'https://example.com/$guid.mp3',
+                pubDate: Value(DateTime.utc(year)),
+                addedAt: DateTime.now(),
+              ),
+            )
+            ..insert(
+              db.playlistItems,
+              PlaylistItemsCompanion.insert(
+                playlistId: playlistId,
+                episodeId: 1000 + i,
+                position: i,
+                addedAt: DateTime.now(),
+              ),
+            );
+        }
+      }),
+    );
+    Future<List<String>> order() async => [
+      for (final e in (await tester.runAsync(
+        () => container.read(playlistRepositoryProvider).entries(playlistId),
+      ))!)
+        e.episode.title,
+    ];
+
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Playlists'));
+    await settle(tester);
+    await tester.tap(find.text('Wiedergabeliste'));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<void>).last);
+    await settle(tester);
+    for (final entry in [
+      'Aufsteigend nach Datum sortieren',
+      'Absteigend nach Datum sortieren',
+      'Aufsteigend nach Namen sortieren',
+      'Alles downloaden',
+      'Umbenennen',
+      'Playlist löschen',
+    ]) {
+      expect(find.text(entry), findsOneWidget, reason: entry);
+    }
+    await tester.tap(find.text('Absteigend nach Datum sortieren'));
+    await settle(tester);
+    expect(await order(), ['Folge Neu', 'Folge Alt']);
+    expect(find.textContaining('neueste zuerst'), findsOneWidget);
+
+    await tester.tap(find.byType(PopupMenuButton<void>).last);
+    await settle(tester);
+    await tester.tap(find.text('Alles downloaden'));
+    await settle(tester);
+    expect(
+      find.textContaining('2 Folgen aus „Wiedergabeliste“'),
+      findsOneWidget,
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Herunterladen'));
+    await settle(tester);
+    expect(downloadEngine.active, hasLength(2));
+    expect(find.text('2 Downloads gestartet.'), findsOneWidget);
+
+    await disposeApp(tester);
+  });
 }
 
 Future<void> handlerSeek(

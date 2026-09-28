@@ -85,16 +85,7 @@ class _PlaylistTile extends ConsumerWidget {
         children: [
           PopupMenuButton<void>(
             // Screen context: the menu's own context goes away on close.
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                onTap: () => renamePlaylist(context, ref, playlist),
-                child: Text(l10n.playlistRename),
-              ),
-              PopupMenuItem(
-                onTap: () => deletePlaylist(context, ref, playlist),
-                child: Text(l10n.playlistDelete),
-              ),
-            ],
+            itemBuilder: (_) => playlistMenuItems(context, ref, playlist),
           ),
           ReorderableDragStartListener(
             index: index,

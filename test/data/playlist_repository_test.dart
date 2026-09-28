@@ -11,18 +11,20 @@ void main() {
   late int podcastId;
   final now = DateTime.utc(2026, 9, 27);
 
-  Future<int> addEpisode(String guid, {int? durationMs}) => db
-      .into(db.episodes)
-      .insert(
-        EpisodesCompanion.insert(
-          podcastId: podcastId,
-          guid: guid,
-          title: guid,
-          audioUrl: 'https://example.com/$guid.mp3',
-          durationMs: Value(durationMs),
-          addedAt: now,
-        ),
-      );
+  Future<int> addEpisode(String guid, {int? durationMs, DateTime? pubDate}) =>
+      db
+          .into(db.episodes)
+          .insert(
+            EpisodesCompanion.insert(
+              podcastId: podcastId,
+              guid: guid,
+              title: guid,
+              audioUrl: 'https://example.com/$guid.mp3',
+              durationMs: Value(durationMs),
+              pubDate: Value(pubDate),
+              addedAt: now,
+            ),
+          );
 
   Future<List<String>> titles(int playlistId) async =>
       (await repo.entries(playlistId)).map((e) => e.episode.title).toList();
@@ -83,6 +85,31 @@ void main() {
       a,
       c,
     ]);
+  });
+
+  test('compareTitles: case, umlauts, numbers by value', () {
+    final titles = ['Folge 10', 'über alles', 'Folge 2', 'Apfel', 'Ärger'];
+    titles.sort(compareTitles);
+    expect(titles, ['Apfel', 'Ärger', 'Folge 2', 'Folge 10', 'über alles']);
+  });
+
+  test('sort by date both ways (undated last) and by name', () async {
+    final playlistId = (await db.select(db.playlists).getSingle()).id;
+    for (final (guid, date) in [
+      ('Zebra', DateTime.utc(2026, 5)),
+      ('ohne Datum', null),
+      ('Mango', DateTime.utc(2025)),
+      ('Apfel', DateTime.utc(2026, 9)),
+    ]) {
+      await repo.add(playlistId, await addEpisode(guid, pubDate: date));
+    }
+
+    await repo.sort(playlistId, PlaylistSort.dateAscending);
+    expect(await titles(playlistId), ['Mango', 'Zebra', 'Apfel', 'ohne Datum']);
+    await repo.sort(playlistId, PlaylistSort.dateDescending);
+    expect(await titles(playlistId), ['Apfel', 'Zebra', 'Mango', 'ohne Datum']);
+    await repo.sort(playlistId, PlaylistSort.nameAscending);
+    expect(await titles(playlistId), ['Apfel', 'Mango', 'ohne Datum', 'Zebra']);
   });
 
   test('summary counts episodes and sums durations', () async {

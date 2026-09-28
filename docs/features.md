@@ -23,6 +23,7 @@ Sideload per APK. Nur Deutsch. Alle Daten nur lokal.
 | # | Funktion | Details |
 |---|----------|---------|
 | F19 | Als gespielt markieren bis Datum | pro Abo, Kalender + Rückfrage → `data-model.md` |
+| F28 | Playlist-Menü | nach Datum ↑/↓ oder Namen sortieren, alles downloaden → `playlists.md` |
 | F27 | Als ungespielt markieren seit Datum | pro Abo, nur gespielte Folgen, Kalender + Rückfrage → `data-model.md` |
 | F26 | Podcast komplett abspielen | Abos: langes Drücken → alle neuen (96 h) / ungespielte seit Datum / alle ungespielten Folgen in eine Playlist → `playlists.md` |
 | F25 | Fehlerarten beim Abspielen | kaputter Download → streamen · Folge gelöscht · Format nicht abspielbar · Netz → `playback.md` |

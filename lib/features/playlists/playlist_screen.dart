@@ -60,21 +60,14 @@ class PlaylistScreen extends ConsumerWidget {
             ),
           if (playlist != null)
             PopupMenuButton<void>(
-              itemBuilder: (_) => [
-                PopupMenuItem(
-                  onTap: () => renamePlaylist(context, ref, playlist),
-                  child: Text(l10n.playlistRename),
-                ),
-                PopupMenuItem(
-                  onTap: () async {
-                    if (await deletePlaylist(context, ref, playlist) &&
-                        context.mounted) {
-                      context.go(Routes.playlists);
-                    }
-                  },
-                  child: Text(l10n.playlistDelete),
-                ),
-              ],
+              itemBuilder: (_) => playlistMenuItems(
+                context,
+                ref,
+                playlist,
+                onDeleted: () {
+                  if (context.mounted) context.go(Routes.playlists);
+                },
+              ),
             ),
         ],
       ),

@@ -9,6 +9,32 @@ typedef PlaylistSummary = ({Playlist playlist, int count, Duration duration});
 /// One entry of a playlist with its episode and podcast.
 typedef PlaylistEntry = ({PlaylistItem item, Episode episode, Podcast podcast});
 
+/// Orders for "Sortieren" in the playlist menu.
+enum PlaylistSort { dateAscending, dateDescending, nameAscending }
+
+/// Title order for people: case-insensitive, umlauts like their base letter,
+/// numbers by value ("Folge 2" before "Folge 10").
+int compareTitles(String a, String b) {
+  String fold(String s) => s
+      .toLowerCase()
+      .replaceAll('ä', 'a')
+      .replaceAll('ö', 'o')
+      .replaceAll('ü', 'u')
+      .replaceAll('ß', 'ss');
+  final digits = RegExp(r'\d+|\D+');
+  final pa = digits.allMatches(fold(a)).map((m) => m[0]!).toList();
+  final pb = digits.allMatches(fold(b)).map((m) => m[0]!).toList();
+  for (var i = 0; i < pa.length && i < pb.length; i++) {
+    final na = int.tryParse(pa[i]);
+    final nb = int.tryParse(pb[i]);
+    final c = na != null && nb != null
+        ? na.compareTo(nb)
+        : pa[i].compareTo(pb[i]);
+    if (c != 0) return c;
+  }
+  return pa.length.compareTo(pb.length);
+}
+
 /// Playlists and their items. Rules: docs/playlists.md.
 class PlaylistRepository {
   PlaylistRepository(this._db, this._clock);
@@ -194,6 +220,45 @@ class PlaylistRepository {
           ))
           .go();
 
+  /// Rewrites the whole order of [playlistId]. Date = publication date;
+  /// episodes without one go last in both date orders.
+  Future<void> sort(int playlistId, PlaylistSort order) async {
+    final entries = await this.entries(playlistId);
+    int byDate(PlaylistEntry a, PlaylistEntry b, {required bool ascending}) {
+      final da = a.episode.pubDate;
+      final db = b.episode.pubDate;
+      if (da == null || db == null) {
+        return da == null ? (db == null ? 0 : 1) : -1;
+      }
+      return ascending ? da.compareTo(db) : db.compareTo(da);
+    }
+
+    entries.sort(
+      (a, b) => switch (order) {
+        PlaylistSort.dateAscending => byDate(a, b, ascending: true),
+        PlaylistSort.dateDescending => byDate(a, b, ascending: false),
+        PlaylistSort.nameAscending => compareTitles(
+          a.episode.title,
+          b.episode.title,
+        ),
+      },
+    );
+    await _writeOrder(playlistId, [for (final e in entries) e.item.episodeId]);
+  }
+
+  Future<void> _writeOrder(int playlistId, List<int> episodeIds) =>
+      _db.batch((batch) {
+        for (var i = 0; i < episodeIds.length; i++) {
+          batch.update(
+            _db.playlistItems,
+            PlaylistItemsCompanion(position: Value(i)),
+            where: (item) =>
+                item.playlistId.equals(playlistId) &
+                item.episodeId.equals(episodeIds[i]),
+          );
+        }
+      });
+
   /// Moves the entry at [oldIndex] to [newIndex] (display order; [newIndex]
   /// is the final index, as ReorderableListView.onReorderItem reports it).
   Future<void> move(int playlistId, int oldIndex, int newIndex) async {
@@ -203,16 +268,6 @@ class PlaylistRepository {
     if (oldIndex < 0 || oldIndex >= ids.length) return;
     final moved = ids.removeAt(oldIndex);
     ids.insert(newIndex.clamp(0, ids.length), moved);
-    await _db.batch((batch) {
-      for (var i = 0; i < ids.length; i++) {
-        batch.update(
-          _db.playlistItems,
-          PlaylistItemsCompanion(position: Value(i)),
-          where: (item) =>
-              item.playlistId.equals(playlistId) &
-              item.episodeId.equals(ids[i]),
-        );
-      }
-    });
+    await _writeOrder(playlistId, ids);
   }
 }

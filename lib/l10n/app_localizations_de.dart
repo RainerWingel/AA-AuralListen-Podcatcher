@@ -821,4 +821,66 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0 als ungespielt markiert';
   }
+
+  @override
+  String get playlistSortDateAscending => 'Aufsteigend nach Datum sortieren';
+
+  @override
+  String get playlistSortDateDescending => 'Absteigend nach Datum sortieren';
+
+  @override
+  String get playlistSortNameAscending => 'Aufsteigend nach Namen sortieren';
+
+  @override
+  String playlistSortedDateAscending(String name) {
+    return '„$name“ nach Datum sortiert (älteste zuerst).';
+  }
+
+  @override
+  String playlistSortedDateDescending(String name) {
+    return '„$name“ nach Datum sortiert (neueste zuerst).';
+  }
+
+  @override
+  String playlistSortedName(String name) {
+    return '„$name“ nach Namen sortiert (A–Z).';
+  }
+
+  @override
+  String get playlistDownloadAll => 'Alles downloaden';
+
+  @override
+  String playlistDownloadAllConfirm(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen',
+      one: '1 Folge',
+    );
+    return '$_temp0 aus „$name“ herunterladen?';
+  }
+
+  @override
+  String playlistDownloadAllSize(String size) {
+    return '(ca. $size)';
+  }
+
+  @override
+  String get playlistDownloadAllHint =>
+      'Die Downloads starten sofort, auch über mobile Daten. Schon heruntergeladene Folgen werden übersprungen.';
+
+  @override
+  String get playlistDownloadAllNone =>
+      'Alle Folgen dieser Playlist sind schon heruntergeladen.';
+
+  @override
+  String playlistDownloadAllStarted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Downloads gestartet.',
+      one: '1 Download gestartet.',
+    );
+    return '$_temp0';
+  }
 }
