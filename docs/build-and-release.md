@@ -42,6 +42,15 @@ flutter build apk --release --split-per-abi  # nur passende CPU-Architektur → 
 adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
+## GitHub-Release
+Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für jeden herunterladbar).
+1. `version:` in `pubspec.yaml` erhöhen (Name + Build-Nummer), mergen, von `main` bauen.
+2. Prüfen: `apksigner verify --print-certs` (Release-Zertifikat), keine DB/Key-Dateien in der APK (`unzip -l`).
+3. APK als `AA-PodcastGuru-<version>-arm64-v8a.apk` hochladen:
+   `gh release create v<version> <apk> --target <volle SHA von origin/main> --title … --notes-file …`
+   (kurze SHA lehnt GitHub ab). Notizen auf Deutsch, mit SHA-256 der APK.
+- v1.0.0 (2026-09-27): https://github.com/RainerWingel/AA-Podcast-Guru/releases/tag/v1.0.0
+
 ## CI (GitHub Actions)
 Bei jedem Push/PR: `flutter pub get` → `dart format --set-exit-if-changed` → `flutter analyze` → `flutter test`
 → Debug-APK bauen (als Artefakt 7 Tage herunterladbar). Keine Secrets in der CI.

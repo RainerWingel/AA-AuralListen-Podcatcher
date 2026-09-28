@@ -85,9 +85,10 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Leak-Tests: leak_tracker in allen Widget-Tests, `dispose()`-Tests für Handler und Downloads
 - [x] Fix: Downloads von `http://`-Links (CRE) scheiterten an Androids Klartext-Sperre
 - [x] Soak-Test Refresh: 50 Refreshes, Speicher flach (`test/soak`)
-- [ ] Soak-Test auf dem S25: 2 h Wiedergabe mit `tool/soak_memory.sh` (läuft)
+- [x] Soak-Test auf dem S25: 2 h Wiedergabe mit `tool/soak_memory.sh`, kein Speicherwachstum
 - [x] Eigenes App-Symbol (adaptiv, Designsymbol, Statusleiste)
-- [ ] Version 1.0.0, Release-APK
+- [x] Version 1.0.0: GitHub-Release `v1.0.0` mit signierter arm64-APK
 
 ## Offene Punkte
-- keine
+- Im Dauertest wurde der Prozess um 22:22 von außen beendet (Signal 9, kein Absturz). Benutzer fragen:
+  App weggewischt / „Alle schließen"? Sonst Samsung-Akku-Optimierung prüfen (App auf „Nicht eingeschränkt").
