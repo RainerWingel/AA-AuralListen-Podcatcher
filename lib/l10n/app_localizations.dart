@@ -379,7 +379,7 @@ abstract class AppLocalizations {
   /// No description provided for @opmlImportSubtitle.
   ///
   /// In de, this message translates to:
-  /// **'Abos aus einer anderen App übernehmen (z. B. Castbox)'**
+  /// **'Abos aus einer anderen App übernehmen'**
   String get opmlImportSubtitle;
 
   /// No description provided for @opmlInvalid.

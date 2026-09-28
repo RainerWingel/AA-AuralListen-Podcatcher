@@ -183,8 +183,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get opmlImport => 'OPML-Datei importieren';
 
   @override
-  String get opmlImportSubtitle =>
-      'Abos aus einer anderen App übernehmen (z. B. Castbox)';
+  String get opmlImportSubtitle => 'Abos aus einer anderen App übernehmen';
 
   @override
   String get opmlInvalid => 'Die Datei ist keine gültige OPML-Datei.';

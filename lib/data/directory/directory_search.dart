@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../core/app_info.dart';
+
 /// A podcast found in a directory, before subscribing.
 class DirectoryResult {
   const DirectoryResult({
@@ -35,8 +37,7 @@ abstract interface class PodcastDirectory {
   Future<List<DirectoryResult>> search(String term);
 }
 
-const _userAgent =
-    'AA-PodcastGuru/0.1 (+https://github.com/RainerWingel/AA-Podcast-Guru)';
+const _userAgent = appUserAgent;
 const _searchTimeout = Duration(seconds: 15);
 const _maxResultsPerDirectory = 25;
 

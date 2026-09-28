@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:background_downloader/background_downloader.dart';
 
+import '../../core/app_info.dart';
+
 /// What the download engine reports about one episode download.
 sealed class DownloadEvent {
   const DownloadEvent(this.episodeId);
@@ -67,8 +69,7 @@ abstract interface class DownloadEngine {
 class BackgroundDownloadEngine implements DownloadEngine {
   static const _group = 'episodes';
   static const _taskPrefix = 'episode-';
-  static const _userAgent =
-      'AA-PodcastGuru/0.1 (+https://github.com/RainerWingel/AA-Podcast-Guru)';
+  static const _userAgent = appUserAgent;
 
   final _events = StreamController<DownloadEvent>.broadcast();
   StreamSubscription<TaskUpdate>? _subscription;

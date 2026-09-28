@@ -105,7 +105,7 @@
   "ok": "OK",
   "settingsSectionSubscriptions": "Abos",
   "opmlImport": "OPML-Datei importieren",
-  "opmlImportSubtitle": "Abos aus einer anderen App übernehmen (z. B. Castbox)",
+  "opmlImportSubtitle": "Abos aus einer anderen App übernehmen",
   "opmlInvalid": "Die Datei ist keine gültige OPML-Datei.",
   "opmlTooLarge": "Die Datei ist zu groß.",
   "opmlEmpty": "In der Datei wurden keine Podcasts gefunden.",

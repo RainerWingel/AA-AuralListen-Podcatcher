@@ -4,6 +4,8 @@ import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 
+import '../../core/app_info.dart';
+
 /// Outcome of downloading a feed.
 sealed class FeedFetchResult {
   const FeedFetchResult();
@@ -57,8 +59,7 @@ class FeedFetcher {
   /// Protects the RAM from absurdly large or endless responses.
   static const maxFeedBytes = 30 * 1024 * 1024;
 
-  static const _userAgent =
-      'AA-PodcastGuru/0.1 (+https://github.com/RainerWingel/AA-Podcast-Guru)';
+  static const _userAgent = appUserAgent;
 
   Future<FeedFetchResult> fetch(
     Uri url, {

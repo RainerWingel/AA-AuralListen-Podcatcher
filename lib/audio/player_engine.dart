@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:just_audio/just_audio.dart';
 
+import '../core/app_info.dart';
+
 enum EngineProcessing { idle, loading, buffering, ready, completed }
 
 class EngineState {
@@ -81,7 +83,7 @@ abstract interface class PlayerEngine {
 class JustAudioEngine implements PlayerEngine {
   JustAudioEngine() {
     _player = AudioPlayer(
-      userAgent: 'AA-PodcastGuru/0.1 (+https://github.com/RainerWingel/AA-Podcast-Guru)',
+      userAgent: appUserAgent,
       // Send the user agent natively via ExoPlayer. The default routes every
       // stream through just_audio's local HTTP proxy inside the app: extra
       // work, uncaught errors when offline, and ExoPlayer then times out

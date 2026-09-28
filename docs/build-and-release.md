@@ -44,7 +44,8 @@ adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
 ## GitHub-Release
 Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für jeden herunterladbar).
-1. `version:` in `pubspec.yaml` erhöhen (Name + Build-Nummer), mergen, von `main` bauen.
+1. `version:` in `pubspec.yaml` erhöhen (Name + Build-Nummer) **und** `appVersion` in `lib/core/app_info.dart`
+   (User-Agent; ein Test vergleicht beide), committen, pushen, von `main` bauen.
 2. Prüfen: `apksigner verify --print-certs` (Release-Zertifikat), keine DB/Key-Dateien in der APK (`unzip -l`).
 3. APK als `AA-PodcastGuru-<version>-arm64-v8a.apk` hochladen:
    `gh release create v<version> <apk> --target <volle SHA von origin/main> --title … --notes-file …`
