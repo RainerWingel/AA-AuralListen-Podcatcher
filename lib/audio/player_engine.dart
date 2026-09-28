@@ -17,6 +17,29 @@ class EngineState {
   final EngineProcessing processing;
 }
 
+/// Kind of a player failure (just_audio only reports ExoPlayer's type).
+enum EngineErrorKind {
+  /// Loading the data failed (network, server, missing/broken file).
+  source,
+
+  /// The decoder failed (e.g. unsupported format, broken data).
+  renderer,
+
+  /// Anything else.
+  other,
+}
+
+/// A failed load or a playback error of the engine.
+class EngineException implements Exception {
+  const EngineException(this.kind, [this.message]);
+
+  final EngineErrorKind kind;
+  final String? message;
+
+  @override
+  String toString() => 'EngineException(${kind.name}): $message';
+}
+
 /// The raw audio player, behind an interface so the playback logic in
 /// [PodcastAudioHandler] can be unit-tested with a fake (think: IAudioPlayer).
 abstract interface class PlayerEngine {
@@ -26,7 +49,7 @@ abstract interface class PlayerEngine {
 
   /// Playback errors (e.g. network timeout while streaming). Afterwards the
   /// engine is unusable until the next [load].
-  Stream<Object> get errorStream;
+  Stream<EngineException> get errorStream;
 
   EngineState get state;
   Duration get position;
@@ -34,6 +57,7 @@ abstract interface class PlayerEngine {
   Duration? get duration;
 
   /// Prepares [uri] (http(s) or file) and returns its duration if known.
+  /// Throws [EngineException] if it cannot be loaded.
   Future<Duration?> load(Uri uri, {Duration initialPosition = Duration.zero});
 
   /// Starts playback. Returns immediately (does not wait until playback ends).
@@ -92,7 +116,16 @@ class JustAudioEngine implements PlayerEngine {
   Stream<Duration?> get durationStream => _player.durationStream;
 
   @override
-  Stream<Object> get errorStream => _player.errorStream;
+  Stream<EngineException> get errorStream =>
+      _player.errorStream.map(_toEngineException);
+
+  /// ExoPlayer's type as sent by just_audio: 0 source, 1 renderer.
+  static EngineException _toEngineException(PlayerException e) =>
+      EngineException(switch (e.code) {
+        0 => EngineErrorKind.source,
+        1 => EngineErrorKind.renderer,
+        _ => EngineErrorKind.other,
+      }, e.message);
 
   @override
   EngineState get state => _map(_player.playerState);
@@ -107,11 +140,19 @@ class JustAudioEngine implements PlayerEngine {
   Duration? get duration => _player.duration;
 
   @override
-  Future<Duration?> load(Uri uri, {Duration initialPosition = Duration.zero}) =>
-      _player.setAudioSource(
+  Future<Duration?> load(
+    Uri uri, {
+    Duration initialPosition = Duration.zero,
+  }) async {
+    try {
+      return await _player.setAudioSource(
         AudioSource.uri(uri),
         initialPosition: initialPosition,
       );
+    } on PlayerException catch (e) {
+      throw _toEngineException(e);
+    }
+  }
 
   @override
   Future<void> play() {

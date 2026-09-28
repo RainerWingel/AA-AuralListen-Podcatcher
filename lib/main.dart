@@ -8,6 +8,7 @@ import 'app/app.dart';
 import 'audio/audio_providers.dart';
 import 'audio/player_engine.dart';
 import 'audio/podcast_audio_handler.dart';
+import 'audio/stream_check.dart';
 import 'data/db/app_database.dart';
 import 'data/playback_repository.dart';
 import 'data/playlist_repository.dart';
@@ -32,6 +33,11 @@ Future<void> main() async {
       playlists: PlaylistRepository(db, DateTime.now),
       localAudioFile: (id) =>
           container.read(downloadServiceProvider).localFile(id),
+      // Only used when playback failed, to tell the cause (docs/playback.md).
+      checkStream: (uri) =>
+          checkStream(container.read(httpClientProvider), uri),
+      deleteDownload: (id) =>
+          container.read(downloadServiceProvider).delete(id),
     ),
     // Reuse the bounded cover cache instead of a second, separate image cache.
     cacheManager: CoverCacheManager.instance,

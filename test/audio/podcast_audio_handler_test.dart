@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:aapodcastguru/audio/player_engine.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/audio/sleep_timer.dart';
+import 'package:aapodcastguru/audio/stream_check.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
 import 'package:aapodcastguru/data/playlist_repository.dart';
@@ -590,6 +592,135 @@ void main() {
       expect(problems, [PlaybackProblem.loadFailed]);
       expect(handler.playbackState.value.playing, isFalse);
       expect(handler.watchdogActive, isFalse);
+    });
+  });
+
+  group('error kinds (docs/playback.md)', () {
+    const tick = Duration(milliseconds: 20);
+    late List<PlaybackProblem> problems;
+    late List<int> deleted;
+    late StreamCheck serverSays;
+    late int checks;
+    late bool hasDownload;
+
+    setUp(() async {
+      await handler.dispose();
+      engine = FakePlayerEngine();
+      deleted = [];
+      serverSays = StreamCheck.offline;
+      checks = 0;
+      hasDownload = false;
+      handler = PodcastAudioHandler(
+        engine: engine,
+        playback: PlaybackRepository(db, () => now),
+        settings: settings,
+        playlists: playlists,
+        stallCheckInterval: tick,
+        recoveryRetryDelay: tick,
+        localAudioFile: (id) async => hasDownload && !deleted.contains(id)
+            ? File('/data/episodes/$id.mp3')
+            : null,
+        deleteDownload: (id) async => deleted.add(id),
+        checkStream: (uri) async {
+          checks++;
+          return serverSays;
+        },
+      );
+      problems = [];
+      handler.problems.listen(problems.add);
+    });
+
+    int loads() => engine.calls.where((c) => c == 'load').length;
+    final stream = Uri.parse('https://example.com/1.mp3');
+
+    test('broken download: deleted, then streamed right away', () async {
+      hasDownload = true;
+      engine.failFileLoads = true;
+      await handler.playEpisode(episodeId);
+      await pumpEventQueue();
+
+      expect(deleted, [episodeId]);
+      expect(engine.loadedUri, stream);
+      expect(handler.playbackState.value.playing, isTrue);
+      expect(problems, [PlaybackProblem.brokenDownload]);
+      expect(checks, 0, reason: 'a local file never asks the server');
+    });
+
+    test('download breaks during playback: streamed from there', () async {
+      hasDownload = true;
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 5));
+      engine.emitError();
+      await pumpEventQueue();
+
+      expect(deleted, [episodeId]);
+      expect(engine.loadedUri, stream);
+      expect(engine.loadedAt, const Duration(minutes: 5));
+      expect(problems, [PlaybackProblem.brokenDownload]);
+    });
+
+    test('episode gone at the provider: no retries, clear message', () async {
+      serverSays = StreamCheck.gone;
+      engine.failLoads = true;
+      await handler.playEpisode(episodeId);
+      await Future<void>.delayed(tick * 5);
+
+      expect(problems, [PlaybackProblem.episodeGone]);
+      expect(loads(), 1);
+      expect(handler.playbackState.value.playing, isFalse);
+    });
+
+    test('episode disappears during playback: stops, no retries', () async {
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 5));
+      serverSays = StreamCheck.gone;
+      engine.failLoads = true;
+      engine.emitError();
+      await Future<void>.delayed(tick * 5);
+
+      expect(problems, [PlaybackProblem.episodeGone]);
+      expect(loads(), 1);
+      expect(handler.position, const Duration(minutes: 5));
+    });
+
+    test('decoder error: unplayable format, no retries', () async {
+      engine
+        ..failLoads = true
+        ..loadErrorKind = EngineErrorKind.renderer;
+      await handler.playEpisode(episodeId);
+      await Future<void>.delayed(tick * 5);
+
+      expect(problems, [PlaybackProblem.unsupportedFormat]);
+      expect(loads(), 1);
+    });
+
+    test('server fine but loading fails twice: unplayable format', () async {
+      serverSays = StreamCheck.reachable;
+      engine.failLoads = true;
+      await handler.playEpisode(episodeId);
+      await pumpEventQueue();
+
+      expect(loads(), 2, reason: 'one more try in case it was a hiccup');
+      expect(problems, [PlaybackProblem.unsupportedFormat]);
+    });
+
+    test('server fine, hiccup on the retry: plays', () async {
+      serverSays = StreamCheck.reachable;
+      engine.failNextLoads = 1; // the extra try succeeds
+      await handler.playEpisode(episodeId);
+      await pumpEventQueue();
+
+      expect(loads(), 2);
+      expect(handler.playbackState.value.playing, isTrue);
+      expect(problems, isEmpty);
+    });
+
+    test('no network when tapping Play: network message', () async {
+      engine.failLoads = true;
+      await handler.playEpisode(episodeId);
+      await pumpEventQueue();
+      expect(problems, [PlaybackProblem.loadFailed]);
+      expect(deleted, isEmpty);
     });
   });
 

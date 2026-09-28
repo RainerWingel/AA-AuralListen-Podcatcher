@@ -12,6 +12,7 @@ import '../data/settings_repository.dart';
 import 'chapter_skips.dart';
 import 'player_engine.dart';
 import 'sleep_timer.dart';
+import 'stream_check.dart';
 
 /// The app's single player (see docs/playback.md).
 ///
@@ -25,6 +26,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     required this._settings,
     this._localAudioFile,
     this._playlists,
+    this._checkStream,
+    this._deleteDownload,
     this.stopAfterPause = const Duration(minutes: 10),
     this.stallCheckInterval = const Duration(seconds: 10),
     this.recoveryRetryDelay = const Duration(seconds: 15),
@@ -38,7 +41,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         }),
       )
       ..add(_engine.durationStream.listen(_onDuration))
-      ..add(_engine.errorStream.listen((e) => unawaited(_onEngineError())));
+      ..add(_engine.errorStream.listen((e) => unawaited(_onEngineError(e))));
     _broadcastState();
   }
 
@@ -51,6 +54,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Needed for "continue with the next playlist episode" (docs/playlists.md).
   final PlaylistRepository? _playlists;
+
+  /// Asks the server why a stream failed (only on errors; docs/playback.md).
+  final Future<StreamCheck> Function(Uri uri)? _checkStream;
+
+  /// Deletes a broken download (DownloadService.delete).
+  final Future<void> Function(int episodeId)? _deleteDownload;
 
   static const rewindInterval = Duration(seconds: 15);
   static const fastForwardInterval = Duration(seconds: 30);
@@ -82,6 +91,17 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   int _stalledChecks = 0;
   int _recoveries = 0;
   bool _recovering = false;
+
+  /// What was loaded last (to tell a broken download from a network error).
+  Uri? _source;
+  bool _sourceIsLocal = false;
+
+  /// Episode whose download turned out broken: stream it instead.
+  int? _noLocalFileFor;
+
+  /// A load failed although the server answered: try once more, then it
+  /// counts as an unplayable format.
+  bool _retriedReachable = false;
 
   /// The load in progress, shared by concurrent callers (user taps Play
   /// while a recovery is loading) – never two loads at once.
@@ -298,31 +318,32 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> play() async {
-    if (!await _tryPlay()) _emitProblem(PlaybackProblem.loadFailed);
+    final error = await _tryPlay();
+    if (error != null) await _handleFailure(error, _Retry.none);
   }
 
-  /// Loads if needed and plays. False if the audio could not be loaded
-  /// (no network, server error) – never throws.
-  Future<bool> _tryPlay() async {
-    if (_episodeId == null) return true;
+  /// Loads if needed and plays. Returns the load error (null = playing or
+  /// nothing to play) – never throws.
+  Future<Object?> _tryPlay() async {
+    if (_episodeId == null) return null;
     _pauseTimer?.cancel();
     if (!_loaded) {
       try {
         await (_loadInFlight ??= _load().whenComplete(
           () => _loadInFlight = null,
         ));
-      } on Exception {
+      } on Exception catch (e) {
         _loaded = false;
         _broadcastState();
-        return false;
+        return e;
       }
     }
-    if (!_loaded) return true; // episode vanished (e.g. unsubscribed)
+    if (!_loaded) return null; // episode vanished (e.g. unsubscribed)
     await _engine.play();
     // just_audio emits no event if it was already playing (e.g. when switching
     // episodes), so report the state ourselves.
     _broadcastState();
-    return true;
+    return null;
   }
 
   @override
@@ -478,12 +499,17 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         : Duration.zero;
     _exactStart = false;
 
-    // Downloaded file first, otherwise stream.
-    final local = await _localAudioFile?.call(id);
+    // Downloaded file first (unless it turned out broken), otherwise stream.
+    final local = _noLocalFileFor == id
+        ? null
+        : await _localAudioFile?.call(id);
     final source = local != null
         ? Uri.file(local.path)
         : Uri.parse(episode.audioUrl);
+    _source = source;
+    _sourceIsLocal = local != null;
     await _engine.load(source, initialPosition: start);
+    _retriedReachable = false;
     await _engine.setBoostDb(await _boostFor(row.podcast));
 
     _loaded = true;
@@ -657,7 +683,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// but freezes the position. So: keep the position, release the player
   /// and load fresh – right away if it was playing (with the hang
   /// detection's retries), otherwise on the next Play.
-  Future<void> _onEngineError() async {
+  Future<void> _onEngineError(EngineException error) async {
     final id = _episodeId;
     if (id == null || !_loaded || _recovering) return;
     // Read before just_audio pauses itself in reaction to the error.
@@ -669,7 +695,77 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _exactStart = true;
     _setIdlePosition(position);
     _broadcastState();
-    if (wasPlaying) await _recover();
+    if (wasPlaying) await _handleFailure(error, _Retry.now);
+  }
+
+  // ------------------------------------------------------- error kinds
+
+  /// Reacts to a failed load or playback error by its cause:
+  /// broken download → delete it and stream; episode gone / unplayable
+  /// format → stop and say so; network → retry per [retry].
+  Future<void> _handleFailure(Object error, _Retry retry) async {
+    final id = _episodeId;
+    if (id == null) return;
+    final kind = error is EngineException ? error.kind : EngineErrorKind.other;
+    switch (await _classify(kind, midPlayback: retry == _Retry.now)) {
+      case _Failure.brokenDownload:
+        _noLocalFileFor = id;
+        await _deleteDownload?.call(id);
+        _emitProblem(PlaybackProblem.brokenDownload);
+        final again = await _tryPlay(); // streams now
+        if (again != null) await _handleFailure(again, retry);
+      case _Failure.retryOnce:
+        _retriedReachable = true;
+        final again = await _tryPlay();
+        if (again != null) await _handleFailure(again, retry);
+      case _Failure.gone:
+        _stopFor(PlaybackProblem.episodeGone);
+      case _Failure.unsupported:
+        _stopFor(PlaybackProblem.unsupportedFormat);
+      case _Failure.network:
+        switch (retry) {
+          case _Retry.none:
+            _emitProblem(PlaybackProblem.loadFailed);
+          case _Retry.now:
+            await _recover();
+          case _Retry.later:
+            _retryTimer = Timer(
+              recoveryRetryDelay,
+              () => unawaited(_recover()),
+            );
+        }
+    }
+  }
+
+  Future<_Failure> _classify(
+    EngineErrorKind kind, {
+    required bool midPlayback,
+  }) async {
+    // A local file never needs the network.
+    if (_sourceIsLocal) return _Failure.brokenDownload;
+    if (kind == EngineErrorKind.renderer) return _Failure.unsupported;
+    final source = _source;
+    final check = _checkStream;
+    if (source == null || check == null) return _Failure.network;
+    return switch (await check(source)) {
+      StreamCheck.gone => _Failure.gone,
+      StreamCheck.offline || StreamCheck.serverError => _Failure.network,
+      // Server fine: mid-playback it was a hiccup (retry); a load failing
+      // twice although the server answers means the data is unplayable.
+      StreamCheck.reachable =>
+        midPlayback
+            ? _Failure.network
+            : _retriedReachable
+            ? _Failure.unsupported
+            : _Failure.retryOnce,
+    };
+  }
+
+  /// No retry makes sense: stay stopped (position kept) and tell the user.
+  void _stopFor(PlaybackProblem problem) {
+    _resetRecovery();
+    _broadcastState();
+    _emitProblem(problem);
   }
 
   /// Reloads the episode at the current position. Gives up after
@@ -699,9 +795,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _loaded = false;
       _setIdlePosition(position);
       _exactStart = true;
-      if (!await _tryPlay()) {
-        _retryTimer = Timer(recoveryRetryDelay, () => unawaited(_recover()));
-      }
+      final error = await _tryPlay();
+      if (error != null) await _handleFailure(error, _Retry.later);
     } finally {
       _recovering = false;
     }
@@ -782,4 +877,20 @@ enum PlaybackProblem {
 
   /// Playback hung and reloading did not help.
   stalled,
+
+  /// The downloaded file was broken; it was deleted and is streamed now.
+  brokenDownload,
+
+  /// The server no longer offers the episode (404/410 …).
+  episodeGone,
+
+  /// The file cannot be played (format/decoder).
+  unsupportedFormat,
 }
+
+/// Cause of a failure, see [PodcastAudioHandler._handleFailure].
+enum _Failure { brokenDownload, retryOnce, gone, unsupported, network }
+
+/// When to retry network failures: not at all (user tapped Play – just
+/// report it), now (error during playback), or after a pause (reload failed).
+enum _Retry { none, now, later }

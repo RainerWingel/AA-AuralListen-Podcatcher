@@ -34,10 +34,23 @@ final skippedChaptersProvider = StreamProvider.autoDispose
           ref.watch(audioHandlerProvider).chapterSkips.watch(episodeId),
     );
 
+/// One occurrence of a playback problem. Deliberately without `==`: the
+/// same problem twice in a row must show the info box twice (a provider only
+/// notifies listeners when its value changes).
+class PlaybackProblemNotice {
+  PlaybackProblemNotice(this.problem);
+
+  final PlaybackProblem problem;
+}
+
 /// Playback problems to show as an info box (hang detection, load errors).
-final playbackProblemsProvider = StreamProvider.autoDispose<PlaybackProblem>(
-  (ref) => ref.watch(audioHandlerProvider).problems,
-);
+final playbackProblemsProvider =
+    StreamProvider.autoDispose<PlaybackProblemNotice>(
+      (ref) => ref
+          .watch(audioHandlerProvider)
+          .problems
+          .map(PlaybackProblemNotice.new),
+    );
 
 /// Sleep timer setting; changes only (the countdown is computed on rebuild).
 final sleepTimerProvider = StreamProvider.autoDispose<SleepTimerState>(

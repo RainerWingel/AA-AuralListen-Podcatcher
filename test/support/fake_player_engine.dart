@@ -11,7 +11,7 @@ class FakePlayerEngine implements PlayerEngine {
   final _state = StreamController<EngineState>.broadcast(sync: true);
   final _position = StreamController<Duration>.broadcast(sync: true);
   final _duration = StreamController<Duration?>.broadcast(sync: true);
-  final _errors = StreamController<Object>.broadcast(sync: true);
+  final _errors = StreamController<EngineException>.broadcast(sync: true);
 
   final calls = <String>[];
   Uri? loadedUri;
@@ -21,6 +21,15 @@ class FakePlayerEngine implements PlayerEngine {
 
   /// While true, [load] fails like just_audio without network.
   bool failLoads = false;
+
+  /// The next [failNextLoads] loads fail, then loading works again.
+  int failNextLoads = 0;
+
+  /// Local files fail to load (broken download).
+  bool failFileLoads = false;
+
+  /// Kind of the load failures above (renderer = unplayable format).
+  EngineErrorKind loadErrorKind = EngineErrorKind.source;
 
   /// While true, seek never completes (just_audio offline after an error).
   bool hangSeeks = false;
@@ -39,7 +48,7 @@ class FakePlayerEngine implements PlayerEngine {
   @override
   Stream<Duration?> get durationStream => _duration.stream;
   @override
-  Stream<Object> get errorStream => _errors.stream;
+  Stream<EngineException> get errorStream => _errors.stream;
   @override
   EngineState get state => _current;
   @override
@@ -62,7 +71,12 @@ class FakePlayerEngine implements PlayerEngine {
 
   /// Simulates a playback error like just_audio: error event, then the
   /// player is idle and paused.
-  void emitError([Object error = 'Source error: SocketTimeoutException']) {
+  void emitError([
+    EngineException error = const EngineException(
+      EngineErrorKind.source,
+      'SocketTimeoutException',
+    ),
+  ]) {
     _errors.add(error);
     _setState(false, EngineProcessing.idle);
   }
@@ -77,7 +91,11 @@ class FakePlayerEngine implements PlayerEngine {
   }) async {
     calls.add('load');
     if (loadDelay > Duration.zero) await Future<void>.delayed(loadDelay);
-    if (failLoads) throw Exception('Source error (no network)');
+    final failOnce = failNextLoads > 0;
+    if (failOnce) failNextLoads--;
+    if (failOnce || failLoads || (failFileLoads && uri.isScheme('file'))) {
+      throw EngineException(loadErrorKind, 'Source error');
+    }
     loadedUri = uri;
     loadedAt = initialPosition;
     _pos = initialPosition;
