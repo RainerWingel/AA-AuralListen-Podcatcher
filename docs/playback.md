@@ -48,7 +48,7 @@ Knopf `SleepTimerButton` rechts neben „Lesezeichen setzen" im Vollbild-Player.
   rechnet beim Neuzeichnen, das der Positions-Stream ohnehin auslöst).
 - **Ausblenden** (Benutzerwunsch, zuerst 10 s, dann 30 s): die letzten 30 s (`sleepFadeDuration`) senkt ein zweiter
   Timer die Lautstärke in 100 Schritten (alle 0,3 s) auf 0 (`PlayerEngine.setVolume`, unabhängig vom Boost).
-  **Kurve kubisch** (`sleepFadeVolume`: Anteil³ ≈ gleiche dB-Schritte: Mitte −18 dB, Viertel rest −36 dB). Linear klang
+  **Kurve kubisch** (`sleepFadeVolume`: Anteil³ ≈ gleiche dB-Schritte: nach der Hälfte −18 dB, bei einem Viertel Restzeit −36 dB). Linear klang
   es wegen des logarithmischen Gehörs, als würde nur in den letzten ~5 s ausgeblendet (Benutzer-Rückmeldung).
   Dieser Timer entsteht erst 30 s vor Ablauf und nur während der Wiedergabe.
 - Ablauf → erst `pause()`, **danach** Lautstärke zurück auf 100 % (kein lauter Ruck); der 10-Minuten-Pause-Stopp gilt
