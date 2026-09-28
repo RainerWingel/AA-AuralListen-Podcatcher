@@ -33,6 +33,11 @@ final skippedChaptersProvider = StreamProvider.autoDispose
           ref.watch(audioHandlerProvider).chapterSkips.watch(episodeId),
     );
 
+/// Playback problems to show as an info box (hang detection, load errors).
+final playbackProblemsProvider = StreamProvider.autoDispose<PlaybackProblem>(
+  (ref) => ref.watch(audioHandlerProvider).problems,
+);
+
 /// Battery optimisation of the app (fake in tests).
 final batteryOptimizationProvider = Provider<BatteryOptimization>(
   (ref) => const AndroidBatteryOptimization(),

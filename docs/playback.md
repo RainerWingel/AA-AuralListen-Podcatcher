@@ -36,6 +36,20 @@ Regressionstest: „switching episodes while playing reports "playing"".
 - Benachrichtigungs-Symbole: `android/app/src/main/res/raw/keep.xml` verhindert, dass der Release-Build sie entfernt.
 - Cover in der Benachrichtigung kommen aus dem begrenzten `CoverCacheManager` und werden auf 512 px verkleinert.
 
+### Hänger-Erkennung (Benutzerwunsch, sparsam)
+Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell`.
+- **Nur während der Wiedergabe** läuft ein Timer (alle 10 s, `stallCheckInterval`); bei Pause/Stopp gibt es keinen.
+  Kosten: ein Vergleich alle 10 s – der Player meldet die Position ohnehin mehrmals pro Sekunde.
+- **Hänger** = spielt laut Player, aber die Position steht 3 Prüfungen (≈ 30 s) still (Puffern ohne Ende, Player nach
+  Netzfehler stehen geblieben).
+- **Korrektur:** Position speichern, Folge an **genau** dieser Stelle neu laden und weiterspielen. Scheitert das Laden
+  (kein Netz), neuer Versuch nach 15 s. Höchstens 3 Versuche (`maxRecoveries`), dann sauber anhalten
+  (Position bleibt) und Infobox „Die Wiedergabe hing und wurde angehalten …".
+- Bewegt sich die Position wieder, beginnt die Zählung neu. Pause, Stopp oder eine andere Folge beenden laufende Versuche.
+- **Laden scheitert beim Antippen** (kein Netz, Serverfehler): kein Absturz/keine stille Nicht-Reaktion mehr, sondern
+  Infobox „Die Folge konnte nicht geladen werden …" (`PlaybackProblem.loadFailed`).
+- Gegen das Beenden des ganzen Prozesses durch Android hilft kein Wächter (er stürbe mit) – dafür „Nicht eingeschränkt" unten.
+
 ### Akku-Optimierung („Nicht eingeschränkt")
 Im Dauertest (2026-09-27) hat Samsung die App bei „Optimiert" nach ~40 min Wiedergabe mit ausgeschaltetem Bildschirm
 beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf das nicht passieren.

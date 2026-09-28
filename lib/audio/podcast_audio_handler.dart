@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 
 import '../data/db/app_database.dart';
 import '../data/playback_repository.dart';
@@ -24,6 +25,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     this._localAudioFile,
     this._playlists,
     this.stopAfterPause = const Duration(minutes: 10),
+    this.stallCheckInterval = const Duration(seconds: 10),
+    this.recoveryRetryDelay = const Duration(seconds: 15),
   }) {
     _subscriptions
       ..add(_engine.stateStream.listen(_onEngineState))
@@ -61,6 +64,31 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// A long pause releases the player and ends the foreground service.
   final Duration stopAfterPause;
+
+  /// Hang detection (docs/playback.md): while playing, the position is
+  /// checked this often; [stallChecks] checks without progress = hanging.
+  final Duration stallCheckInterval;
+  static const stallChecks = 3;
+
+  /// Reload attempts before giving up, and the wait after a failed load.
+  static const maxRecoveries = 3;
+  final Duration recoveryRetryDelay;
+
+  Timer? _watchdog;
+  Timer? _retryTimer;
+  Duration? _watchdogPosition;
+  int _stalledChecks = 0;
+  int _recoveries = 0;
+  bool _recovering = false;
+
+  final _problems = StreamController<PlaybackProblem>.broadcast();
+
+  /// Whether the hang-detection timer runs (only while playing).
+  @visibleForTesting
+  bool get watchdogActive => _watchdog != null;
+
+  /// Problems the user should be told about (info box in the app shell).
+  Stream<PlaybackProblem> get problems => _problems.stream;
 
   final _subscriptions = <StreamSubscription<Object?>>[];
   Timer? _pauseTimer;
@@ -134,6 +162,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     int? playlistId,
     Duration? startAt,
   }) async {
+    _resetRecovery();
     await _setActivePlaylist(episodeId, playlistId);
     if (episodeId == _episodeId && _loaded) {
       mediaItem.add(_withPlaylist(mediaItem.value));
@@ -226,18 +255,34 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> play() async {
-    if (_episodeId == null) return;
+    if (!await _tryPlay()) _emitProblem(PlaybackProblem.loadFailed);
+  }
+
+  /// Loads if needed and plays. False if the audio could not be loaded
+  /// (no network, server error) – never throws.
+  Future<bool> _tryPlay() async {
+    if (_episodeId == null) return true;
     _pauseTimer?.cancel();
-    if (!_loaded) await _load();
-    if (!_loaded) return;
+    if (!_loaded) {
+      try {
+        await _load();
+      } on Exception {
+        _loaded = false;
+        _broadcastState();
+        return false;
+      }
+    }
+    if (!_loaded) return true; // episode vanished (e.g. unsubscribed)
     await _engine.play();
     // just_audio emits no event if it was already playing (e.g. when switching
     // episodes), so report the state ourselves.
     _broadcastState();
+    return true;
   }
 
   @override
   Future<void> pause() async {
+    _resetRecovery();
     await _engine.pause();
     _broadcastState();
     await _saveCurrentPosition();
@@ -271,6 +316,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> stop() async {
     _pauseTimer?.cancel();
+    _resetRecovery();
     await _saveCurrentPosition();
     // Keep showing where playback stopped (0 if the episode was finished).
     _setIdlePosition(_markedPlayed ? Duration.zero : _engine.position);
@@ -288,11 +334,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Releases everything (tests and app shutdown).
   Future<void> dispose() async {
     _pauseTimer?.cancel();
+    _watchdog?.cancel();
+    _retryTimer?.cancel();
     for (final s in _subscriptions) {
       await s.cancel();
     }
     _subscriptions.clear();
     await _positions.close();
+    await _problems.close();
     await chapterSkips.dispose();
     await _engine.dispose();
   }
@@ -488,9 +537,86 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
+  // ------------------------------------------------------ hang detection
+
+  /// Runs the watchdog timer only while audio is playing (no cost otherwise).
+  void _updateWatchdog(bool playing) {
+    if (playing) {
+      _watchdog ??= Timer.periodic(stallCheckInterval, (_) => _checkStall());
+    } else {
+      _watchdog?.cancel();
+      _watchdog = null;
+      _watchdogPosition = null;
+      _stalledChecks = 0;
+    }
+  }
+
+  void _checkStall() {
+    if (_recovering || _completing || !_loaded) return;
+    final position = _engine.position;
+    if (position != _watchdogPosition) {
+      _watchdogPosition = position;
+      _stalledChecks = 0;
+      _recoveries = 0; // it plays again: a later hang gets fresh attempts
+      return;
+    }
+    if (++_stalledChecks >= stallChecks) {
+      _stalledChecks = 0;
+      unawaited(_recover());
+    }
+  }
+
+  /// Reloads the episode at the current position. Gives up after
+  /// [maxRecoveries] attempts: stops cleanly and tells the user.
+  Future<void> _recover() async {
+    _retryTimer?.cancel();
+    final id = _episodeId;
+    if (id == null || _recovering) return;
+    _recovering = true;
+    try {
+      if (_recoveries >= maxRecoveries) {
+        _resetRecovery();
+        // Loaded: stop saves the position. Not loaded (every reload failed):
+        // the position is already saved and shown – just report "stopped".
+        if (_loaded) {
+          await stop();
+        } else {
+          _broadcastState();
+        }
+        _emitProblem(PlaybackProblem.stalled);
+        return;
+      }
+      _recoveries++;
+      final position = _loaded ? _engine.position : _idlePosition;
+      if (!_markedPlayed) await _playback.savePosition(id, position);
+      await _engine.stop();
+      _loaded = false;
+      _setIdlePosition(position);
+      _exactStart = true;
+      if (!await _tryPlay()) {
+        _retryTimer = Timer(recoveryRetryDelay, () => unawaited(_recover()));
+      }
+    } finally {
+      _recovering = false;
+    }
+  }
+
+  /// A user action (pause, stop, other episode) ends any recovery.
+  void _resetRecovery() {
+    _retryTimer?.cancel();
+    _retryTimer = null;
+    _recoveries = 0;
+    _stalledChecks = 0;
+  }
+
+  void _emitProblem(PlaybackProblem problem) {
+    if (!_problems.isClosed) _problems.add(problem);
+  }
+
   void _broadcastState() {
     final state = _engine.state;
     final playing = state.playing && _loaded;
+    _updateWatchdog(playing);
     playbackState.add(
       PlaybackState(
         controls: [
@@ -540,4 +666,13 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       extras: {'episodeId': e.id, 'podcastId': p.id},
     );
   }
+}
+
+/// Why playback could not continue (shown as an info box).
+enum PlaybackProblem {
+  /// The episode could not be loaded (no network, server error).
+  loadFailed,
+
+  /// Playback hung and reloading did not help.
+  stalled,
 }

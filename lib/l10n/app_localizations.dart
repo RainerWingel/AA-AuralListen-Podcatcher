@@ -1161,6 +1161,18 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{count, plural, =1{1 ungespielte Folge} other{{count} ungespielte Folgen}}'**
   String unplayedCount(int count);
+
+  /// No description provided for @playbackLoadFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Folge konnte nicht geladen werden. Bitte Internetverbindung prüfen.'**
+  String get playbackLoadFailed;
+
+  /// No description provided for @playbackStalled.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Wiedergabe hing und wurde angehalten. Position ist gespeichert – bitte Verbindung prüfen.'**
+  String get playbackStalled;
 }
 
 class _AppLocalizationsDelegate

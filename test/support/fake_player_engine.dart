@@ -18,6 +18,9 @@ class FakePlayerEngine implements PlayerEngine {
   double boostDb = 0;
   Duration fakeDuration = const Duration(minutes: 10);
 
+  /// While true, [load] fails like just_audio without network.
+  bool failLoads = false;
+
   EngineState _current = EngineState.idle;
   Duration _pos = Duration.zero;
   Duration? _dur;
@@ -57,6 +60,7 @@ class FakePlayerEngine implements PlayerEngine {
     Duration initialPosition = Duration.zero,
   }) async {
     calls.add('load');
+    if (failLoads) throw Exception('Source error (no network)');
     loadedUri = uri;
     loadedAt = initialPosition;
     _pos = initialPosition;

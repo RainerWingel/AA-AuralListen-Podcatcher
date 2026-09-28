@@ -884,6 +884,38 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'an episode that cannot be loaded shows an info box',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+
+      engine.failLoads = true;
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      expect(
+        find.text(
+          'Die Folge konnte nicht geladen werden. '
+          'Bitte Internetverbindung prüfen.',
+        ),
+        findsOneWidget,
+      );
+      expect(handler.playbackState.value.playing, isFalse);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(

@@ -678,4 +678,12 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get playbackLoadFailed =>
+      'Die Folge konnte nicht geladen werden. Bitte Internetverbindung prüfen.';
+
+  @override
+  String get playbackStalled =>
+      'Die Wiedergabe hing und wurde angehalten. Position ist gespeichert – bitte Verbindung prüfen.';
 }

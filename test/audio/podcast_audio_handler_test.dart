@@ -360,6 +360,100 @@ void main() {
     expect(done, unorderedEquals(['position', 'skips']));
   });
 
+  group('hang detection', () {
+    const tick = Duration(milliseconds: 20);
+    late List<PlaybackProblem> problems;
+
+    setUp(() async {
+      await handler.dispose();
+      engine = FakePlayerEngine();
+      handler = PodcastAudioHandler(
+        engine: engine,
+        playback: PlaybackRepository(db, () => now),
+        settings: settings,
+        playlists: playlists,
+        stallCheckInterval: tick,
+        recoveryRetryDelay: tick,
+      );
+      problems = [];
+      handler.problems.listen(problems.add);
+    });
+
+    Future<void> wait(int ticks) =>
+        Future<void>.delayed(tick * ticks + const Duration(milliseconds: 5));
+
+    int loads() => engine.calls.where((c) => c == 'load').length;
+
+    test('the watchdog only runs while playing', () async {
+      expect(handler.watchdogActive, isFalse);
+      await handler.playEpisode(episodeId);
+      expect(handler.watchdogActive, isTrue);
+      await handler.pause();
+      expect(handler.watchdogActive, isFalse);
+    });
+
+    test('no reload while the position moves', () async {
+      await handler.playEpisode(episodeId);
+      for (var i = 1; i <= 8; i++) {
+        engine.emitPosition(Duration(minutes: 1, seconds: i));
+        await wait(1);
+      }
+      expect(loads(), 1);
+    });
+
+    test('a hang reloads exactly at the current position', () async {
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 2));
+      await wait(HangTicks.detect);
+
+      expect(loads(), 2);
+      expect(engine.loadedAt, const Duration(minutes: 2));
+      expect(handler.playbackState.value.playing, isTrue);
+      expect((await episode()).positionMs, 2 * 60000);
+      expect(problems, isEmpty);
+    });
+
+    test('without network: retries, then stops and tells the user', () async {
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 2));
+      engine.failLoads = true;
+      await wait(HangTicks.detect + PodcastAudioHandler.maxRecoveries + 3);
+
+      expect(loads(), 1 + PodcastAudioHandler.maxRecoveries);
+      expect(problems, [PlaybackProblem.stalled]);
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(handler.position, const Duration(minutes: 2));
+      expect((await episode()).positionMs, 2 * 60000);
+
+      // Nothing keeps running afterwards.
+      await wait(5);
+      expect(loads(), 1 + PodcastAudioHandler.maxRecoveries);
+    });
+
+    test('pausing ends a pending retry', () async {
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 2));
+      engine.failLoads = true;
+      // Pause right after the first failed reload, while a retry is pending.
+      while (loads() < 2) {
+        await Future<void>.delayed(const Duration(milliseconds: 2));
+      }
+      await handler.pause();
+      await wait(5);
+      expect(loads(), 2);
+      expect(problems, isEmpty);
+    });
+
+    test('an episode that cannot be loaded reports it, never throws', () async {
+      engine.failLoads = true;
+      await handler.playEpisode(episodeId);
+      await pumpEventQueue();
+      expect(problems, [PlaybackProblem.loadFailed]);
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(handler.watchdogActive, isFalse);
+    });
+  });
+
   group('skipped chapters (in memory)', () {
     Future<void> skip(int startMin, int? endMin, [int? id]) =>
         handler.setChapterSkipped(
@@ -531,4 +625,10 @@ void main() {
       expect(restarted.mediaItem.value!.extras!['playlistId'], playlistId);
     });
   });
+}
+
+/// Ticks until a hang is detected (checks without progress, plus one to
+/// register the starting position).
+abstract final class HangTicks {
+  static const detect = PodcastAudioHandler.stallChecks + 2;
 }

@@ -427,5 +427,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "playbackLoadFailed": "Die Folge konnte nicht geladen werden. Bitte Internetverbindung prüfen.",
+  "playbackStalled": "Die Wiedergabe hing und wurde angehalten. Position ist gespeichert – bitte Verbindung prüfen."
 }
