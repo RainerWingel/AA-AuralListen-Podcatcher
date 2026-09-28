@@ -131,7 +131,13 @@ class EpisodeTile extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final now = ref.watch(clockProvider)();
-    final isCurrent = ref.watch(mediaItemProvider).value?.id == '${episode.id}';
+    // The mini player keeps showing the last episode after it finished; a
+    // played episode only counts as current while it still plays (the last
+    // 2 % after the 98 % mark), otherwise it shows as played (user report).
+    final inPlayer = ref.watch(mediaItemProvider).value?.id == '${episode.id}';
+    final playing = ref.watch(playbackStateProvider).value?.playing ?? false;
+    final isCurrent =
+        inPlayer && (episode.status != EpisodeStatus.played || playing);
 
     // Date and duration get their own line so a long podcast name can
     // never push them out of view.

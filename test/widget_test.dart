@@ -1249,6 +1249,47 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'a finished episode shows as played, not as playing',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge').first);
+      await settle(tester);
+      expect(find.byTooltip('Läuft gerade'), findsOneWidget);
+
+      // Streamed to the end, nothing follows.
+      await tester.runAsync(() async {
+        engine.complete();
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      });
+      await settle(tester);
+
+      expect(
+        handler.currentEpisodeId,
+        isNotNull,
+        reason: 'still in the mini player',
+      );
+      expect(find.byTooltip('Läuft gerade'), findsNothing);
+      expect(find.byTooltip('Gespielt'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(
