@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -126,9 +128,13 @@ class _SeekBarState extends ConsumerState<_SeekBar> {
           max: max > 0 ? max : 1.0,
           value: value,
           onChanged: max > 0 ? (v) => setState(() => _dragValue = v) : null,
-          onChangeEnd: (v) async {
-            await handler.seek(Duration(milliseconds: v.round()));
-            if (mounted) setState(() => _dragValue = null);
+          onChangeEnd: (v) {
+            // Release the finger value right away: without network the
+            // player may never confirm the seek, and waiting for it froze
+            // the time display (bug 2026-09-28). The position stream shows
+            // the new place immediately anyway.
+            unawaited(handler.seek(Duration(milliseconds: v.round())));
+            setState(() => _dragValue = null);
           },
         ),
         Padding(

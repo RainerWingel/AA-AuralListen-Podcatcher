@@ -972,6 +972,44 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets(
+    'time display keeps running when a seek never completes',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+
+      // Offline after a player error: just_audio never confirms the seek.
+      engine.hangSeeks = true;
+      await tester.drag(find.byType(Slider), const Offset(200, 0));
+      await settle(tester);
+
+      // Playback goes on (network back): the display must follow.
+      engine.emitPosition(const Duration(minutes: 7, seconds: 5));
+      await settle(tester);
+      expect(find.text('7:05'), findsOneWidget);
+      engine.emitPosition(const Duration(minutes: 7, seconds: 9));
+      await settle(tester);
+      expect(find.text('7:09'), findsOneWidget);
+
+      engine.hangSeeks = false;
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(

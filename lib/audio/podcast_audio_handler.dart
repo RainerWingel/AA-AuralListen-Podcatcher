@@ -37,7 +37,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
           _onPosition(p);
         }),
       )
-      ..add(_engine.durationStream.listen(_onDuration));
+      ..add(_engine.durationStream.listen(_onDuration))
+      ..add(_engine.errorStream.listen((e) => unawaited(_onEngineError())));
     _broadcastState();
   }
 
@@ -81,6 +82,10 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   int _stalledChecks = 0;
   int _recoveries = 0;
   bool _recovering = false;
+
+  /// The load in progress, shared by concurrent callers (user taps Play
+  /// while a recovery is loading) – never two loads at once.
+  Future<void>? _loadInFlight;
 
   final _problems = StreamController<PlaybackProblem>.broadcast();
 
@@ -303,7 +308,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _pauseTimer?.cancel();
     if (!_loaded) {
       try {
-        await _load();
+        await (_loadInFlight ??= _load().whenComplete(
+          () => _loadInFlight = null,
+        ));
       } on Exception {
         _loaded = false;
         _broadcastState();
@@ -333,7 +340,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final id = _episodeId;
     if (id == null) return;
     if (_loaded) {
-      await _engine.seek(position);
+      try {
+        await _engine.seek(position);
+      } on Exception {
+        return; // player failed (e.g. offline) – the error handling reloads
+      }
       await _saveCurrentPosition();
       return;
     }
@@ -639,6 +650,26 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _stalledChecks = 0;
       unawaited(_recover());
     }
+  }
+
+  /// The player failed (e.g. network timeout while streaming). just_audio
+  /// then shuts its native player down; resuming that one later plays audio
+  /// but freezes the position. So: keep the position, release the player
+  /// and load fresh – right away if it was playing (with the hang
+  /// detection's retries), otherwise on the next Play.
+  Future<void> _onEngineError() async {
+    final id = _episodeId;
+    if (id == null || !_loaded || _recovering) return;
+    // Read before just_audio pauses itself in reaction to the error.
+    final wasPlaying = _engine.state.playing || _watchdog != null;
+    final position = _engine.position;
+    if (!_markedPlayed) await _playback.savePosition(id, position);
+    await _engine.stop();
+    _loaded = false;
+    _exactStart = true;
+    _setIdlePosition(position);
+    _broadcastState();
+    if (wasPlaying) await _recover();
   }
 
   /// Reloads the episode at the current position. Gives up after

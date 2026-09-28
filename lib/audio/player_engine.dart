@@ -24,6 +24,10 @@ abstract interface class PlayerEngine {
   Stream<Duration> get positionStream;
   Stream<Duration?> get durationStream;
 
+  /// Playback errors (e.g. network timeout while streaming). Afterwards the
+  /// engine is unusable until the next [load].
+  Stream<Object> get errorStream;
+
   EngineState get state;
   Duration get position;
   Duration get bufferedPosition;
@@ -51,6 +55,11 @@ class JustAudioEngine implements PlayerEngine {
   JustAudioEngine() {
     _player = AudioPlayer(
       userAgent: 'AA-PodcastGuru/0.1 (+https://github.com/RainerWingel/AA-Podcast-Guru)',
+      // Send the user agent natively via ExoPlayer. The default routes every
+      // stream through just_audio's local HTTP proxy inside the app: extra
+      // work, uncaught errors when offline, and ExoPlayer then times out
+      // against the proxy instead of waiting for the network.
+      useProxyForRequestHeaders: false,
       audioPipeline: _enhancer == null
           ? null
           : AudioPipeline(androidAudioEffects: [_enhancer]),
@@ -81,6 +90,9 @@ class JustAudioEngine implements PlayerEngine {
 
   @override
   Stream<Duration?> get durationStream => _player.durationStream;
+
+  @override
+  Stream<Object> get errorStream => _player.errorStream;
 
   @override
   EngineState get state => _map(_player.playerState);
