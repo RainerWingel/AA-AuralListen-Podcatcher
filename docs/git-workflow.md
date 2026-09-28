@@ -10,10 +10,11 @@
   oder `ssh-temp/` enthalten sind (`git status`, `git diff --cached`).
 
 ## Branches (seit 2026-09-28: nur `main`)
-- **Alles wird direkt auf `main` committet und gepusht** – keine Feature-Branches, keine Pull Requests
-  (Wunsch des Benutzers). Gilt für beide Agenten.
-- Deshalb **vor jedem Push** lokal: `dart format .` · `flutter analyze` (0 Probleme) · `flutter test` (alle grün).
-  Die CI läuft danach auf `main` als zweite Absicherung; ist sie rot, sofort auf `main` reparieren.
+- **Alles wird direkt auf `main` committet** – keine Feature-Branches, keine Pull Requests (Wunsch des Benutzers).
+  Gilt für beide Agenten.
+- **Committen jederzeit, pushen nur auf Ansage des Benutzers** (seit 2026-09-28). Die CI läuft daher erst beim Push.
+- **Vor jedem Commit** lokal: `dart format .` · `flutter analyze` (0 Probleme) · `flutter test` (alle grün).
+  Nach einem Push prüft die CI auf `main` noch einmal; ist sie rot, sofort auf `main` reparieren.
 - Vor dem Arbeiten `git pull --ff-only`, damit man auf dem Stand des anderen Agenten aufsetzt.
 - Früher (bis PR #31): Branches + PRs mit geprüftem Merge; die Historie bleibt so stehen.
 
@@ -22,7 +23,8 @@
 - Klein und in sich abgeschlossen; Doku-Änderungen im selben Commit wie der zugehörige Code.
 
 ## Übergabe zwischen Agenten (Claude ⇄ ChatGPT)
-1. Arbeit auf `main` committen und pushen – nie mit uncommitteten Änderungen aufhören.
+1. Arbeit auf `main` committen – nie mit uncommitteten Änderungen aufhören. Gepusht wird, wenn der Benutzer es sagt
+   (spätestens vor einem Agentenwechsel, sonst sieht der andere Agent den Stand nicht).
 2. In `docs/roadmap.md` abhaken, was erledigt ist; Offenes als Checkbox eintragen.
 3. Neue Entscheidungen in `docs/decisions.md`.
 4. Der nächste Agent startet mit `git pull`, liest `AGENTS.md` → `docs/roadmap.md` → betroffene Themen.

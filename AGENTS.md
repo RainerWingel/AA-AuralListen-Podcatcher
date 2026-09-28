@@ -38,8 +38,8 @@ Alles Fachliche steht in Themen-Dateien unter `docs/`.
 - **Neue Pakete** nur nach Rückfrage beim Benutzer; begründen in `docs/decisions.md`.
 - **Keine Secrets ins Git** (Repo ist öffentlich!): API-Keys, Keystore, `android/key.properties`.
 - **Vor jedem Commit:** `dart format .` · `flutter analyze` (0 Probleme) · `flutter test` (alle grün).
-- **Nie mit uncommitteten Änderungen enden** – der andere Agent arbeitet nur mit dem, was gepusht ist
-  (Details: `docs/git-workflow.md`).
+- **Direkt auf `main` committen, nie mit uncommitteten Änderungen enden. Gepusht wird nur auf Ansage des Benutzers**
+  – der andere Agent arbeitet nur mit dem, was gepusht ist (Details: `docs/git-workflow.md`).
 
 ## Wichtige Befehle
 ```bash
