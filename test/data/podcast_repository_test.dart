@@ -390,7 +390,7 @@ void main() {
   });
 
   test(
-    'fresh = fetched by a refresh within 24 h, never the initial import',
+    'fresh = fetched by a refresh within 96 h, never the initial import',
     () async {
       server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
       final id = await repo.subscribe('https://example.com/feed');
@@ -431,8 +431,10 @@ void main() {
         'ep-3',
       ]);
 
-      // 24 h after that refresh it is no longer fresh.
-      clockNow = now.add(const Duration(hours: 25, seconds: 1));
+      // Still fresh 95 h after that refresh, no longer after 96 h.
+      clockNow = now.add(const Duration(hours: 96));
+      expect(await guids(freshOnly: true), ['ep-3']);
+      clockNow = now.add(const Duration(hours: 97, seconds: 1));
       expect(await guids(freshOnly: true), isEmpty);
     },
   );

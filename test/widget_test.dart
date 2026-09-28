@@ -1047,7 +1047,7 @@ void main() {
       expect(find.text('Alle neuen Episoden spielen'), findsOneWidget);
       // Only the initial import so far: nothing is "new".
       expect(
-        find.text('Keine neuen Folgen in den letzten 24 Stunden'),
+        find.text('Keine neuen Folgen in den letzten 96 Stunden'),
         findsOneWidget,
       );
 

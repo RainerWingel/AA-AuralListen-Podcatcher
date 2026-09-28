@@ -1237,7 +1237,7 @@ abstract class AppLocalizations {
   /// No description provided for @playNewEpisodesHint.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =0{Keine neuen Folgen in den letzten 24 Stunden} =1{1 Folge aus den letzten 24 Stunden} other{{count} Folgen aus den letzten 24 Stunden}}'**
+  /// **'{count, plural, =0{Keine neuen Folgen in den letzten 96 Stunden} =1{1 Folge aus den letzten 96 Stunden} other{{count} Folgen aus den letzten 96 Stunden}}'**
   String playNewEpisodesHint(int count);
 
   /// No description provided for @playUnplayedEpisodes.

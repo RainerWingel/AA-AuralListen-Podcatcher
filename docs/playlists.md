@@ -19,9 +19,9 @@ Abos-Tab → **langes Drücken** auf eine Kachel → Menü (`play_podcast_episod
 1. **„Alle neuen Episoden spielen"** – nur **frische** Folgen.
 2. **„Alle ungespielten Episoden spielen"** – alle Folgen mit Status neu oder angefangen.
 - **Frisch** ist kein eigener Status (kein Enum/Feld): berechnet aus `episodes.addedAt` (erster Abruf, spätere Refreshes
-  ändern es nicht) – jünger als 24 h (`PodcastRepository.freshFor`) **und** nicht beim Abonnieren mitgekommen
+  ändern es nicht) – jünger als 96 h (`PodcastRepository.freshFor`; zuerst 24 h, auf Wunsch 96 h) **und** nicht beim Abonnieren mitgekommen
   (`addedAt > podcasts.subscribedAt`; sonst wären nach dem Abo alle 200 Altfolgen „neu"). Gespielte zählen nie.
-  Ein gespeicherter Zustand müsste nach 24 h von selbst umkippen – dafür gäbe es ohne Hintergrunddienst keinen Auslöser.
+  Ein gespeicherter Zustand müsste nach 96 h von selbst umkippen – dafür gäbe es ohne Hintergrunddienst keinen Auslöser.
 - Menü zeigt die Anzahl; Einträge ohne passende Folgen sind ausgegraut.
 - Playlist: bei genau einer direkt, sonst Auswahl (`choosePlaylist`, auch „Neue Playlist"). Folgen werden **älteste
   zuerst** angehängt (`PlaylistRepository.addAll`), schon enthaltene übersprungen. Dann startet die **älteste** dieser

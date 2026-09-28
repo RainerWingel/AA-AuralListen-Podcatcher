@@ -729,9 +729,9 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Folgen aus den letzten 24 Stunden',
-      one: '1 Folge aus den letzten 24 Stunden',
-      zero: 'Keine neuen Folgen in den letzten 24 Stunden',
+      other: '$count Folgen aus den letzten 96 Stunden',
+      one: '1 Folge aus den letzten 96 Stunden',
+      zero: 'Keine neuen Folgen in den letzten 96 Stunden',
     );
     return '$_temp0';
   }

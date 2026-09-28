@@ -100,7 +100,7 @@ class PodcastRepository {
           .watch();
 
   /// How long an episode counts as "fresh" after it was first fetched.
-  static const freshFor = Duration(hours: 24);
+  static const freshFor = Duration(hours: 96);
 
   /// Unplayed episodes (new or in progress) of a podcast, oldest first – for
   /// "Alle ungespielten Episoden spielen". With [freshOnly] only those a
