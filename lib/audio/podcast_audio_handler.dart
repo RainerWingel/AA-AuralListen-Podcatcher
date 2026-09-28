@@ -681,7 +681,15 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     }
     final share = left.inMicroseconds / sleepFadeDuration.inMicroseconds;
     _volumeLowered = true;
-    unawaited(_engine.setVolume(share.clamp(0.0, 1.0)));
+    unawaited(_engine.setVolume(sleepFadeVolume(share)));
+  }
+
+  /// Volume for the [share] (1 → 0) of the fade that is left. Cubic, because
+  /// hearing is logarithmic: a linear fade sounds unchanged until the last
+  /// seconds (user report). Half-way this is −18 dB, at a quarter −36 dB.
+  static double sleepFadeVolume(double share) {
+    final s = share.clamp(0.0, 1.0);
+    return s * s * s;
   }
 
   /// Pause first, then switch the timer off (which restores the volume

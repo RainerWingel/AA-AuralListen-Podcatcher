@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:aapodcastguru/audio/player_engine.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
@@ -408,6 +409,21 @@ void main() {
         );
       },
     );
+
+    test('the fade follows hearing, not a straight line', () {
+      double db(double v) => 20 * log(v) / ln10;
+      const vol = PodcastAudioHandler.sleepFadeVolume;
+      expect(vol(1), 1);
+      expect(vol(0), 0);
+      // Clearly quieter early on: a quarter into the fade already −7 dB …
+      expect(db(vol(0.75)), lessThan(-7));
+      // … and evenly on towards silence (roughly equal dB steps).
+      expect(db(vol(0.5)), closeTo(-18, 0.5));
+      expect(db(vol(0.25)), closeTo(-36, 0.5));
+      for (var s = 0.0; s < 1; s += 0.05) {
+        expect(vol(s), lessThanOrEqualTo(vol(s + 0.05)));
+      }
+    });
 
     test('pausing during the fade restores the volume', () async {
       await handler.playEpisode(episodeId);
