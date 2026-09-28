@@ -51,9 +51,12 @@ Knopf `SleepTimerButton` rechts neben „Lesezeichen setzen" im Vollbild-Player.
   **Kurve kubisch** (`sleepFadeVolume`: Anteil³ ≈ gleiche dB-Schritte: nach der Hälfte −18 dB, bei einem Viertel Restzeit −36 dB). Linear klang
   es wegen des logarithmischen Gehörs, als würde nur in den letzten ~5 s ausgeblendet (Benutzer-Rückmeldung).
   Dieser Timer entsteht erst 30 s vor Ablauf und nur während der Wiedergabe.
-- Ablauf → erst `pause()`, **danach** Lautstärke zurück auf 100 % (kein lauter Ruck); der 10-Minuten-Pause-Stopp gilt
-  wie sonst, Timer steht danach auf „Aus". Pause, „Aus" oder Folgenende während des Ausblendens → Lautstärke sofort
-  wieder 100 %; beim Weiterhören blendet es ab der verbleibenden Zeit weiter aus.
+- Die Kurve erreicht **1 s vor Ablauf** 0 % (1/30 der Ausblendzeit) – die letzte Sekunde läuft stumm. Dann `pause()`.
+  **Die Lautstärke bleibt danach unten** und kommt erst **unmittelbar vor dem nächsten Play** zurück (`_volumeBeforePlay`):
+  Android spielt nach „Pause" noch den Audiopuffer aus, ein Hochsetzen direkt danach war als kurzes lautes Aufblitzen
+  hörbar (Benutzer-Rückmeldung). Pausieren während des Ausblendens lässt die Lautstärke ebenfalls unten; Play setzt
+  direkt auf den passenden Ausblend-Wert und blendet weiter aus. „Aus" während der Wiedergabe → sofort 100 %.
+  Der 10-Minuten-Pause-Stopp gilt wie sonst; der Timer steht nach Ablauf auf „Aus"
 - **Bis Ende der Folge:** Die Folge endet regulär (gespielt, raus aus Playlists), aber die nächste Playlist-Folge startet
   **nicht**; danach „Aus". Gilt auch, wenn das Ende durch ein übersprungenes letztes Kapitel kommt.
 - Folgenwechsel lässt den Timer weiterlaufen. „Aus" bricht ihn ab.

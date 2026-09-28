@@ -379,33 +379,47 @@ void main() {
       );
     });
 
+    test('fades out, plays the last part silently, pauses', () async {
+      await handler.playEpisode(episodeId);
+      handler.setSleepTimer(const SleepTimerAfter(Duration(milliseconds: 150)));
+      await ms(80);
+      expect(engine.volumes, isEmpty, reason: 'no fade before the end');
+
+      await ms(50); // inside the last 40 ms
+      expect(engine.volume, lessThan(1));
+      expect(handler.playbackState.value.playing, isTrue);
+
+      await ms(80);
+      expect(handler.playbackState.value.playing, isFalse);
+      // Lower and lower down to 0 – the last part plays silently.
+      for (var i = 1; i < engine.volumes.length; i++) {
+        expect(engine.volumes[i], lessThanOrEqualTo(engine.volumes[i - 1]));
+      }
+      expect(engine.volumes.last, 0);
+      expect(
+        engine.calls.indexOf('volume zero'),
+        lessThan(engine.calls.lastIndexOf('pause')),
+      );
+    });
+
     test(
-      'fades out over the last seconds, then pauses at full volume',
+      'full volume only returns with the next Play (no loud blip)',
       () async {
         await handler.playEpisode(episodeId);
         handler.setSleepTimer(
-          const SleepTimerAfter(Duration(milliseconds: 150)),
+          const SleepTimerAfter(Duration(milliseconds: 60)),
         );
-        await ms(80);
-        expect(engine.volumes, isEmpty, reason: 'no fade before the end');
-
-        await ms(50); // inside the last 40 ms
-        expect(engine.volume, lessThan(1));
-        expect(engine.volume, greaterThanOrEqualTo(0));
-        expect(handler.playbackState.value.playing, isTrue);
-
-        await ms(80);
+        await ms(120);
         expect(handler.playbackState.value.playing, isFalse);
-        // Lower and lower, then back to full – only after pausing.
-        final fade = engine.volumes.sublist(0, engine.volumes.length - 1);
-        for (var i = 1; i < fade.length; i++) {
-          expect(fade[i], lessThanOrEqualTo(fade[i - 1]));
-        }
+        await ms(50); // after the pause the volume stays down
+        expect(engine.volume, 0);
+
+        await handler.play();
         expect(engine.volume, 1);
-        // No loud blip: full volume comes back only after the pause.
         expect(
           engine.calls.lastIndexOf('volume full'),
-          greaterThan(engine.calls.lastIndexOf('pause')),
+          lessThan(engine.calls.lastIndexOf('play')),
+          reason: 'raised right before playing, never while paused',
         );
       },
     );
@@ -425,22 +439,29 @@ void main() {
       }
     });
 
-    test('pausing during the fade restores the volume', () async {
-      await handler.playEpisode(episodeId);
-      handler.setSleepTimer(const SleepTimerAfter(Duration(milliseconds: 60)));
-      await ms(35);
-      expect(engine.volume, lessThan(1));
-      await handler.pause();
-      expect(engine.volume, 1);
-      expect(handler.sleepTimerState.isActive, isTrue);
+    test(
+      'pausing during the fade stays quiet; Play continues the fade',
+      () async {
+        await handler.playEpisode(episodeId);
+        handler.setSleepTimer(
+          const SleepTimerAfter(Duration(milliseconds: 60)),
+        );
+        await ms(35);
+        final level = engine.volume;
+        expect(level, lessThan(1));
+        await handler.pause();
+        expect(engine.volume, level);
+        expect(handler.sleepTimerState.isActive, isTrue);
 
-      await handler.play(); // the fade continues from where it was
-      await ms(10);
-      expect(engine.volume, lessThan(1));
-      await ms(60);
-      expect(handler.playbackState.value.playing, isFalse);
-      expect(engine.volume, 1);
-    });
+        final before = engine.volumes.length;
+        await handler.play();
+        // Straight back to the fade level, never up to full in between.
+        expect(engine.volumes.skip(before), everyElement(lessThan(1)));
+        await ms(60);
+        expect(handler.playbackState.value.playing, isFalse);
+        expect(engine.volume, 0);
+      },
+    );
 
     test('"Aus" during the fade restores the volume', () async {
       await handler.playEpisode(episodeId);

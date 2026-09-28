@@ -203,7 +203,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// while playing; [SleepTimerAtEpisodeEnd] stops after this episode.
   void setSleepTimer(SleepTimer timer) {
     _cancelSleepTimers();
-    _restoreVolume();
+    // While paused the volume stays down until the next Play (see _tryPlay):
+    // raising it right after a pause lets the audio buffer blip loudly.
+    if (_engine.state.playing && _loaded) _restoreVolume();
     _sleepPlayed
       ..stop()
       ..reset();
@@ -354,6 +356,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       }
     }
     if (!_loaded) return null; // episode vanished (e.g. unsubscribed)
+    await _volumeBeforePlay();
     await _engine.play();
     // just_audio emits no event if it was already playing (e.g. when switching
     // episodes), so report the state ourselves.
@@ -654,7 +657,6 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     } else if (!playing && _sleepPlayed.isRunning) {
       _sleepPlayed.stop();
       _cancelSleepTimers();
-      _restoreVolume(); // paused already – no audible jump
       _emitSleepState(); // remaining time is frozen now
     }
   }
@@ -679,9 +681,34 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       unawaited(_onSleepAlarm());
       return;
     }
-    final share = left.inMicroseconds / sleepFadeDuration.inMicroseconds;
     _volumeLowered = true;
-    unawaited(_engine.setVolume(sleepFadeVolume(share)));
+    unawaited(_engine.setVolume(_fadeVolumeFor(left)));
+  }
+
+  /// The fade reaches 0 % one second (1/30 of the fade) before the end: the
+  /// last second plays silently, so nothing is audible when it pauses.
+  Duration get _silentTail => sleepFadeDuration ~/ 30;
+
+  double _fadeVolumeFor(Duration left) {
+    final fadeLeft = left - _silentTail;
+    final fadeLength = sleepFadeDuration - _silentTail;
+    return sleepFadeVolume(fadeLeft.inMicroseconds / fadeLength.inMicroseconds);
+  }
+
+  /// Right before playing: the volume the sleep timer wants now – full, or
+  /// the fade level if playback resumes inside the fade.
+  Future<void> _volumeBeforePlay() async {
+    if (!_volumeLowered) return;
+    final timer = _sleepTimer;
+    final left = timer is SleepTimerAfter
+        ? timer.duration - _sleepPlayed.elapsed
+        : null;
+    if (left != null && left <= sleepFadeDuration) {
+      await _engine.setVolume(_fadeVolumeFor(left));
+    } else {
+      _volumeLowered = false;
+      await _engine.setVolume(1);
+    }
   }
 
   /// Volume for the [share] (1 → 0) of the fade that is left. Cubic, because
@@ -692,8 +719,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     return s * s * s;
   }
 
-  /// Pause first, then switch the timer off (which restores the volume
-  /// while nothing plays).
+  /// Pause (the volume is 0 already), then switch the timer off. Full volume
+  /// comes back with the next Play.
   Future<void> _onSleepAlarm() async {
     await pause();
     setSleepTimer(const SleepTimerOff());

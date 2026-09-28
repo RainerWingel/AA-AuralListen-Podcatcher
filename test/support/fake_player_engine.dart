@@ -152,6 +152,7 @@ class FakePlayerEngine implements PlayerEngine {
     volume = value;
     volumes.add(value);
     if (value == 1) calls.add('volume full');
+    if (value == 0) calls.add('volume zero');
   }
 
   @override
