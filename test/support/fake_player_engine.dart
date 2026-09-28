@@ -11,6 +11,7 @@ class FakePlayerEngine implements PlayerEngine {
   final _state = StreamController<EngineState>.broadcast(sync: true);
   final _position = StreamController<Duration>.broadcast(sync: true);
   final _duration = StreamController<Duration?>.broadcast(sync: true);
+  final _errors = StreamController<Object>.broadcast(sync: true);
 
   final calls = <String>[];
   Uri? loadedUri;
@@ -20,6 +21,9 @@ class FakePlayerEngine implements PlayerEngine {
 
   /// While true, [load] fails like just_audio without network.
   bool failLoads = false;
+
+  /// Simulates slow loading (e.g. waiting for the network).
+  Duration loadDelay = Duration.zero;
 
   EngineState _current = EngineState.idle;
   Duration _pos = Duration.zero;
@@ -31,6 +35,8 @@ class FakePlayerEngine implements PlayerEngine {
   Stream<Duration> get positionStream => _position.stream;
   @override
   Stream<Duration?> get durationStream => _duration.stream;
+  @override
+  Stream<Object> get errorStream => _errors.stream;
   @override
   EngineState get state => _current;
   @override
@@ -51,6 +57,13 @@ class FakePlayerEngine implements PlayerEngine {
     _position.add(position);
   }
 
+  /// Simulates a playback error like just_audio: error event, then the
+  /// player is idle and paused.
+  void emitError([Object error = 'Source error: SocketTimeoutException']) {
+    _errors.add(error);
+    _setState(false, EngineProcessing.idle);
+  }
+
   /// Simulates the end of the file.
   void complete() => _setState(false, EngineProcessing.completed);
 
@@ -60,6 +73,7 @@ class FakePlayerEngine implements PlayerEngine {
     Duration initialPosition = Duration.zero,
   }) async {
     calls.add('load');
+    if (loadDelay > Duration.zero) await Future<void>.delayed(loadDelay);
     if (failLoads) throw Exception('Source error (no network)');
     loadedUri = uri;
     loadedAt = initialPosition;
@@ -103,5 +117,6 @@ class FakePlayerEngine implements PlayerEngine {
     await _state.close();
     await _position.close();
     await _duration.close();
+    await _errors.close();
   }
 }

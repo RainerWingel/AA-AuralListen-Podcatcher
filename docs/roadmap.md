@@ -105,5 +105,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Stoppuhr-Knopf neben „Lesezeichen setzen": Aus / 5 / 15 / 30 / 60 min (Spielzeit) / Bis Ende der Folge
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Bugfix – Zeitanzeige eingefroren nach Netzausfall
+- [x] Player-Fehler → Player freigeben und frisch laden; keine parallelen Ladevorgänge; kein just_audio-Proxy
+- [ ] Praxistest auf dem S25 (Benutzer)
+
 ## Offene Punkte
 - keine

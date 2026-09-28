@@ -54,3 +54,4 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Dev-Paket `leak_tracker_flutter_testing`** (Benutzer zugestimmt) · automatische Erkennung nicht freigegebener Controller in Widget-Tests; kommt nicht in die App.
 - 2026-09-28 · **Akku-Ausnahme per eigenem MethodChannel statt `permission_handler`** · zwei Android-Aufrufe rechtfertigen kein Paket; System-Dialog nur einmal automatisch, danach nur auf Wunsch.
 - 2026-09-28 · **Sleep-Timer doch umgesetzt** (Benutzerwunsch, hebt „bewusst nicht" auf) · Minuten zählen nur Spielzeit; „Bis Ende der Folge" stoppt ohne Playlist-Weiterspielen; nur im Arbeitsspeicher.
+- 2026-09-28 · **just_audio ohne lokalen Proxy** (`useProxyForRequestHeaders: false`) · User-Agent nativ über ExoPlayer; Proxy verursachte Timeouts/unbehandelte Fehler offline und kostet Ressourcen.

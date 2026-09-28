@@ -60,6 +60,16 @@ Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell
 - Bewegt sich die Position wieder, beginnt die Zählung neu. Pause, Stopp oder eine andere Folge beenden laufende Versuche.
 - **Laden scheitert beim Antippen** (kein Netz, Serverfehler): kein Absturz/keine stille Nicht-Reaktion mehr, sondern
   Infobox „Die Folge konnte nicht geladen werden …" (`PlaybackProblem.loadFailed`).
+- **Player-Fehler** (ExoPlayer „Playback error", z. B. kein Netz nach einem Sprung): just_audio schaltet dann seinen
+  nativen Player ab und pausiert. Früher hielt die App die Folge weiter für geladen; ein späteres Play weckte den halb
+  toten Player – Ton lief, Zeitanzeige blieb stehen (Bug 2026-09-28). Jetzt (`_onEngineError`): Position sichern,
+  Player freigeben, **frisch** laden – sofort mit den Wiederholungen oben, wenn gespielt wurde, sonst beim nächsten Play.
+- Nie zwei Ladevorgänge gleichzeitig: Play während eines laufenden Neu-Ladens wartet auf dasselbe Laden (`_loadInFlight`).
+- **Kein just_audio-Proxy** (`useProxyForRequestHeaders: false`): Der User-Agent geht direkt über ExoPlayer. Mit Proxy lief
+  jeder Stream über einen HTTP-Server in der App (Mehraufwand, unbehandelte Fehler offline, Timeouts gegen den Proxy).
+- Nachgestellt im Emulator (`Medium_Phone_API_36.0`, `svc wifi/data disable`, Sprünge per
+  `cmd media_session dispatch fast-forward`): kurzer Ausfall → spielt von selbst weiter; langer Ausfall → Infobox,
+  Position bleibt, Play nach Netzrückkehr läuft mit laufender Anzeige.
 - Gegen das Beenden des ganzen Prozesses durch Android hilft kein Wächter (er stürbe mit) – dafür „Nicht eingeschränkt" unten.
 
 ### Akku-Optimierung („Nicht eingeschränkt")

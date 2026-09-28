@@ -510,6 +510,79 @@ void main() {
       expect(problems, isEmpty);
     });
 
+    test('player error while playing: fresh load at the same spot', () async {
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 7));
+      engine.emitError();
+      await pumpEventQueue();
+
+      // Not the half-dead just_audio player: stopped and loaded anew.
+      expect(engine.calls.sublist(engine.calls.length - 3), [
+        'stop',
+        'load',
+        'play',
+      ]);
+      expect(engine.loadedAt, const Duration(minutes: 7));
+      expect(handler.playbackState.value.playing, isTrue);
+      expect((await episode()).positionMs, 7 * 60000);
+      expect(problems, isEmpty);
+
+      // The position display runs again.
+      final seen = <Duration>[];
+      final sub = handler.positionStream.listen(seen.add);
+      engine.emitPosition(const Duration(minutes: 7, seconds: 1));
+      await pumpEventQueue();
+      await sub.cancel();
+      expect(seen.last, const Duration(minutes: 7, seconds: 1));
+    });
+
+    test(
+      'player error while offline: retries until the network is back',
+      () async {
+        await handler.playEpisode(episodeId);
+        engine.emitPosition(const Duration(minutes: 7));
+        engine.failLoads = true;
+        engine.emitError();
+        await wait(1);
+        expect(handler.playbackState.value.playing, isFalse);
+        expect(handler.position, const Duration(minutes: 7));
+
+        engine.failLoads = false; // network back
+        await wait(2);
+        expect(handler.playbackState.value.playing, isTrue);
+        expect(engine.loadedAt, const Duration(minutes: 7));
+        expect(problems, isEmpty);
+      },
+    );
+
+    test('player error while paused: reload only on the next Play', () async {
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 7));
+      await handler.pause();
+      final before = loads();
+      engine.emitError();
+      await wait(3);
+      expect(loads(), before);
+
+      await handler.play();
+      expect(loads(), before + 1);
+      expect(engine.loadedAt, const Duration(minutes: 7));
+      expect(handler.playbackState.value.playing, isTrue);
+    });
+
+    test('Play during a pending reload does not start a second load', () async {
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 7));
+      engine.loadDelay = const Duration(milliseconds: 80);
+      engine.emitError(); // starts the reload (slow network)
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      final before = loads();
+      await handler.play(); // user taps Play meanwhile
+      await wait(3);
+      expect(loads(), before);
+      expect(handler.playbackState.value.playing, isTrue);
+    });
+
     test('an episode that cannot be loaded reports it, never throws', () async {
       engine.failLoads = true;
       await handler.playEpisode(episodeId);
