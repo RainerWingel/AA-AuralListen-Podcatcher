@@ -22,6 +22,9 @@ class FakePlayerEngine implements PlayerEngine {
   /// While true, [load] fails like just_audio without network.
   bool failLoads = false;
 
+  /// While true, seek never completes (just_audio offline after an error).
+  bool hangSeeks = false;
+
   /// Simulates slow loading (e.g. waiting for the network).
   Duration loadDelay = Duration.zero;
 
@@ -100,6 +103,12 @@ class FakePlayerEngine implements PlayerEngine {
   Future<void> seek(Duration position) async {
     calls.add('seek');
     _pos = position;
+    // just_audio reports the new position right away, but asynchronously
+    // (a seek may happen while a position event is being delivered).
+    scheduleMicrotask(() {
+      if (!_position.isClosed) _position.add(position);
+    });
+    if (hangSeeks) await Completer<void>().future;
   }
 
   @override

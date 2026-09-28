@@ -340,7 +340,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final id = _episodeId;
     if (id == null) return;
     if (_loaded) {
-      await _engine.seek(position);
+      try {
+        await _engine.seek(position);
+      } on Exception {
+        return; // player failed (e.g. offline) – the error handling reloads
+      }
       await _saveCurrentPosition();
       return;
     }

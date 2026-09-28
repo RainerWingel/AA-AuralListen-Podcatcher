@@ -64,6 +64,10 @@ Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell
   nativen Player ab und pausiert. Früher hielt die App die Folge weiter für geladen; ein späteres Play weckte den halb
   toten Player – Ton lief, Zeitanzeige blieb stehen (Bug 2026-09-28). Jetzt (`_onEngineError`): Position sichern,
   Player freigeben, **frisch** laden – sofort mit den Wiederholungen oben, wenn gespielt wurde, sonst beim nächsten Play.
+- **Die eigentliche Ursache der eingefrorenen Zeitanzeige** war der Schieberegler: Er hielt den Finger-Wert fest, bis der
+  Sprung bestätigt war – offline bestätigt just_audio ihn nie. Jetzt wird der Finger-Wert beim Loslassen sofort
+  freigegeben; `seek` fängt Player-Fehler ab. (Gefunden mit einer Diagnose-Version auf dem S25: Player und Handler
+  meldeten laufende Positionen, nur die Anzeige stand.)
 - Nie zwei Ladevorgänge gleichzeitig: Play während eines laufenden Neu-Ladens wartet auf dasselbe Laden (`_loadInFlight`).
 - **Kein just_audio-Proxy** (`useProxyForRequestHeaders: false`): Der User-Agent geht direkt über ExoPlayer. Mit Proxy lief
   jeder Stream über einen HTTP-Server in der App (Mehraufwand, unbehandelte Fehler offline, Timeouts gegen den Proxy).
