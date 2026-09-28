@@ -11,6 +11,7 @@ import '../data/settings_keys.dart';
 import '../data/settings_repository.dart';
 import 'chapter_skips.dart';
 import 'player_engine.dart';
+import 'sleep_timer.dart';
 
 /// The app's single player (see docs/playback.md).
 ///
@@ -83,6 +84,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   final _problems = StreamController<PlaybackProblem>.broadcast();
 
+  // Sleep timer: counts playing time only; one Timer while playing.
+  SleepTimer _sleepTimer = const SleepTimerOff();
+  final _sleepPlayed = Stopwatch();
+  Timer? _sleepAlarm;
+  final _sleepStates = StreamController<SleepTimerState>.broadcast();
+
   /// Whether the hang-detection timer runs (only while playing).
   @visibleForTesting
   bool get watchdogActive => _watchdog != null;
@@ -133,6 +140,37 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   // ------------------------------------------------------------ public API
+
+  /// Current sleep timer with the playing time left.
+  SleepTimerState get sleepTimerState => switch (_sleepTimer) {
+    SleepTimerAfter(:final duration) => SleepTimerState(
+      _sleepTimer,
+      remaining: duration > _sleepPlayed.elapsed
+          ? duration - _sleepPlayed.elapsed
+          : Duration.zero,
+    ),
+    final timer => SleepTimerState(timer),
+  };
+
+  /// Sleep timer now and after every change (not every second – the UI
+  /// computes the countdown from [sleepTimerState] while it is visible).
+  Stream<SleepTimerState> get sleepTimerStream async* {
+    yield sleepTimerState;
+    yield* _sleepStates.stream;
+  }
+
+  /// Sets or clears the sleep timer (docs/playback.md). Minutes count only
+  /// while playing; [SleepTimerAtEpisodeEnd] stops after this episode.
+  void setSleepTimer(SleepTimer timer) {
+    _sleepAlarm?.cancel();
+    _sleepAlarm = null;
+    _sleepPlayed
+      ..stop()
+      ..reset();
+    _sleepTimer = timer;
+    _updateSleepTimer(_engine.state.playing && _loaded);
+    _emitSleepState();
+  }
 
   /// Shows the last episode in the mini player after an app start, without
   /// loading audio (no network until the user presses play).
@@ -334,6 +372,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Releases everything (tests and app shutdown).
   Future<void> dispose() async {
     _pauseTimer?.cancel();
+    _sleepAlarm?.cancel();
     _watchdog?.cancel();
     _retryTimer?.cancel();
     for (final s in _subscriptions) {
@@ -342,6 +381,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _subscriptions.clear();
     await _positions.close();
     await _problems.close();
+    await _sleepStates.close();
     await chapterSkips.dispose();
     await _engine.dispose();
   }
@@ -528,6 +568,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         await _markPlayed(id);
       }
       await stop();
+      if (_sleepTimer is SleepTimerAtEpisodeEnd) {
+        // Sleep timer "Bis Ende der Folge": stay stopped, then it is off.
+        setSleepTimer(const SleepTimerOff());
+        return;
+      }
       final next = await _nextInPlaylist();
       if (next != null) {
         await playEpisode(next, playlistId: _activePlaylistId);
@@ -535,6 +580,36 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     } finally {
       _completing = false;
     }
+  }
+
+  // --------------------------------------------------------- sleep timer
+
+  /// Counts playing time: the stopwatch and the alarm run only while playing.
+  void _updateSleepTimer(bool playing) {
+    final timer = _sleepTimer;
+    if (timer is! SleepTimerAfter) return;
+    if (playing && !_sleepPlayed.isRunning) {
+      _sleepPlayed.start();
+      final left = timer.duration - _sleepPlayed.elapsed;
+      _sleepAlarm = Timer(
+        left > Duration.zero ? left : Duration.zero,
+        () => unawaited(_onSleepAlarm()),
+      );
+    } else if (!playing && _sleepPlayed.isRunning) {
+      _sleepPlayed.stop();
+      _sleepAlarm?.cancel();
+      _sleepAlarm = null;
+      _emitSleepState(); // remaining time is frozen now
+    }
+  }
+
+  Future<void> _onSleepAlarm() async {
+    setSleepTimer(const SleepTimerOff());
+    await pause();
+  }
+
+  void _emitSleepState() {
+    if (!_sleepStates.isClosed) _sleepStates.add(sleepTimerState);
   }
 
   // ------------------------------------------------------ hang detection
@@ -617,6 +692,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final state = _engine.state;
     final playing = state.playing && _loaded;
     _updateWatchdog(playing);
+    _updateSleepTimer(playing);
     playbackState.add(
       PlaybackState(
         controls: [

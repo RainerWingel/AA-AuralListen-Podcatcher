@@ -429,5 +429,25 @@
     }
   },
   "playbackLoadFailed": "Die Folge konnte nicht geladen werden. Bitte Internetverbindung prüfen.",
-  "playbackStalled": "Die Wiedergabe hing und wurde angehalten. Position ist gespeichert – bitte Verbindung prüfen."
+  "playbackStalled": "Die Wiedergabe hing und wurde angehalten. Position ist gespeichert – bitte Verbindung prüfen.",
+  "sleepTimer": "Sleep-Timer",
+  "sleepTimerOff": "Aus",
+  "sleepTimerMinutes": "{minutes} Minuten",
+  "@sleepTimerMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "sleepTimerEpisodeEnd": "Bis Ende der Folge",
+  "sleepTimerEpisodeEndShort": "Bis Folgenende",
+  "sleepTimerLeft": "noch {time}",
+  "@sleepTimerLeft": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

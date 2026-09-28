@@ -25,7 +25,8 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
   dünner Fortschrittsbalken, Cover, Titel, Podcast, Play/Pause (Kreisel beim Puffern). Tippen → Vollbild-Player.
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast,
   Slider mit „verstrichen" / „-verbleibend", −15 s / Play / +30 s, „Boost: …" (öffnet Auswahl). Pfeil nach unten schließt.
-  Darunter „Kapitel x/n: Titel" (falls vorhanden) und Knöpfe „Kapitel (n)", „Lesezeichen setzen", „Lesezeichen (n)".
+  Darunter „Kapitel x/n: Titel" (falls vorhanden) und Knöpfe „Kapitel (n)", „Lesezeichen setzen", Sleep-Timer (Stoppuhr;
+  aktiv: „noch mm:ss" bzw. „Bis Folgenende"), „Lesezeichen (n)".
   Kapitel-Liste: Titel, darunter Startzeit, rechts Chip „Skip" (übersprungen = durchgestrichen) → `playback.md`.
 - **Boost-Auswahl** (Bottom-Sheet): Aus / +3 / +6 / +9 / +12 dB, Schalter „Nur für diesen Podcast".
 

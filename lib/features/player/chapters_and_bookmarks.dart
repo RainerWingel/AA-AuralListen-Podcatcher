@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../audio/audio_providers.dart';
+import '../../audio/sleep_timer.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/info_snack_bar.dart';
@@ -88,6 +89,7 @@ class ChapterBookmarkButtons extends ConsumerWidget {
           icon: const Icon(Icons.bookmark_add_outlined),
           label: Text(l10n.bookmarkAdd),
         ),
+        const SleepTimerButton(),
         if (bookmarks.isNotEmpty)
           TextButton.icon(
             onPressed: () => showEpisodeBookmarksSheet(context, episodeId),
@@ -95,6 +97,74 @@ class ChapterBookmarkButtons extends ConsumerWidget {
             label: Text(l10n.bookmarksCount(bookmarks.length)),
           ),
       ],
+    );
+  }
+}
+
+/// Stopwatch button: shows the sleep timer, tap to choose (docs/playback.md).
+class SleepTimerButton extends ConsumerWidget {
+  const SleepTimerButton({super.key});
+
+  static const minuteChoices = [5, 15, 30, 60];
+
+  Future<void> _choose(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final handler = ref.read(audioHandlerProvider);
+    final current = switch (handler.sleepTimerState.timer) {
+      SleepTimerOff() => 'off',
+      SleepTimerAfter(:final duration) => '${duration.inMinutes}',
+      SleepTimerAtEpisodeEnd() => 'end',
+    };
+    final chosen = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(l10n.sleepTimer),
+        children: [
+          RadioGroup<String>(
+            groupValue: current,
+            onChanged: (v) => Navigator.of(context).pop(v),
+            child: Column(
+              children: [
+                RadioListTile(value: 'off', title: Text(l10n.sleepTimerOff)),
+                for (final m in minuteChoices)
+                  RadioListTile(
+                    value: '$m',
+                    title: Text(l10n.sleepTimerMinutes(m)),
+                  ),
+                RadioListTile(
+                  value: 'end',
+                  title: Text(l10n.sleepTimerEpisodeEnd),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+    if (chosen == null) return;
+    handler.setSleepTimer(switch (chosen) {
+      'off' => const SleepTimerOff(),
+      'end' => const SleepTimerAtEpisodeEnd(),
+      _ => SleepTimerAfter(Duration(minutes: int.parse(chosen))),
+    });
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    ref.watch(sleepTimerProvider);
+    // The position ticks while playing – enough to refresh the countdown.
+    ref.watch(positionProvider);
+    final state = ref.read(audioHandlerProvider).sleepTimerState;
+    final label = switch (state.timer) {
+      SleepTimerOff() => l10n.sleepTimer,
+      SleepTimerAfter() => l10n.sleepTimerLeft(formatClock(state.remaining!)),
+      SleepTimerAtEpisodeEnd() => l10n.sleepTimerEpisodeEndShort,
+    };
+    return TextButton.icon(
+      onPressed: () => _choose(context, ref),
+      icon: Icon(state.isActive ? Icons.timer : Icons.timer_outlined),
+      label: Text(label),
     );
   }
 }

@@ -5,6 +5,7 @@ import '../data/providers.dart';
 import '../data/settings_keys.dart';
 import 'battery_optimization.dart';
 import 'podcast_audio_handler.dart';
+import 'sleep_timer.dart';
 
 /// The single player instance. Created in main() via AudioService.init and
 /// injected with an override (tests inject one with a fake engine).
@@ -36,6 +37,11 @@ final skippedChaptersProvider = StreamProvider.autoDispose
 /// Playback problems to show as an info box (hang detection, load errors).
 final playbackProblemsProvider = StreamProvider.autoDispose<PlaybackProblem>(
   (ref) => ref.watch(audioHandlerProvider).problems,
+);
+
+/// Sleep timer setting; changes only (the countdown is computed on rebuild).
+final sleepTimerProvider = StreamProvider.autoDispose<SleepTimerState>(
+  (ref) => ref.watch(audioHandlerProvider).sleepTimerStream,
 );
 
 /// Battery optimisation of the app (fake in tests).

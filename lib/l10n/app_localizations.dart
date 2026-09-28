@@ -1173,6 +1173,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Die Wiedergabe hing und wurde angehalten. Position ist gespeichert – bitte Verbindung prüfen.'**
   String get playbackStalled;
+
+  /// No description provided for @sleepTimer.
+  ///
+  /// In de, this message translates to:
+  /// **'Sleep-Timer'**
+  String get sleepTimer;
+
+  /// No description provided for @sleepTimerOff.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus'**
+  String get sleepTimerOff;
+
+  /// No description provided for @sleepTimerMinutes.
+  ///
+  /// In de, this message translates to:
+  /// **'{minutes} Minuten'**
+  String sleepTimerMinutes(int minutes);
+
+  /// No description provided for @sleepTimerEpisodeEnd.
+  ///
+  /// In de, this message translates to:
+  /// **'Bis Ende der Folge'**
+  String get sleepTimerEpisodeEnd;
+
+  /// No description provided for @sleepTimerEpisodeEndShort.
+  ///
+  /// In de, this message translates to:
+  /// **'Bis Folgenende'**
+  String get sleepTimerEpisodeEndShort;
+
+  /// No description provided for @sleepTimerLeft.
+  ///
+  /// In de, this message translates to:
+  /// **'noch {time}'**
+  String sleepTimerLeft(String time);
 }
 
 class _AppLocalizationsDelegate

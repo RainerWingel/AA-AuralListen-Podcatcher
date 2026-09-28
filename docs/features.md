@@ -23,6 +23,7 @@ Sideload per APK. Nur Deutsch. Alle Daten nur lokal.
 | # | Funktion | Details |
 |---|----------|---------|
 | F19 | Als gehört markieren bis Datum | pro Abo, Kalender + Rückfrage → `data-model.md` |
+| F24 | Sleep-Timer | 5/15/30/60 min Spielzeit oder bis Folgenende, Knopf neben „Lesezeichen setzen" → `playback.md` |
 | F23 | Hänger-Erkennung | Wiedergabe steht 30 s → an gleicher Stelle neu laden, max. 3 Versuche → `playback.md` |
 | F22 | Ungespielt-Zähler | rotes Abzeichen je Abo-Kachel, „99+" ab 100 → `ui-ux.md` |
 | F21 | Kapitel überspringen | Chip „Skip" je Kapitel, nur im Arbeitsspeicher → `playback.md` |
@@ -39,5 +40,5 @@ Sideload per APK. Nur Deutsch. Alle Daten nur lokal.
 | F17 | Dark Mode | |
 
 ## Bewusst NICHT
-Geschwindigkeit, Sleep-Timer, Stille kürzen, CarPlay/Android Auto, Video, Sync/Cloud, Hintergrund-Feed-Update,
+Geschwindigkeit, Stille kürzen, CarPlay/Android Auto, Video, Sync/Cloud, Hintergrund-Feed-Update,
 Transkripte, KI-Funktionen, Statistiken, andere Sprachen als Deutsch, SD-Karte (Gerät hat keinen Slot).

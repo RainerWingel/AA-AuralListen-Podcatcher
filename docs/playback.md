@@ -18,7 +18,7 @@ UI (Mini-/Vollbild-Player, EpisodeTile)      Benachrichtigung / Sperrbildschirm 
 - In `main()` wird die Datenbank **vor** dem Handler erzeugt und per Override in Riverpod eingespeist
   (`databaseProvider`, `audioHandlerProvider`). UI-Streams: `mediaItemProvider`, `playbackStateProvider`, `positionProvider`.
 - Quelle: Streaming der `audioUrl`. Ab M4: lokale Datei, falls heruntergeladen.
-- Keine Geschwindigkeitsregelung, kein Sleep-Timer, kein Stille-Kürzen (bewusst weggelassen).
+- Keine Geschwindigkeitsregelung, kein Stille-Kürzen (bewusst weggelassen). Sleep-Timer: seit 2026-09-28 (siehe unten).
 
 ### Zustandsmeldungen (Stolperfalle)
 `just_audio` meldet **keinen** neuen Zustand, wenn es beim Folgenwechsel schon spielte (`playing` bleibt `true`, `play()`
@@ -35,6 +35,18 @@ Regressionstest: „switching episodes while playing reports "playing"".
 - App im Task-Switcher weggewischt: läuft weiter, wenn gerade gespielt wird, sonst `stop()`.
 - Benachrichtigungs-Symbole: `android/app/src/main/res/raw/keep.xml` verhindert, dass der Release-Build sie entfernt.
 - Cover in der Benachrichtigung kommen aus dem begrenzten `CoverCacheManager` und werden auf 512 px verkleinert.
+
+### Sleep-Timer (Benutzerwunsch 2026-09-28)
+Code: `lib/audio/sleep_timer.dart` (Einstellung), `PodcastAudioHandler` (Abschnitt „sleep timer"),
+Knopf `SleepTimerButton` rechts neben „Lesezeichen setzen" im Vollbild-Player.
+- Auswahl: Aus · 5 · 15 · 30 · 60 Minuten · Bis Ende der Folge. Nur im Arbeitsspeicher, nicht gespeichert.
+- **Minuten = Spielzeit:** Eine `Stopwatch` läuft nur während der Wiedergabe; in der Pause steht der Countdown.
+  Dazu genau ein `Timer` bis zum Ablauf, nur während der Wiedergabe (kein Sekunden-Takt; die Anzeige „noch mm:ss"
+  rechnet beim Neuzeichnen, das der Positions-Stream ohnehin auslöst).
+- Ablauf → `pause()` (der 10-Minuten-Pause-Stopp gilt wie sonst), Timer steht danach auf „Aus".
+- **Bis Ende der Folge:** Die Folge endet regulär (gespielt, raus aus Playlists), aber die nächste Playlist-Folge startet
+  **nicht**; danach „Aus". Gilt auch, wenn das Ende durch ein übersprungenes letztes Kapitel kommt.
+- Folgenwechsel lässt den Timer weiterlaufen. „Aus" bricht ihn ab.
 
 ### Hänger-Erkennung (Benutzerwunsch, sparsam)
 Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell`.
