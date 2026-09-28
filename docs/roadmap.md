@@ -94,5 +94,8 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] System-Dialog „Nicht eingeschränkt" einmal beim ersten Abspielen, Status + Knopf unter Optionen → Hören
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Zusatz – Ungespielt-Zähler
+- [x] Rotes Abzeichen mit Anzahl ungespielter Folgen an jeder Abo-Kachel, „99+" ab 100
+
 ## Offene Punkte
 - keine

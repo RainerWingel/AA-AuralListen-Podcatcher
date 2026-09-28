@@ -137,6 +137,11 @@ final podcastsProvider = StreamProvider.autoDispose<List<Podcast>>(
   (ref) => ref.watch(podcastRepositoryProvider).watchPodcasts(),
 );
 
+/// Unplayed episodes per podcast id (badges in the subscriptions grid).
+final unplayedCountsProvider = StreamProvider.autoDispose<Map<int, int>>(
+  (ref) => ref.watch(podcastRepositoryProvider).watchUnplayedCounts(),
+);
+
 final podcastProvider = StreamProvider.autoDispose.family<Podcast?, int>(
   (ref, id) => ref.watch(podcastRepositoryProvider).watchPodcast(id),
 );

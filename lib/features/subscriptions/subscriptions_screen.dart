@@ -83,7 +83,7 @@ class SubscriptionsScreen extends ConsumerWidget {
   }
 }
 
-class _PodcastGrid extends StatelessWidget {
+class _PodcastGrid extends ConsumerWidget {
   const _PodcastGrid({required this.podcasts});
 
   final List<Podcast> podcasts;
@@ -92,7 +92,9 @@ class _PodcastGrid extends StatelessWidget {
   static const _columns = 3;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unplayed = ref.watch(unplayedCountsProvider).value ?? const {};
+    final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final tileWidth =
@@ -110,6 +112,7 @@ class _PodcastGrid extends StatelessWidget {
           itemCount: podcasts.length,
           itemBuilder: (context, index) {
             final podcast = podcasts[index];
+            final count = unplayed[podcast.id] ?? 0;
             return InkWell(
               borderRadius: BorderRadius.circular(10),
               onTap: () => context.go(Routes.podcast(podcast.id)),
@@ -119,11 +122,38 @@ class _PodcastGrid extends StatelessWidget {
                   Stack(
                     children: [
                       CoverImage(url: podcast.imageUrl, size: tileWidth),
+                      // Top left, so it never hides the badge.
                       if (podcast.lastError != null)
                         const Positioned(
-                          right: 4,
+                          left: 4,
                           top: 4,
                           child: Icon(Icons.error, color: Colors.redAccent),
+                        ),
+                      if (count > 0)
+                        Positioned(
+                          right: 4,
+                          top: 4,
+                          child: Semantics(
+                            label: l10n.unplayedCount(count),
+                            excludeSemantics: true,
+                            // Shows "99+" above 99.
+                            child: Badge.count(
+                              count: count,
+                              maxCount: 99,
+                              // Clearly red in light and dark theme (the
+                              // dark error colour is a pale pink).
+                              backgroundColor: Colors.red.shade700,
+                              textColor: Colors.white,
+                              largeSize: 22,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                              ),
+                              textStyle: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                     ],
                   ),

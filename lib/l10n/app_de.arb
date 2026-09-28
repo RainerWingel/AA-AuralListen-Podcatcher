@@ -419,5 +419,13 @@
   "chapterSkipHint": "Kapitel beim Abspielen überspringen (gilt bis zum Neustart der App)",
   "backgroundPlayback": "Hintergrund-Wiedergabe",
   "backgroundPlaybackUnrestricted": "Akku: Nicht eingeschränkt ✓ – tippen für die App-Einstellungen",
-  "backgroundPlaybackRestricted": "Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern."
+  "backgroundPlaybackRestricted": "Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern.",
+  "unplayedCount": "{count, plural, =1{1 ungespielte Folge} other{{count} ungespielte Folgen}}",
+  "@unplayedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

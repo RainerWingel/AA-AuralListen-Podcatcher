@@ -371,6 +371,22 @@ void main() {
     );
   });
 
+  test('unplayed counts per podcast ignore played episodes', () async {
+    server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
+    final id = await repo.subscribe('https://example.com/feed');
+    expect(await repo.watchUnplayedCounts().first, {id: 2});
+
+    // In progress still counts as unplayed; played does not.
+    await (db.update(db.episodes)..where((e) => e.guid.equals('ep-2'))).write(
+      const EpisodesCompanion(status: Value(EpisodeStatus.inProgress)),
+    );
+    expect(await repo.watchUnplayedCounts().first, {id: 2});
+    await db
+        .update(db.episodes)
+        .write(const EpisodesCompanion(status: Value(EpisodeStatus.played)));
+    expect(await repo.watchUnplayedCounts().first, isEmpty);
+  });
+
   test('latest episodes across podcasts are sorted by date', () async {
     server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
     await repo.subscribe('https://example.com/feed');

@@ -4,7 +4,9 @@ Vorbild: **Castbox**. Material 3, nur Deutsch, Hell/Dunkel (Dunkel ab M7).
 
 ## Navigation (untere Leiste)
 1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh
-2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen
+2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen.
+   Rotes Zahlen-Abzeichen oben rechts = ungespielte Folgen (neu + angefangen), ab 100 „99+", bei 0 keins
+   (`watchUnplayedCounts`: eine gruppierte Abfrage für alle Abos). Feed-Fehler: rotes Symbol oben links.
 3. **Playlists** – Liste der Playlists → Inhalt mit Drag & Drop
 4. **Downloads** – laufende und fertige Downloads
 5. **Optionen** (Bildschirmtitel „Einstellungen") – Sprünge, Boost-Standard, Speicher, OPML, Backup, Info
