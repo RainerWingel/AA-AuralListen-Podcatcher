@@ -101,5 +101,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Watchdog nur während der Wiedergabe, Neu-Laden an gleicher Stelle, Infobox bei Aufgabe / Ladefehler
 - [ ] Praxistest: Streamen, dann WLAN/Mobilfunk kurz aus (Benutzer)
 
+## Zusatz – Sleep-Timer
+- [x] Stoppuhr-Knopf neben „Lesezeichen setzen": Aus / 5 / 15 / 30 / 60 min (Spielzeit) / Bis Ende der Folge
+- [ ] Praxistest auf dem S25 (Benutzer)
+
 ## Offene Punkte
 - keine

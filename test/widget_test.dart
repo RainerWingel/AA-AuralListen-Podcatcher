@@ -916,6 +916,62 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets(
+    'sleep timer is chosen next to "Lesezeichen setzen"',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.runAsync(handler.pause);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+
+      await tester.ensureVisible(find.text('Sleep-Timer'));
+      await tester.tap(find.text('Sleep-Timer'));
+      await settle(tester);
+      for (final option in [
+        'Aus',
+        '5 Minuten',
+        '15 Minuten',
+        '30 Minuten',
+        '60 Minuten',
+        'Bis Ende der Folge',
+      ]) {
+        expect(find.text(option), findsOneWidget);
+      }
+      await tester.tap(find.text('15 Minuten'));
+      await settle(tester);
+      // Paused: the countdown waits.
+      expect(find.text('noch 15:00'), findsOneWidget);
+
+      await tester.tap(find.text('noch 15:00'));
+      await settle(tester);
+      await tester.tap(find.text('Bis Ende der Folge'));
+      await settle(tester);
+      expect(find.text('Bis Folgenende'), findsOneWidget);
+
+      await tester.tap(find.text('Bis Folgenende'));
+      await settle(tester);
+      await tester.tap(find.text('Aus'));
+      await settle(tester);
+      expect(find.text('Sleep-Timer'), findsOneWidget);
+      expect(handler.sleepTimerState.isActive, isFalse);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(

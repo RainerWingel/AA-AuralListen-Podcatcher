@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
+import 'package:aapodcastguru/audio/sleep_timer.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
 import 'package:aapodcastguru/data/playlist_repository.dart';
@@ -358,6 +359,71 @@ void main() {
     await handler.dispose();
     await pumpEventQueue();
     expect(done, unorderedEquals(['position', 'skips']));
+  });
+
+  group('sleep timer (in memory)', () {
+    Future<void> ms(int n) => Future<void>.delayed(Duration(milliseconds: n));
+
+    test('pauses after the chosen playing time, then is off', () async {
+      await handler.playEpisode(episodeId);
+      handler.setSleepTimer(const SleepTimerAfter(Duration(milliseconds: 60)));
+      expect(handler.sleepTimerState.isActive, isTrue);
+      await ms(120);
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(handler.sleepTimerState.isActive, isFalse);
+    });
+
+    test('paused time does not count', () async {
+      await handler.playEpisode(episodeId);
+      handler.setSleepTimer(const SleepTimerAfter(Duration(milliseconds: 150)));
+      await ms(50);
+      await handler.pause();
+      final left = handler.sleepTimerState.remaining!;
+      await ms(200); // longer than the whole timer
+      expect(handler.sleepTimerState.remaining, left);
+      expect(handler.sleepTimerState.isActive, isTrue);
+
+      await handler.play();
+      await ms(30);
+      expect(handler.playbackState.value.playing, isTrue);
+      await ms(200);
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(handler.sleepTimerState.isActive, isFalse);
+    });
+
+    test('"Aus" cancels a running timer', () async {
+      await handler.playEpisode(episodeId);
+      handler.setSleepTimer(const SleepTimerAfter(Duration(milliseconds: 40)));
+      handler.setSleepTimer(const SleepTimerOff());
+      await ms(100);
+      expect(handler.playbackState.value.playing, isTrue);
+    });
+
+    test('end of episode: played, but the playlist does not go on', () async {
+      final playlistId = (await db.select(db.playlists).getSingle()).id;
+      final ep2 = await addEpisode('2');
+      await playlists.add(playlistId, episodeId);
+      await playlists.add(playlistId, ep2);
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      handler.setSleepTimer(const SleepTimerAtEpisodeEnd());
+
+      engine.complete();
+      await pumpEventQueue();
+
+      expect((await episode()).status, EpisodeStatus.played);
+      expect(handler.currentEpisodeId, episodeId);
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(handler.sleepTimerState.isActive, isFalse);
+    });
+
+    test('dispose ends the sleep timer stream', () async {
+      var done = false;
+      handler.sleepTimerStream.listen(null, onDone: () => done = true);
+      await pumpEventQueue();
+      await handler.dispose();
+      await pumpEventQueue();
+      expect(done, isTrue);
+    });
   });
 
   group('hang detection', () {

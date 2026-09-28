@@ -686,4 +686,26 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get playbackStalled =>
       'Die Wiedergabe hing und wurde angehalten. Position ist gespeichert – bitte Verbindung prüfen.';
+
+  @override
+  String get sleepTimer => 'Sleep-Timer';
+
+  @override
+  String get sleepTimerOff => 'Aus';
+
+  @override
+  String sleepTimerMinutes(int minutes) {
+    return '$minutes Minuten';
+  }
+
+  @override
+  String get sleepTimerEpisodeEnd => 'Bis Ende der Folge';
+
+  @override
+  String get sleepTimerEpisodeEndShort => 'Bis Folgenende';
+
+  @override
+  String sleepTimerLeft(String time) {
+    return 'noch $time';
+  }
 }

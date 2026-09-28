@@ -53,3 +53,4 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-27 · **Klartext-HTTP erlaubt (network_security_config)** · Podcast-Audio ist öffentlich; ohne das scheitern Downloads/Streams von Feeds mit `http://`-Links (CRE). Wie AntennaPod.
 - 2026-09-27 · **Dev-Paket `leak_tracker_flutter_testing`** (Benutzer zugestimmt) · automatische Erkennung nicht freigegebener Controller in Widget-Tests; kommt nicht in die App.
 - 2026-09-28 · **Akku-Ausnahme per eigenem MethodChannel statt `permission_handler`** · zwei Android-Aufrufe rechtfertigen kein Paket; System-Dialog nur einmal automatisch, danach nur auf Wunsch.
+- 2026-09-28 · **Sleep-Timer doch umgesetzt** (Benutzerwunsch, hebt „bewusst nicht" auf) · Minuten zählen nur Spielzeit; „Bis Ende der Folge" stoppt ohne Playlist-Weiterspielen; nur im Arbeitsspeicher.
