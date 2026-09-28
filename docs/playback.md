@@ -68,6 +68,20 @@ Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell
   Sprung bestätigt war – offline bestätigt just_audio ihn nie. Jetzt wird der Finger-Wert beim Loslassen sofort
   freigegeben; `seek` fängt Player-Fehler ab. (Gefunden mit einer Diagnose-Version auf dem S25: Player und Handler
   meldeten laufende Positionen, nur die Anzeige stand.)
+- **Fehlerarten** (`_handleFailure`/`_classify`, Benutzerwunsch 2026-09-28). just_audio meldet nur ExoPlayers Typ
+  (0 Quelle, 1 Decoder), keinen HTTP-Code – die App ordnet selbst ein:
+  - **Lokale Datei** scheitert → **kaputter Download**: Download löschen (`DownloadService.delete`), sofort streamen,
+    Infobox „Der Download war beschädigt …". Kein Netz-Check nötig.
+  - Decoder-Fehler → **Format nicht abspielbar**, keine Wiederholung.
+  - Sonst fragt `checkStream` (`lib/audio/stream_check.dart`) den Server – **nur im Fehlerfall**, nur 1 Byte (`Range`):
+    404/410/403 → **„beim Anbieter nicht mehr verfügbar"**, keine Wiederholung · kein Netz/5xx/408/429 → Netzwerk:
+    Wiederholungen wie oben · Server antwortet normal → mitten in der Wiedergabe ein Aussetzer (wiederholen); beim
+    Laden noch ein Versuch, scheitert der auch → **Format nicht abspielbar** (z. B. Server liefert Text statt Audio –
+    ExoPlayer meldet das als Quellen-, nicht als Decoder-Fehler).
+  - Antippen ohne Netz → Infobox „nicht geladen werden …", keine automatischen Wiederholungen.
+  - Geprüft im Emulator mit einem lokalen Test-Feed (404-Folge, Text-statt-Audio-Folge).
+- Infoboxen: Jede Meldung ist ein eigenes Objekt (`PlaybackProblemNotice`), sonst zeigte ein Provider die gleiche
+  Meldung beim zweiten Mal nicht mehr an.
 - Nie zwei Ladevorgänge gleichzeitig: Play während eines laufenden Neu-Ladens wartet auf dasselbe Laden (`_loadInFlight`).
 - **Kein just_audio-Proxy** (`useProxyForRequestHeaders: false`): Der User-Agent geht direkt über ExoPlayer. Mit Proxy lief
   jeder Stream über einen HTTP-Server in der App (Mehraufwand, unbehandelte Fehler offline, Timeouts gegen den Proxy).

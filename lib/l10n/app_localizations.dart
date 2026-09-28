@@ -1209,6 +1209,24 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'noch {time}'**
   String sleepTimerLeft(String time);
+
+  /// No description provided for @playbackBrokenDownload.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Download war beschädigt und wurde gelöscht. Die Folge wird jetzt gestreamt.'**
+  String get playbackBrokenDownload;
+
+  /// No description provided for @playbackEpisodeGone.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Folge ist beim Anbieter nicht mehr verfügbar.'**
+  String get playbackEpisodeGone;
+
+  /// No description provided for @playbackUnsupported.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann.'**
+  String get playbackUnsupported;
 }
 
 class _AppLocalizationsDelegate

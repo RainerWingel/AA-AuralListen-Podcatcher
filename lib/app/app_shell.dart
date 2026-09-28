@@ -36,11 +36,14 @@ class AppShell extends ConsumerWidget {
       }
     });
     ref.listen(playbackProblemsProvider, (_, next) {
-      final problem = next.value;
+      final problem = next.value?.problem;
       if (problem == null) return;
       showInfoSnackBar(ScaffoldMessenger.of(context), switch (problem) {
         PlaybackProblem.loadFailed => l10n.playbackLoadFailed,
         PlaybackProblem.stalled => l10n.playbackStalled,
+        PlaybackProblem.brokenDownload => l10n.playbackBrokenDownload,
+        PlaybackProblem.episodeGone => l10n.playbackEpisodeGone,
+        PlaybackProblem.unsupportedFormat => l10n.playbackUnsupported,
       });
     });
     return Scaffold(

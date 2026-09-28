@@ -449,5 +449,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "playbackBrokenDownload": "Der Download war beschädigt und wurde gelöscht. Die Folge wird jetzt gestreamt.",
+  "playbackEpisodeGone": "Diese Folge ist beim Anbieter nicht mehr verfügbar.",
+  "playbackUnsupported": "Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann."
 }

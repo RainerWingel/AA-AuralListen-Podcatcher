@@ -109,5 +109,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Player-Fehler → Player freigeben und frisch laden; keine parallelen Ladevorgänge; kein just_audio-Proxy
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Zusatz – Fehlerarten beim Abspielen
+- [x] Kaputter Download → löschen + streamen; 404/410 → „nicht mehr verfügbar"; Format → Meldung; keine sinnlosen Wiederholungen
+- [x] Gleiche Infobox auch beim zweiten Mal
+
 ## Offene Punkte
 - keine

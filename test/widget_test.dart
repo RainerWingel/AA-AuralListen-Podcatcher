@@ -913,6 +913,14 @@ void main() {
       );
       expect(handler.playbackState.value.playing, isFalse);
 
+      // The same problem again (second tap): the info box shows again.
+      await tester.pump(const Duration(seconds: 8)); // first box is gone
+      await settle(tester);
+      expect(find.textContaining('nicht geladen werden'), findsNothing);
+      await tester.tap(find.text('Erste Folge').first); // the list entry
+      await settle(tester);
+      expect(find.textContaining('nicht geladen werden'), findsOneWidget);
+
       await disposeApp(tester);
     },
   );

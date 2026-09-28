@@ -708,4 +708,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String sleepTimerLeft(String time) {
     return 'noch $time';
   }
+
+  @override
+  String get playbackBrokenDownload =>
+      'Der Download war beschädigt und wurde gelöscht. Die Folge wird jetzt gestreamt.';
+
+  @override
+  String get playbackEpisodeGone =>
+      'Diese Folge ist beim Anbieter nicht mehr verfügbar.';
+
+  @override
+  String get playbackUnsupported =>
+      'Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann.';
 }
