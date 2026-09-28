@@ -105,6 +105,8 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 ## Zusatz – Sleep-Timer
 - [x] Stoppuhr-Knopf neben „Lesezeichen setzen": Aus / 5 / 15 / 30 / 60 min (Spielzeit) / Bis Ende der Folge
 - [x] Eigene Zeit 1–3600 Minuten
+- [x] Ausblenden in den letzten 30 Sekunden
+- [ ] Praxistest Ausblenden (Benutzer)
 - [x] Praxistest auf dem S25 inkl. eigener Zeit (Benutzer, 2026-09-28)
 
 ## Bugfix – Zeitanzeige eingefroren nach Netzausfall

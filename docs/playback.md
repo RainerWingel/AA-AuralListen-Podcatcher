@@ -46,7 +46,12 @@ Knopf `SleepTimerButton` rechts neben „Lesezeichen setzen" im Vollbild-Player.
 - **Minuten = Spielzeit:** Eine `Stopwatch` läuft nur während der Wiedergabe; in der Pause steht der Countdown.
   Dazu genau ein `Timer` bis zum Ablauf, nur während der Wiedergabe (kein Sekunden-Takt; die Anzeige „noch mm:ss"
   rechnet beim Neuzeichnen, das der Positions-Stream ohnehin auslöst).
-- Ablauf → `pause()` (der 10-Minuten-Pause-Stopp gilt wie sonst), Timer steht danach auf „Aus".
+- **Ausblenden** (Benutzerwunsch, zuerst 10 s, dann 30 s): die letzten 30 s (`sleepFadeDuration`) senkt ein zweiter
+  Timer die Lautstärke in 100 Schritten (alle 0,3 s) linear auf 0 (`PlayerEngine.setVolume`, unabhängig vom Boost).
+  Dieser Timer entsteht erst 30 s vor Ablauf und nur während der Wiedergabe.
+- Ablauf → erst `pause()`, **danach** Lautstärke zurück auf 100 % (kein lauter Ruck); der 10-Minuten-Pause-Stopp gilt
+  wie sonst, Timer steht danach auf „Aus". Pause, „Aus" oder Folgenende während des Ausblendens → Lautstärke sofort
+  wieder 100 %; beim Weiterhören blendet es ab der verbleibenden Zeit weiter aus.
 - **Bis Ende der Folge:** Die Folge endet regulär (gespielt, raus aus Playlists), aber die nächste Playlist-Folge startet
   **nicht**; danach „Aus". Gilt auch, wenn das Ende durch ein übersprungenes letztes Kapitel kommt.
 - Folgenwechsel lässt den Timer weiterlaufen. „Aus" bricht ihn ab.

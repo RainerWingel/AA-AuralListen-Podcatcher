@@ -143,6 +143,17 @@ class FakePlayerEngine implements PlayerEngine {
   @override
   Future<void> setBoostDb(double db) async => boostDb = db;
 
+  /// Current volume and every value set (sleep timer fade-out).
+  double volume = 1;
+  final volumes = <double>[];
+
+  @override
+  Future<void> setVolume(double value) async {
+    volume = value;
+    volumes.add(value);
+    if (value == 1) calls.add('volume full');
+  }
+
   @override
   Future<void> dispose() async {
     await _state.close();

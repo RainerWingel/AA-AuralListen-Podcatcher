@@ -71,6 +71,9 @@ abstract interface class PlayerEngine {
   /// Loudness boost in dB; 0 disables it. Android only.
   Future<void> setBoostDb(double db);
 
+  /// Playback volume 0…1 (sleep timer fade-out); independent of the boost.
+  Future<void> setVolume(double volume);
+
   Future<void> dispose();
 }
 
@@ -177,6 +180,9 @@ class JustAudioEngine implements PlayerEngine {
     await enhancer.setTargetGain(db);
     await enhancer.setEnabled(db > 0);
   }
+
+  @override
+  Future<void> setVolume(double volume) => _player.setVolume(volume);
 
   @override
   Future<void> dispose() => _player.dispose();

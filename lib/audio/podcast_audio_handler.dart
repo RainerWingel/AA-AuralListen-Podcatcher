@@ -31,6 +31,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     this.stopAfterPause = const Duration(minutes: 10),
     this.stallCheckInterval = const Duration(seconds: 10),
     this.recoveryRetryDelay = const Duration(seconds: 15),
+    this.sleepFadeDuration = const Duration(seconds: 30),
   }) {
     _subscriptions
       ..add(_engine.stateStream.listen(_onEngineState))
@@ -116,6 +117,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   SleepTimer _sleepTimer = const SleepTimerOff();
   final _sleepPlayed = Stopwatch();
   Timer? _sleepAlarm;
+
+  /// Sleep timer: the last [sleepFadeDuration] fade the volume to 0.
+  final Duration sleepFadeDuration;
+  Timer? _sleepFade;
+  bool _volumeLowered = false;
   final _sleepStates = StreamController<SleepTimerState>.broadcast();
 
   /// Whether the hang-detection timer runs (only while playing).
@@ -196,8 +202,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Sets or clears the sleep timer (docs/playback.md). Minutes count only
   /// while playing; [SleepTimerAtEpisodeEnd] stops after this episode.
   void setSleepTimer(SleepTimer timer) {
-    _sleepAlarm?.cancel();
-    _sleepAlarm = null;
+    _cancelSleepTimers();
+    _restoreVolume();
     _sleepPlayed
       ..stop()
       ..reset();
@@ -414,7 +420,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Releases everything (tests and app shutdown).
   Future<void> dispose() async {
     _pauseTimer?.cancel();
-    _sleepAlarm?.cancel();
+    _cancelSleepTimers();
     _watchdog?.cancel();
     _retryTimer?.cancel();
     for (final s in _subscriptions) {
@@ -632,28 +638,70 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   // --------------------------------------------------------- sleep timer
 
-  /// Counts playing time: the stopwatch and the alarm run only while playing.
+  /// Counts playing time: the stopwatch and the timers run only while
+  /// playing. The fade-out starts [sleepFadeDuration] before the end.
   void _updateSleepTimer(bool playing) {
     final timer = _sleepTimer;
     if (timer is! SleepTimerAfter) return;
     if (playing && !_sleepPlayed.isRunning) {
       _sleepPlayed.start();
-      final left = timer.duration - _sleepPlayed.elapsed;
+      final untilFade =
+          timer.duration - _sleepPlayed.elapsed - sleepFadeDuration;
       _sleepAlarm = Timer(
-        left > Duration.zero ? left : Duration.zero,
-        () => unawaited(_onSleepAlarm()),
+        untilFade > Duration.zero ? untilFade : Duration.zero,
+        _startSleepFade,
       );
     } else if (!playing && _sleepPlayed.isRunning) {
       _sleepPlayed.stop();
-      _sleepAlarm?.cancel();
-      _sleepAlarm = null;
+      _cancelSleepTimers();
+      _restoreVolume(); // paused already – no audible jump
       _emitSleepState(); // remaining time is frozen now
     }
   }
 
+  /// Lowers the volume in small steps (100 per fade: every 0.3 s for 30 s)
+  /// until the timer ends.
+  void _startSleepFade() {
+    _sleepFade?.cancel();
+    _sleepFade = Timer.periodic(
+      sleepFadeDuration ~/ 100,
+      (_) => _sleepFadeStep(),
+    );
+    _sleepFadeStep();
+  }
+
+  void _sleepFadeStep() {
+    final timer = _sleepTimer;
+    if (timer is! SleepTimerAfter) return;
+    final left = timer.duration - _sleepPlayed.elapsed;
+    if (left <= Duration.zero) {
+      _cancelSleepTimers();
+      unawaited(_onSleepAlarm());
+      return;
+    }
+    final share = left.inMicroseconds / sleepFadeDuration.inMicroseconds;
+    _volumeLowered = true;
+    unawaited(_engine.setVolume(share.clamp(0.0, 1.0)));
+  }
+
+  /// Pause first, then switch the timer off (which restores the volume
+  /// while nothing plays).
   Future<void> _onSleepAlarm() async {
-    setSleepTimer(const SleepTimerOff());
     await pause();
+    setSleepTimer(const SleepTimerOff());
+  }
+
+  void _cancelSleepTimers() {
+    _sleepAlarm?.cancel();
+    _sleepAlarm = null;
+    _sleepFade?.cancel();
+    _sleepFade = null;
+  }
+
+  void _restoreVolume() {
+    if (!_volumeLowered) return;
+    _volumeLowered = false;
+    unawaited(_engine.setVolume(1));
   }
 
   void _emitSleepState() {
