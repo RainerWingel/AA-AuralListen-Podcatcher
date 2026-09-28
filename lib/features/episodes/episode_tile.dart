@@ -28,6 +28,9 @@ class EpisodeTile extends ConsumerWidget {
   /// Set when shown inside a playlist: playing continues with the playlist.
   final int? playlistId;
 
+  /// Played episodes: thumbnail and text half transparent (like Castbox).
+  static const playedOpacity = 0.5;
+
   Future<void> _showMenu(BuildContext context, WidgetRef ref) {
     // The sheet's own context is gone once it closes; dialogs/snackbars that
     // follow a menu action use the tile's context.
@@ -137,7 +140,10 @@ class EpisodeTile extends ConsumerWidget {
         formatEpisodeDuration(l10n, Duration(milliseconds: ms)),
     ].join(' · ');
 
-    final played = episode.status == EpisodeStatus.played;
+    // The episode in the player stays fully visible even when played.
+    final dimmed = episode.status == EpisodeStatus.played && !isCurrent;
+    Widget dim(Widget child) =>
+        dimmed ? Opacity(opacity: playedOpacity, child: child) : child;
     final progress = switch ((episode.status, episode.durationMs)) {
       (EpisodeStatus.inProgress, final ms?) when ms > 0 =>
         (episode.positionMs / ms).clamp(0.0, 1.0),
@@ -150,34 +156,37 @@ class EpisodeTile extends ConsumerWidget {
           .playEpisode(episode.id, playlistId: playlistId),
       onLongPress: () => _showMenu(context, ref),
       selected: isCurrent,
-      leading: CoverImage(url: episode.imageUrl ?? podcast.imageUrl, size: 56),
-      title: Text(
-        episode.title,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: played && !isCurrent
-            ? TextStyle(color: theme.colorScheme.onSurfaceVariant)
-            : null,
+      leading: dim(
+        CoverImage(url: episode.imageUrl ?? podcast.imageUrl, size: 56),
       ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (showPodcastTitle)
-            Text(podcast.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-          Row(
-            children: [
-              _DownloadIndicator(episodeId: episode.id),
-              Expanded(
-                child: Text(meta, maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-            ],
-          ),
-          if (progress != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: LinearProgressIndicator(value: progress),
+      title: dim(
+        Text(episode.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+      ),
+      subtitle: dim(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (showPodcastTitle)
+              Text(podcast.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+            Row(
+              children: [
+                _DownloadIndicator(episodeId: episode.id),
+                Expanded(
+                  child: Text(
+                    meta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
-        ],
+            if (progress != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: LinearProgressIndicator(value: progress),
+              ),
+          ],
+        ),
       ),
       trailing: isCurrent
           ? Tooltip(

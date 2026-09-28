@@ -843,6 +843,47 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets('played episodes are shown half transparent', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://example.com/feed'),
+    );
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+    await settle(tester);
+    await tester.tap(find.text('Widget-Podcast'));
+    await settle(tester);
+
+    double? opacityOf(Finder finder) {
+      final opacity = find.ancestor(of: finder, matching: find.byType(Opacity));
+      return opacity.evaluate().isEmpty
+          ? null
+          : tester.widget<Opacity>(opacity.first).opacity;
+    }
+
+    expect(opacityOf(find.text('Erste Folge')), isNull);
+
+    await tester.runAsync(
+      () => db
+          .update(db.episodes)
+          .write(const EpisodesCompanion(status: Value(EpisodeStatus.played))),
+    );
+    await settle(tester);
+    expect(opacityOf(find.text('Erste Folge')), 0.5);
+    // The check mark itself stays fully visible.
+    expect(opacityOf(find.byTooltip('Gespielt')), isNull);
+
+    await disposeApp(tester);
+  });
 }
 
 Future<void> handlerSeek(
