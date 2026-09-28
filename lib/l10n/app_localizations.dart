@@ -1137,6 +1137,24 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Kapitel beim Abspielen überspringen (gilt bis zum Neustart der App)'**
   String get chapterSkipHint;
+
+  /// No description provided for @backgroundPlayback.
+  ///
+  /// In de, this message translates to:
+  /// **'Hintergrund-Wiedergabe'**
+  String get backgroundPlayback;
+
+  /// No description provided for @backgroundPlaybackUnrestricted.
+  ///
+  /// In de, this message translates to:
+  /// **'Akku: Nicht eingeschränkt ✓ – tippen für die App-Einstellungen'**
+  String get backgroundPlaybackUnrestricted;
+
+  /// No description provided for @backgroundPlaybackRestricted.
+  ///
+  /// In de, this message translates to:
+  /// **'Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern.'**
+  String get backgroundPlaybackRestricted;
 }
 
 class _AppLocalizationsDelegate

@@ -22,6 +22,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+import 'support/fake_battery_optimization.dart';
 import 'support/fake_download_engine.dart';
 import 'support/fake_player_engine.dart';
 
@@ -88,10 +89,12 @@ void main() {
   late PodcastAudioHandler handler;
   late Directory episodesDir;
   late FakeDownloadEngine downloadEngine;
+  late FakeBatteryOptimization battery;
 
   setUp(() {
     episodesDir = Directory.systemTemp.createTempSync('widget_episodes_');
     downloadEngine = FakeDownloadEngine(episodesDir);
+    battery = FakeBatteryOptimization();
     db = AppDatabase.forTesting(NativeDatabase.memory());
     engine = FakePlayerEngine();
     handler = PodcastAudioHandler(
@@ -115,6 +118,7 @@ void main() {
           databaseProvider.overrideWithValue(db),
           audioHandlerProvider.overrideWithValue(handler),
           downloadEngineProvider.overrideWithValue(downloadEngine),
+          batteryOptimizationProvider.overrideWithValue(battery),
           episodesDirectoryProvider.overrideWithValue(() async => episodesDir),
           httpClientProvider.overrideWithValue(
             MockClient(
@@ -747,6 +751,45 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'first playback offers "Nicht eingeschränkt" once',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      expect(battery.requests, 1);
+
+      // Pause and play again: no second automatic prompt.
+      await tester.runAsync(handler.pause);
+      await settle(tester);
+      await tester.runAsync(handler.play);
+      await settle(tester);
+      expect(battery.requests, 1);
+
+      // Optionen shows the problem; tapping asks again on purpose.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      expect(find.textContaining('Akku-Optimierung aktiv'), findsOneWidget);
+      await tester.tap(find.text('Hintergrund-Wiedergabe'));
+      await settle(tester);
+      expect(battery.requests, 2);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(
