@@ -87,6 +87,11 @@ class PodcastDetailScreen extends ConsumerWidget {
                     child: Text(l10n.markPlayedUntil),
                   ),
                   PopupMenuItem(
+                    onTap: () =>
+                        markUnplayedSinceFlow(context, ref, podcast, items),
+                    child: Text(l10n.markUnplayedSince),
+                  ),
+                  PopupMenuItem(
                     onTap: () => _unsubscribe(context, ref, podcast),
                     child: Text(l10n.unsubscribe),
                   ),

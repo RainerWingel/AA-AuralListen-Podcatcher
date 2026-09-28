@@ -1290,6 +1290,70 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets(
+    'marks played episodes as unplayed since a date',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final podcastId = await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      final today = DateTime.now();
+      await tester.runAsync(
+        () => db
+            .into(db.episodes)
+            .insert(
+              EpisodesCompanion.insert(
+                podcastId: podcastId!,
+                guid: 'heute',
+                title: 'Heutige Folge',
+                audioUrl: 'https://example.com/heute.mp3',
+                pubDate: Value(DateTime(today.year, today.month, today.day, 6)),
+                status: const Value(EpisodeStatus.played),
+                playedAt: Value(today),
+                addedAt: today,
+              ),
+            ),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+      await tester.tap(find.byType(PopupMenuButton<void>));
+      await settle(tester);
+      // Right below "Als gehört markieren bis …".
+      expect(find.text('Als gehört markieren bis …'), findsOneWidget);
+      await tester.tap(find.text('Als ungehört markieren seit …'));
+      await settle(tester);
+
+      // Calendar opens on today: confirm.
+      await tester.tap(find.text('OK'));
+      await settle(tester);
+      expect(
+        find.textContaining('1 gehörte Folge seit einschließlich'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Markieren'));
+      await settle(tester);
+
+      expect(find.text('1 Folge als ungehört markiert'), findsOneWidget);
+      final episode = await tester.runAsync(
+        () => (db.select(
+          db.episodes,
+        )..where((e) => e.guid.equals('heute'))).getSingle(),
+      );
+      expect(episode!.status, EpisodeStatus.newEpisode);
+
+      await disposeApp(tester);
+    },
+  );
 }
 
 Future<void> handlerSeek(

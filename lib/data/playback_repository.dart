@@ -110,6 +110,41 @@ class PlaybackRepository {
         return ids.length;
       });
 
+  Expression<bool> _playedSince(
+    $EpisodesTable e,
+    int podcastId,
+    DateTime since,
+  ) =>
+      e.podcastId.equals(podcastId) &
+      e.pubDate.isBiggerOrEqualValue(since) &
+      e.status.equalsValue(EpisodeStatus.played);
+
+  /// Number of played episodes published at or after [since].
+  Future<int> countPlayedSince(int podcastId, DateTime since) async {
+    final count = _db.episodes.id.count();
+    return await (_db.selectOnly(_db.episodes)
+              ..addColumns([count])
+              ..where(_playedSince(_db.episodes, podcastId, since)))
+            .map((r) => r.read(count))
+            .getSingle() ??
+        0;
+  }
+
+  /// "Als ungehört markieren seit …": played episodes published at or after
+  /// [since] become new again (like [markUnplayed]: position 0, no eviction).
+  /// Episodes in progress keep their position; undated ones are skipped.
+  /// Returns the number of episodes changed.
+  Future<int> markUnplayedSince(int podcastId, DateTime since) =>
+      (_db.update(
+        _db.episodes,
+      )..where((e) => _playedSince(e, podcastId, since))).write(
+        const EpisodesCompanion(
+          status: Value(EpisodeStatus.newEpisode),
+          playedAt: Value(null),
+          positionMs: Value(0),
+        ),
+      );
+
   /// Manual "mark as unplayed": cancels the eviction timer.
   Future<void> markUnplayed(int episodeId) => _update(
     episodeId,

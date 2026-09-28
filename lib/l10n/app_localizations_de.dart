@@ -783,4 +783,42 @@ class AppLocalizationsDe extends AppLocalizations {
   String playUnplayedSinceNone(String date) {
     return 'Keine ungespielten Folgen seit dem $date.';
   }
+
+  @override
+  String get markUnplayedSince => 'Als ungehört markieren seit …';
+
+  @override
+  String get markUnplayedSincePick =>
+      'Alle gehörten Folgen seit einschließlich';
+
+  @override
+  String markUnplayedSinceConfirm(int count, String date) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gehörte Folgen',
+      one: '1 gehörte Folge',
+    );
+    return '$_temp0 seit einschließlich $date als ungehört markieren?';
+  }
+
+  @override
+  String get markUnplayedSinceHint =>
+      'Sie beginnen wieder von vorn und werden nicht mehr automatisch gelöscht. Angefangene Folgen bleiben, wie sie sind.';
+
+  @override
+  String markUnplayedSinceNone(String date) {
+    return 'Seit dem $date gibt es keine gehörten Folgen.';
+  }
+
+  @override
+  String markUnplayedSinceDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen',
+      one: '1 Folge',
+    );
+    return '$_temp0 als ungehört markiert';
+  }
 }

@@ -506,5 +506,35 @@
         "type": "String"
       }
     }
+  },
+  "markUnplayedSince": "Als ungehört markieren seit …",
+  "markUnplayedSincePick": "Alle gehörten Folgen seit einschließlich",
+  "markUnplayedSinceConfirm": "{count, plural, =1{1 gehörte Folge} other{{count} gehörte Folgen}} seit einschließlich {date} als ungehört markieren?",
+  "@markUnplayedSinceConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "markUnplayedSinceHint": "Sie beginnen wieder von vorn und werden nicht mehr automatisch gelöscht. Angefangene Folgen bleiben, wie sie sind.",
+  "markUnplayedSinceNone": "Seit dem {date} gibt es keine gehörten Folgen.",
+  "@markUnplayedSinceNone": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "markUnplayedSinceDone": "{count, plural, =1{1 Folge} other{{count} Folgen}} als ungehört markiert",
+  "@markUnplayedSinceDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

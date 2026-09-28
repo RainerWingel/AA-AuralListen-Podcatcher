@@ -1305,6 +1305,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Keine ungespielten Folgen seit dem {date}.'**
   String playUnplayedSinceNone(String date);
+
+  /// No description provided for @markUnplayedSince.
+  ///
+  /// In de, this message translates to:
+  /// **'Als ungehört markieren seit …'**
+  String get markUnplayedSince;
+
+  /// No description provided for @markUnplayedSincePick.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle gehörten Folgen seit einschließlich'**
+  String get markUnplayedSincePick;
+
+  /// No description provided for @markUnplayedSinceConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 gehörte Folge} other{{count} gehörte Folgen}} seit einschließlich {date} als ungehört markieren?'**
+  String markUnplayedSinceConfirm(int count, String date);
+
+  /// No description provided for @markUnplayedSinceHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Sie beginnen wieder von vorn und werden nicht mehr automatisch gelöscht. Angefangene Folgen bleiben, wie sie sind.'**
+  String get markUnplayedSinceHint;
+
+  /// No description provided for @markUnplayedSinceNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Seit dem {date} gibt es keine gehörten Folgen.'**
+  String markUnplayedSinceNone(String date);
+
+  /// No description provided for @markUnplayedSinceDone.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als ungehört markiert'**
+  String markUnplayedSinceDone(int count);
 }
 
 class _AppLocalizationsDelegate

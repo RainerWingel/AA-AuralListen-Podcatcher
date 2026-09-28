@@ -52,7 +52,8 @@ Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Co
 „Wartet auf WLAN …" / „Download fehlgeschlagen"; rechts Löschen / Abbrechen / Erneut. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
 
 ## Podcast-Menü (⋮ im Podcast-Detail)
-Podcast-Einstellungen · Als gehört markieren bis … (Kalender → Rückfrage mit Anzahl → Infobox) · Abo kündigen.
+Podcast-Einstellungen · Als gehört markieren bis … · Als ungehört markieren seit … (je Kalender → Rückfrage mit Anzahl →
+Infobox) · Abo kündigen.
 
 ## Podcast-Einstellungen
 Podcast-Detail → ⋮ → „Podcast-Einstellungen" (Bottom-Sheet): Automatisch herunterladen (Aus / Nur WLAN / Immer),
@@ -81,6 +82,6 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
 - Fehlermeldungen verständlich, ohne Stacktraces („Feed konnte nicht geladen werden").
 
 ## Datumsauswahl
-Kalender („Als gehört markieren bis …", „Ungespielte Episoden seit …"): Im Texteingabe-Modus (Stift) wird die
+Kalender („Als gehört markieren bis …", „Als ungehört markieren seit …", „Ungespielte Episoden seit …"): Im Texteingabe-Modus (Stift) wird die
 **normale Tastatur** angefordert (`keyboardType: TextInputType.text`) – Samsungs Datums-Tastatur hat keinen Punkt,
 „tt.mm.jjjj" ließ sich sonst nicht eintippen.

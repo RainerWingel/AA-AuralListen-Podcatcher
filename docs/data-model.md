@@ -35,6 +35,10 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
   Tages (lokale Zeit) werden `gespielt` – gleiche Regeln wie `markPlayed` (aus allen Playlists, `playedAt` = jetzt →
   Downloads nach 96 h weg). Folgen ohne Datum und bereits gespielte (ihr `playedAt` bleibt) sind nicht betroffen.
   Code: `PlaybackRepository.markPlayedUntil`, Tests: `test/data/playback_repository_test.dart`.
+- Podcast → ⋮ → „Als ungehört markieren seit …" (Benutzerwunsch 2026-09-28): alle **gehörten** Folgen mit `pubDate` ab
+  Beginn des gewählten Tags werden `newEpisode` (Position 0, `playedAt` = null → keine Eviction). Angefangene Folgen
+  bleiben unverändert (Hörposition), Folgen ohne Datum werden übersprungen. Kalender → Rückfrage mit Anzahl → Infobox.
+  Sie kommen **nicht** automatisch zurück in Playlists.
 - Beim Gespielt-Werden wird `positionMs` auf 0 gesetzt; Details zur Wiedergabe in `playback.md`.
 - Enums werden als Text gespeichert (`textEnum`) – Umbenennen eines Enum-Werts braucht eine Migration.
 - Beim Refresh werden Feed-Felder bekannter Folgen aktualisiert, **nie** aber Hörzustand (status, positionMs, playedAt).

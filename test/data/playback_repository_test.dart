@@ -129,4 +129,75 @@ void main() {
       expect(await playback.markPlayedUntil(podcastId, until), 0);
     });
   });
+
+  group('markUnplayedSince', () {
+    final since = DateTime(2026, 9, 10);
+
+    test('played episodes from the chosen day on become new again', () async {
+      final before = await addEpisode(
+        'before',
+        pubDate: DateTime(2026, 9, 9, 23, 59),
+        status: EpisodeStatus.played,
+        playedAt: now,
+      );
+      final onDay = await addEpisode(
+        'onDay',
+        pubDate: DateTime(2026, 9, 10),
+        status: EpisodeStatus.played,
+        playedAt: now,
+      );
+      final later = await addEpisode(
+        'later',
+        pubDate: DateTime(2026, 9, 20),
+        status: EpisodeStatus.played,
+        playedAt: now,
+      );
+      final inProgress = await addEpisode(
+        'inProgress',
+        pubDate: DateTime(2026, 9, 20),
+        status: EpisodeStatus.inProgress,
+      );
+      final undated = await addEpisode(
+        'undated',
+        status: EpisodeStatus.played,
+        playedAt: now,
+      );
+
+      expect(await playback.countPlayedSince(podcastId, since), 2);
+      expect(await playback.markUnplayedSince(podcastId, since), 2);
+
+      for (final id in [onDay, later]) {
+        final e = await episode(id);
+        expect(e.status, EpisodeStatus.newEpisode);
+        expect(e.positionMs, 0);
+        expect(e.playedAt, isNull, reason: 'no eviction any more');
+      }
+      expect((await episode(before)).status, EpisodeStatus.played);
+      expect((await episode(undated)).status, EpisodeStatus.played);
+      final kept = await episode(inProgress);
+      expect(kept.status, EpisodeStatus.inProgress);
+      expect(kept.positionMs, 5000, reason: 'position is kept');
+    });
+
+    test('other podcasts are not touched; nothing to do → 0', () async {
+      final other = await db
+          .into(db.podcasts)
+          .insert(
+            PodcastsCompanion.insert(
+              feedUrl: 'https://example.com/other',
+              title: 'Other',
+              subscribedAt: now,
+            ),
+          );
+      final foreign = await addEpisode(
+        'foreign',
+        pubDate: DateTime(2026, 9, 20),
+        status: EpisodeStatus.played,
+        playedAt: now,
+        podcast: other,
+      );
+      expect(await playback.markUnplayedSince(podcastId, since), 0);
+      expect((await episode(foreign)).status, EpisodeStatus.played);
+    });
+  });
 }
