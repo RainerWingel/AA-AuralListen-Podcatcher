@@ -36,6 +36,22 @@ Regressionstest: „switching episodes while playing reports "playing"".
 - Benachrichtigungs-Symbole: `android/app/src/main/res/raw/keep.xml` verhindert, dass der Release-Build sie entfernt.
 - Cover in der Benachrichtigung kommen aus dem begrenzten `CoverCacheManager` und werden auf 512 px verkleinert.
 
+### Akku-Optimierung („Nicht eingeschränkt")
+Im Dauertest (2026-09-27) hat Samsung die App bei „Optimiert" nach ~40 min Wiedergabe mit ausgeschaltetem Bildschirm
+beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf das nicht passieren.
+- Apps dürfen das **nicht selbst umschalten**; erlaubt ist nur der System-Dialog
+  (`ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, Recht `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`) – ein Tipp auf
+  „Zulassen" setzt „Nicht eingeschränkt". Samsungs Listen („Nie in Standby" usw.) kann keine App ändern oder anfragen;
+  bei „Nicht eingeschränkt" sind sie auch nicht nötig.
+- Brücke: `MainActivity.kt` (MethodChannel `aapodcastguru/battery`: `isExempt`, `requestExemption`, `openAppSettings`),
+  Dart-Seite `lib/audio/battery_optimization.dart` (Interface, im Test ein Fake). Kein zusätzliches Paket.
+- **Automatisch, genau einmal:** beim ersten Wiedergabestart (`AppShell` hört auf `playbackState`), nur wenn die App
+  noch optimiert ist. Merker `player.batteryExemptionAsked`; wer ablehnt, wird nicht erneut automatisch gefragt.
+- **Optionen → Hören → „Hintergrund-Wiedergabe"** zeigt den Status (wird beim Zurückkehren in die App neu geprüft).
+  Optimiert → Tippen öffnet den System-Dialog; nicht eingeschränkt → Tippen öffnet die App-Einstellungen.
+- Samsung zeigt Apps in „Grenzen der Hintergrundnutzung" nur, wenn sie kürzlich liefen – dass die App dort zeitweise
+  fehlt, ist normal.
+
 ## Audio-Fokus & Kopfhörer
 Übernimmt `just_audio` (Standard `handleInterruptions: true`):
 - Anruf / andere App mit Audio → Pause; nach einer **kurzen** Unterbrechung (z. B. Anruf) geht es automatisch weiter.

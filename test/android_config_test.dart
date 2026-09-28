@@ -17,6 +17,15 @@ void main() {
     expect(config, contains('<base-config cleartextTrafficPermitted="true">'));
   });
 
+  test('may ask for "Nicht eingeschränkt" (battery dialog)', () {
+    final manifest = File('android/app/src/main/AndroidManifest.xml')
+        .readAsStringSync();
+    expect(
+      manifest,
+      contains('android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS'),
+    );
+  });
+
   test('release builds keep the notification icons', () {
     final keep = File('android/app/src/main/res/raw/keep.xml')
         .readAsStringSync();

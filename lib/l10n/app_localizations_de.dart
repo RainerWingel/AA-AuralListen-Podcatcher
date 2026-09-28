@@ -656,4 +656,15 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get chapterSkipHint =>
       'Kapitel beim Abspielen überspringen (gilt bis zum Neustart der App)';
+
+  @override
+  String get backgroundPlayback => 'Hintergrund-Wiedergabe';
+
+  @override
+  String get backgroundPlaybackUnrestricted =>
+      'Akku: Nicht eingeschränkt ✓ – tippen für die App-Einstellungen';
+
+  @override
+  String get backgroundPlaybackRestricted =>
+      'Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern.';
 }

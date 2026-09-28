@@ -416,5 +416,8 @@
     }
   },
   "chapterSkip": "Skip",
-  "chapterSkipHint": "Kapitel beim Abspielen überspringen (gilt bis zum Neustart der App)"
+  "chapterSkipHint": "Kapitel beim Abspielen überspringen (gilt bis zum Neustart der App)",
+  "backgroundPlayback": "Hintergrund-Wiedergabe",
+  "backgroundPlaybackUnrestricted": "Akku: Nicht eingeschränkt ✓ – tippen für die App-Einstellungen",
+  "backgroundPlaybackRestricted": "Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern."
 }

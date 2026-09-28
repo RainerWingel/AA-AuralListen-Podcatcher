@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
-
+import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
 import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
@@ -106,6 +106,7 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l10n.bookmarks),
             onTap: () => context.go(Routes.bookmarks),
           ),
+          const _BackgroundPlaybackTile(),
           _SectionHeader(l10n.settingsSectionSubscriptions),
           ListTile(
             leading: const Icon(Icons.file_upload_outlined),
@@ -167,6 +168,60 @@ class _SectionHeader extends StatelessWidget {
           color: theme.colorScheme.primary,
         ),
       ),
+    );
+  }
+}
+
+/// Status of the battery optimisation; tap to fix it (docs/playback.md).
+class _BackgroundPlaybackTile extends ConsumerStatefulWidget {
+  const _BackgroundPlaybackTile();
+
+  @override
+  ConsumerState<_BackgroundPlaybackTile> createState() =>
+      _BackgroundPlaybackTileState();
+}
+
+class _BackgroundPlaybackTileState
+    extends ConsumerState<_BackgroundPlaybackTile> {
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    // The user changes the setting in a system screen: re-check on return.
+    _lifecycle = AppLifecycleListener(
+      onResume: () => ref.invalidate(batteryExemptProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final exempt = ref.watch(batteryExemptProvider).value;
+    final battery = ref.read(batteryOptimizationProvider);
+    return ListTile(
+      leading: Icon(
+        exempt == false ? Icons.battery_alert : Icons.battery_charging_full,
+        color: exempt == false ? Theme.of(context).colorScheme.error : null,
+      ),
+      title: Text(l10n.backgroundPlayback),
+      subtitle: Text(
+        exempt == false
+            ? l10n.backgroundPlaybackRestricted
+            : l10n.backgroundPlaybackUnrestricted,
+      ),
+      isThreeLine: exempt == false,
+      // Restricted: the system dialog. Otherwise the app settings (Akku,
+      // Samsung standby lists) – apps cannot change those themselves.
+      onTap: () => exempt == false
+          ? battery.requestExemption()
+          : battery.openAppSettings(),
     );
   }
 }

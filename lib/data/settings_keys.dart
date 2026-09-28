@@ -14,4 +14,7 @@ abstract final class SettingsKeys {
 
   /// Playlist the current episode was started from (null = none).
   static const activePlaylistId = 'player.activePlaylistId';
+
+  /// Set once the battery dialog was shown automatically (never ask twice).
+  static const batteryExemptionAsked = 'player.batteryExemptionAsked';
 }

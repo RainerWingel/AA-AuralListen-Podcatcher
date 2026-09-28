@@ -89,6 +89,10 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Eigenes App-Symbol (adaptiv, Designsymbol, Statusleiste)
 - [x] Version 1.0.0: GitHub-Release `v1.0.0` mit signierter arm64-APK
 
+## Zusatz – Akku-Optimierung
+- [x] Ursache Abbruch im Dauertest: App war „Optimiert" (Samsung beendete sie nach ~40 min, Bildschirm aus)
+- [x] System-Dialog „Nicht eingeschränkt" einmal beim ersten Abspielen, Status + Knopf unter Optionen → Hören
+- [ ] Praxistest auf dem S25 (Benutzer)
+
 ## Offene Punkte
-- Im Dauertest wurde der Prozess um 22:22 von außen beendet (Signal 9, kein Absturz). Benutzer fragen:
-  App weggewischt / „Alle schließen"? Sonst Samsung-Akku-Optimierung prüfen (App auf „Nicht eingeschränkt").
+- keine

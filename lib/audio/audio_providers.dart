@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers.dart';
 import '../data/settings_keys.dart';
+import 'battery_optimization.dart';
 import 'podcast_audio_handler.dart';
 
 /// The single player instance. Created in main() via AudioService.init and
@@ -31,6 +32,17 @@ final skippedChaptersProvider = StreamProvider.autoDispose
       (ref, episodeId) =>
           ref.watch(audioHandlerProvider).chapterSkips.watch(episodeId),
     );
+
+/// Battery optimisation of the app (fake in tests).
+final batteryOptimizationProvider = Provider<BatteryOptimization>(
+  (ref) => const AndroidBatteryOptimization(),
+);
+
+/// Whether the app is "Nicht eingeschränkt"; invalidate after returning
+/// from the system dialog or settings.
+final batteryExemptProvider = FutureProvider.autoDispose<bool>(
+  (ref) => ref.watch(batteryOptimizationProvider).isExempt(),
+);
 
 final globalBoostProvider = StreamProvider.autoDispose<double>(
   (ref) => ref
