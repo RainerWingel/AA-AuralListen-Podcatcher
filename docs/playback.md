@@ -132,6 +132,7 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 ## Hörposition
 - Gespeichert: alle **5 s** während der Wiedergabe, bei Pause, Seek, Stopp und Folgenwechsel.
 - Fortsetzen: **3 s** vor der gespeicherten Position.
+- Erst ab **15 s** Position gilt eine neue Folge als `angefangen` (`data-model.md` → Episoden-Status).
 - Folge ≥ **98 %** der (vom Player gemeldeten) Dauer → `gespielt`, `playedAt` = jetzt, Position = 0.
   Danach wird die Position dieser Folge nicht mehr überschrieben.
 - Ende der Datei → `gespielt` (falls noch nicht), Player wird gestoppt. (Ab M5: nächste Playlist-Folge.)

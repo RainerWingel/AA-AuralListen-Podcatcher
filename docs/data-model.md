@@ -27,7 +27,9 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 | ~~`player_state`~~ | entfällt – letzte Folge und aktive Playlist stehen in `settings` |
 
 ## Episoden-Status
-- `neu` → `angefangen` (Position > 0) → `gespielt`.
+- `neu` → `angefangen` (Position ≥ **15 s**, `PlaybackRepository.inProgressFrom`, Benutzerwunsch 2026-09-29) →
+  `gespielt`. Darunter wird nur die Position gespeichert, die Folge bleibt „neu". Der Status geht beim Speichern der
+  Position nur vorwärts (Zurückspulen auf 0 macht eine angefangene Folge nicht wieder neu).
 - **Gespielt** = Hörposition ≥ **98 %** der Dauer (oder Ende erreicht). `playedAt` wird dabei gesetzt –
   daran hängt die 96-h-Löschregel (`eviction.md`).
 - Manuell „als gespielt / ungespielt markieren" (langes Drücken auf eine Folge). „Ungespielt" → `neu`, Position 0, `playedAt` = null.

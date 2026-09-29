@@ -29,8 +29,14 @@ class PlaybackRepository {
     _db.episodes,
   )..where((e) => e.id.equals(episodeId))).write(changes);
 
+  /// From this position on a new episode counts as "angespielt" (user rule):
+  /// a few seconds of listening in do not take away its "new" state.
+  static const inProgressFrom = Duration(seconds: 15);
+
   /// Stores the listening position. Played episodes are left alone, so the
   /// last seconds after the 98 % mark cannot turn them back into "in progress".
+  /// The status only moves forward: new → in progress at [inProgressFrom];
+  /// below that it stays as it is (also when seeking back to the start).
   Future<void> savePosition(int episodeId, Duration position) =>
       (_db.update(_db.episodes)..where(
             (e) =>
@@ -40,11 +46,9 @@ class PlaybackRepository {
           .write(
             EpisodesCompanion(
               positionMs: Value(position.inMilliseconds),
-              status: Value(
-                position > Duration.zero
-                    ? EpisodeStatus.inProgress
-                    : EpisodeStatus.newEpisode,
-              ),
+              status: position >= inProgressFrom
+                  ? const Value(EpisodeStatus.inProgress)
+                  : const Value.absent(),
             ),
           );
 

@@ -126,13 +126,27 @@ void main() {
 
     engine.emitPosition(const Duration(seconds: 6));
     await pumpEventQueue();
-    final saved = await episode(fresh);
+    var saved = await episode(fresh);
     expect(saved.positionMs, 6000);
-    expect(saved.status, EpisodeStatus.inProgress);
+    // Position is kept, but under 15 s the episode is still new.
+    expect(saved.status, EpisodeStatus.newEpisode);
 
-    engine.emitPosition(const Duration(seconds: 8));
+    engine.emitPosition(const Duration(seconds: 14));
     await handler.pause();
-    expect((await episode(fresh)).positionMs, 8000);
+    saved = await episode(fresh);
+    expect((saved.positionMs, saved.status), (14000, EpisodeStatus.newEpisode));
+
+    await handler.play();
+    engine.emitPosition(const Duration(seconds: 15));
+    await handler.pause();
+    expect((await episode(fresh)).status, EpisodeStatus.inProgress);
+
+    // Seeking back to the start does not make it new again.
+    await handler.play();
+    engine.emitPosition(Duration.zero);
+    await handler.pause();
+    saved = await episode(fresh);
+    expect((saved.positionMs, saved.status), (0, EpisodeStatus.inProgress));
   });
 
   test('marks as played at 98 % and never overwrites that', () async {
