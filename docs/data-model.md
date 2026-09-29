@@ -30,6 +30,8 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 - `neu` → `angefangen` (Position ≥ **15 s**, `PlaybackRepository.inProgressFrom`, Benutzerwunsch 2026-09-29) →
   `gespielt`. Darunter wird nur die Position gespeichert, die Folge bleibt „neu". Der Status geht beim Speichern der
   Position nur vorwärts (Zurückspulen auf 0 macht eine angefangene Folge nicht wieder neu).
+- Gilt genauso beim **erneuten Abspielen** einer gespielten Folge: unter 15 s bleibt sie `gespielt` (Position und
+  `playedAt` unverändert), ab 15 s wird sie `angefangen` (`playedAt` gelöscht).
 - **Gespielt** = Hörposition ≥ **98 %** der Dauer (oder Ende erreicht). `playedAt` wird dabei gesetzt –
   daran hängt die 96-h-Löschregel (`eviction.md`).
 - Manuell „als gespielt / ungespielt markieren" (langes Drücken auf eine Folge). „Ungespielt" → `neu`, Position 0, `playedAt` = null.

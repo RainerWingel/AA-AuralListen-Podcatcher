@@ -131,12 +131,15 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 
 ## Hörposition
 - Gespeichert: alle **5 s** während der Wiedergabe, bei Pause, Seek, Stopp und Folgenwechsel.
-- Fortsetzen: **3 s** vor der gespeicherten Position.
-- Erst ab **15 s** Position gilt eine neue Folge als `angefangen` (`data-model.md` → Episoden-Status).
+- Fortsetzen: **3 s** vor der gespeicherten Position – aber unter **15 s** gespeicherter Position ab **0:00**
+  (`PodcastAudioHandler.resumeStart`; der Mini-Player zeigt dann 0:00). Ausnahme: nach einer Unterbrechung
+  (Netzfehler, Hänger) oder einem Sprung ohne geladenes Audio geht es exakt an der Stelle weiter.
+- Erst ab **15 s** gilt eine Folge als `angefangen` – neu wie erneut abgespielt (`data-model.md` → Episoden-Status).
 - Folge ≥ **98 %** der (vom Player gemeldeten) Dauer → `gespielt`, `playedAt` = jetzt, Position = 0.
   Danach wird die Position dieser Folge nicht mehr überschrieben.
 - Ende der Datei → `gespielt` (falls noch nicht), Player wird gestoppt. (Ab M5: nächste Playlist-Folge.)
-- Eine gespielte Folge erneut abspielen → startet bei 0 und ist wieder `angefangen` (`playedAt` gelöscht → keine Löschung nach 96 h).
+- Eine gespielte Folge erneut abspielen → startet bei 0; ab 15 s ist sie wieder `angefangen` (`playedAt` gelöscht → keine
+  Löschung nach 96 h), darunter bleibt sie `gespielt`.
 - Die vom Player gemeldete Dauer wird in `episodes.durationMs` übernommen (genauer als die Feed-Angabe).
 - Letzte Folge: `settings['player.lastEpisodeId']`; nach App-Start zeigt der Mini-Player sie an, **ohne** Audio zu laden
   (kein Netzverkehr, bis Play gedrückt wird).

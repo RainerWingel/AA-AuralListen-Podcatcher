@@ -179,9 +179,51 @@ void main() {
 
     await handler.play();
     expect(engine.loadedAt, Duration.zero);
-    final e = await episode();
-    expect(e.status, EpisodeStatus.inProgress);
+    // Under 15 s a replay does not count: still played.
+    engine.emitPosition(const Duration(seconds: 10));
+    await handler.pause();
+    var e = await episode();
+    expect((e.status, e.positionMs), (EpisodeStatus.played, 0));
+    expect(e.playedAt, isNotNull);
+
+    engine.emitPosition(const Duration(seconds: 15));
+    await handler.pause();
+    e = await episode();
+    expect((e.status, e.positionMs), (EpisodeStatus.inProgress, 15000));
     expect(e.playedAt, isNull);
+  });
+
+  test(
+    'a new play under 15 s starts at 0:00, from 15 s on 3 s earlier',
+    () async {
+      final fresh = await addEpisode('2');
+      await handler.playEpisode(fresh);
+      engine.emitPosition(const Duration(seconds: 12));
+      await handler.stop();
+      expect((await episode(fresh)).positionMs, 12000);
+      expect(handler.position, const Duration(seconds: 12));
+
+      await handler.playEpisode(episodeId);
+      await handler.playEpisode(fresh);
+      expect(engine.loadedAt, Duration.zero);
+
+      engine.emitPosition(const Duration(seconds: 20));
+      await handler.stop();
+      await handler.playEpisode(episodeId);
+      await handler.playEpisode(fresh);
+      expect(engine.loadedAt, const Duration(seconds: 17));
+    },
+  );
+
+  test('a replay under 15 s that is interrupted continues exactly', () async {
+    await PlaybackRepository(db, () => now).markPlayed(episodeId);
+    await handler.playEpisode(episodeId);
+    engine.emitPosition(const Duration(seconds: 10));
+    await pumpEventQueue();
+    engine.emitError();
+    await pumpEventQueue();
+    expect(engine.loadedAt, const Duration(seconds: 10));
+    expect((await episode()).status, EpisodeStatus.played);
   });
 
   test('skips −15 s / +30 s within bounds', () async {

@@ -71,6 +71,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// When resuming, jump back a little to regain context.
   static const resumeRewind = Duration(seconds: 3);
 
+  /// Where a new play of an episode saved at [saved] begins: under
+  /// [PlaybackRepository.inProgressFrom] (15 s) from the start – it did not
+  /// count as started – otherwise [resumeRewind] before the saved position.
+  static Duration resumeStart(Duration saved) =>
+      saved < PlaybackRepository.inProgressFrom
+      ? Duration.zero
+      : saved - resumeRewind;
+
   /// Minimum distance between two position writes to the database.
   static const saveInterval = Duration(seconds: 5);
 
@@ -143,6 +151,10 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   bool _loaded = false;
   bool _markedPlayed = false;
+
+  /// A played episode is being replayed but has not reached
+  /// [PlaybackRepository.inProgressFrom] yet: it stays "played" until then.
+  bool _replayOfPlayed = false;
   bool _completing = false;
   bool _skipping = false;
 
@@ -508,21 +520,19 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final row = await _playback.load(id);
     if (row == null) return;
 
-    var episode = row.episode;
-    if (episode.status == EpisodeStatus.played) {
-      await _playback.restartPlayed(id);
-      episode = episode.copyWith(
-        status: EpisodeStatus.inProgress,
-        positionMs: 0,
-      );
-    }
-
-    final saved = Duration(milliseconds: episode.positionMs);
-    final start = _exactStart
-        ? saved
-        : saved > resumeRewind
-        ? saved - resumeRewind
+    final episode = row.episode;
+    // Replaying starts over; it becomes "in progress" only from 15 s on.
+    _replayOfPlayed = episode.status == EpisodeStatus.played;
+    // A replay under 15 s is not stored; after an interruption or a seek
+    // while unloaded the shown idle position is the one to continue from.
+    final saved = !_replayOfPlayed
+        ? Duration(milliseconds: episode.positionMs)
+        : _exactStart
+        ? _idlePosition
         : Duration.zero;
+    // Exact after an interruption or a seek while unloaded; otherwise
+    // [resumeStart] (under 15 s → from the beginning).
+    final start = _exactStart ? saved : resumeStart(saved);
     _exactStart = false;
 
     // Downloaded file first (unless it turned out broken), otherwise stream.
@@ -545,11 +555,26 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _lastSaved = start;
   }
 
-  /// Where playback would continue; played episodes start over.
-  Duration _savedPosition(Episode episode) =>
-      episode.status == EpisodeStatus.played
-      ? Duration.zero
-      : Duration(milliseconds: episode.positionMs);
+  /// Position shown before loading: played episodes and positions under
+  /// 15 s start over, so they show 0:00.
+  Duration _savedPosition(Episode episode) {
+    final saved = Duration(milliseconds: episode.positionMs);
+    return episode.status == EpisodeStatus.played ||
+            saved < PlaybackRepository.inProgressFrom
+        ? Duration.zero
+        : saved;
+  }
+
+  /// Stores [position] – except while replaying a played episode under
+  /// 15 s: that one stays "played" (and starts over next time) until then.
+  Future<void> _persistPosition(int id, Duration position) async {
+    if (_replayOfPlayed) {
+      if (position < PlaybackRepository.inProgressFrom) return;
+      _replayOfPlayed = false;
+      await _playback.restartPlayed(id);
+    }
+    await _playback.savePosition(id, position);
+  }
 
   void _setIdlePosition(Duration position) {
     _idlePosition = position;
@@ -564,7 +589,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (id == null || !_loaded || _markedPlayed) return;
     final position = _engine.position;
     _lastSaved = position;
-    await _playback.savePosition(id, position);
+    await _persistPosition(id, position);
   }
 
   Future<void> _onPosition(Duration position) async {
@@ -585,7 +610,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     }
     if ((position - _lastSaved).abs() >= saveInterval) {
       _lastSaved = position;
-      await _playback.savePosition(id, position);
+      await _persistPosition(id, position);
     }
   }
 
@@ -790,7 +815,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     // Read before just_audio pauses itself in reaction to the error.
     final wasPlaying = _engine.state.playing || _watchdog != null;
     final position = _knownPosition;
-    if (!_markedPlayed) await _playback.savePosition(id, position);
+    if (!_markedPlayed) await _persistPosition(id, position);
     await _engine.stop();
     _loaded = false;
     _exactStart = true;
@@ -891,7 +916,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       }
       _recoveries++;
       final position = _loaded ? _knownPosition : _idlePosition;
-      if (!_markedPlayed) await _playback.savePosition(id, position);
+      if (!_markedPlayed) await _persistPosition(id, position);
       await _engine.stop();
       _loaded = false;
       _setIdlePosition(position);
