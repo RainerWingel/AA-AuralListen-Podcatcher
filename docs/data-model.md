@@ -1,8 +1,8 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 7** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
-v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+Aktuell **schemaVersion 8** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
+v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`; v8: nur Daten – `angefangen` unter 15 s → `neu`, Position 0). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 0. Neue Tabelle? → auch in `BackupService._restoredTables` eintragen (`backup.md`).
@@ -32,6 +32,8 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
   Position nur vorwärts (Zurückspulen auf 0 macht eine angefangene Folge nicht wieder neu).
 - Gilt genauso beim **erneuten Abspielen** einer gespielten Folge: unter 15 s bleibt sie `gespielt` (Position und
   `playedAt` unverändert), ab 15 s wird sie `angefangen` (`playedAt` gelöscht).
+- Migration v8 (einmalig): Folgen, die nach der alten Regel schon nach wenigen Sekunden `angefangen` wurden
+  (Position < 15 s), sind wieder `neu` mit Position 0. Gilt auch für ältere Backups beim Wiederherstellen.
 - **Gespielt** = Hörposition ≥ **98 %** der Dauer (oder Ende erreicht). `playedAt` wird dabei gesetzt –
   daran hängt die 96-h-Löschregel (`eviction.md`).
 - Manuell „als gespielt / ungespielt markieren" (langes Drücken auf eine Folge). „Ungespielt" → `neu`, Position 0, `playedAt` = null.

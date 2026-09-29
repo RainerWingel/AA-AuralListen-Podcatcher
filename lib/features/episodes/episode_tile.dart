@@ -6,6 +6,7 @@ import '../../core/clock.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../data/db/app_database.dart';
+import '../../data/playback_repository.dart' show PlaybackRepository;
 import '../../data/podcast_repository.dart' show isFreshEpisode;
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
@@ -152,8 +153,12 @@ class EpisodeTile extends ConsumerWidget {
     final dimmed = episode.status == EpisodeStatus.played && !isCurrent;
     Widget dim(Widget child) =>
         dimmed ? Opacity(opacity: playedOpacity, child: child) : child;
+    // Like the status rule: under 15 s nothing counts, so no (empty) bar.
     final progress = switch ((episode.status, episode.durationMs)) {
-      (EpisodeStatus.inProgress, final ms?) when ms > 0 =>
+      (EpisodeStatus.inProgress, final ms?)
+          when ms > 0 &&
+              episode.positionMs >=
+                  PlaybackRepository.inProgressFrom.inMilliseconds =>
         (episode.positionMs / ms).clamp(0.0, 1.0),
       _ => null,
     };

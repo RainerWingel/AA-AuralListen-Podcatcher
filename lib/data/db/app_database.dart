@@ -39,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -90,6 +90,15 @@ class AppDatabase extends _$AppDatabase {
       // Before v4 the table was just created above, already with the column.
       if (from >= 4 && from < 7) {
         await m.addColumn(playlists, playlists.lastEpisodeId);
+      }
+      if (from < 8) {
+        // New rule "under 15 s nothing counts" (PlaybackRepository
+        // .inProgressFrom): episodes that became "in progress" after a few
+        // seconds under the old rule are new again. No schema change.
+        await customStatement(
+          "UPDATE episodes SET status = 'newEpisode', position_ms = 0 "
+          "WHERE status = 'inProgress' AND position_ms < 15000",
+        );
       }
     },
     beforeOpen: (details) async {

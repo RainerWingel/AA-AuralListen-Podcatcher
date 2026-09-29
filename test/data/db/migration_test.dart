@@ -117,4 +117,40 @@ void main() {
     expect(playlists.every((p) => p.lastEpisodeId == null), isTrue);
     await db.close();
   });
+
+  test('upgrade v7 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(7);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v8: "in progress" under 15 s becomes new again', () async {
+    final schema = await verifier.schemaAt(7);
+    schema.rawDatabase
+      ..execute(
+        'INSERT INTO podcasts (id, feed_url, title, subscribed_at) '
+        "VALUES (1, 'https://example.com/feed', 'P', 1767225600)",
+      )
+      ..execute(
+        'INSERT INTO episodes '
+        '(podcast_id, guid, title, audio_url, added_at, status, position_ms) '
+        "VALUES (1, 'short', 'short', 'u1', 1767225600, 'inProgress', 5000), "
+        "(1, 'long', 'long', 'u2', 1767225600, 'inProgress', 15000), "
+        "(1, 'played', 'played', 'u3', 1767225600, 'played', 0), "
+        "(1, 'new', 'new', 'u4', 1767225600, 'newEpisode', 0)",
+      );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    final byGuid = {
+      for (final e in await db.select(db.episodes).get())
+        e.guid: (e.status, e.positionMs),
+    };
+    expect(byGuid, {
+      'short': (EpisodeStatus.newEpisode, 0),
+      'long': (EpisodeStatus.inProgress, 15000),
+      'played': (EpisodeStatus.played, 0),
+      'new': (EpisodeStatus.newEpisode, 0),
+    });
+    await db.close();
+  });
 }
