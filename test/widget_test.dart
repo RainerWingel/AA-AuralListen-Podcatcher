@@ -17,6 +17,7 @@ import 'package:aapodcastguru/data/providers.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
+import 'package:aapodcastguru/features/player/player_screen.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
 import 'package:aapodcastguru/features/settings/settings_screen.dart';
 import 'package:drift/drift.dart' show Value;
@@ -1001,6 +1002,50 @@ void main() {
       await tester.tap(find.text('Erste Folge').first); // the list entry
       await settle(tester);
       expect(find.textContaining('nicht geladen werden'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'the player shows a "downloaded" mark for downloaded episodes',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.runAsync(handler.pause);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      final inPlayer = find.descendant(
+        of: find.byType(PlayerScreen),
+        matching: find.byTooltip('Heruntergeladen'),
+      );
+      expect(inPlayer, findsNothing, reason: 'streamed');
+
+      // Download it while the player is open: the mark appears once done.
+      await tester.runAsync(
+        () =>
+            ProviderScope.containerOf(tester.element(find.byType(PlayerScreen)))
+                .read(downloadServiceProvider)
+                .download(handler.currentEpisodeId!),
+      );
+      await settle(tester);
+      expect(inPlayer, findsNothing, reason: 'still running');
+      final id = downloadEngine.active.keys.single;
+      await tester.runAsync(() => downloadEngine.finish(id, bytes: 2048));
+      await settle(tester);
+      expect(inPlayer, findsOneWidget);
 
       await disposeApp(tester);
     },

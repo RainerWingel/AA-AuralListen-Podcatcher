@@ -6,11 +6,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../data/db/app_database.dart' show DownloadState;
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import 'boost_sheet.dart';
 import 'chapters_and_bookmarks.dart';
 import 'player_controls.dart';
+
+/// "Downloaded" mark in front of the podcast name – only when the file is
+/// complete (playback then comes from the phone, not the network).
+class _DownloadedIcon extends ConsumerWidget {
+  const _DownloadedIcon({required this.episodeId});
+
+  final int episodeId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final done = ref.watch(
+      downloadStatesProvider.select(
+        (s) => s.value?[episodeId]?.state == DownloadState.done,
+      ),
+    );
+    if (!done) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(end: 6),
+      child: Tooltip(
+        message: AppLocalizations.of(context).downloadDone,
+        child: Icon(
+          Icons.download_done,
+          size: 18,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
 
 /// Full-screen player (opened from the mini player).
 class PlayerScreen extends ConsumerWidget {
@@ -59,12 +89,21 @@ class PlayerScreen extends ConsumerWidget {
                           style: theme.textTheme.titleLarge,
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          item.album ?? '',
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (item.extras?['episodeId'] case final int id)
+                              _DownloadedIcon(episodeId: id),
+                            Flexible(
+                              child: Text(
+                                item.album ?? '',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         _SeekBar(total: item.duration),
