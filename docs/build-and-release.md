@@ -66,6 +66,8 @@ Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für 
    (kurze SHA lehnt GitHub ab). Notizen auf Deutsch, mit SHA-256 der APK.
 - v1.0.0 (2026-09-27): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.0.0
 - v1.1.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.1.0
+- v1.2.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.0 – erster
+  Release unter dem neuen Namen und Paketnamen (`io.github.rainerwingel.aurallisten`)
 
 ## CI (GitHub Actions)
 Bei jedem Push/PR: `flutter pub get` → `dart format --set-exit-if-changed` → `flutter analyze` → `flutter test`
