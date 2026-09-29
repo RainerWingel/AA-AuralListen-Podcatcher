@@ -1594,6 +1594,70 @@ void main() {
     await disposeApp(tester);
   });
 
+  testWidgets('a playlist gets a category color', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Playlists'));
+    await settle(tester);
+    Color? tileColor() => tester
+        .widget<ListTile>(find.widgetWithText(ListTile, 'Wiedergabeliste'))
+        .tileColor;
+    expect(tileColor(), isNull);
+
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    await tester.tap(find.text('Farbe…'));
+    await settle(tester);
+    for (final name in [
+      'Rot',
+      'Orange',
+      'Gelb',
+      'Grün',
+      'Blau',
+      'Indigo',
+      'Violett',
+      'Keine Farbe',
+    ]) {
+      expect(find.byTooltip(name), findsOneWidget, reason: name);
+    }
+    await tester.tap(find.byTooltip('Grün'));
+    await settle(tester);
+    final playlist = await tester.runAsync(
+      () => db.select(db.playlists).getSingle(),
+    );
+    expect(playlist!.color, PlaylistColor.green);
+    final green = tileColor();
+    expect(green, isNotNull);
+
+    // The playlist's own screen uses the same background.
+    await tester.tap(find.text('Wiedergabeliste'));
+    await settle(tester);
+    expect(
+      tester.widget<Scaffold>(find.byType(Scaffold).last).backgroundColor,
+      green,
+    );
+
+    // "Keine Farbe" removes it again.
+    ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+        .read(routerProvider)
+        .go(Routes.playlists);
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    await tester.tap(find.text('Farbe…'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Keine Farbe'));
+    await settle(tester);
+    expect(tileColor(), isNull);
+
+    await disposeApp(tester);
+  });
+
   testWidgets(
     'a download can be added to a chosen playlist',
     timeout: timeout,

@@ -220,6 +220,18 @@
   "downloadLimitHint": "Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen.",
   "playlistNew": "Neue Playlist",
   "playlistName": "Name",
+  "playlistColor": "Farbe…",
+  "@playlistColor": {
+    "description": "Playlist menu: pick a category color (dialog title too)."
+  },
+  "playlistColorNone": "Keine Farbe",
+  "colorRed": "Rot",
+  "colorOrange": "Orange",
+  "colorYellow": "Gelb",
+  "colorGreen": "Grün",
+  "colorBlue": "Blau",
+  "colorIndigo": "Indigo",
+  "colorViolet": "Violett",
   "playlistRename": "Umbenennen",
   "playlistDelete": "Playlist löschen",
   "playlistDeleteConfirm": "„{name}“ löschen? Die Folgen selbst bleiben erhalten.",

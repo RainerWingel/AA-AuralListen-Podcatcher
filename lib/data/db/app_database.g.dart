@@ -2736,12 +2736,22 @@ class $PlaylistsTable extends Playlists
     requiredDuringInsert: false,
   );
   @override
+  late final GeneratedColumnWithTypeConverter<PlaylistColor?, String> color =
+      GeneratedColumn<String>(
+        'color',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<PlaylistColor?>($PlaylistsTable.$convertercolorn);
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     name,
     sortOrder,
     createdAt,
     lastEpisodeId,
+    color,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2818,6 +2828,12 @@ class $PlaylistsTable extends Playlists
         DriftSqlType.int,
         data['${effectivePrefix}last_episode_id'],
       ),
+      color: $PlaylistsTable.$convertercolorn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}color'],
+        ),
+      ),
     );
   }
 
@@ -2825,6 +2841,11 @@ class $PlaylistsTable extends Playlists
   $PlaylistsTable createAlias(String alias) {
     return $PlaylistsTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<PlaylistColor, String, String> $convertercolor =
+      const EnumNameConverter<PlaylistColor>(PlaylistColor.values);
+  static JsonTypeConverter2<PlaylistColor?, String?, String?> $convertercolorn =
+      JsonTypeConverter2.asNullable($convertercolor);
 }
 
 class Playlist extends DataClass implements Insertable<Playlist> {
@@ -2839,12 +2860,16 @@ class Playlist extends DataClass implements Insertable<Playlist> {
   /// foreign key: it may point to an episode that has left the playlist
   /// meanwhile; resuming then starts at the top (docs/playlists.md).
   final int? lastEpisodeId;
+
+  /// Category color (background in the lists) – schema v9. Null = none.
+  final PlaylistColor? color;
   const Playlist({
     required this.id,
     required this.name,
     required this.sortOrder,
     required this.createdAt,
     this.lastEpisodeId,
+    this.color,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2855,6 +2880,11 @@ class Playlist extends DataClass implements Insertable<Playlist> {
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || lastEpisodeId != null) {
       map['last_episode_id'] = Variable<int>(lastEpisodeId);
+    }
+    if (!nullToAbsent || color != null) {
+      map['color'] = Variable<String>(
+        $PlaylistsTable.$convertercolorn.toSql(color),
+      );
     }
     return map;
   }
@@ -2868,6 +2898,9 @@ class Playlist extends DataClass implements Insertable<Playlist> {
       lastEpisodeId: lastEpisodeId == null && nullToAbsent
           ? const Value.absent()
           : Value(lastEpisodeId),
+      color: color == null && nullToAbsent
+          ? const Value.absent()
+          : Value(color),
     );
   }
 
@@ -2882,6 +2915,9 @@ class Playlist extends DataClass implements Insertable<Playlist> {
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       lastEpisodeId: serializer.fromJson<int?>(json['lastEpisodeId']),
+      color: $PlaylistsTable.$convertercolorn.fromJson(
+        serializer.fromJson<String?>(json['color']),
+      ),
     );
   }
   @override
@@ -2893,6 +2929,9 @@ class Playlist extends DataClass implements Insertable<Playlist> {
       'sortOrder': serializer.toJson<int>(sortOrder),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'lastEpisodeId': serializer.toJson<int?>(lastEpisodeId),
+      'color': serializer.toJson<String?>(
+        $PlaylistsTable.$convertercolorn.toJson(color),
+      ),
     };
   }
 
@@ -2902,6 +2941,7 @@ class Playlist extends DataClass implements Insertable<Playlist> {
     int? sortOrder,
     DateTime? createdAt,
     Value<int?> lastEpisodeId = const Value.absent(),
+    Value<PlaylistColor?> color = const Value.absent(),
   }) => Playlist(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -2910,6 +2950,7 @@ class Playlist extends DataClass implements Insertable<Playlist> {
     lastEpisodeId: lastEpisodeId.present
         ? lastEpisodeId.value
         : this.lastEpisodeId,
+    color: color.present ? color.value : this.color,
   );
   Playlist copyWithCompanion(PlaylistsCompanion data) {
     return Playlist(
@@ -2920,6 +2961,7 @@ class Playlist extends DataClass implements Insertable<Playlist> {
       lastEpisodeId: data.lastEpisodeId.present
           ? data.lastEpisodeId.value
           : this.lastEpisodeId,
+      color: data.color.present ? data.color.value : this.color,
     );
   }
 
@@ -2930,14 +2972,15 @@ class Playlist extends DataClass implements Insertable<Playlist> {
           ..write('name: $name, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt, ')
-          ..write('lastEpisodeId: $lastEpisodeId')
+          ..write('lastEpisodeId: $lastEpisodeId, ')
+          ..write('color: $color')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, name, sortOrder, createdAt, lastEpisodeId);
+      Object.hash(id, name, sortOrder, createdAt, lastEpisodeId, color);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2946,7 +2989,8 @@ class Playlist extends DataClass implements Insertable<Playlist> {
           other.name == this.name &&
           other.sortOrder == this.sortOrder &&
           other.createdAt == this.createdAt &&
-          other.lastEpisodeId == this.lastEpisodeId);
+          other.lastEpisodeId == this.lastEpisodeId &&
+          other.color == this.color);
 }
 
 class PlaylistsCompanion extends UpdateCompanion<Playlist> {
@@ -2955,12 +2999,14 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
   final Value<int> sortOrder;
   final Value<DateTime> createdAt;
   final Value<int?> lastEpisodeId;
+  final Value<PlaylistColor?> color;
   const PlaylistsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.lastEpisodeId = const Value.absent(),
+    this.color = const Value.absent(),
   });
   PlaylistsCompanion.insert({
     this.id = const Value.absent(),
@@ -2968,6 +3014,7 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
     this.sortOrder = const Value.absent(),
     required DateTime createdAt,
     this.lastEpisodeId = const Value.absent(),
+    this.color = const Value.absent(),
   }) : name = Value(name),
        createdAt = Value(createdAt);
   static Insertable<Playlist> custom({
@@ -2976,6 +3023,7 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
     Expression<int>? sortOrder,
     Expression<DateTime>? createdAt,
     Expression<int>? lastEpisodeId,
+    Expression<String>? color,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2983,6 +3031,7 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
       if (sortOrder != null) 'sort_order': sortOrder,
       if (createdAt != null) 'created_at': createdAt,
       if (lastEpisodeId != null) 'last_episode_id': lastEpisodeId,
+      if (color != null) 'color': color,
     });
   }
 
@@ -2992,6 +3041,7 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
     Value<int>? sortOrder,
     Value<DateTime>? createdAt,
     Value<int?>? lastEpisodeId,
+    Value<PlaylistColor?>? color,
   }) {
     return PlaylistsCompanion(
       id: id ?? this.id,
@@ -2999,6 +3049,7 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
       lastEpisodeId: lastEpisodeId ?? this.lastEpisodeId,
+      color: color ?? this.color,
     );
   }
 
@@ -3020,6 +3071,11 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
     if (lastEpisodeId.present) {
       map['last_episode_id'] = Variable<int>(lastEpisodeId.value);
     }
+    if (color.present) {
+      map['color'] = Variable<String>(
+        $PlaylistsTable.$convertercolorn.toSql(color.value),
+      );
+    }
     return map;
   }
 
@@ -3030,7 +3086,8 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
           ..write('name: $name, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt, ')
-          ..write('lastEpisodeId: $lastEpisodeId')
+          ..write('lastEpisodeId: $lastEpisodeId, ')
+          ..write('color: $color')
           ..write(')'))
         .toString();
   }
@@ -6116,6 +6173,7 @@ typedef $$PlaylistsTableCreateCompanionBuilder = PlaylistsCompanion Function({
   Value<int> sortOrder,
   required DateTime createdAt,
   Value<int?> lastEpisodeId,
+  Value<PlaylistColor?> color,
 });
 typedef $$PlaylistsTableUpdateCompanionBuilder = PlaylistsCompanion Function({
   Value<int> id,
@@ -6123,6 +6181,7 @@ typedef $$PlaylistsTableUpdateCompanionBuilder = PlaylistsCompanion Function({
   Value<int> sortOrder,
   Value<DateTime> createdAt,
   Value<int?> lastEpisodeId,
+  Value<PlaylistColor?> color,
 });
 
 final class $$PlaylistsTableReferences
@@ -6180,6 +6239,12 @@ class $$PlaylistsTableFilterComposer
   ColumnFilters<int> get lastEpisodeId => $composableBuilder(
     column: $table.lastEpisodeId,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<PlaylistColor?, PlaylistColor, String>
+  get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   Expression<bool> playlistItemsRefs(
@@ -6241,6 +6306,11 @@ class $$PlaylistsTableOrderingComposer
     column: $table.lastEpisodeId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get color => $composableBuilder(
+    column: $table.color,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PlaylistsTableAnnotationComposer
@@ -6268,6 +6338,9 @@ class $$PlaylistsTableAnnotationComposer
     column: $table.lastEpisodeId,
     builder: (column) => column,
   );
+
+  GeneratedColumnWithTypeConverter<PlaylistColor?, String> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
 
   Expression<T> playlistItemsRefs<T extends Object>(
     Expression<T> Function($$PlaylistItemsTableAnnotationComposer a) f,
@@ -6328,12 +6401,14 @@ class $$PlaylistsTableTableManager
                 Value<int> sortOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int?> lastEpisodeId = const Value.absent(),
+                Value<PlaylistColor?> color = const Value.absent(),
               }) => PlaylistsCompanion(
                 id: id,
                 name: name,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
                 lastEpisodeId: lastEpisodeId,
+                color: color,
               ),
           createCompanionCallback:
               ({
@@ -6342,12 +6417,14 @@ class $$PlaylistsTableTableManager
                 Value<int> sortOrder = const Value.absent(),
                 required DateTime createdAt,
                 Value<int?> lastEpisodeId = const Value.absent(),
+                Value<PlaylistColor?> color = const Value.absent(),
               }) => PlaylistsCompanion.insert(
                 id: id,
                 name: name,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
                 lastEpisodeId: lastEpisodeId,
+                color: color,
               ),
           withReferenceMapper: (p0) => p0
               .map(

@@ -369,6 +369,33 @@ class AppLocalizationsDe extends AppLocalizations {
   String get playlistName => 'Name';
 
   @override
+  String get playlistColor => 'Farbe…';
+
+  @override
+  String get playlistColorNone => 'Keine Farbe';
+
+  @override
+  String get colorRed => 'Rot';
+
+  @override
+  String get colorOrange => 'Orange';
+
+  @override
+  String get colorYellow => 'Gelb';
+
+  @override
+  String get colorGreen => 'Grün';
+
+  @override
+  String get colorBlue => 'Blau';
+
+  @override
+  String get colorIndigo => 'Indigo';
+
+  @override
+  String get colorViolet => 'Violett';
+
+  @override
   String get playlistRename => 'Umbenennen';
 
   @override

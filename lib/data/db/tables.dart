@@ -10,6 +10,10 @@ enum DownloadState { queued, running, done, failed }
 /// Stored by name (textEnum), so renaming a value needs a migration.
 enum EpisodeStatus { newEpisode, inProgress, played }
 
+/// Category color of a playlist (rainbow order). Stored by name (textEnum),
+/// so renaming a value needs a migration. RGB values: playlist_colors.dart.
+enum PlaylistColor { red, orange, yellow, green, blue, indigo, violet }
+
 @DataClassName('Podcast')
 class Podcasts extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -130,6 +134,9 @@ class Playlists extends Table {
   /// foreign key: it may point to an episode that has left the playlist
   /// meanwhile; resuming then starts at the top (docs/playlists.md).
   IntColumn get lastEpisodeId => integer().nullable()();
+
+  /// Category color (background in the lists) – schema v9. Null = none.
+  TextColumn get color => textEnum<PlaylistColor>().nullable()();
 }
 
 /// Episodes in a playlist. An episode appears at most once per playlist.

@@ -146,6 +146,12 @@ class PlaylistRepository {
         ?.episodeId;
   }
 
+  /// Sets the category color (null = none).
+  Future<void> setColor(int playlistId, PlaylistColor? color) =>
+      (_db.update(_db.playlists)..where((p) => p.id.equals(playlistId))).write(
+        PlaylistsCompanion(color: Value(color)),
+      );
+
   /// Remembers [episodeId] as the one last played from [playlistId].
   Future<void> setLastEpisode(int playlistId, int episodeId) =>
       (_db.update(_db.playlists)..where((p) => p.id.equals(playlistId))).write(

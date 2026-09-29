@@ -156,5 +156,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Sortieren nur in der geöffneten Playlist, in der Übersicht stattdessen „Fortsetzen"
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Zusatz – Playlist-Farben (2026-09-29)
+- [x] 7 Regenbogenfarben + „Keine Farbe" im Playlist-Menü (Schema v9), Farbton in Übersicht und Playlist-Fenster
+- [ ] Praxistest auf dem S25 (Benutzer)
+
 ## Offene Punkte
 - keine

@@ -170,6 +170,17 @@ void main() {
     },
   );
 
+  test('setColor stores and clears the category color', () async {
+    final list = await repo.create('Bunt');
+    Future<PlaylistColor?> color() async =>
+        (await repo.playlists()).firstWhere((p) => p.id == list).color;
+    expect(await color(), isNull);
+    await repo.setColor(list, PlaylistColor.green);
+    expect(await color(), PlaylistColor.green);
+    await repo.setColor(list, null);
+    expect(await color(), isNull);
+  });
+
   test('nextAfter reads the current state', () async {
     final list = (await repo.playlists()).single.id;
     final a = await addEpisode('A');

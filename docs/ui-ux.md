@@ -42,7 +42,7 @@ Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskrei
 
 ## Playlists
 - **Playlists-Tab:** Liste mit Name und „N Folgen · Dauer", Griff ≡ zum Sortieren, ⋮ (Fortsetzen, Alles downloaden,
-  Umbenennen, Löschen – `playlists.md`),
+  Umbenennen, Farbe…, Löschen – `playlists.md`), farbige Playlists mit Farbton im Hintergrund,
   AppBar „Neue Playlist". Tippen öffnet die Playlist.
 - **Playlist:** Folgen in Reihenfolge (mit Podcast-Name), Griff ≡ zum Verschieben, nach links wischen = entfernen
   (Snackbar mit „Rückgängig"). Tippen spielt ab und macht die Playlist aktiv. AppBar: ▶ „Fortsetzen" (zuletzt gespielte Folge, sonst oben), ⋮ mit

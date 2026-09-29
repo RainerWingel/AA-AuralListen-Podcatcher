@@ -9,6 +9,7 @@ import '../../data/db/app_database.dart';
 import '../../data/playlist_repository.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import 'playlist_colors.dart';
 
 /// Dialog → new playlist. Returns its id, or null if cancelled.
 Future<int?> createPlaylist(BuildContext context, WidgetRef ref) async {
@@ -219,6 +220,11 @@ List<PopupMenuEntry<void>> playlistMenuItems(
       Icons.edit_outlined,
       l10n.playlistRename,
       () => renamePlaylist(context, ref, playlist),
+    ),
+    item(
+      Icons.palette_outlined,
+      l10n.playlistColor,
+      () => choosePlaylistColor(context, ref, playlist),
     ),
     item(Icons.delete_outline, l10n.playlistDelete, () async {
       if (await deletePlaylist(context, ref, playlist)) onDeleted?.call();

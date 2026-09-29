@@ -153,4 +153,22 @@ void main() {
     });
     await db.close();
   });
+
+  test('upgrade v8 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(8);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v9: playlists have no color yet', () async {
+    final db = AppDatabase.forTesting(
+      (await verifier.schemaAt(8)).newConnection(),
+    );
+    expect(
+      (await db.select(db.playlists).get()).every((p) => p.color == null),
+      isTrue,
+    );
+    await db.close();
+  });
 }

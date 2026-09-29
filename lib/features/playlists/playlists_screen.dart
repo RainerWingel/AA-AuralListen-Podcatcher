@@ -9,6 +9,7 @@ import '../../data/playlist_repository.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import 'playlist_actions.dart';
+import 'playlist_colors.dart';
 
 /// All playlists; drag to reorder, tap to open.
 class PlaylistsScreen extends ConsumerWidget {
@@ -76,6 +77,7 @@ class _PlaylistTile extends ConsumerWidget {
         ? ' · ${formatEpisodeDuration(l10n, summary.duration)}'
         : '';
     return ListTile(
+      tileColor: playlistBackground(context, playlist.color),
       leading: const Icon(Icons.playlist_play, size: 32),
       title: Text(playlist.name),
       subtitle: Text(l10n.playlistSummary(summary.count, duration)),

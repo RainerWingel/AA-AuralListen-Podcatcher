@@ -10,6 +10,7 @@ import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../episodes/episode_tile.dart';
 import 'playlist_actions.dart';
+import 'playlist_colors.dart';
 
 /// Episodes of one playlist: drag to reorder, swipe to remove, tap to play
 /// (the playlist then continues automatically).
@@ -45,8 +46,12 @@ class PlaylistScreen extends ConsumerWidget {
     final entries = ref.watch(playlistEntriesProvider(playlistId));
     final items = entries.value ?? const <PlaylistEntry>[];
 
+    // Category color: whole screen incl. app bar in the soft tint.
+    final background = playlistBackground(context, playlist?.color);
     return Scaffold(
+      backgroundColor: background,
       appBar: AppBar(
+        backgroundColor: background,
         title: Text(playlist?.name ?? ''),
         actions: [
           if (items.isNotEmpty)

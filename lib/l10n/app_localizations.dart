@@ -704,6 +704,60 @@ abstract class AppLocalizations {
   /// **'Name'**
   String get playlistName;
 
+  /// Playlist menu: pick a category color (dialog title too).
+  ///
+  /// In de, this message translates to:
+  /// **'Farbe…'**
+  String get playlistColor;
+
+  /// No description provided for @playlistColorNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine Farbe'**
+  String get playlistColorNone;
+
+  /// No description provided for @colorRed.
+  ///
+  /// In de, this message translates to:
+  /// **'Rot'**
+  String get colorRed;
+
+  /// No description provided for @colorOrange.
+  ///
+  /// In de, this message translates to:
+  /// **'Orange'**
+  String get colorOrange;
+
+  /// No description provided for @colorYellow.
+  ///
+  /// In de, this message translates to:
+  /// **'Gelb'**
+  String get colorYellow;
+
+  /// No description provided for @colorGreen.
+  ///
+  /// In de, this message translates to:
+  /// **'Grün'**
+  String get colorGreen;
+
+  /// No description provided for @colorBlue.
+  ///
+  /// In de, this message translates to:
+  /// **'Blau'**
+  String get colorBlue;
+
+  /// No description provided for @colorIndigo.
+  ///
+  /// In de, this message translates to:
+  /// **'Indigo'**
+  String get colorIndigo;
+
+  /// No description provided for @colorViolet.
+  ///
+  /// In de, this message translates to:
+  /// **'Violett'**
+  String get colorViolet;
+
   /// No description provided for @playlistRename.
   ///
   /// In de, this message translates to:

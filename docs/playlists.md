@@ -20,6 +20,10 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
   (gespielt, entfernt), die oberste. Jede Playlist merkt sich ihre eigene Folge.
   - Gemerkt wird, sobald eine Folge aus der Playlist startet (auch automatisches Weiterspielen) und nochmal bei Pause.
     Dieselbe Folge woanders gestartet (z. B. auf „Start") ändert den Merker nicht.
+- **Farbe** (Benutzerwunsch 2026-09-29): ⋮ → „Farbe…" → Dialog mit 7 Regenbogenfarben (Rot, Orange, Gelb, Grün, Blau,
+  Indigo, Violett) und „Keine Farbe" (`playlist_colors.dart`, gespeichert in `playlists.color`). Die Playlist bekommt
+  in der Übersicht (Kachel) und in ihrem eigenen Fenster (Hintergrund inkl. AppBar) einen sanften Farbton: Farbe mit
+  22 % (hell) bzw. 30 % (dunkel) über die Oberfläche gemischt, damit der Text lesbar bleibt.
 - **Playlist-Menü ⋮** (Übersicht und geöffnete Playlist, gemeinsam: `playlistMenuItems`), Benutzerwunsch 2026-09-29:
   - **Übersicht:** Fortsetzen (ausgegraut bei leerer Playlist), Alles downloaden, Umbenennen, Löschen.
   - **Geöffnete Playlist:** die drei Sortierungen, Alles downloaden, Umbenennen, Löschen (Sortieren nur hier).
@@ -32,7 +36,7 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
   - **Alles downloaden**: Rückfrage mit Anzahl der fehlenden Folgen und ungefährer Größe; lädt sofort (auch mobil),
     überspringt fertige/laufende Downloads, wiederholt fehlgeschlagene. Ungespielte Downloads zählen nicht zum
     automatischen Aufräumen (siehe `eviction.md`).
-  - Umbenennen, Playlist löschen.
+  - Umbenennen, Farbe…, Playlist löschen.
 
 ## Ganze Podcasts in eine Playlist (Benutzerwunsch 2026-09-28)
 Abos-Tab → **langes Drücken** auf eine Kachel → Menü (`play_podcast_episodes.dart`):
