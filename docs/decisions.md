@@ -60,3 +60,4 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-29 · **Umbenennung in „AA-AuralListen Podcatcher"** (markenrechtlich, Benutzer) · Launcher „AuralListen", applicationId `io.github.rainerwingel.aurallisten` (neue App, Neustart ohne Datenübernahme – alte Backups werden nicht angenommen); Keystore, Dart-Paket- und DB-Dateiname bleiben.
 - 2026-09-29 · **Kein Akku-Ausnahme-Dialog mehr** · nur Status + Knopf zu den App-Einstellungen; das Recht `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` ist für den Play Store heikel.
 - 2026-09-29 · **Play Store geplant** (hebt „nur Sideload" auf) · Datenschutzerklärung nötig, Klartext-HTTP im Datensicherheits-Formular angeben.
+- 2026-09-29 · **Weitere Sprachen geplant** (hebt „Nur Deutsch" auf, Benutzer) · vorerst weiter nur `app_de.arb`; die gen-l10n-Struktur ist dafür schon vorbereitet. README weist darauf hin.
