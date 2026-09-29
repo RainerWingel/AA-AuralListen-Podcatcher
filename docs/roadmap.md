@@ -138,9 +138,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 ## Umbenennung „AA-AuralListen Podcatcher" (2026-09-29)
 - [x] Anzeigename voll / Launcher „AuralListen", applicationId `io.github.rainerwingel.aurallisten`, User-Agent, Backup-/OPML-Namen
 - [x] Akku: kein Ausnahme-Dialog mehr, nur Knopf zu den App-Einstellungen
-- [ ] GitHub-Repo in `AA-AuralListen-Podcatcher` umbenennen (gemeinsam mit dem Benutzer), Remote + Links anpassen
 - [ ] Alte App deinstallieren, neue einrichten (Benutzer; keine Datenübernahme)
-- [ ] Datenschutzerklärung für den Play Store (Entwurf + GitHub Pages)
+- [x] Datenschutzerklärung (`docs/datenschutz.md`, GitHub Pages)
+- [x] GitHub-Repo umbenannt in `AA-AuralListen-Podcatcher`, Remote + Links angepasst
 
 ## Offene Punkte
 - keine

@@ -47,6 +47,15 @@ flutter build apk --release --split-per-abi  # nur passende CPU-Architektur → 
 adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
+## GitHub Pages (Datenschutzerklärung)
+- Quelle: `main`, Ordner `/docs`. `docs/_config.yml` veröffentlicht **nur** `index.md` und `datenschutz.md`
+  (interne Doku bleibt draußen).
+- Adresse: https://rainerwingel.github.io/AA-AuralListen-Podcatcher/datenschutz/ – für die Play Console.
+- Ändert sich, welche Server die App abruft, welche Berechtigungen sie hat oder was sie speichert: `datenschutz.md`
+  im selben Commit anpassen (Stand-Datum!).
+- Kontakt ist bewusst pseudonym (GitHub-Issues). Für den Play Store muss der Entwicklername dort zur Angabe in der
+  Play Console passen; ggf. dort die Kontakt-E-Mail ergänzen (Benutzer).
+
 ## GitHub-Release
 Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für jeden herunterladbar).
 1. `version:` in `pubspec.yaml` erhöhen (Name + Build-Nummer) **und** `appVersion` in `lib/core/app_info.dart`

@@ -1,0 +1,9 @@
+# GitHub Pages for the public pages only (privacy policy for Google Play).
+# The other files in docs/ are internal agent docs and are not published.
+title: AA-AuralListen Podcatcher
+lang: de
+exclude:
+  - "*.md"
+include:
+  - index.md
+  - datenschutz.md
