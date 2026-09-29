@@ -1505,7 +1505,7 @@ void main() {
   );
 
   testWidgets(
-    'Optionen → Info: version, developer, tip and links',
+    'Optionen → Info: version, developer and links',
     timeout: timeout,
     (tester) async {
       tester.view
@@ -1523,16 +1523,15 @@ void main() {
       // Version comes from Android (here: the fake), not from a constant.
       expect(find.text('Version 1.2.0 (Build 3)'), findsOneWidget);
       expect(find.text('Entwickelt von Artem A.'), findsOneWidget);
-      expect(
-        find.textContaining('kannst du mir ein Trinkgeld über PayPal senden'),
-        findsOneWidget,
-      );
+      // No payment link in the app – support is offered on GitHub.
+      expect(find.textContaining('PayPal'), findsNothing);
+      expect(find.textContaining('Trinkgeld'), findsNothing);
 
-      await tester.tap(find.text('paypal.me/Yama83'));
+      await tester.tap(find.text('Quellcode auf GitHub'));
       await settle(tester);
       await tester.tap(find.text('Datenschutzerklärung'));
       await settle(tester);
-      expect(appPlatform.opened, [tipUrl, privacyPolicyUrl]);
+      expect(appPlatform.opened, [sourceCodeUrl, privacyPolicyUrl]);
 
       await disposeApp(tester);
     },

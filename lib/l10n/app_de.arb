@@ -623,9 +623,8 @@
       }
     }
   },
-  "infoTipText": "Wenn dir der AA-AuralListen Podcatcher gefällt und du die Entwicklung freiwillig unterstützen möchtest, kannst du mir ein Trinkgeld über PayPal senden.",
-  "infoTipButton": "paypal.me/Yama83",
   "infoPrivacy": "Datenschutzerklärung",
   "infoSourceCode": "Quellcode auf GitHub",
-  "infoLinkFailed": "Der Link konnte nicht geöffnet werden."
+  "infoLinkFailed": "Der Link konnte nicht geöffnet werden.",
+  "infoSourceCodeHint": "Quellcode, Releases und Möglichkeit zur freiwilligen Unterstützung"
 }

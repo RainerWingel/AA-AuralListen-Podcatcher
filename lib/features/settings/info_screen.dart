@@ -6,7 +6,7 @@ import '../../core/app_platform.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Optionen → Info: name, installed version, developer, tip and links.
+/// Optionen → Info: name, installed version, developer and links.
 class InfoScreen extends ConsumerWidget {
   const InfoScreen({super.key});
 
@@ -62,27 +62,6 @@ class InfoScreen extends ConsumerWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          if (showTipLink)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(l10n.infoTipText),
-                      const SizedBox(height: 12),
-                      FilledButton.tonalIcon(
-                        onPressed: () => _open(context, ref, tipUrl),
-                        icon: const Icon(Icons.favorite_outline),
-                        label: Text(l10n.infoTipButton),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           const SizedBox(height: 8),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
@@ -90,9 +69,12 @@ class InfoScreen extends ConsumerWidget {
             trailing: const Icon(Icons.open_in_new),
             onTap: () => _open(context, ref, privacyPolicyUrl),
           ),
+          // Support (PayPal) lives on GitHub, not in the app: no payment
+          // link in the app (Google Play policy), docs/decisions.md.
           ListTile(
             leading: const Icon(Icons.code),
             title: Text(l10n.infoSourceCode),
+            subtitle: Text(l10n.infoSourceCodeHint),
             trailing: const Icon(Icons.open_in_new),
             onTap: () => _open(context, ref, sourceCodeUrl),
           ),

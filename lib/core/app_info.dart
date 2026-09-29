@@ -8,12 +8,6 @@ const appName = 'AA-AuralListen Podcatcher';
 /// Developer as shown on the info page and in the privacy policy.
 const appDeveloper = 'Artem A.';
 
-/// Voluntary tip via PayPal (info page). Google Play generally does not
-/// allow external payment links for tips – set to false for a Play Store
-/// build (docs/build-and-release.md).
-const showTipLink = true;
-const tipUrl = 'https://paypal.me/Yama83';
-
 const privacyPolicyUrl =
     'https://rainerwingel.github.io/AA-AuralListen-Podcatcher/datenschutz/';
 const sourceCodeUrl =

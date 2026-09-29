@@ -1444,18 +1444,6 @@ abstract class AppLocalizations {
   /// **'Entwickelt von {name}'**
   String infoDeveloper(String name);
 
-  /// No description provided for @infoTipText.
-  ///
-  /// In de, this message translates to:
-  /// **'Wenn dir der AA-AuralListen Podcatcher gefällt und du die Entwicklung freiwillig unterstützen möchtest, kannst du mir ein Trinkgeld über PayPal senden.'**
-  String get infoTipText;
-
-  /// No description provided for @infoTipButton.
-  ///
-  /// In de, this message translates to:
-  /// **'paypal.me/Yama83'**
-  String get infoTipButton;
-
   /// No description provided for @infoPrivacy.
   ///
   /// In de, this message translates to:
@@ -1473,6 +1461,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Der Link konnte nicht geöffnet werden.'**
   String get infoLinkFailed;
+
+  /// No description provided for @infoSourceCodeHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Quellcode, Releases und Möglichkeit zur freiwilligen Unterstützung'**
+  String get infoSourceCodeHint;
 }
 
 class _AppLocalizationsDelegate

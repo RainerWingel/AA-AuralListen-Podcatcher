@@ -143,8 +143,8 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] GitHub-Repo umbenannt in `AA-AuralListen-Podcatcher`, Remote + Links angepasst
 
 ## Zusatz – Info-Seite
-- [x] Optionen → Info: Version automatisch, Entwickler „Artem A.", PayPal-Trinkgeld, Links
-- [ ] Vor Play-Store-Veröffentlichung: `showTipLink = false` (Richtlinie)
+- [x] Optionen → Info: Version automatisch, Entwickler „Artem A.", Links (Datenschutz, GitHub)
+- [x] Freiwillige Unterstützung per PayPal nur auf GitHub (README, Sponsor-Knopf)
 
 ## Offene Punkte
 - keine

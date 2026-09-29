@@ -56,11 +56,6 @@ adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 - Kontakt ist bewusst pseudonym (GitHub-Issues). Für den Play Store muss der Entwicklername dort zur Angabe in der
   Play Console passen; ggf. dort die Kontakt-E-Mail ergänzen (Benutzer).
 
-## Play-Store-Build: Trinkgeld-Link
-Google Play erlaubt externe Zahlungslinks für Trinkgeld an Entwickler in der Regel nicht (nur Play-Abrechnung bzw.
-geprüfte gemeinnützige Organisationen). Für eine Store-Version `showTipLink = false` in `lib/core/app_info.dart`
-setzen; die GitHub-APK behält den PayPal-Link.
-
 ## GitHub-Release
 Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für jeden herunterladbar).
 1. `version:` in `pubspec.yaml` erhöhen (Name + Build-Nummer) **und** `appVersion` in `lib/core/app_info.dart`

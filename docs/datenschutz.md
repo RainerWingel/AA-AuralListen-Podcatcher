@@ -39,9 +39,8 @@ Wie bei jedem Abruf im Internet sehen diese Server dabei technisch notwendige An
 dort sind die jeweiligen Betreiber verantwortlich; es gelten deren Datenschutzerklärungen, z. B.
 [Apple](https://www.apple.com/de/legal/privacy/) und [fyyd](https://fyyd.de/datenschutz).
 
-Die Links auf der Info-Seite der App (Datenschutzerklärung, Quellcode auf GitHub, freiwilliges Trinkgeld über
-PayPal) öffnen nur deinen Browser; die App selbst überträgt dabei nichts. Auf diesen Seiten gelten die
-Datenschutzbestimmungen von GitHub bzw. PayPal.
+Die Links auf der Info-Seite der App (Datenschutzerklärung, Quellcode auf GitHub) öffnen nur deinen Browser; die
+App selbst überträgt dabei nichts. Auf GitHub gelten die Datenschutzbestimmungen von GitHub.
 
 Manche Podcast-Anbieter liefern Dateien noch über unverschlüsseltes `http://` aus. Die App lädt sie trotzdem, damit
 diese Podcasts funktionieren; solche Übertragungen sind dann nicht verschlüsselt.

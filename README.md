@@ -45,6 +45,11 @@ Die App ist (noch) nicht im Play Store. Die signierte APK gibt es unter
 3. Empfehlung: In den App-Einstellungen unter **Akku → „Nicht eingeschränkt"** wählen (in der App: Optionen →
    Hören → „Hintergrund-Wiedergabe"), damit Android lange Wiedergaben mit ausgeschaltetem Bildschirm nicht beendet.
 
+## Unterstützen
+
+Wenn dir der AA-AuralListen Podcatcher gefällt und du die Entwicklung freiwillig unterstützen möchtest, kannst du mir
+ein Trinkgeld über PayPal senden: **[paypal.me/Yama83](https://paypal.me/Yama83)**
+
 ## Datenschutz
 
 Keine Konten, keine Werbung, kein Tracking, kein eigener Server. Details:

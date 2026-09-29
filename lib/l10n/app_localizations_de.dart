@@ -905,13 +905,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get infoTipText =>
-      'Wenn dir der AA-AuralListen Podcatcher gefällt und du die Entwicklung freiwillig unterstützen möchtest, kannst du mir ein Trinkgeld über PayPal senden.';
-
-  @override
-  String get infoTipButton => 'paypal.me/Yama83';
-
-  @override
   String get infoPrivacy => 'Datenschutzerklärung';
 
   @override
@@ -919,4 +912,8 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get infoLinkFailed => 'Der Link konnte nicht geöffnet werden.';
+
+  @override
+  String get infoSourceCodeHint =>
+      'Quellcode, Releases und Möglichkeit zur freiwilligen Unterstützung';
 }
