@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" width="128" alt="App-Symbol von AA-AuralListen Podcatcher">
+</p>
+
 # AA-AuralListen Podcatcher
 
 Privater, werbefreier Podcatcher für Android – nur Audio, ohne Konto, ohne Tracking. Alle Daten bleiben auf dem
