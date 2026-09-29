@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../audio/audio_providers.dart';
+import '../../core/app_info.dart';
 import '../../core/formatting.dart';
 import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
@@ -145,6 +146,13 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l10n.backupRestore),
             subtitle: Text(l10n.backupRestoreSubtitle),
             onTap: () => restoreBackup(context, ref),
+          ),
+          _SectionHeader(l10n.infoTitle),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text(l10n.infoAbout),
+            subtitle: const Text(appName),
+            onTap: () => context.go(Routes.info),
           ),
         ],
       ),

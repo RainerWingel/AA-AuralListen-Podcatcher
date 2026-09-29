@@ -882,4 +882,41 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get infoTitle => 'Info';
+
+  @override
+  String get infoAbout => 'Über die App';
+
+  @override
+  String infoVersion(String name, int build) {
+    return 'Version $name (Build $build)';
+  }
+
+  @override
+  String infoVersionShort(String name) {
+    return 'Version $name';
+  }
+
+  @override
+  String infoDeveloper(String name) {
+    return 'Entwickelt von $name';
+  }
+
+  @override
+  String get infoTipText =>
+      'Wenn dir der AA-AuralListen Podcatcher gefällt und du die Entwicklung freiwillig unterstützen möchtest, kannst du mir ein Trinkgeld über PayPal senden.';
+
+  @override
+  String get infoTipButton => 'paypal.me/Yama83';
+
+  @override
+  String get infoPrivacy => 'Datenschutzerklärung';
+
+  @override
+  String get infoSourceCode => 'Quellcode auf GitHub';
+
+  @override
+  String get infoLinkFailed => 'Der Link konnte nicht geöffnet werden.';
 }

@@ -3,6 +3,7 @@ package io.github.rainerwingel.aurallisten
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import com.ryanheise.audioservice.AudioServiceActivity
@@ -26,6 +27,31 @@ class MainActivity : AudioServiceActivity() {
                                 Uri.parse("package:$packageName"),
                             ),
                         ),
+                    )
+                    else -> result.notImplemented()
+                }
+            }
+        // App info page: installed version (from pubspec.yaml via the build)
+        // and opening links in the browser, see docs/ui-ux.md.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "aurallisten/app")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "version" -> {
+                        val info = packageManager.getPackageInfo(packageName, 0)
+                        result.success(
+                            mapOf(
+                                "name" to info.versionName,
+                                "build" to if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                    info.longVersionCode
+                                } else {
+                                    @Suppress("DEPRECATION")
+                                    info.versionCode.toLong()
+                                },
+                            ),
+                        )
+                    }
+                    "openUrl" -> result.success(
+                        start(Intent(Intent.ACTION_VIEW, Uri.parse(call.arguments as String))),
                     )
                     else -> result.notImplemented()
                 }

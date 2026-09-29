@@ -1413,6 +1413,66 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'{count, plural, =1{1 Download gestartet.} other{{count} Downloads gestartet.}}'**
   String playlistDownloadAllStarted(int count);
+
+  /// No description provided for @infoTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Info'**
+  String get infoTitle;
+
+  /// No description provided for @infoAbout.
+  ///
+  /// In de, this message translates to:
+  /// **'Über die App'**
+  String get infoAbout;
+
+  /// No description provided for @infoVersion.
+  ///
+  /// In de, this message translates to:
+  /// **'Version {name} (Build {build})'**
+  String infoVersion(String name, int build);
+
+  /// No description provided for @infoVersionShort.
+  ///
+  /// In de, this message translates to:
+  /// **'Version {name}'**
+  String infoVersionShort(String name);
+
+  /// No description provided for @infoDeveloper.
+  ///
+  /// In de, this message translates to:
+  /// **'Entwickelt von {name}'**
+  String infoDeveloper(String name);
+
+  /// No description provided for @infoTipText.
+  ///
+  /// In de, this message translates to:
+  /// **'Wenn dir der AA-AuralListen Podcatcher gefällt und du die Entwicklung freiwillig unterstützen möchtest, kannst du mir ein Trinkgeld über PayPal senden.'**
+  String get infoTipText;
+
+  /// No description provided for @infoTipButton.
+  ///
+  /// In de, this message translates to:
+  /// **'paypal.me/Yama83'**
+  String get infoTipButton;
+
+  /// No description provided for @infoPrivacy.
+  ///
+  /// In de, this message translates to:
+  /// **'Datenschutzerklärung'**
+  String get infoPrivacy;
+
+  /// No description provided for @infoSourceCode.
+  ///
+  /// In de, this message translates to:
+  /// **'Quellcode auf GitHub'**
+  String get infoSourceCode;
+
+  /// No description provided for @infoLinkFailed.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Link konnte nicht geöffnet werden.'**
+  String get infoLinkFailed;
 }
 
 class _AppLocalizationsDelegate

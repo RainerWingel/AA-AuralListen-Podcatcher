@@ -593,5 +593,39 @@
         "type": "int"
       }
     }
-  }
+  },
+  "infoTitle": "Info",
+  "infoAbout": "Über die App",
+  "infoVersion": "Version {name} (Build {build})",
+  "@infoVersion": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "build": {
+        "type": "int"
+      }
+    }
+  },
+  "infoVersionShort": "Version {name}",
+  "@infoVersionShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "infoDeveloper": "Entwickelt von {name}",
+  "@infoDeveloper": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "infoTipText": "Wenn dir der AA-AuralListen Podcatcher gefällt und du die Entwicklung freiwillig unterstützen möchtest, kannst du mir ein Trinkgeld über PayPal senden.",
+  "infoTipButton": "paypal.me/Yama83",
+  "infoPrivacy": "Datenschutzerklärung",
+  "infoSourceCode": "Quellcode auf GitHub",
+  "infoLinkFailed": "Der Link konnte nicht geöffnet werden."
 }

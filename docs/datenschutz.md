@@ -6,7 +6,7 @@ permalink: /datenschutz/
 # Datenschutzerklärung
 
 **App:** AA-AuralListen Podcatcher (Android, Paketname `io.github.rainerwingel.aurallisten`)
-**Entwickler:** RainerWingel · Kontakt: über die
+**Entwickler:** Artem A. · Kontakt: über die
 [Issues des GitHub-Projekts](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
 **Stand:** 29. September 2026
 
@@ -38,6 +38,10 @@ Wie bei jedem Abruf im Internet sehen diese Server dabei technisch notwendige An
 **IP-Adresse**, den Zeitpunkt und die Kennung der App (User-Agent „AA-AuralListen/Version"). Für die Verarbeitung
 dort sind die jeweiligen Betreiber verantwortlich; es gelten deren Datenschutzerklärungen, z. B.
 [Apple](https://www.apple.com/de/legal/privacy/) und [fyyd](https://fyyd.de/datenschutz).
+
+Die Links auf der Info-Seite der App (Datenschutzerklärung, Quellcode auf GitHub, freiwilliges Trinkgeld über
+PayPal) öffnen nur deinen Browser; die App selbst überträgt dabei nichts. Auf diesen Seiten gelten die
+Datenschutzbestimmungen von GitHub bzw. PayPal.
 
 Manche Podcast-Anbieter liefern Dateien noch über unverschlüsseltes `http://` aus. Die App lädt sie trotzdem, damit
 diese Podcasts funktionieren; solche Übertragungen sind dann nicht verschlüsselt.

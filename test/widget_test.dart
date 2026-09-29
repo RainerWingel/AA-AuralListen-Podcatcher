@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:aapodcastguru/app/app.dart';
 import 'package:aapodcastguru/audio/audio_providers.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
+import 'package:aapodcastguru/core/app_info.dart';
+import 'package:aapodcastguru/core/app_platform.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/feed/opml.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
@@ -22,6 +24,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+import 'support/fake_app_platform.dart';
 import 'support/fake_battery_optimization.dart';
 import 'support/fake_download_engine.dart';
 import 'support/fake_player_engine.dart';
@@ -90,11 +93,13 @@ void main() {
   late Directory episodesDir;
   late FakeDownloadEngine downloadEngine;
   late FakeBatteryOptimization battery;
+  late FakeAppPlatform appPlatform;
 
   setUp(() {
     episodesDir = Directory.systemTemp.createTempSync('widget_episodes_');
     downloadEngine = FakeDownloadEngine(episodesDir);
     battery = FakeBatteryOptimization();
+    appPlatform = FakeAppPlatform();
     db = AppDatabase.forTesting(NativeDatabase.memory());
     engine = FakePlayerEngine();
     handler = PodcastAudioHandler(
@@ -119,6 +124,7 @@ void main() {
           audioHandlerProvider.overrideWithValue(handler),
           downloadEngineProvider.overrideWithValue(downloadEngine),
           batteryOptimizationProvider.overrideWithValue(battery),
+          appPlatformProvider.overrideWithValue(appPlatform),
           episodesDirectoryProvider.overrideWithValue(() async => episodesDir),
           httpClientProvider.overrideWithValue(
             MockClient(
@@ -152,6 +158,9 @@ void main() {
     await tester.runAsync(handler.stop);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(milliseconds: 10));
+    // Images (e.g. the icon on the info page) stay in Flutter's global,
+    // size-limited image cache; empty it so the leak check sees them freed.
+    PaintingBinding.instance.imageCache.clear();
   }
 
   const timeout = Timeout(Duration(seconds: 60));
@@ -1490,6 +1499,40 @@ void main() {
         () => container.read(playlistRepositoryProvider).entries(second!),
       );
       expect(entries!.map((e) => e.episode.id), [episodeId]);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'Optionen → Info: version, developer, tip and links',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      await tester.scrollUntilVisible(find.text('Über die App'), 300);
+      await settle(tester);
+      await tester.tap(find.text('Über die App'));
+      await settle(tester);
+
+      // Version comes from Android (here: the fake), not from a constant.
+      expect(find.text('Version 1.2.0 (Build 3)'), findsOneWidget);
+      expect(find.text('Entwickelt von Artem A.'), findsOneWidget);
+      expect(
+        find.textContaining('kannst du mir ein Trinkgeld über PayPal senden'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('paypal.me/Yama83'));
+      await settle(tester);
+      await tester.tap(find.text('Datenschutzerklärung'));
+      await settle(tester);
+      expect(appPlatform.opened, [tipUrl, privacyPolicyUrl]);
 
       await disposeApp(tester);
     },

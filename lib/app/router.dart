@@ -9,6 +9,7 @@ import '../features/player/player_screen.dart';
 import '../features/playlists/playlist_screen.dart';
 import '../features/playlists/playlists_screen.dart';
 import '../features/search/search_screen.dart';
+import '../features/settings/info_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/subscriptions/podcast_detail_screen.dart';
 import '../features/subscriptions/subscriptions_screen.dart';
@@ -87,6 +88,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'lesezeichen',
                     builder: (context, state) => const BookmarksScreen(),
+                  ),
+                  GoRoute(
+                    path: 'info',
+                    builder: (context, state) => const InfoScreen(),
                   ),
                 ],
               ),

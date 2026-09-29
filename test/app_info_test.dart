@@ -13,4 +13,9 @@ void main() {
     expect(appVersion, version);
     expect(appUserAgent, startsWith('AA-AuralListen/$version '));
   });
+
+  test('privacy policy names the same developer as the info page', () {
+    final policy = File('docs/datenschutz.md').readAsStringSync();
+    expect(policy, contains('**Entwickler:** $appDeveloper'));
+  });
 }
