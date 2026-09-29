@@ -206,7 +206,13 @@ class _ThemeFilter extends ConsumerWidget {
             subtitle: Text(
               l10n.themeSubtitle(
                 t.count,
-                t.latest == null ? '–' : formatEpisodeDate(t.latest!, now: now),
+                t.latest == null
+                    ? '–'
+                    : formatEpisodeDate(
+                        t.latest!,
+                        now: now,
+                        locale: l10n.localeName,
+                      ),
               ),
             ),
           ),

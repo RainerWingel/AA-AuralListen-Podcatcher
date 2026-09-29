@@ -13,7 +13,7 @@
 | Dateien | `path_provider`, `file_picker`, `share_plus`, `archive` | System.IO |
 | Bilder | `cached_network_image` mit begrenztem Cache-Manager | – |
 | Routing | `go_router` | – |
-| Texte | `flutter gen-l10n`, nur `de` | .resx |
+| Texte | `flutter gen-l10n`, `de` (Vorlage) + `en` | .resx |
 | Tests | `flutter_test`, `leak_tracker`, `mocktail` | xUnit + Moq |
 
 Exakte Versionen stehen in `pubspec.lock`. Neue Pakete nur nach Rückfrage (siehe AGENTS.md).
@@ -35,7 +35,7 @@ lib/
   features/       # je Feature: Screens, Widgets, Provider
     subscriptions/ search/ episodes/ player/ playlists/
     downloads/ bookmarks/ settings/ backup/
-  l10n/           # app_de.arb
+  l10n/           # app_de.arb (Vorlage), app_en.arb
 test/             # spiegelt lib/
 ```
 

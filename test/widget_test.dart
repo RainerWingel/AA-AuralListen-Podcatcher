@@ -12,6 +12,7 @@ import 'package:aapodcastguru/data/feed/opml.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
 import 'package:aapodcastguru/data/playlist_repository.dart';
 import 'package:aapodcastguru/data/providers.dart';
+import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
@@ -116,7 +117,13 @@ void main() {
     if (episodesDir.existsSync()) episodesDir.deleteSync(recursive: true);
   });
 
-  Future<void> pumpApp(WidgetTester tester) async {
+  /// [language]: stored UI language; null = first start (language picker).
+  Future<void> pumpApp(WidgetTester tester, {String? language = 'de'}) async {
+    if (language != null) {
+      await tester.runAsync(
+        () => SettingsRepository(db).set(SettingsKeys.language, language),
+      );
+    }
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -718,6 +725,52 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'first start asks for the language; Optionen can change it',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      Future<String?> stored() => tester.runAsync<String?>(
+        () => SettingsRepository(db).get(SettingsKeys.language),
+      );
+
+      // Nothing chosen yet: the picker comes first, in the device language
+      // (English in tests), and the app behind it is not shown.
+      await pumpApp(tester, language: null);
+      expect(find.text('Choose language'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+
+      await tester.tap(find.text('Deutsch'));
+      await settle(tester);
+      expect(await stored(), 'de');
+      expect(find.text('Choose language'), findsNothing);
+      expect(
+        find.widgetWithText(NavigationDestination, 'Optionen'),
+        findsOneWidget,
+      );
+
+      // Optionen → Sprache → English switches the whole app at once.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      await tester.tap(find.text('Sprache'));
+      await settle(tester);
+      await tester.tap(find.text('English'));
+      await settle(tester);
+      expect(await stored(), 'en');
+      expect(find.text('Language'), findsOneWidget);
+      expect(
+        find.widgetWithText(NavigationDestination, 'Settings'),
+        findsOneWidget,
+      );
+      expect(find.text('Dark'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
 
   testWidgets('feed address can be changed after a move', timeout: timeout, (
     tester,

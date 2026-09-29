@@ -142,7 +142,8 @@ class EpisodeTile extends ConsumerWidget {
     // Date and duration get their own line so a long podcast name can
     // never push them out of view.
     final meta = [
-      if (episode.pubDate case final date?) formatEpisodeDate(date, now: now),
+      if (episode.pubDate case final date?)
+        formatEpisodeDate(date, now: now, locale: l10n.localeName),
       if (episode.durationMs case final ms?)
         formatEpisodeDuration(l10n, Duration(milliseconds: ms)),
     ].join(' · ');

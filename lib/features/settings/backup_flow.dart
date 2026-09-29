@@ -95,7 +95,7 @@ Future<void> restoreBackup(BuildContext context, WidgetRef ref) async {
   }
   final date = preview.createdAt == null
       ? '–'
-      : DateFormat.yMMMMd('de').add_Hm().format(preview.createdAt!);
+      : DateFormat.yMMMMd(l10n.localeName).add_Hm().format(preview.createdAt!);
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(

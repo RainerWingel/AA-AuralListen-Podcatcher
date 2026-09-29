@@ -2,12 +2,17 @@ import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
 
-/// "10. Juni 2025", or without year for the current year ("10. Juni").
-String formatEpisodeDate(DateTime date, {required DateTime now}) {
+/// "10. Juni 2025" / "June 10, 2025", or without year for the current year
+/// ("10. Juni"). [locale]: `AppLocalizations.localeName`.
+String formatEpisodeDate(
+  DateTime date, {
+  required DateTime now,
+  required String locale,
+}) {
   final local = date.toLocal();
   return local.year == now.year
-      ? DateFormat.MMMMd('de').format(local)
-      : DateFormat.yMMMMd('de').format(local);
+      ? DateFormat.MMMMd(locale).format(local)
+      : DateFormat.yMMMMd(locale).format(local);
 }
 
 /// "1 Std. 5 Min." or "42 Min." (at least 1 minute).
@@ -31,12 +36,12 @@ String formatClock(Duration duration) {
       : '$minutes:$seconds';
 }
 
-/// "350 MB", "1,2 GB" (German decimal comma).
-String formatBytes(int bytes) {
+/// "350 MB", "1,2 GB" (decimal separator of [locale]: "1.2 GB" in English).
+String formatBytes(int bytes, String locale) {
   const mb = 1024 * 1024;
   const gb = 1024 * mb;
   if (bytes >= gb) {
-    return '${NumberFormat('#,##0.0', 'de').format(bytes / gb)} GB';
+    return '${NumberFormat('#,##0.0', locale).format(bytes / gb)} GB';
   }
-  return '${NumberFormat('#,##0', 'de').format((bytes / mb).ceil())} MB';
+  return '${NumberFormat('#,##0', locale).format((bytes / mb).ceil())} MB';
 }

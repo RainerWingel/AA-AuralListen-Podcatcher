@@ -9,6 +9,10 @@ abstract final class SettingsKeys {
   /// Light/dark mode: `system`, `light` or `dark` (ThemeMode names).
   static const themeMode = 'ui.themeMode';
 
+  /// UI language: `de` or `en` (AppLanguage names). Missing = not chosen yet,
+  /// the app asks on start.
+  static const language = 'ui.language';
+
   /// Upper limit for all downloaded audio files in bytes (default 5 GB).
   static const downloadLimitBytes = 'downloads.limitBytes';
 

@@ -7,6 +7,7 @@ import 'package:drift/native.dart';
 
 import '../../core/clock.dart';
 import '../db/app_database.dart';
+import '../settings_keys.dart';
 
 /// Contents of a backup file, shown before restoring.
 class BackupPreview {
@@ -186,6 +187,11 @@ class BackupService {
   /// cancels running downloads and runs the download maintenance afterwards).
   Future<void> restore(BackupPreview preview) async {
     final path = preview._databaseFile.path;
+    // Backups without a UI language (made before 1.3.0) keep the current one –
+    // otherwise the first-start language question would come back.
+    final language = await (_db.select(
+      _db.settings,
+    )..where((s) => s.key.equals(SettingsKeys.language))).getSingleOrNull();
     await _db.customStatement('ATTACH DATABASE ? AS backup', [path]);
     try {
       await _db.transaction(() async {
@@ -203,6 +209,11 @@ class BackupService {
             'INSERT INTO main."$name" ($columns) '
             'SELECT $columns FROM backup."$name"',
           );
+        }
+        if (language != null) {
+          await _db
+              .into(_db.settings)
+              .insert(language, mode: InsertMode.insertOrIgnore);
         }
       });
     } finally {

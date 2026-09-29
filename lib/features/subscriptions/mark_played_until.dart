@@ -46,7 +46,7 @@ Future<void> markPlayedUntilFlow(
     picked.month,
     picked.day + 1,
   ).subtract(const Duration(milliseconds: 1));
-  final dateText = DateFormat.yMMMMd('de').format(picked);
+  final dateText = DateFormat.yMMMMd(l10n.localeName).format(picked);
   final count = await playback.countUnplayedUntil(podcast.id, until);
   if (!context.mounted) return;
   if (count == 0) {
@@ -113,7 +113,7 @@ Future<void> markUnplayedSinceFlow(
 
   // Inclusive: from the start of the picked day on.
   final since = DateTime(picked.year, picked.month, picked.day);
-  final dateText = DateFormat.yMMMMd('de').format(picked);
+  final dateText = DateFormat.yMMMMd(l10n.localeName).format(picked);
   final count = await playback.countPlayedSince(podcast.id, since);
   if (!context.mounted) return;
   if (count == 0) {

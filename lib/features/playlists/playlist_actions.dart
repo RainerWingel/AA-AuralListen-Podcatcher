@@ -249,7 +249,7 @@ Future<void> downloadWholePlaylist(
       title: Text(l10n.playlistDownloadAll),
       content: Text(
         '${l10n.playlistDownloadAllConfirm(missing.length, playlist.name)}'
-        '${bytes > 0 ? ' ${l10n.playlistDownloadAllSize(formatBytes(bytes))}' : ''}'
+        '${bytes > 0 ? ' ${l10n.playlistDownloadAllSize(formatBytes(bytes, l10n.localeName))}' : ''}'
         '\n\n${l10n.playlistDownloadAllHint}',
       ),
       actions: [

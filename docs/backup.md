@@ -16,6 +16,8 @@ Optionen → Sicherung → „Backup erstellen" → Speichern-Dialog (`AA-AuralL
   App-Cache, wird sofort gelöscht).
 - Enthalten: Abos inkl. Einstellungen, Folgen mit Hörstand, Kapitel, Lesezeichen, Playlists, App-Einstellungen.
 - **Nicht** enthalten: Audiodateien (Downloads).
+- Sprache: Enthält das Backup `ui.language`, wird sie übernommen; ältere Backups ohne Sprache behalten die aktuelle
+  (sonst käme die Sprachabfrage des ersten Starts zurück).
 
 ## Wiederherstellen
 Optionen → Sicherung → „Backup wiederherstellen" → Datei wählen → Vorschau (Datum, Anzahl Abos/Folgen/Playlists/

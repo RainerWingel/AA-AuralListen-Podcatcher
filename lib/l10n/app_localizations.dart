@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_de.dart';
+import 'app_localizations_en.dart';
 
 // ignore_for_file: type=lint
 
@@ -92,7 +93,10 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('de')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
+    Locale('en'),
+  ];
 
   /// No description provided for @appTitle.
   ///
@@ -1467,6 +1471,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Quellcode, Releases und Möglichkeit zur freiwilligen Unterstützung'**
   String get infoSourceCodeHint;
+
+  /// No description provided for @language.
+  ///
+  /// In de, this message translates to:
+  /// **'Sprache'**
+  String get language;
+
+  /// Always the language's own name – same text in every ARB file.
+  ///
+  /// In de, this message translates to:
+  /// **'Deutsch'**
+  String get languageGerman;
+
+  /// Always the language's own name – same text in every ARB file.
+  ///
+  /// In de, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// First start: shown in the device language before anything is chosen.
+  ///
+  /// In de, this message translates to:
+  /// **'Sprache wählen'**
+  String get languagePickerTitle;
+
+  /// No description provided for @languagePickerHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Du kannst die Sprache später unter Optionen ändern.'**
+  String get languagePickerHint;
+
+  /// Name of the Android notification channel (system settings → app notifications).
+  ///
+  /// In de, this message translates to:
+  /// **'Wiedergabe'**
+  String get notificationChannelPlayback;
 }
 
 class _AppLocalizationsDelegate
@@ -1480,7 +1520,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['de'].contains(locale.languageCode);
+      <String>['de', 'en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1491,6 +1531,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'de':
       return AppLocalizationsDe();
+    case 'en':
+      return AppLocalizationsEn();
   }
 
   throw FlutterError(

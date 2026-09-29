@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import '../audio/audio_providers.dart';
+import '../core/app_language.dart';
 import '../core/clock.dart';
 import 'backup/backup_service.dart';
 import 'bookmark_repository.dart';
@@ -230,6 +231,14 @@ final backupServiceProvider = Provider<BackupService>(
     clock: ref.watch(clockProvider),
     tempDirectory: ref.watch(tempDirectoryProvider),
   ),
+);
+
+/// UI language chosen by the user; null = not chosen yet (first start).
+final appLanguageProvider = StreamProvider<AppLanguage?>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.language)
+      .map(AppLanguage.fromSetting),
 );
 
 /// Light/dark mode chosen in Optionen (default: follow the system).

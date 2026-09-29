@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +10,15 @@ import 'audio/audio_providers.dart';
 import 'audio/player_engine.dart';
 import 'audio/podcast_audio_handler.dart';
 import 'audio/stream_check.dart';
+import 'core/app_language.dart';
 import 'data/db/app_database.dart';
 import 'data/playback_repository.dart';
 import 'data/playlist_repository.dart';
 import 'data/providers.dart';
+import 'data/settings_keys.dart';
 import 'data/settings_repository.dart';
 import 'data/storage/cover_cache.dart';
+import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +26,14 @@ Future<void> main() async {
   // The database is created first because the audio handler (which lives
   // outside the widget tree, in the playback service) needs it too.
   final db = AppDatabase();
+  // The notification channel is named before the widget tree exists, so the
+  // language is read here directly (null = not chosen yet → device language).
+  final language =
+      AppLanguage.fromSetting(
+        await SettingsRepository(db).get(SettingsKeys.language),
+      ) ??
+      AppLanguage.forDevice(PlatformDispatcher.instance.locale);
+  final l10n = lookupAppLocalizations(language.locale);
   // The container is created after the handler; the handler only calls this
   // lookup when playback starts, long after both exist.
   late final ProviderContainer container;
@@ -41,10 +53,10 @@ Future<void> main() async {
     ),
     // Reuse the bounded cover cache instead of a second, separate image cache.
     cacheManager: CoverCacheManager.instance,
-    config: const AudioServiceConfig(
+    config: AudioServiceConfig(
       androidNotificationChannelId:
           'io.github.rainerwingel.aurallisten.playback',
-      androidNotificationChannelName: 'Wiedergabe',
+      androidNotificationChannelName: l10n.notificationChannelPlayback,
       // White silhouette for the status bar (tool/icon/make_icons.py); the
       // coloured launcher icon would show up as a blank square there.
       androidNotificationIcon: 'drawable/ic_stat_podcast',

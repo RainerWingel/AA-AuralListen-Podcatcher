@@ -146,5 +146,10 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Optionen → Info: Version automatisch, Entwickler „Artem A.", Links (Datenschutz, GitHub)
 - [x] Freiwillige Unterstützung per PayPal nur auf GitHub (README, Sponsor-Knopf)
 
+## Zusatz – Englisch (2026-09-29)
+- [x] `app_en.arb` mit allen Texten, Sprachwähler beim ersten Start, Optionen → Sprache
+- [x] Datum/Größen in der gewählten Sprache, Kanalname der Benachrichtigung, Sprache bleibt beim Restore alter Backups
+- [ ] Praxistest auf dem S25 (Benutzer)
+
 ## Offene Punkte
 - keine

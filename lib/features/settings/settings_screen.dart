@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/routes.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/app_info.dart';
+import '../../core/app_language.dart';
 import '../../core/formatting.dart';
 import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
@@ -12,6 +13,7 @@ import '../../data/storage/download_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../downloads/downloads_screen.dart';
 import 'backup_flow.dart';
+import 'language_picker.dart';
 import 'opml_import_flow.dart';
 
 /// Selectable storage limits for downloads.
@@ -46,7 +48,7 @@ class SettingsScreen extends ConsumerWidget {
                 for (final limit in downloadLimitChoices)
                   RadioListTile<int>(
                     value: limit,
-                    title: Text(formatBytes(limit)),
+                    title: Text(formatBytes(limit, l10n.localeName)),
                   ),
               ],
             ),
@@ -65,6 +67,8 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    // The language the UI is shown in right now.
+    final language = AppLanguage.fromSetting(l10n.localeName) ?? AppLanguage.de;
     final limit =
         ref.watch(downloadLimitProvider).value ??
         DownloadService.defaultLimitBytes;
@@ -101,6 +105,12 @@ class SettingsScreen extends ConsumerWidget {
                   .set(SettingsKeys.themeMode, v.single.name),
             ),
           ),
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: Text(l10n.language),
+            subtitle: Text(languageName(l10n, language)),
+            onTap: () => chooseAppLanguage(context, ref, language),
+          ),
           _SectionHeader(l10n.settingsSectionListening),
           ListTile(
             leading: const Icon(Icons.bookmarks_outlined),
@@ -119,7 +129,9 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.sd_storage_outlined),
             title: Text(l10n.downloadLimit),
-            subtitle: Text('${formatBytes(limit)} – ${l10n.downloadLimitHint}'),
+            subtitle: Text(
+              '${formatBytes(limit, l10n.localeName)} – ${l10n.downloadLimitHint}',
+            ),
             isThreeLine: true,
             onTap: () => _chooseLimit(context, ref, limit),
           ),

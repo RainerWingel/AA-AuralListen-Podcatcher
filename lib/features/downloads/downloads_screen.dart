@@ -20,7 +20,7 @@ Future<void> cleanUpDownloads(BuildContext context, WidgetRef ref) async {
   showInfoSnackBar(
     messenger,
     result.freedBytes > 0
-        ? l10n.cleanUpResult(formatBytes(result.freedBytes))
+        ? l10n.cleanUpResult(formatBytes(result.freedBytes, l10n.localeName))
         : l10n.cleanUpNothing,
   );
 }
@@ -85,7 +85,12 @@ class _UsageHeader extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.downloadsUsage(formatBytes(used), formatBytes(limit))),
+          Text(
+            l10n.downloadsUsage(
+              formatBytes(used, l10n.localeName),
+              formatBytes(limit, l10n.localeName),
+            ),
+          ),
           const SizedBox(height: 6),
           LinearProgressIndicator(value: (used / limit).clamp(0.0, 1.0)),
         ],
@@ -111,7 +116,7 @@ class _DownloadTile extends ConsumerWidget {
 
     final (String status, Widget action) = switch (download.state) {
       DownloadState.done => (
-        formatBytes(download.sizeBytes ?? 0),
+        formatBytes(download.sizeBytes ?? 0, l10n.localeName),
         IconButton(
           tooltip: l10n.downloadDelete,
           icon: const Icon(Icons.delete_outline),

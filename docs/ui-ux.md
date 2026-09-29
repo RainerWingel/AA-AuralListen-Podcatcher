@@ -1,6 +1,6 @@
 # UI / UX
 
-Vorbild: **Castbox**. Material 3, nur Deutsch, Hell/Dunkel (Dunkel ab M7).
+Vorbild: **Castbox**. Material 3, Deutsch und Englisch, Hell/Dunkel (Dunkel ab M7).
 
 ## Navigation (untere Leiste)
 1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh
@@ -67,7 +67,8 @@ Fehler erscheinen im Textfeld, Erfolg als Infobox „Feed-Adresse geändert.".
 Hat ein Pull-to-Refresh Umzüge erkannt, meldet eine Infobox „N Podcast(s) umgezogen – die Adresse wurde aktualisiert."
 
 ## Optionen
-Abschnitt „Darstellung": System / Hell / Dunkel (`settings['ui.themeMode']`, Dark Mode aus derselben Grundfarbe).
+Abschnitt „Darstellung": System / Hell / Dunkel (`settings['ui.themeMode']`, Dark Mode aus derselben Grundfarbe),
+darunter „Sprache" → Dialog Deutsch / English (`settings['ui.language']`, die App wechselt sofort).
 Abschnitt „Info" (ganz unten): „Über die App" → Info-Seite (`info_screen.dart`): App-Symbol, Name, **Version + Build
 automatisch von Android** (Kanal `aurallisten/app`, kommt beim Bauen aus `pubspec.yaml`), „Entwickelt von Artem A.",
 Links Datenschutzerklärung und „Quellcode auf GitHub" (öffnen den Browser). **Kein Zahlungslink in der App** –
@@ -81,8 +82,17 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
 - Hintergrund: Flutter lässt SnackBars **mit** Knopf standardmäßig stehen, bis man sie wegwischt (`persist`); der Helfer
   setzt `persist: false`. Test: `test/core/info_snack_bar_test.dart`.
 
-## Texte
-- Alle Texte in `lib/l10n/app_de.arb`, Du-Form, kurz.
+## Sprache und Texte
+- Alle Texte in `lib/l10n/app_de.arb` (Vorlage) und `lib/l10n/app_en.arb` – **jeder neue Schlüssel in beide**
+  (Test `test/l10n_test.dart` prüft das). Deutsch in Du-Form, Englisch im gleichen lockeren Ton; kurz.
+- **Erster Start:** Ist `ui.language` nicht gesetzt, zeigt `AuralListenApp` (über `MaterialApp.builder`) statt der App
+  den Sprachwähler (`lib/features/settings/language_picker.dart`: App-Symbol, „Sprache wählen", Knöpfe Deutsch /
+  English). Er erscheint in der Gerätesprache (Deutsch bei deutschem Gerät, sonst Englisch). Ein Tipp speichert die
+  Wahl, danach erscheint die App.
+- Datum und Größen formatieren mit `AppLocalizations.localeName` (nie fest `'de'`): „10. Juni 2025" / „June 10, 2025",
+  „1,2 GB" / „1.2 GB".
+- Der Name des Benachrichtigungskanals (Android-Einstellungen) wird in `main.dart` beim Start aus der gespeicherten
+  Sprache gesetzt.
 - Fehlermeldungen verständlich, ohne Stacktraces („Feed konnte nicht geladen werden").
 
 ## Datumsauswahl

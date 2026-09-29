@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:aapodcastguru/data/backup/backup_service.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
+import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:archive/archive.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
@@ -141,6 +142,46 @@ void main() {
     await sub.cancel();
     await target.close();
   });
+
+  test(
+    'the UI language survives a backup without one, else it is restored',
+    () async {
+      Future<String?> languageOf(AppDatabase db) async =>
+          (await (db.select(db.settings)
+                    ..where((s) => s.key.equals(SettingsKeys.language)))
+                  .getSingleOrNull())
+              ?.value;
+      Future<void> setLanguage(AppDatabase db, String value) => db
+          .into(db.settings)
+          .insertOnConflictUpdate(
+            SettingsCompanion.insert(key: SettingsKeys.language, value: value),
+          );
+
+      // Backup made before the language setting existed.
+      final old = await filledDb();
+      final oldBackup = await serviceFor(old).createBackup();
+      // Backup with a language.
+      await setLanguage(old, 'de');
+      final newBackup = await serviceFor(old).createBackup();
+      await old.close();
+
+      final target = await filledDb(title: 'Andere');
+      await setLanguage(target, 'en');
+      final service = serviceFor(target);
+
+      await service.restore(await service.inspect(oldBackup));
+      expect(await languageOf(target), 'en');
+      expect(
+        (await target.select(target.settings).get()).map((s) => s.key),
+        unorderedEquals(['player.boostDb', SettingsKeys.language]),
+      );
+
+      await service.restore(await service.inspect(newBackup));
+      expect(await languageOf(target), 'de');
+
+      await target.close();
+    },
+  );
 
   test('a backup from an older schema is migrated on restore', () async {
     // Build a v3 database file (before themes, playlists, chapters …).

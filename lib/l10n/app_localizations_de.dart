@@ -916,4 +916,23 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get infoSourceCodeHint =>
       'Quellcode, Releases und Möglichkeit zur freiwilligen Unterstützung';
+
+  @override
+  String get language => 'Sprache';
+
+  @override
+  String get languageGerman => 'Deutsch';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languagePickerTitle => 'Sprache wählen';
+
+  @override
+  String get languagePickerHint =>
+      'Du kannst die Sprache später unter Optionen ändern.';
+
+  @override
+  String get notificationChannelPlayback => 'Wiedergabe';
 }

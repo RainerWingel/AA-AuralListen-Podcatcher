@@ -7,8 +7,12 @@
 Privater, werbefreier Podcatcher für Android – nur Audio, ohne Konto, ohne Tracking. Alle Daten bleiben auf dem
 Gerät. Geschrieben in Flutter.
 
-> **Sprache:** Die App ist momentan **nur auf Deutsch** verfügbar. Weitere Sprachen sollen demnächst folgen –
-> alle Texte liegen bereits zentral in einer Übersetzungsdatei (`lib/l10n/app_de.arb`).
+> **Sprachen:** Die App gibt es auf **Deutsch und Englisch**. Beim ersten Start fragt sie nach der Sprache; ändern
+> lässt sie sich jederzeit unter Optionen → Sprache. Weitere Sprachen können folgen – alle Texte liegen zentral in
+> Übersetzungsdateien (`lib/l10n/app_de.arb`, `lib/l10n/app_en.arb`).
+>
+> *The app is available in **German and English**. It asks for the language on first start; you can change it any
+> time under Settings → Language.*
 
 ## Funktionen
 
@@ -36,7 +40,7 @@ Gerät. Geschrieben in Flutter.
 
 **Sonstiges**
 - „Als gespielt markieren bis …" / „Als ungespielt markieren seit …"
-- Backup und Wiederherstellung (ZIP), Dark Mode
+- Backup und Wiederherstellung (ZIP), Dark Mode, Deutsch oder Englisch
 
 ## Installation
 

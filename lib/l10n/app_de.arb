@@ -626,5 +626,23 @@
   "infoPrivacy": "Datenschutzerklärung",
   "infoSourceCode": "Quellcode auf GitHub",
   "infoLinkFailed": "Der Link konnte nicht geöffnet werden.",
-  "infoSourceCodeHint": "Quellcode, Releases und Möglichkeit zur freiwilligen Unterstützung"
+  "infoSourceCodeHint": "Quellcode, Releases und Möglichkeit zur freiwilligen Unterstützung",
+  "language": "Sprache",
+  "languageGerman": "Deutsch",
+  "@languageGerman": {
+    "description": "Always the language's own name – same text in every ARB file."
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "Always the language's own name – same text in every ARB file."
+  },
+  "languagePickerTitle": "Sprache wählen",
+  "@languagePickerTitle": {
+    "description": "First start: shown in the device language before anything is chosen."
+  },
+  "languagePickerHint": "Du kannst die Sprache später unter Optionen ändern.",
+  "notificationChannelPlayback": "Wiedergabe",
+  "@notificationChannelPlayback": {
+    "description": "Name of the Android notification channel (system settings → app notifications)."
+  }
 }

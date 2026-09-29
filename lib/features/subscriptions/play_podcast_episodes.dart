@@ -130,7 +130,9 @@ Future<void> _playUnplayedSince(
   if (episodes.isEmpty) {
     showInfoSnackBar(
       messenger,
-      l10n.playUnplayedSinceNone(DateFormat.yMMMMd('de').format(picked)),
+      l10n.playUnplayedSinceNone(
+        DateFormat.yMMMMd(l10n.localeName).format(picked),
+      ),
     );
     return;
   }
