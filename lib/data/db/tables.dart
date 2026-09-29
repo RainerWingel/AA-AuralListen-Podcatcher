@@ -125,6 +125,11 @@ class Playlists extends Table {
   /// Order in the Playlists tab (ascending).
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime()();
+
+  /// Episode last played from this playlist ("Resume") – schema v7. No
+  /// foreign key: it may point to an episode that has left the playlist
+  /// meanwhile; resuming then starts at the top (docs/playlists.md).
+  IntColumn get lastEpisodeId => integer().nullable()();
 }
 
 /// Episodes in a playlist. An episode appears at most once per playlist.

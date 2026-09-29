@@ -129,6 +129,29 @@ class PlaylistRepository {
             ..limit(1))
           .getSingleOrNull();
 
+  /// "Resume": the episode last played from [playlistId] if it is still in
+  /// there, otherwise the first entry. Null = the playlist is empty.
+  Future<int?> resumeEpisode(int playlistId) async {
+    final last = (await (_db.select(
+      _db.playlists,
+    )..where((p) => p.id.equals(playlistId))).getSingleOrNull())?.lastEpisodeId;
+    if (last != null && await positionOf(playlistId, last) != null) {
+      return last;
+    }
+    return (await (_db.select(_db.playlistItems)
+              ..where((i) => i.playlistId.equals(playlistId))
+              ..orderBy([(i) => OrderingTerm.asc(i.position)])
+              ..limit(1))
+            .getSingleOrNull())
+        ?.episodeId;
+  }
+
+  /// Remembers [episodeId] as the one last played from [playlistId].
+  Future<void> setLastEpisode(int playlistId, int episodeId) =>
+      (_db.update(_db.playlists)..where((p) => p.id.equals(playlistId))).write(
+        PlaylistsCompanion(lastEpisodeId: Value(episodeId)),
+      );
+
   Future<List<Playlist>> playlists() =>
       (_db.select(_db.playlists)..orderBy([
             (p) => OrderingTerm.asc(p.sortOrder),

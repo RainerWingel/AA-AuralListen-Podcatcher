@@ -1000,6 +1000,33 @@ void main() {
       expect(await itemsOf(other), isEmpty);
     });
 
+    test('"Resume" continues with the episode last played there', () async {
+      Future<int?> resume() => playlists.resumeEpisode(playlistId);
+      expect(await resume(), episodeId, reason: 'nothing played yet: top');
+
+      await handler.playEpisode(ep2, playlistId: playlistId);
+      await handler.pause();
+      expect(await resume(), ep2);
+
+      // Played outside the playlist: the playlist still remembers ep2.
+      await handler.playEpisode(episodeId);
+      await handler.pause();
+      expect(await resume(), ep2);
+
+      // Automatic advance counts as played from the playlist.
+      await handler.playEpisode(ep2, playlistId: playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep3);
+      expect(await resume(), ep3);
+
+      // The remembered episode left the playlist (played) → top again.
+      engine.complete();
+      await pumpEventQueue();
+      expect(await itemsOf(playlistId), [episodeId]);
+      expect(await resume(), episodeId);
+    });
+
     test('active playlist survives an app restart', () async {
       await handler.playEpisode(episodeId, playlistId: playlistId);
       await handler.stop();

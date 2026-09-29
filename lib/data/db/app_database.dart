@@ -39,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -86,6 +86,10 @@ class AppDatabase extends _$AppDatabase {
         await customStatement(
           'UPDATE podcasts SET etag = NULL, last_modified = NULL',
         );
+      }
+      // Before v4 the table was just created above, already with the column.
+      if (from >= 4 && from < 7) {
+        await m.addColumn(playlists, playlists.lastEpisodeId);
       }
     },
     beforeOpen: (details) async {

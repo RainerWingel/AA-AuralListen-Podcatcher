@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:aapodcastguru/app/app.dart';
+import 'package:aapodcastguru/app/router.dart';
+import 'package:aapodcastguru/app/routes.dart';
 import 'package:aapodcastguru/audio/audio_providers.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/core/app_info.dart';
@@ -1526,6 +1528,24 @@ void main() {
     await settle(tester);
     expect(downloadEngine.active, hasLength(2));
     expect(find.text('2 Downloads gestartet.'), findsOneWidget);
+
+    // Overview menu: no sort options, "Fortsetzen" instead.
+    container.read(routerProvider).go(Routes.playlists);
+    await settle(tester);
+    await tester.runAsync(
+      () => container
+          .read(playlistRepositoryProvider)
+          .setLastEpisode(playlistId, 1000),
+    );
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    expect(find.text('Aufsteigend nach Datum sortieren'), findsNothing);
+    expect(find.text('Alles downloaden'), findsOneWidget);
+    await tester.tap(find.text('Fortsetzen'));
+    await settle(tester);
+    // 1000 ("Folge Alt") is second after the sort, but it was played last.
+    expect(handler.currentEpisodeId, 1000);
+    expect(handler.activePlaylistId, playlistId);
 
     await disposeApp(tester);
   });

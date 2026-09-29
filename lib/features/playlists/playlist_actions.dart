@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../core/widgets/text_input_dialog.dart';
@@ -144,41 +145,70 @@ Future<void> addToPlaylist(
   );
 }
 
-/// The playlist menu (overview and playlist screen share it). [onDeleted]
-/// runs after the playlist was deleted (e.g. leave its screen).
+/// "Resume": plays the episode last played from [playlist] – or the first
+/// one if that episode has left the playlist – and keeps playing the playlist.
+Future<void> resumePlaylist(WidgetRef ref, int playlistId) async {
+  final episodeId = await ref
+      .read(playlistRepositoryProvider)
+      .resumeEpisode(playlistId);
+  if (episodeId == null) return;
+  await ref
+      .read(audioHandlerProvider)
+      .playEpisode(episodeId, playlistId: playlistId);
+}
+
+/// The playlist menu. In the overview ([onPlaylistScreen] false) it offers
+/// "Resume" ([canResume]: the playlist has episodes); the sort options only
+/// appear on the playlist's own screen. [onDeleted] runs after the playlist
+/// was deleted (e.g. leave its screen).
 /// Uses the screen [context]: the menu's own context is gone once it closes.
 List<PopupMenuEntry<void>> playlistMenuItems(
   BuildContext context,
   WidgetRef ref,
   Playlist playlist, {
+  required bool onPlaylistScreen,
+  bool canResume = true,
   VoidCallback? onDeleted,
 }) {
   final l10n = AppLocalizations.of(context);
-  PopupMenuItem<void> item(IconData icon, String text, VoidCallback onTap) =>
-      PopupMenuItem(
-        onTap: onTap,
-        child: ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(icon),
-          title: Text(text),
-        ),
-      );
+  PopupMenuItem<void> item(
+    IconData icon,
+    String text,
+    VoidCallback onTap, {
+    bool enabled = true,
+  }) => PopupMenuItem(
+    onTap: onTap,
+    enabled: enabled,
+    child: ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon),
+      title: Text(text),
+    ),
+  );
   return [
-    item(
-      Icons.arrow_upward,
-      l10n.playlistSortDateAscending,
-      () => sortPlaylist(context, ref, playlist, PlaylistSort.dateAscending),
-    ),
-    item(
-      Icons.arrow_downward,
-      l10n.playlistSortDateDescending,
-      () => sortPlaylist(context, ref, playlist, PlaylistSort.dateDescending),
-    ),
-    item(
-      Icons.arrow_upward,
-      l10n.playlistSortNameAscending,
-      () => sortPlaylist(context, ref, playlist, PlaylistSort.nameAscending),
-    ),
+    if (onPlaylistScreen) ...[
+      item(
+        Icons.arrow_upward,
+        l10n.playlistSortDateAscending,
+        () => sortPlaylist(context, ref, playlist, PlaylistSort.dateAscending),
+      ),
+      item(
+        Icons.arrow_downward,
+        l10n.playlistSortDateDescending,
+        () => sortPlaylist(context, ref, playlist, PlaylistSort.dateDescending),
+      ),
+      item(
+        Icons.arrow_upward,
+        l10n.playlistSortNameAscending,
+        () => sortPlaylist(context, ref, playlist, PlaylistSort.nameAscending),
+      ),
+    ] else
+      item(
+        Icons.play_circle_outline,
+        l10n.playlistResume,
+        () => resumePlaylist(ref, playlist.id),
+        enabled: canResume,
+      ),
     item(
       Icons.download_for_offline_outlined,
       l10n.playlistDownloadAll,

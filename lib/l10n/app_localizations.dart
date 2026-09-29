@@ -764,12 +764,6 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{Leer} =1{1 Folge} other{{count} Folgen}}{duration}'**
   String playlistSummary(int count, String duration);
 
-  /// No description provided for @playlistPlay.
-  ///
-  /// In de, this message translates to:
-  /// **'Playlist abspielen'**
-  String get playlistPlay;
-
   /// No description provided for @addToPlaylist.
   ///
   /// In de, this message translates to:
@@ -1381,6 +1375,12 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'„{name}“ nach Namen sortiert (A–Z).'**
   String playlistSortedName(String name);
+
+  /// Playlist: continue with the episode last played from it (else the first one).
+  ///
+  /// In de, this message translates to:
+  /// **'Fortsetzen'**
+  String get playlistResume;
 
   /// No description provided for @playlistDownloadAll.
   ///

@@ -151,5 +151,10 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Datum/Größen in der gewählten Sprache, Kanalname der Benachrichtigung, Sprache bleibt beim Restore alter Backups
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Zusatz – Playlist fortsetzen (2026-09-29)
+- [x] Jede Playlist merkt sich die zuletzt daraus gespielte Folge (Schema v7), ▶ und „Fortsetzen" spielen sie weiter
+- [x] Sortieren nur in der geöffneten Playlist, in der Übersicht stattdessen „Fortsetzen"
+- [ ] Praxistest auf dem S25 (Benutzer)
+
 ## Offene Punkte
 - keine

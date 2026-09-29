@@ -97,4 +97,24 @@ void main() {
     await verifier.migrateAndValidate(db, db.schemaVersion);
     await db.close();
   });
+
+  test('upgrade v6 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(6);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v7 keeps playlists; nothing to resume yet', () async {
+    final schema = await verifier.schemaAt(6);
+    schema.rawDatabase.execute(
+      'INSERT INTO playlists (name, sort_order, created_at) '
+      "VALUES ('Morgens', 1, 1767225600)",
+    );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    final playlists = await db.select(db.playlists).get();
+    expect(playlists.map((p) => p.name), contains('Morgens'));
+    expect(playlists.every((p) => p.lastEpisodeId == null), isTrue);
+    await db.close();
+  });
 }

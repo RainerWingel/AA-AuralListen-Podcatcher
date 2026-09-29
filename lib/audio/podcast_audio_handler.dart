@@ -370,6 +370,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await _engine.pause();
     _broadcastState();
     await _saveCurrentPosition();
+    // Already stored when the episode started; again here so the paused
+    // episode is always the one "Resume" continues with.
+    if ((_activePlaylistId, _episodeId) case (final int p, final int e)) {
+      await _playlists?.setLastEpisode(p, e);
+    }
     _pauseTimer?.cancel();
     _pauseTimer = Timer(stopAfterPause, stop);
   }
@@ -450,6 +455,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     } else {
       _activePlaylistId = playlistId;
       _playlistPosition = position;
+      // "Resume" in the playlist continues with this episode.
+      await _playlists?.setLastEpisode(playlistId, episodeId);
       await _settings.set(
         SettingsKeys.activePlaylistId,
         '$playlistId:$position',

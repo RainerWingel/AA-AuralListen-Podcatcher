@@ -2724,8 +2724,25 @@ class $PlaylistsTable extends Playlists
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _lastEpisodeIdMeta = const VerificationMeta(
+    'lastEpisodeId',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, sortOrder, createdAt];
+  late final GeneratedColumn<int> lastEpisodeId = GeneratedColumn<int>(
+    'last_episode_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    sortOrder,
+    createdAt,
+    lastEpisodeId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2763,6 +2780,15 @@ class $PlaylistsTable extends Playlists
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('last_episode_id')) {
+      context.handle(
+        _lastEpisodeIdMeta,
+        lastEpisodeId.isAcceptableOrUnknown(
+          data['last_episode_id']!,
+          _lastEpisodeIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2788,6 +2814,10 @@ class $PlaylistsTable extends Playlists
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      lastEpisodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_episode_id'],
+      ),
     );
   }
 
@@ -2804,11 +2834,17 @@ class Playlist extends DataClass implements Insertable<Playlist> {
   /// Order in the Playlists tab (ascending).
   final int sortOrder;
   final DateTime createdAt;
+
+  /// Episode last played from this playlist ("Resume") – schema v7. No
+  /// foreign key: it may point to an episode that has left the playlist
+  /// meanwhile; resuming then starts at the top (docs/playlists.md).
+  final int? lastEpisodeId;
   const Playlist({
     required this.id,
     required this.name,
     required this.sortOrder,
     required this.createdAt,
+    this.lastEpisodeId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2817,6 +2853,9 @@ class Playlist extends DataClass implements Insertable<Playlist> {
     map['name'] = Variable<String>(name);
     map['sort_order'] = Variable<int>(sortOrder);
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || lastEpisodeId != null) {
+      map['last_episode_id'] = Variable<int>(lastEpisodeId);
+    }
     return map;
   }
 
@@ -2826,6 +2865,9 @@ class Playlist extends DataClass implements Insertable<Playlist> {
       name: Value(name),
       sortOrder: Value(sortOrder),
       createdAt: Value(createdAt),
+      lastEpisodeId: lastEpisodeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastEpisodeId),
     );
   }
 
@@ -2839,6 +2881,7 @@ class Playlist extends DataClass implements Insertable<Playlist> {
       name: serializer.fromJson<String>(json['name']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      lastEpisodeId: serializer.fromJson<int?>(json['lastEpisodeId']),
     );
   }
   @override
@@ -2849,6 +2892,7 @@ class Playlist extends DataClass implements Insertable<Playlist> {
       'name': serializer.toJson<String>(name),
       'sortOrder': serializer.toJson<int>(sortOrder),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'lastEpisodeId': serializer.toJson<int?>(lastEpisodeId),
     };
   }
 
@@ -2857,11 +2901,15 @@ class Playlist extends DataClass implements Insertable<Playlist> {
     String? name,
     int? sortOrder,
     DateTime? createdAt,
+    Value<int?> lastEpisodeId = const Value.absent(),
   }) => Playlist(
     id: id ?? this.id,
     name: name ?? this.name,
     sortOrder: sortOrder ?? this.sortOrder,
     createdAt: createdAt ?? this.createdAt,
+    lastEpisodeId: lastEpisodeId.present
+        ? lastEpisodeId.value
+        : this.lastEpisodeId,
   );
   Playlist copyWithCompanion(PlaylistsCompanion data) {
     return Playlist(
@@ -2869,6 +2917,9 @@ class Playlist extends DataClass implements Insertable<Playlist> {
       name: data.name.present ? data.name.value : this.name,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      lastEpisodeId: data.lastEpisodeId.present
+          ? data.lastEpisodeId.value
+          : this.lastEpisodeId,
     );
   }
 
@@ -2878,13 +2929,15 @@ class Playlist extends DataClass implements Insertable<Playlist> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('sortOrder: $sortOrder, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastEpisodeId: $lastEpisodeId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, sortOrder, createdAt);
+  int get hashCode =>
+      Object.hash(id, name, sortOrder, createdAt, lastEpisodeId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2892,7 +2945,8 @@ class Playlist extends DataClass implements Insertable<Playlist> {
           other.id == this.id &&
           other.name == this.name &&
           other.sortOrder == this.sortOrder &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.lastEpisodeId == this.lastEpisodeId);
 }
 
 class PlaylistsCompanion extends UpdateCompanion<Playlist> {
@@ -2900,17 +2954,20 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
   final Value<String> name;
   final Value<int> sortOrder;
   final Value<DateTime> createdAt;
+  final Value<int?> lastEpisodeId;
   const PlaylistsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.lastEpisodeId = const Value.absent(),
   });
   PlaylistsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.sortOrder = const Value.absent(),
     required DateTime createdAt,
+    this.lastEpisodeId = const Value.absent(),
   }) : name = Value(name),
        createdAt = Value(createdAt);
   static Insertable<Playlist> custom({
@@ -2918,12 +2975,14 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
     Expression<String>? name,
     Expression<int>? sortOrder,
     Expression<DateTime>? createdAt,
+    Expression<int>? lastEpisodeId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (sortOrder != null) 'sort_order': sortOrder,
       if (createdAt != null) 'created_at': createdAt,
+      if (lastEpisodeId != null) 'last_episode_id': lastEpisodeId,
     });
   }
 
@@ -2932,12 +2991,14 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
     Value<String>? name,
     Value<int>? sortOrder,
     Value<DateTime>? createdAt,
+    Value<int?>? lastEpisodeId,
   }) {
     return PlaylistsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
+      lastEpisodeId: lastEpisodeId ?? this.lastEpisodeId,
     );
   }
 
@@ -2956,6 +3017,9 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (lastEpisodeId.present) {
+      map['last_episode_id'] = Variable<int>(lastEpisodeId.value);
+    }
     return map;
   }
 
@@ -2965,7 +3029,8 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('sortOrder: $sortOrder, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastEpisodeId: $lastEpisodeId')
           ..write(')'))
         .toString();
   }
@@ -6050,12 +6115,14 @@ typedef $$PlaylistsTableCreateCompanionBuilder = PlaylistsCompanion Function({
   required String name,
   Value<int> sortOrder,
   required DateTime createdAt,
+  Value<int?> lastEpisodeId,
 });
 typedef $$PlaylistsTableUpdateCompanionBuilder = PlaylistsCompanion Function({
   Value<int> id,
   Value<String> name,
   Value<int> sortOrder,
   Value<DateTime> createdAt,
+  Value<int?> lastEpisodeId,
 });
 
 final class $$PlaylistsTableReferences
@@ -6107,6 +6174,11 @@ class $$PlaylistsTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastEpisodeId => $composableBuilder(
+    column: $table.lastEpisodeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6164,6 +6236,11 @@ class $$PlaylistsTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get lastEpisodeId => $composableBuilder(
+    column: $table.lastEpisodeId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PlaylistsTableAnnotationComposer
@@ -6186,6 +6263,11 @@ class $$PlaylistsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get lastEpisodeId => $composableBuilder(
+    column: $table.lastEpisodeId,
+    builder: (column) => column,
+  );
 
   Expression<T> playlistItemsRefs<T extends Object>(
     Expression<T> Function($$PlaylistItemsTableAnnotationComposer a) f,
@@ -6245,11 +6327,13 @@ class $$PlaylistsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int?> lastEpisodeId = const Value.absent(),
               }) => PlaylistsCompanion(
                 id: id,
                 name: name,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
+                lastEpisodeId: lastEpisodeId,
               ),
           createCompanionCallback:
               ({
@@ -6257,11 +6341,13 @@ class $$PlaylistsTableTableManager
                 required String name,
                 Value<int> sortOrder = const Value.absent(),
                 required DateTime createdAt,
+                Value<int?> lastEpisodeId = const Value.absent(),
               }) => PlaylistsCompanion.insert(
                 id: id,
                 name: name,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
+                lastEpisodeId: lastEpisodeId,
               ),
           withReferenceMapper: (p0) => p0
               .map(

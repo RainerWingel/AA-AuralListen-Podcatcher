@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
-import '../../audio/audio_providers.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/playlist_repository.dart';
@@ -52,11 +51,9 @@ class PlaylistScreen extends ConsumerWidget {
         actions: [
           if (items.isNotEmpty)
             IconButton(
-              tooltip: l10n.playlistPlay,
+              tooltip: l10n.playlistResume,
               icon: const Icon(Icons.play_circle_outline),
-              onPressed: () => ref
-                  .read(audioHandlerProvider)
-                  .playEpisode(items.first.episode.id, playlistId: playlistId),
+              onPressed: () => resumePlaylist(ref, playlistId),
             ),
           if (playlist != null)
             PopupMenuButton<void>(
@@ -64,6 +61,7 @@ class PlaylistScreen extends ConsumerWidget {
                 context,
                 ref,
                 playlist,
+                onPlaylistScreen: true,
                 onDeleted: () {
                   if (context.mounted) context.go(Routes.playlists);
                 },

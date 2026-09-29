@@ -247,7 +247,6 @@
       }
     }
   },
-  "playlistPlay": "Playlist abspielen",
   "addToPlaylist": "Zu Playlist hinzufügen…",
   "addedToPlaylist": "Zu „{name}“ hinzugefügt",
   "@addedToPlaylist": {
@@ -563,6 +562,10 @@
         "type": "String"
       }
     }
+  },
+  "playlistResume": "Fortsetzen",
+  "@playlistResume": {
+    "description": "Playlist: continue with the episode last played from it (else the first one)."
   },
   "playlistDownloadAll": "Alles downloaden",
   "playlistDownloadAllConfirm": "{count, plural, =1{1 Folge} other{{count} Folgen}} aus „{name}“ herunterladen?",

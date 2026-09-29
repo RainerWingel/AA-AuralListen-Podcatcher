@@ -410,9 +410,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get playlistPlay => 'Play playlist';
-
-  @override
   String get addToPlaylist => 'Add to playlist…';
 
   @override
@@ -842,6 +839,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String playlistSortedName(String name) {
     return '“$name” sorted by name (A–Z).';
   }
+
+  @override
+  String get playlistResume => 'Resume';
 
   @override
   String get playlistDownloadAll => 'Download all';

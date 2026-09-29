@@ -148,6 +148,28 @@ void main() {
     expect(await db.select(db.playlistItems).get(), isEmpty);
   });
 
+  test(
+    'resumeEpisode: remembered one while in the list, else the top',
+    () async {
+      final list = await repo.create('Unterwegs');
+      expect(await repo.resumeEpisode(list), isNull, reason: 'empty');
+      final a = await addEpisode('A');
+      final b = await addEpisode('B');
+      await repo.addAll(list, [a, b]);
+      expect(await repo.resumeEpisode(list), a);
+
+      await repo.setLastEpisode(list, b);
+      expect(await repo.resumeEpisode(list), b);
+      // Another playlist remembers its own episode.
+      final other = await repo.create('Abends');
+      await repo.add(other, a);
+      expect(await repo.resumeEpisode(other), a);
+
+      await repo.remove(list, b);
+      expect(await repo.resumeEpisode(list), a);
+    },
+  );
+
   test('nextAfter reads the current state', () async {
     final list = (await repo.playlists()).single.id;
     final a = await addEpisode('A');
