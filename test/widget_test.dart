@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:aapodcastguru/app/app.dart';
 import 'package:aapodcastguru/app/router.dart';
 import 'package:aapodcastguru/app/routes.dart';
+import 'package:aapodcastguru/app/theme.dart';
 import 'package:aapodcastguru/audio/audio_providers.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/core/app_info.dart';
@@ -23,6 +24,7 @@ import 'package:aapodcastguru/features/settings/settings_screen.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -743,6 +745,38 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'screen titles use Playfair Display, tabs do not',
+    timeout: timeout,
+    (tester) async {
+      await pumpApp(tester);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Playlists'));
+      await settle(tester);
+      String? fontOf(Finder text) =>
+          tester.renderObject<RenderParagraph>(text).text.style?.fontFamily;
+      expect(
+        fontOf(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.text('Playlists'),
+          ),
+        ),
+        AppTheme.titleFontFamily,
+      );
+      expect(
+        fontOf(
+          find.descendant(
+            of: find.byType(NavigationBar),
+            matching: find.text('Playlists'),
+          ),
+        ),
+        isNot(AppTheme.titleFontFamily),
+      );
+
+      await disposeApp(tester);
+    },
+  );
 
   testWidgets('dark mode can be chosen in Optionen', timeout: timeout, (
     tester,

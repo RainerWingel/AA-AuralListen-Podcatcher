@@ -1,6 +1,9 @@
 # UI / UX
 
 Vorbild: **Castbox**. Material 3, Deutsch und Englisch, Hell/Dunkel (Dunkel ab M7).
+Schrift: **Bildschirmtitel (AppBar) in Playfair Display** fett (Benutzerwahl 2026-09-30, `AppTheme.titleFontFamily`,
+über `appBarTheme.titleTextStyle`); alles andere inkl. Tab-Beschriftungen in der Systemschrift. Die Schrift liegt als
+variable TTF in `assets/fonts/` (Gewicht über die `wght`-Achse), Lizenz SIL OFL 1.1 (`OFL-PlayfairDisplay.txt`).
 
 ## Navigation (untere Leiste)
 1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh
