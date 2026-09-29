@@ -158,6 +158,8 @@ void main() {
           ArchiveFile.string(
             BackupService.manifestName,
             jsonEncode({
+              // The app's former name: backups of the old app must still
+              // restore (moving data to the new application id).
               'app': 'AA-PodcastGuru',
               'format': 1,
               'schemaVersion': 3,
@@ -223,11 +225,24 @@ void main() {
     await db.close();
   });
 
+  test('new backups carry the new app name', () async {
+    final source = await filledDb();
+    final bytes = await serviceFor(source).createBackup();
+    await source.close();
+    final manifest = ZipDecoder()
+        .decodeBytes(bytes)
+        .findFile(BackupService.manifestName)!;
+    final json = jsonDecode(
+      utf8.decode(manifest.content as List<int>),
+    ) as Map<String, Object?>;
+    expect(json['app'], 'AA-AuralListen');
+  });
+
   test('suggested file name', () async {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     expect(
       serviceFor(db).suggestedFileName(),
-      'AA-PodcastGuru-Backup-2026-09-27.zip',
+      'AA-AuralListen-Backup-2026-09-27.zip',
     );
     await db.close();
   });

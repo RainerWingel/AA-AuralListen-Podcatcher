@@ -1,7 +1,7 @@
 # Funktionsumfang
 
 Privater, werbefreier Podcatcher, **nur Audio**, im Stil von Castbox. Zielgerät: Samsung Galaxy S25 (Android),
-Sideload per APK. Nur Deutsch. Alle Daten nur lokal.
+Sideload per APK, Play Store geplant (Name „AA-AuralListen Podcatcher"). Nur Deutsch. Alle Daten nur lokal.
 
 ## Muss (MVP, bis M5)
 | # | Funktion | Details / Verweis |

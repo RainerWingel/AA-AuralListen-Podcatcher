@@ -59,7 +59,11 @@ class BackupService {
   static const manifestName = 'manifest.json';
   static const databaseName = 'aapodcastguru.sqlite';
   static const formatVersion = 1;
-  static const _appId = 'AA-PodcastGuru';
+  static const _appId = 'AA-AuralListen';
+
+  /// Backups of the app's former name are still accepted – the only way to
+  /// move data from the old app id (io.github.rainerwingel.aapodcastguru).
+  static const _legacyAppIds = {'AA-PodcastGuru'};
 
   /// Largest backup accepted for restore (guards the RAM).
   static const maxBackupBytes = 200 * 1024 * 1024;
@@ -99,11 +103,11 @@ class BackupService {
     }
   }
 
-  /// File name suggestion, e.g. `AA-PodcastGuru-Backup-2026-09-27.zip`.
+  /// File name suggestion, e.g. `AA-AuralListen-Backup-2026-09-27.zip`.
   String suggestedFileName() {
     final d = _clock();
     String two(int n) => n.toString().padLeft(2, '0');
-    return 'AA-PodcastGuru-Backup-${d.year}-${two(d.month)}-${two(d.day)}.zip';
+    return 'AA-AuralListen-Backup-${d.year}-${two(d.month)}-${two(d.day)}.zip';
   }
 
   // ----------------------------------------------------------------- restore
@@ -133,8 +137,9 @@ class BackupService {
       throw const BackupFormatException('broken manifest');
     }
     final schema = manifest['schemaVersion'];
-    if (manifest['app'] != _appId || schema is! int) {
-      throw const BackupFormatException('not an AA-PodcastGuru backup');
+    final app = manifest['app'];
+    if ((app != _appId && !_legacyAppIds.contains(app)) || schema is! int) {
+      throw const BackupFormatException('not an AA-AuralListen backup');
     }
     if (schema > _db.schemaVersion) {
       throw const BackupFormatException('backup from a newer app version');

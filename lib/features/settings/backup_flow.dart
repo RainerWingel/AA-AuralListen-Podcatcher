@@ -37,7 +37,7 @@ Future<void> exportOpml(BuildContext context, WidgetRef ref) async {
   final xml = buildOpml(podcasts, created: now);
   try {
     if (await _saveAs(
-      'AA-PodcastGuru-Abos-${_today(now)}.opml',
+      'AA-AuralListen-Abos-${_today(now)}.opml',
       Uint8List.fromList(utf8.encode(xml)),
       'text/x-opml',
     )) {

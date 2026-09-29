@@ -140,7 +140,7 @@ void main() {
             ),
           ),
         ],
-        child: const PodcastGuruApp(),
+        child: const AuralListenApp(),
       ),
     );
     await settle(tester);
@@ -753,7 +753,7 @@ void main() {
   });
 
   testWidgets(
-    'first playback offers "Nicht eingeschränkt" once',
+    'battery: status in Optionen, button opens the app settings',
     timeout: timeout,
     (tester) async {
       tester.view
@@ -768,24 +768,18 @@ void main() {
       );
       await settle(tester);
 
+      // Playing never asks for the exemption by itself.
       await tester.tap(find.text('Erste Folge'));
       await settle(tester);
-      expect(battery.requests, 1);
+      expect(battery.settingsOpened, 0);
 
-      // Pause and play again: no second automatic prompt.
-      await tester.runAsync(handler.pause);
-      await settle(tester);
-      await tester.runAsync(handler.play);
-      await settle(tester);
-      expect(battery.requests, 1);
-
-      // Optionen shows the problem; tapping asks again on purpose.
+      // Optionen shows the status; tapping opens the app's system settings.
       await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
       await settle(tester);
       expect(find.textContaining('Akku-Optimierung aktiv'), findsOneWidget);
       await tester.tap(find.text('Hintergrund-Wiedergabe'));
       await settle(tester);
-      expect(battery.requests, 2);
+      expect(battery.settingsOpened, 1);
 
       await disposeApp(tester);
     },

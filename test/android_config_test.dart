@@ -17,12 +17,21 @@ void main() {
     expect(config, contains('<base-config cleartextTrafficPermitted="true">'));
   });
 
-  test('may ask for "Nicht eingeschränkt" (battery dialog)', () {
+  test('no REQUEST_IGNORE_BATTERY_OPTIMIZATIONS (Google Play policy)', () {
     final manifest = File('android/app/src/main/AndroidManifest.xml')
         .readAsStringSync();
+    expect(manifest, isNot(contains('REQUEST_IGNORE_BATTERY_OPTIMIZATIONS')));
+  });
+
+  test('app name: full in the system, short under the launcher icon', () {
+    final manifest = File('android/app/src/main/AndroidManifest.xml')
+        .readAsStringSync();
+    expect(manifest, contains('android:label="AA-AuralListen Podcatcher"'));
+    expect(manifest, contains('android:label="AuralListen"'));
+    final gradle = File('android/app/build.gradle.kts').readAsStringSync();
     expect(
-      manifest,
-      contains('android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS'),
+      gradle,
+      contains('applicationId = "io.github.rainerwingel.aurallisten"'),
     );
   });
 

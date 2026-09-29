@@ -1,4 +1,6 @@
-# AA-PodcastGuru
+# AA-AuralListen Podcatcher
+
+(bis 2026-09-29: „AA-PodcastGuru")
 
 Privater, werbefreier Podcatcher (nur Audio) für Android, geschrieben in Flutter.
 

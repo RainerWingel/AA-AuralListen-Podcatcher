@@ -97,7 +97,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In de, this message translates to:
-  /// **'AA-PodcastGuru'**
+  /// **'AA-AuralListen Podcatcher'**
   String get appTitle;
 
   /// No description provided for @navHome.
@@ -1153,7 +1153,7 @@ abstract class AppLocalizations {
   /// No description provided for @backgroundPlaybackRestricted.
   ///
   /// In de, this message translates to:
-  /// **'Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern.'**
+  /// **'Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen öffnet die App-Einstellungen → Akku → „Nicht eingeschränkt“.'**
   String get backgroundPlaybackRestricted;
 
   /// No description provided for @unplayedCount.

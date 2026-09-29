@@ -1,6 +1,5 @@
-package io.github.rainerwingel.aapodcastguru
+package io.github.rainerwingel.aurallisten
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -14,12 +13,12 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : AudioServiceActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        // Battery optimisation ("Nicht eingeschränkt"), see docs/playback.md.
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "aapodcastguru/battery")
+        // Battery optimisation status + app settings (the user sets
+        // "Nicht eingeschränkt" there himself), see docs/playback.md.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "aurallisten/battery")
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "isExempt" -> result.success(isExempt())
-                    "requestExemption" -> result.success(requestExemption())
                     "openAppSettings" -> result.success(
                         start(
                             Intent(
@@ -35,18 +34,6 @@ class MainActivity : AudioServiceActivity() {
 
     private fun isExempt(): Boolean =
         (getSystemService(POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(packageName)
-
-    /** Shows the system dialog "allow running in the background?". */
-    @SuppressLint("BatteryLife") // Sideloaded podcast player: background playback is the core function.
-    private fun requestExemption(): Boolean {
-        if (isExempt()) return true
-        return start(
-            Intent(
-                Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                Uri.parse("package:$packageName"),
-            ),
-        )
-    }
 
     private fun start(intent: Intent): Boolean =
         try {

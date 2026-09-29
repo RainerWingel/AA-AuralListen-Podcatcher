@@ -6,16 +6,17 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
-    <!-- Lets the app show the system dialog "Nicht eingeschränkt" (MainActivity.kt). -->
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
+    <!-- Full name in the system (app info, settings); the launcher shows the
+         short activity label below, since longer names get cut off there. -->
     <application
-        android:label="AA-PodcastGuru"
+        android:label="AA-AuralListen Podcatcher"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:networkSecurityConfig="@xml/network_security_config">
         <activity
             android:name=".MainActivity"
+            android:label="AuralListen"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""

@@ -5,11 +5,13 @@ UI: `lib/features/settings/backup_flow.dart`. Tests: `test/data/backup/backup_se
 
 ## OPML-Export
 Optionen → Sicherung → „Abos als OPML exportieren": OPML 2.0 mit allen Abos (`title`, `xmlUrl`, `htmlUrl`), gespeichert
-über den Android-Speichern-Dialog (Datei `AA-PodcastGuru-Abos-JJJJ-MM-TT.opml`). Nur Abos, kein Hörstand – für andere Apps.
+über den Android-Speichern-Dialog (Datei `AA-AuralListen-Abos-JJJJ-MM-TT.opml`). Nur Abos, kein Hörstand – für andere Apps.
 
 ## Backup
-Optionen → Sicherung → „Backup erstellen" → Speichern-Dialog (`AA-PodcastGuru-Backup-JJJJ-MM-TT.zip`).
-- ZIP mit `manifest.json` (`app`, `format` = 1, `schemaVersion`, `createdAt`) und `aapodcastguru.sqlite`.
+Optionen → Sicherung → „Backup erstellen" → Speichern-Dialog (`AA-AuralListen-Backup-JJJJ-MM-TT.zip`).
+- ZIP mit `manifest.json` (`app` = `AA-AuralListen`, `format` = 1, `schemaVersion`, `createdAt`) und
+  `aapodcastguru.sqlite` (Dateiname bewusst unverändert). Beim Einlesen wird auch `app` = `AA-PodcastGuru` (alter
+  Name) angenommen – nur so kommen Daten aus der alten App (andere applicationId) in die umbenannte.
 - Die Datenbank wird mit `VACUUM INTO` als konsistenter, kompakter Schnappschuss kopiert (temporäre Datei im
   App-Cache, wird sofort gelöscht).
 - Enthalten: Abos inkl. Einstellungen, Folgen mit Hörstand, Kapitel, Lesezeichen, Playlists, App-Einstellungen.

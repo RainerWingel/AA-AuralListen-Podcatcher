@@ -7,10 +7,10 @@
 # Start playback of a long episode first. The memory must not grow over time
 # (docs/eviction.md); a slow upward trend of TOTAL PSS over 2 h is a leak.
 # If the pid changes, the process was restarted: check the reason with
-#   adb shell dumpsys activity exit-info io.github.rainerwingel.aapodcastguru
+#   adb shell dumpsys activity exit-info io.github.rainerwingel.aurallisten
 set -euo pipefail
 ADB="${ADB:-$HOME/Library/Android/sdk/platform-tools/adb}"
-PKG=io.github.rainerwingel.aapodcastguru
+PKG=io.github.rainerwingel.aurallisten
 MINUTES="${1:-120}"
 INTERVAL="${2:-60}"
 END=$(( $(date +%s) + MINUTES * 60 ))

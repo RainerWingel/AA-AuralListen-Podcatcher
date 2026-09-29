@@ -8,8 +8,8 @@ import 'router.dart';
 import 'theme.dart';
 
 /// Root widget: wires up routing, theme and German localization.
-class PodcastGuruApp extends ConsumerWidget {
-  const PodcastGuruApp({super.key});
+class AuralListenApp extends ConsumerWidget {
+  const AuralListenApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

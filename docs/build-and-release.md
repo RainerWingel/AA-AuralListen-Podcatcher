@@ -9,9 +9,14 @@
   Einstellungen → Akku → Hintergrundnutzungsgrenzen als „Nie im Standby" eintragen.
 
 ## App-Identität
-- applicationId / namespace: `io.github.rainerwingel.aapodcastguru` – **nie mehr ändern**
-  (sonst ist es für Android eine andere App, Daten weg).
-- Dart-Paketname: `aapodcastguru`.
+- Name (2026-09-29, markenrechtlich umbenannt): **„AA-AuralListen Podcatcher"** (App-Info, Einstellungen, Store,
+  `appName` in `lib/core/app_info.dart`); unter dem Launcher-Symbol kurz **„AuralListen"** (Activity-Label, sonst
+  abgeschnitten). Früher „AA-PodcastGuru".
+- applicationId / namespace: `io.github.rainerwingel.aurallisten` (Doppel-L) – **nie mehr ändern**, spätestens ab
+  Play-Store-Veröffentlichung unveränderlich. Bis 2026-09-29 `io.github.rainerwingel.aapodcastguru`: für Android eine
+  andere App; Daten kommen per Backup herüber (alte Backups werden angenommen, `backup.md`).
+- Bewusst unverändert (unsichtbar): Dart-Paketname `aapodcastguru`, DB-Datei `aapodcastguru.sqlite`, Keystore
+  (Alias `aapodcastguru`, Zertifikat `CN=AA-PodcastGuru`) – ein neuer Schlüssel würde Updates verhindern.
 
 ## App-Symbol
 Vorlage vom Benutzer: `tool/icon/source.webp` (Kopfhörer + „AA" + Mikrofon auf Navy). Erzeugt mit
@@ -47,7 +52,7 @@ Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für 
 1. `version:` in `pubspec.yaml` erhöhen (Name + Build-Nummer) **und** `appVersion` in `lib/core/app_info.dart`
    (User-Agent; ein Test vergleicht beide), committen, pushen, von `main` bauen.
 2. Prüfen: `apksigner verify --print-certs` (Release-Zertifikat), keine DB/Key-Dateien in der APK (`unzip -l`).
-3. APK als `AA-PodcastGuru-<version>-arm64-v8a.apk` hochladen:
+3. APK als `AA-AuralListen-<version>-arm64-v8a.apk` hochladen (bis v1.1.0: `AA-PodcastGuru-…`):
    `gh release create v<version> <apk> --target <volle SHA von origin/main> --title … --notes-file …`
    (kurze SHA lehnt GitHub ab). Notizen auf Deutsch, mit SHA-256 der APK.
 - v1.0.0 (2026-09-27): https://github.com/RainerWingel/AA-Podcast-Guru/releases/tag/v1.0.0

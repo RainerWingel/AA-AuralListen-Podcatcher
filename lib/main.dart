@@ -43,7 +43,7 @@ Future<void> main() async {
     cacheManager: CoverCacheManager.instance,
     config: const AudioServiceConfig(
       androidNotificationChannelId:
-          'io.github.rainerwingel.aapodcastguru.playback',
+          'io.github.rainerwingel.aurallisten.playback',
       androidNotificationChannelName: 'Wiedergabe',
       // White silhouette for the status bar (tool/icon/make_icons.py); the
       // coloured launcher icon would show up as a blank square there.
@@ -73,7 +73,7 @@ Future<void> main() async {
   runApp(
     UncontrolledProviderScope(
       container: container,
-      child: const PodcastGuruApp(),
+      child: const AuralListenApp(),
     ),
   );
 }

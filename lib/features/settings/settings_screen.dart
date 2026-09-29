@@ -217,11 +217,9 @@ class _BackgroundPlaybackTileState
             : l10n.backgroundPlaybackUnrestricted,
       ),
       isThreeLine: exempt == false,
-      // Restricted: the system dialog. Otherwise the app settings (Akku,
-      // Samsung standby lists) – apps cannot change those themselves.
-      onTap: () => exempt == false
-          ? battery.requestExemption()
-          : battery.openAppSettings(),
+      // Always the app's system settings (Akku → "Nicht eingeschränkt"):
+      // the app does not request the exemption itself (docs/playback.md).
+      onTap: battery.openAppSettings,
     );
   }
 }

@@ -1,14 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../audio/audio_providers.dart';
-import '../audio/battery_optimization.dart';
 import '../audio/podcast_audio_handler.dart';
 import '../core/widgets/info_snack_bar.dart';
-import '../data/providers.dart';
 import '../features/player/mini_player.dart';
 import '../l10n/app_localizations.dart';
 
@@ -22,19 +18,6 @@ class AppShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    // First playback: offer "Nicht eingeschränkt" once, so Samsung does not
-    // stop long playback with the screen off (docs/playback.md).
-    ref.listen(playbackStateProvider, (previous, next) {
-      final wasPlaying = previous?.value?.playing ?? false;
-      if (!wasPlaying && (next.value?.playing ?? false)) {
-        unawaited(
-          askForBatteryExemptionOnce(
-            ref.read(batteryOptimizationProvider),
-            ref.read(settingsRepositoryProvider),
-          ),
-        );
-      }
-    });
     ref.listen(playbackProblemsProvider, (_, next) {
       final problem = next.value?.problem;
       if (problem == null) return;

@@ -10,7 +10,7 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get appTitle => 'AA-PodcastGuru';
+  String get appTitle => 'AA-AuralListen Podcatcher';
 
   @override
   String get navHome => 'Start';
@@ -665,7 +665,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get backgroundPlaybackRestricted =>
-      'Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen zum Ändern.';
+      'Akku-Optimierung aktiv: Android kann die Wiedergabe bei ausgeschaltetem Bildschirm beenden. Tippen öffnet die App-Einstellungen → Akku → „Nicht eingeschränkt“.';
 
   @override
   String unplayedCount(int count) {

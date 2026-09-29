@@ -14,7 +14,7 @@ val keystoreProperties = Properties().apply {
 val hasReleaseKeystore = keystoreProperties.getProperty("storeFile") != null
 
 android {
-    namespace = "io.github.rainerwingel.aapodcastguru"
+    namespace = "io.github.rainerwingel.aurallisten"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -25,7 +25,7 @@ android {
 
     defaultConfig {
         // Never change: a different ID is a different app for Android (all data lost).
-        applicationId = "io.github.rainerwingel.aapodcastguru"
+        applicationId = "io.github.rainerwingel.aurallisten"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

@@ -57,3 +57,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-28 · **just_audio ohne lokalen Proxy** (`useProxyForRequestHeaders: false`) · User-Agent nativ über ExoPlayer; Proxy verursachte Timeouts/unbehandelte Fehler offline und kostet Ressourcen.
 - 2026-09-28 · **Nur noch direkt auf `main` committen** (Benutzerwunsch) · keine Feature-Branches/PRs mehr; lokale Prüfungen (format, analyze, test) vor jedem Push, CI auf `main` als Nachkontrolle.
 - 2026-09-28 · **Pushen nur auf Ansage des Benutzers** · committen jederzeit auf `main`; CI läuft beim Push.
+- 2026-09-29 · **Umbenennung in „AA-AuralListen Podcatcher"** (markenrechtlich, Benutzer) · Launcher „AuralListen", applicationId `io.github.rainerwingel.aurallisten` (neue App; Daten per Backup, alter Backup-Name wird angenommen); Keystore, Dart-Paket- und DB-Dateiname bleiben.
+- 2026-09-29 · **Kein Akku-Ausnahme-Dialog mehr** · nur Status + Knopf zu den App-Einstellungen; das Recht `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` ist für den Play Store heikel.
+- 2026-09-29 · **Play Store geplant** (hebt „nur Sideload" auf) · Datenschutzerklärung nötig, Klartext-HTTP im Datensicherheits-Formular angeben.

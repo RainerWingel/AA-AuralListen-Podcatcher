@@ -53,7 +53,7 @@ String buildOpml(List<Podcast> podcasts, {required DateTime created}) {
         'head',
         nest: () {
           builder
-            ..element('title', nest: 'AA-PodcastGuru Abos')
+            ..element('title', nest: 'AA-AuralListen Podcatcher Abos')
             ..element('dateCreated', nest: created.toUtc().toIso8601String());
         },
       );

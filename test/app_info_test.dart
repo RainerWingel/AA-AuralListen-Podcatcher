@@ -11,6 +11,6 @@ void main() {
       multiLine: true,
     ).firstMatch(pubspec)![1];
     expect(appVersion, version);
-    expect(appUserAgent, startsWith('AA-PodcastGuru/$version '));
+    expect(appUserAgent, startsWith('AA-AuralListen/$version '));
   });
 }

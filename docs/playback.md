@@ -110,16 +110,13 @@ Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell
 ### Akku-Optimierung („Nicht eingeschränkt")
 Im Dauertest (2026-09-27) hat Samsung die App bei „Optimiert" nach ~40 min Wiedergabe mit ausgeschaltetem Bildschirm
 beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf das nicht passieren.
-- Apps dürfen das **nicht selbst umschalten**; erlaubt ist nur der System-Dialog
-  (`ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, Recht `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`) – ein Tipp auf
-  „Zulassen" setzt „Nicht eingeschränkt". Samsungs Listen („Nie in Standby" usw.) kann keine App ändern oder anfragen;
-  bei „Nicht eingeschränkt" sind sie auch nicht nötig.
-- Brücke: `MainActivity.kt` (MethodChannel `aapodcastguru/battery`: `isExempt`, `requestExemption`, `openAppSettings`),
-  Dart-Seite `lib/audio/battery_optimization.dart` (Interface, im Test ein Fake). Kein zusätzliches Paket.
-- **Automatisch, genau einmal:** beim ersten Wiedergabestart (`AppShell` hört auf `playbackState`), nur wenn die App
-  noch optimiert ist. Merker `player.batteryExemptionAsked`; wer ablehnt, wird nicht erneut automatisch gefragt.
-- **Optionen → Hören → „Hintergrund-Wiedergabe"** zeigt den Status (wird beim Zurückkehren in die App neu geprüft).
-  Optimiert → Tippen öffnet den System-Dialog; nicht eingeschränkt → Tippen öffnet die App-Einstellungen.
+- Apps dürfen das **nicht selbst umschalten**. Den System-Dialog (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`) gab es bis
+  2026-09-29 – **entfernt** (Benutzerwunsch, Play-Store-Richtlinie erlaubt das Recht nur wenigen App-Arten; ein Test
+  sichert, dass es nicht im Manifest steht). Samsungs Listen („Nie in Standby" usw.) kann keine App ändern.
+- Brücke: `MainActivity.kt` (MethodChannel `aurallisten/battery`: `isExempt`, `openAppSettings`), Dart-Seite
+  `lib/audio/battery_optimization.dart` (Interface, im Test ein Fake). Kein zusätzliches Paket.
+- **Optionen → Hören → „Hintergrund-Wiedergabe"** zeigt den Status (wird beim Zurückkehren in die App neu geprüft);
+  Tippen öffnet **immer die App-Einstellungen** – dort Akku → „Nicht eingeschränkt". Kein automatisches Nachfragen.
 - Samsung zeigt Apps in „Grenzen der Hintergrundnutzung" nur, wenn sie kürzlich liefen – dass die App dort zeitweise
   fehlt, ist normal.
 
