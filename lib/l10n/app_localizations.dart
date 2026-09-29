@@ -1490,7 +1490,7 @@ abstract class AppLocalizations {
   /// **'English'**
   String get languageEnglish;
 
-  /// First start: shown in the device language before anything is chosen.
+  /// First start: the picker is always shown in English, so only app_en.arb is visible there.
   ///
   /// In de, this message translates to:
   /// **'Sprache wählen'**

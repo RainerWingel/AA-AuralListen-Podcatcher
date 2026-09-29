@@ -638,7 +638,7 @@
   },
   "languagePickerTitle": "Sprache wählen",
   "@languagePickerTitle": {
-    "description": "First start: shown in the device language before anything is chosen."
+    "description": "First start: the picker is always shown in English, so only app_en.arb is visible there."
   },
   "languagePickerHint": "Du kannst die Sprache später unter Optionen ändern.",
   "notificationChannelPlayback": "Wiedergabe",
