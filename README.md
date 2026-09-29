@@ -31,7 +31,7 @@ Gerät. Geschrieben in Flutter.
 
 **Playlists**
 - Mehrere Playlists mit automatischem Weiterspielen; gespielte Folgen verlassen alle Playlists
-- Sortieren nach Datum oder Namen, „Alles downloaden"
+- „Fortsetzen" mit der zuletzt gespielten Folge jeder Playlist, Sortieren nach Datum oder Namen, „Alles downloaden"
 - Aus dem Abo-Menü: alle neuen, alle ungespielten oder alle ungespielten seit einem Datum in eine Playlist
 
 **Downloads und Speicher**
