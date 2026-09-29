@@ -23,7 +23,7 @@ class AuralListenApp extends ConsumerWidget {
       darkTheme: AppTheme.dark(),
       themeMode: ref.watch(themeModeProvider).value ?? ThemeMode.system,
       routerConfig: ref.watch(routerProvider),
-      // null = not chosen yet: until then the device's language is used.
+      // null = not chosen yet: the picker is shown in the device's language.
       locale: language.value?.locale,
       localeResolutionCallback: (deviceLocale, _) =>
           AppLanguage.forDevice(deviceLocale).locale,
@@ -40,13 +40,7 @@ class AuralListenApp extends ConsumerWidget {
           return ColoredBox(color: Theme.of(context).colorScheme.surface);
         }
         if (!language.hasError && language.value == null) {
-          // Always in English – understood by most people who have not chosen
-          // yet; the buttons show each language in its own name.
-          return Localizations.override(
-            context: context,
-            locale: AppLanguage.en.locale,
-            child: const LanguagePickerScreen(),
-          );
+          return const LanguagePickerScreen();
         }
         return child!;
       },

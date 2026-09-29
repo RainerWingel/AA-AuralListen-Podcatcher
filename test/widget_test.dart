@@ -738,12 +738,8 @@ void main() {
         () => SettingsRepository(db).get(SettingsKeys.language),
       );
 
-      // German device – the picker is still English.
-      tester.platformDispatcher.localeTestValue = const Locale('de', 'DE');
-      addTearDown(tester.platformDispatcher.clearLocaleTestValue);
-
-      // Nothing chosen yet: the picker comes first, always in English, and
-      // the app behind it is not shown.
+      // Nothing chosen yet: the picker comes first, in the device language
+      // (English in tests), and the app behind it is not shown.
       await pumpApp(tester, language: null);
       expect(find.text('Choose language'), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
