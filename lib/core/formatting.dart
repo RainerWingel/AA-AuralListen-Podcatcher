@@ -2,8 +2,9 @@ import 'package:intl/intl.dart';
 
 import '../l10n/app_localizations.dart';
 
-/// "10. Juni 2025" / "June 10, 2025", or without year for the current year
-/// ("10. Juni"). [locale]: `AppLocalizations.localeName`.
+/// Short month for lists (user rule): "15. März 2025" / "Mar 15, 2025", or
+/// without year for the current year ("27. Feb." / "Feb 27").
+/// [locale]: `AppLocalizations.localeName`.
 String formatEpisodeDate(
   DateTime date, {
   required DateTime now,
@@ -11,8 +12,8 @@ String formatEpisodeDate(
 }) {
   final local = date.toLocal();
   return local.year == now.year
-      ? DateFormat.MMMMd(locale).format(local)
-      : DateFormat.yMMMMd(locale).format(local);
+      ? DateFormat.MMMd(locale).format(local)
+      : DateFormat.yMMMd(locale).format(local);
 }
 
 /// "1 Std. 5 Min." or "42 Min." (at least 1 minute).

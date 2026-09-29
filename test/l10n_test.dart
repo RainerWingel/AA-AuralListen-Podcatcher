@@ -6,6 +6,7 @@ import 'package:aapodcastguru/core/app_language.dart';
 import 'package:aapodcastguru/core/formatting.dart';
 import 'package:aapodcastguru/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 /// Message keys of an ARB file in file order, duplicates included (a JSON
 /// decoder would silently keep only the last of two equal keys).
@@ -70,5 +71,18 @@ void main() {
     const size = 1288490189; // 1.2 GiB
     expect(formatBytes(size, 'de'), '1,2 GB');
     expect(formatBytes(size, 'en'), '1.2 GB');
+  });
+
+  test('list dates use the short month name', () async {
+    await initializeDateFormatting();
+    final now = DateTime(2026, 9, 29);
+    String date(String locale, DateTime d) =>
+        formatEpisodeDate(d, now: now, locale: locale);
+    expect(date('en', DateTime(2026, 3, 15)), 'Mar 15');
+    expect(date('en', DateTime(2026, 2, 27)), 'Feb 27');
+    expect(date('en', DateTime(2025, 9, 26)), 'Sep 26, 2025');
+    expect(date('de', DateTime(2026, 2, 27)), '27. Feb.');
+    expect(date('de', DateTime(2026, 3, 15)), '15. März');
+    expect(date('de', DateTime(2025, 9, 26)), '26. Sept. 2025');
   });
 }

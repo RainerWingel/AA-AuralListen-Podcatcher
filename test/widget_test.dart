@@ -426,7 +426,7 @@ void main() {
     }
 
     // Date and duration have their own line, separate from the podcast name.
-    expect(find.text('26. September 2025 · 4 Std. 5 Min.'), findsOneWidget);
+    expect(find.text('26. Sept. 2025 · 4 Std. 5 Min.'), findsOneWidget);
     expect(
       find.text('wrint: gespräche zum runterladen – ein sehr langer Name'),
       findsOneWidget,

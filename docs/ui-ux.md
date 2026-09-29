@@ -92,7 +92,9 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
   „AA-AuralListen“" / „Welcome to the Podcatcher …", App-Symbol, „Sprache wählen", Knöpfe Deutsch /
   English). Er erscheint in der Gerätesprache (Deutsch bei deutschem Gerät, sonst Englisch). Ein Tipp speichert die
   Wahl, danach erscheint die App.
-- Datum und Größen formatieren mit `AppLocalizations.localeName` (nie fest `'de'`): „10. Juni 2025" / „June 10, 2025",
+- Datum und Größen formatieren mit `AppLocalizations.localeName` (nie fest `'de'`). In **Listen** kurzer Monat
+  (`formatEpisodeDate`, Benutzerwunsch 2026-09-29): „27. Feb." / „Feb 27", mit Jahr „15. März 2025" / „Mar 15, 2025";
+  in Dialogen und Meldungen ausgeschrieben („10. Juni 2025"),
   „1,2 GB" / „1.2 GB".
 - Der Name des Benachrichtigungskanals (Android-Einstellungen) wird in `main.dart` beim Start aus der gespeicherten
   Sprache gesetzt.
