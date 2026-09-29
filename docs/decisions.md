@@ -61,3 +61,4 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-29 · **Kein Akku-Ausnahme-Dialog mehr** · nur Status + Knopf zu den App-Einstellungen; das Recht `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` ist für den Play Store heikel.
 - 2026-09-29 · **Play Store geplant** (hebt „nur Sideload" auf) · Datenschutzerklärung nötig, Klartext-HTTP im Datensicherheits-Formular angeben.
 - 2026-09-29 · **Weitere Sprachen geplant** (hebt „Nur Deutsch" auf, Benutzer) · vorerst weiter nur `app_de.arb`; die gen-l10n-Struktur ist dafür schon vorbereitet. README weist darauf hin.
+- 2026-09-29 · **Kein Trinkgeld über Google Play Billing** (Benutzer) · nur freiwilliger PayPal-Link auf der Info-Seite; für einen Play-Store-Build `showTipLink = false` (Richtlinie für externe Zahlungslinks), Händler-Pflichtangaben entfallen so.
