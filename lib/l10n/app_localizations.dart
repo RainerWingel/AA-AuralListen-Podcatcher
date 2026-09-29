@@ -1490,6 +1490,12 @@ abstract class AppLocalizations {
   /// **'English'**
   String get languageEnglish;
 
+  /// First start: headline at the top of the language picker.
+  ///
+  /// In de, this message translates to:
+  /// **'Willkommen beim Podcatcher „AA-AuralListen“'**
+  String get languagePickerWelcome;
+
   /// First start: shown in the device language before anything is chosen.
   ///
   /// In de, this message translates to:

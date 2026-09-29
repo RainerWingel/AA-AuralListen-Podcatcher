@@ -636,6 +636,10 @@
   "@languageEnglish": {
     "description": "Always the language's own name – same text in every ARB file."
   },
+  "languagePickerWelcome": "Willkommen beim Podcatcher „AA-AuralListen“",
+  "@languagePickerWelcome": {
+    "description": "First start: headline at the top of the language picker."
+  },
   "languagePickerTitle": "Sprache wählen",
   "@languagePickerTitle": {
     "description": "First start: shown in the device language before anything is chosen."

@@ -86,7 +86,8 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
 - Alle Texte in `lib/l10n/app_de.arb` (Vorlage) und `lib/l10n/app_en.arb` – **jeder neue Schlüssel in beide**
   (Test `test/l10n_test.dart` prüft das). Deutsch in Du-Form, Englisch im gleichen lockeren Ton; kurz.
 - **Erster Start:** Ist `ui.language` nicht gesetzt, zeigt `AuralListenApp` (über `MaterialApp.builder`) statt der App
-  den Sprachwähler (`lib/features/settings/language_picker.dart`: App-Symbol, „Sprache wählen", Knöpfe Deutsch /
+  den Sprachwähler (`lib/features/settings/language_picker.dart`: oben „Willkommen beim Podcatcher
+  „AA-AuralListen“" / „Welcome to the Podcatcher …", App-Symbol, „Sprache wählen", Knöpfe Deutsch /
   English). Er erscheint in der Gerätesprache (Deutsch bei deutschem Gerät, sonst Englisch). Ein Tipp speichert die
   Wahl, danach erscheint die App.
 - Datum und Größen formatieren mit `AppLocalizations.localeName` (nie fest `'de'`): „10. Juni 2025" / „June 10, 2025",

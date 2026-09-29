@@ -34,6 +34,12 @@ class LanguagePickerScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Text(
+                  l10n.languagePickerWelcome,
+                  style: theme.textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(24),
                   child: Image.asset(
@@ -46,7 +52,7 @@ class LanguagePickerScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
                 Text(
                   l10n.languagePickerTitle,
-                  style: theme.textTheme.headlineSmall,
+                  style: theme.textTheme.titleLarge,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),

@@ -742,6 +742,10 @@ void main() {
       // (English in tests), and the app behind it is not shown.
       await pumpApp(tester, language: null);
       expect(find.text('Choose language'), findsOneWidget);
+      expect(
+        find.text('Welcome to the Podcatcher “AA-AuralListen”'),
+        findsOneWidget,
+      );
       expect(find.byType(NavigationBar), findsNothing);
 
       await tester.tap(find.text('Deutsch'));
@@ -781,6 +785,10 @@ void main() {
 
       await pumpApp(tester, language: null);
       expect(find.text('Sprache wählen'), findsOneWidget);
+      expect(
+        find.text('Willkommen beim Podcatcher „AA-AuralListen“'),
+        findsOneWidget,
+      );
       expect(find.text('Choose language'), findsNothing);
 
       await disposeApp(tester);
