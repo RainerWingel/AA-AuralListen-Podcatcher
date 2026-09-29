@@ -107,8 +107,9 @@ class RssParser {
       throw const FeedFormatException('Not an RSS feed');
     }
 
-    final title = _text(channel.getElement('title'));
-    if (title == null) {
+    final rawTitle = _text(channel.getElement('title'));
+    final title = rawTitle == null ? null : cleanTitle(rawTitle);
+    if (title == null || title.isEmpty) {
       throw const FeedFormatException('Feed has no title');
     }
 
@@ -156,7 +157,10 @@ class RssParser {
 
     return ParsedEpisode(
       guid: _text(item.getElement('guid')) ?? audioUrl,
-      title: _text(item.getElement('title')) ?? audioUrl,
+      title: switch (_text(item.getElement('title'))) {
+        final t? when cleanTitle(t).isNotEmpty => cleanTitle(t),
+        _ => audioUrl,
+      },
       audioUrl: audioUrl,
       audioMimeType: mimeType,
       audioSizeBytes: size != null && size > 0 ? size : null,

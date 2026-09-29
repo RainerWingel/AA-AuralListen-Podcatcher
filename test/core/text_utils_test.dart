@@ -19,4 +19,15 @@ void main() {
     final text = htmlToPlainText('x' * 50, maxLength: 10);
     expect(text, '${'x' * 10}…');
   });
+
+  test('titles: entities decoded, spaces collapsed, tags kept', () {
+    expect(cleanTitle('A&nbsp;B'), 'A B');
+    expect(cleanTitle('Folge 12 &#8211; Titel'), 'Folge 12 – Titel');
+    expect(cleanTitle('K&auml;se &amp; Brot'), 'Käse & Brot');
+    expect(cleanTitle('  C<3   Liebe '), 'C<3 Liebe');
+    // Double-escaped stays one level: the feed meant the text "&nbsp;".
+    expect(cleanTitle('a &amp;nbsp; b'), 'a &nbsp; b');
+    // Unknown or impossible entities stay as they are (no crash).
+    expect(cleanTitle('x &foo; &#99999999; y'), 'x &foo; &#99999999; y');
+  });
 }

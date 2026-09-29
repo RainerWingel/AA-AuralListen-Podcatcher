@@ -9,9 +9,9 @@ final RegExp _anyTag = RegExp(r'<[^>]*>');
 final RegExp _spaces = RegExp(r'[ \t ]+');
 final RegExp _blankLines = RegExp(r'\n\s*\n\s*(\n\s*)+');
 
+// `&amp;` last, so "&amp;nbsp;" stays the literal text "&nbsp;".
 const Map<String, String> _entities = {
   '&nbsp;': ' ',
-  '&amp;': '&',
   '&lt;': '<',
   '&gt;': '>',
   '&quot;': '"',
@@ -27,18 +27,34 @@ const Map<String, String> _entities = {
   '&ndash;': '–',
   '&mdash;': '—',
   '&hellip;': '…',
+  '&amp;': '&',
 };
 
 final RegExp _numericEntity = RegExp(r'&#(x?)([0-9a-fA-F]+);');
 
+/// Replaces HTML entities that feeds leave in their text ("&nbsp;",
+/// "&#8211;" …) by the characters. Unknown entities stay as they are.
+String decodeHtmlEntities(String text) {
+  var result = text;
+  _entities.forEach(
+    (entity, value) => result = result.replaceAll(entity, value),
+  );
+  return result.replaceAllMapped(_numericEntity, (m) {
+    final code = int.tryParse(m[2]!, radix: m[1]!.isEmpty ? 10 : 16);
+    return code == null || code > 0x10FFFF ? m[0]! : String.fromCharCode(code);
+  });
+}
+
+/// Titles: entities decoded, whitespace collapsed – but no tag stripping,
+/// so a title like "C<3" stays intact.
+String cleanTitle(String title) =>
+    decodeHtmlEntities(title).replaceAll(_spaces, ' ').trim();
+
 /// Converts HTML show notes to readable plain text and caps the length.
 String htmlToPlainText(String html, {int maxLength = maxDescriptionLength}) {
-  var text = html.replaceAll(_blockTags, '\n').replaceAll(_anyTag, '');
-  _entities.forEach((entity, value) => text = text.replaceAll(entity, value));
-  text = text.replaceAllMapped(_numericEntity, (m) {
-    final code = int.tryParse(m[2]!, radix: m[1]!.isEmpty ? 10 : 16);
-    return code == null ? m[0]! : String.fromCharCode(code);
-  });
+  var text = decodeHtmlEntities(
+    html.replaceAll(_blockTags, '\n').replaceAll(_anyTag, ''),
+  );
   text = text
       .replaceAll('\r', '')
       .replaceAll(_spaces, ' ')

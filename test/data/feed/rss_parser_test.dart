@@ -77,6 +77,24 @@ void main() {
     expect(feed.imageUrl, 'https://example.com/rss.jpg');
   });
 
+  test('HTML entities in titles are decoded', () {
+    final feed = parser.parse(
+      '<rss><channel><title>Tom&amp;nbsp;&amp;amp; Jerry</title>'
+      '<item><title>Folge&nbsp;1 &amp;#8211; Start</title>'
+      '<enclosure url="https://example.com/1.mp3"/></item>'
+      '<item><title>&nbsp;</title>'
+      '<enclosure url="https://example.com/2.mp3"/></item>'
+      '</channel></rss>',
+    );
+    // Feeds often escape twice; the result is still the intended text.
+    expect(feed.title, 'Tom & Jerry');
+    expect(feed.episodes.map((e) => e.title), [
+      'Folge 1 – Start',
+      // Nothing left of the title: fall back to the file address.
+      'https://example.com/2.mp3',
+    ]);
+  });
+
   test('rejects HTML and broken XML', () {
     expect(
       () => parser.parse('<html><body>Hallo</body></html>'),
