@@ -356,6 +356,46 @@ void main() {
     });
   });
 
+  test(
+    'searchEpisodes: title matches first, notes too, wildcards literal',
+    () async {
+      final podcastId = await db
+          .into(db.podcasts)
+          .insert(
+            PodcastsCompanion.insert(
+              feedUrl: 'https://example.com/s',
+              title: 'CRE',
+              subscribedAt: clockNow,
+            ),
+          );
+      Future<void> add(String title, String? notes, int year) => db
+          .into(db.episodes)
+          .insert(
+            EpisodesCompanion.insert(
+              podcastId: podcastId,
+              guid: title,
+              title: title,
+              audioUrl: 'https://example.com/$title.mp3',
+              description: Value(notes),
+              pubDate: Value(DateTime.utc(year)),
+              addedAt: clockNow,
+            ),
+          );
+      await add('CRE195 Das Gehirn', null, 2012);
+      await add('CRE200 Neuronen', 'Wie das Gehirn lernt', 2014);
+      await add('CRE201 Sterne', 'Astronomie', 2015);
+      await add('100% Rabatt', null, 2016);
+
+      Future<List<String>> titles(String q) async =>
+          (await repo.searchEpisodes(q)).map((e) => e.episode.title).toList();
+      // Case-insensitive; the title match comes before the newer notes match.
+      expect(await titles('gehirn'), ['CRE195 Das Gehirn', 'CRE200 Neuronen']);
+      expect(await titles('%'), ['100% Rabatt']);
+      expect(await titles('_'), isEmpty);
+      expect(await titles('  '), isEmpty);
+    },
+  );
+
   test('unsubscribe deletes episodes and evicts cover images', () async {
     server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
     final id = await repo.subscribe('https://example.com/feed');

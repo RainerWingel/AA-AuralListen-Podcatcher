@@ -14,10 +14,15 @@ Vorbild: **Castbox**. Material 3, Deutsch und Englisch, Hell/Dunkel (Dunkel ab M
 Tab-Beschriftungen höchstens 9 Zeichen (Länge von „Downloads"): Bei 5 Tabs und großer Systemschrift brechen längere
 Wörter auf dem S25 um (Test: „layout fits a Galaxy S25 with enlarged font").
 
-Suche: Lupe oben rechts auf Start und Abos → Suchbildschirm (`/abos/suche`) mit Eingabefeld in der AppBar.
+Suche (Verzeichnisse, neue Podcasts): Lupe oben rechts auf **Start** → Suchbildschirm (`/abos/suche`) mit Eingabefeld
+in der AppBar.
 Treffer: Cover, Titel, „Autor · N Folgen", rechts ⊕ (abonnieren) bzw. ✓ (abonniert). Nach dem Abonnieren
 Snackbar „„X" abonniert" mit Aktion „Öffnen".
-Abos-Tab: Lupe + „+" (RSS-URL). Langes Drücken auf eine Kachel → „Alle neuen / seit … / alle ungespielten Episoden spielen" (→ `playlists.md`). Leerer Abos-Tab bietet: Suchen · Per RSS-URL hinzufügen · OPML-Datei importieren.
+Abos-Tab: Lupe + „+" (RSS-URL). Die **Lupe im Abos-Tab sucht nur in den Abos** (Benutzerwunsch 2026-09-30, lokal,
+ohne Internet): AppBar wird zum Eingabefeld „In Abos suchen" (← bzw. Android-Zurück schließt, ✕ leert). Treffer
+während des Tippens: Abschnitt „Podcasts" (Name oder Autor, ohne Groß/Klein und Umlaute, `foldForSearch`), darunter
+„Folgen" (Titel oder Show-Notes, `PodcastRepository.searchEpisodes`: Titel-Treffer zuerst, dann neueste, max. 50;
+SQLite-LIKE ignoriert Groß/Klein nur bei ASCII). Nichts gefunden → Hinweis auf die Suche auf „Start". Langes Drücken auf eine Kachel → „Alle neuen / seit … / alle ungespielten Episoden spielen" (→ `playlists.md`). Leerer Abos-Tab bietet: Suchen · Per RSS-URL hinzufügen · OPML-Datei importieren.
 Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 
 ## Player

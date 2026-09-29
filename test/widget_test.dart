@@ -241,6 +241,52 @@ void main() {
   );
 
   testWidgets(
+    'the Abos search finds only subscribed podcasts and their episodes',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.byTooltip('In Abos suchen'));
+      await settle(tester);
+
+      // Podcast by its author, case ignored.
+      await tester.enterText(find.byType(TextField), 'tESTER');
+      await settle(tester);
+      expect(find.text('Podcasts'), findsOneWidget);
+      expect(find.widgetWithText(ListTile, 'Widget-Podcast'), findsOneWidget);
+
+      // Episode by title, from the local database.
+      await tester.enterText(find.byType(TextField), 'erste');
+      await settle(tester);
+      expect(find.text('Folgen'), findsOneWidget);
+      expect(find.text('Erste Folge'), findsOneWidget);
+      expect(find.text('Podcasts'), findsNothing);
+
+      await tester.enterText(find.byType(TextField), 'gibtsnicht');
+      await settle(tester);
+      expect(find.text('Nichts gefunden in deinen Abos'), findsOneWidget);
+
+      // Back closes the search and shows the grid again.
+      await tester.tap(find.byTooltip('Suche schließen'));
+      await settle(tester);
+      expect(find.byType(TextField), findsNothing);
+      expect(find.text('Widget-Podcast'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'searches directories and subscribes from the results',
     timeout: timeout,
     (tester) async {

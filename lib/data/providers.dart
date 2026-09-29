@@ -138,6 +138,13 @@ final podcastsProvider = StreamProvider.autoDispose<List<Podcast>>(
   (ref) => ref.watch(podcastRepositoryProvider).watchPodcasts(),
 );
 
+/// Episodes found by the search in the Abos tab (docs/ui-ux.md).
+final subscriptionEpisodeSearchProvider = FutureProvider.autoDispose
+    .family<List<EpisodeWithPodcast>, String>(
+      (ref, query) =>
+          ref.watch(podcastRepositoryProvider).searchEpisodes(query),
+    );
+
 /// Unplayed episodes per podcast id (badges in the subscriptions grid).
 final unplayedCountsProvider = StreamProvider.autoDispose<Map<int, int>>(
   (ref) => ref.watch(podcastRepositoryProvider).watchUnplayedCounts(),

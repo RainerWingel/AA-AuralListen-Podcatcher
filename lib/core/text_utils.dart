@@ -1,3 +1,12 @@
+/// Text for comparing and searching: lower case, umlauts like their base
+/// letter ("Äpfel" ~ "apfel"), ß as ss.
+String foldForSearch(String s) => s
+    .toLowerCase()
+    .replaceAll('ä', 'a')
+    .replaceAll('ö', 'o')
+    .replaceAll('ü', 'u')
+    .replaceAll('ß', 'ss');
+
 /// Maximum length of stored descriptions (see docs/eviction.md: keep the DB small).
 const int maxDescriptionLength = 4000;
 

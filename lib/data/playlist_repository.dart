@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../core/clock.dart';
+import '../core/text_utils.dart';
 import 'db/app_database.dart';
 
 /// A playlist with its episode count and total duration (Playlists tab).
@@ -15,12 +16,7 @@ enum PlaylistSort { dateAscending, dateDescending, nameAscending }
 /// Title order for people: case-insensitive, umlauts like their base letter,
 /// numbers by value ("Folge 2" before "Folge 10").
 int compareTitles(String a, String b) {
-  String fold(String s) => s
-      .toLowerCase()
-      .replaceAll('ä', 'a')
-      .replaceAll('ö', 'o')
-      .replaceAll('ü', 'u')
-      .replaceAll('ß', 'ss');
+  const fold = foldForSearch;
   final digits = RegExp(r'\d+|\D+');
   final pa = digits.allMatches(fold(a)).map((m) => m[0]!).toList();
   final pb = digits.allMatches(fold(b)).map((m) => m[0]!).toList();

@@ -320,6 +320,48 @@ abstract class AppLocalizations {
   /// **'Durchsucht Apple Podcasts und fyyd.de'**
   String get searchStartHint;
 
+  /// Abos tab: the search there only looks in subscribed podcasts and their episodes (local).
+  ///
+  /// In de, this message translates to:
+  /// **'In Abos suchen'**
+  String get subsSearchHint;
+
+  /// No description provided for @subsSearchClose.
+  ///
+  /// In de, this message translates to:
+  /// **'Suche schließen'**
+  String get subsSearchClose;
+
+  /// No description provided for @searchClear.
+  ///
+  /// In de, this message translates to:
+  /// **'Eingabe löschen'**
+  String get searchClear;
+
+  /// No description provided for @subsSearchPodcasts.
+  ///
+  /// In de, this message translates to:
+  /// **'Podcasts'**
+  String get subsSearchPodcasts;
+
+  /// No description provided for @subsSearchEpisodes.
+  ///
+  /// In de, this message translates to:
+  /// **'Folgen'**
+  String get subsSearchEpisodes;
+
+  /// No description provided for @subsSearchNothing.
+  ///
+  /// In de, this message translates to:
+  /// **'Nichts gefunden in deinen Abos'**
+  String get subsSearchNothing;
+
+  /// No description provided for @subsSearchNothingHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Podcasts findest du über die Suche auf „Start“.'**
+  String get subsSearchNothingHint;
+
   /// No description provided for @searchNoResults.
   ///
   /// In de, this message translates to:

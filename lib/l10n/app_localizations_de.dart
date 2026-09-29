@@ -148,6 +148,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchStartHint => 'Durchsucht Apple Podcasts und fyyd.de';
 
   @override
+  String get subsSearchHint => 'In Abos suchen';
+
+  @override
+  String get subsSearchClose => 'Suche schließen';
+
+  @override
+  String get searchClear => 'Eingabe löschen';
+
+  @override
+  String get subsSearchPodcasts => 'Podcasts';
+
+  @override
+  String get subsSearchEpisodes => 'Folgen';
+
+  @override
+  String get subsSearchNothing => 'Nichts gefunden in deinen Abos';
+
+  @override
+  String get subsSearchNothingHint =>
+      'Neue Podcasts findest du über die Suche auf „Start“.';
+
+  @override
   String get searchNoResults => 'Keine Podcasts gefunden';
 
   @override

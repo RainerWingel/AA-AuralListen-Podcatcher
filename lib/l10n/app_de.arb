@@ -81,6 +81,16 @@
   "searchHint": "Podcast suchen",
   "searchStart": "Suche nach Titel, Thema oder Autor",
   "searchStartHint": "Durchsucht Apple Podcasts und fyyd.de",
+  "subsSearchHint": "In Abos suchen",
+  "@subsSearchHint": {
+    "description": "Abos tab: the search there only looks in subscribed podcasts and their episodes (local)."
+  },
+  "subsSearchClose": "Suche schließen",
+  "searchClear": "Eingabe löschen",
+  "subsSearchPodcasts": "Podcasts",
+  "subsSearchEpisodes": "Folgen",
+  "subsSearchNothing": "Nichts gefunden in deinen Abos",
+  "subsSearchNothingHint": "Neue Podcasts findest du über die Suche auf „Start“.",
   "searchNoResults": "Keine Podcasts gefunden",
   "searchFailed": "Suche fehlgeschlagen. Bitte Internetverbindung prüfen.",
   "searchPartialFailure": "{names} nicht erreichbar – Ergebnisse unvollständig",

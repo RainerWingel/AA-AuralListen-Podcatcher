@@ -164,6 +164,56 @@ class PodcastRepository {
     );
   }
 
+  /// Search in the subscriptions (Abos tab): episodes whose title or show
+  /// notes contain [query]. Title matches first, then newest first; at most
+  /// [limit] (the list is for finding, not browsing). SQLite's LIKE ignores
+  /// case for ASCII letters only, so "ä"/"Ä" still differ here.
+  Future<List<EpisodeWithPodcast>> searchEpisodes(
+    String query, {
+    int limit = 50,
+  }) async {
+    final text = query.trim();
+    if (text.isEmpty) return const [];
+    // Escape LIKE wildcards typed by the user.
+    final escaped = text
+        .replaceAll(r'\', r'\\')
+        .replaceAll('%', r'\%')
+        .replaceAll('_', r'\_');
+    final pattern = '%$escaped%';
+    final inTitle = _db.episodes.title.like(pattern, escapeChar: r'\');
+    final inNotes = _db.episodes.description.like(pattern, escapeChar: r'\');
+    final rows =
+        await (_db.select(_db.episodes).join([
+                innerJoin(
+                  _db.podcasts,
+                  _db.podcasts.id.equalsExp(_db.episodes.podcastId),
+                ),
+              ])
+              ..where(inTitle | inNotes)
+              ..orderBy([
+                OrderingTerm(
+                  expression: CaseWhenExpression(
+                    cases: [CaseWhen(inTitle, then: const Constant(0))],
+                    orElse: const Constant(1),
+                  ),
+                ),
+                OrderingTerm(
+                  expression: _db.episodes.pubDate,
+                  mode: OrderingMode.desc,
+                  nulls: NullsOrder.last,
+                ),
+              ])
+              ..limit(limit))
+            .get();
+    return [
+      for (final row in rows)
+        (
+          episode: row.readTable(_db.episodes),
+          podcast: row.readTable(_db.podcasts),
+        ),
+    ];
+  }
+
   /// Newest episodes across all subscriptions (home screen).
   Stream<List<EpisodeWithPodcast>> watchLatestEpisodes({int limit = 100}) {
     final query =
