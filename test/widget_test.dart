@@ -772,6 +772,21 @@ void main() {
     },
   );
 
+  testWidgets(
+    'the language picker speaks German on a German device',
+    timeout: timeout,
+    (tester) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('de', 'DE')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+      await pumpApp(tester, language: null);
+      expect(find.text('Sprache wählen'), findsOneWidget);
+      expect(find.text('Choose language'), findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('feed address can be changed after a move', timeout: timeout, (
     tester,
   ) async {
