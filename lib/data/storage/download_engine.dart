@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:background_downloader/background_downloader.dart';
+import 'package:http/http.dart' as http;
 
 import '../../core/app_info.dart';
+import 'download_url.dart';
 
 /// What the download engine reports about one episode download.
 sealed class DownloadEvent {
@@ -67,6 +69,11 @@ abstract interface class DownloadEngine {
 /// downloads continue when the app is in the background. Partial data is kept
 /// in a temporary file and only moved into place when complete.
 class BackgroundDownloadEngine implements DownloadEngine {
+  BackgroundDownloadEngine(this._client);
+
+  /// Only for [resolveProtocolSwitches]; owned by the caller.
+  final http.Client _client;
+
   static const _group = 'episodes';
   static const _taskPrefix = 'episode-';
   static const _userAgent = appUserAgent;
@@ -117,10 +124,10 @@ class BackgroundDownloadEngine implements DownloadEngine {
     required String url,
     required String fileName,
     required bool wifiOnly,
-  }) => FileDownloader().enqueue(
+  }) async => FileDownloader().enqueue(
     DownloadTask(
       taskId: '$_taskPrefix$episodeId',
-      url: url,
+      url: await resolveProtocolSwitches(_client, url),
       filename: fileName,
       directory: 'episodes',
       baseDirectory: BaseDirectory.applicationSupport,

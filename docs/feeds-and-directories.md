@@ -37,6 +37,11 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
   Feeds, Verzeichnisse, Downloads und Streaming.
 - Unverschlüsseltes `http://` ist erlaubt (`res/xml/network_security_config.xml`): viele Feeds verlinken Audio noch
   per http (z. B. CRE-mp3-Feed, der dann auf https umleitet). Android blockiert das sonst – Downloads schlugen fehl.
+- **Downloads mit Protokollwechsel** (Bug 2026-09-29, CRE195/192/151 „Download fehlgeschlagen"): Der Downloader
+  (Android `HttpURLConnection`) folgt nie einem Redirect http ↔ https und scheitert am 301. Vor dem Einreihen folgt
+  `resolveProtocolSwitches` (`lib/data/storage/download_url.dart`) deshalb **nur** solchen Wechseln (GET mit
+  `Range: bytes=0-0`, max. 5) und übergibt z. B. `https://cre.fm/…`; Redirects im selben Protokoll (oft kurzlebige
+  Tracking-Adressen) macht der Downloader selbst. Ohne Netz bleibt die Original-Adresse. Streaming betrifft das nicht.
 - Eingabe-URLs werden normalisiert: `https://` wird ergänzt, `feed://`/`itpc://`/`pcast://` → `https://`.
 - Aktualisierung nur beim App-Start (`main.dart`) und per Pull-to-Refresh, max. 4 Feeds parallel.
   Gleichzeitige Aufrufe teilen sich einen Lauf.

@@ -56,7 +56,7 @@ final podcastRepositoryProvider = Provider<PodcastRepository>(
 
 /// Native downloader; tests override it with a fake.
 final downloadEngineProvider = Provider<DownloadEngine>((ref) {
-  final engine = BackgroundDownloadEngine();
+  final engine = BackgroundDownloadEngine(ref.watch(httpClientProvider));
   ref.onDispose(engine.dispose);
   return engine;
 });
