@@ -16,16 +16,58 @@ Color playlistColorValue(PlaylistColor color) => switch (color) {
   PlaylistColor.violet => const Color(0xFF8E24AA),
 };
 
-/// Soft background for a colored playlist: the color blended into the
-/// surface, so the normal text stays readable in light and dark mode.
-/// Null = no color (default background).
+/// How strongly the color shows at its strongest point: soft, so the normal
+/// text stays readable in light and dark mode.
+double _tintAlpha(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark ? 0.30 : 0.22;
+
+/// Solid soft tint (the color blended into the surface), e.g. for the app
+/// bar above a [playlistGradient]. Null = no color.
 Color? playlistBackground(BuildContext context, PlaylistColor? color) {
   if (color == null) return null;
-  final theme = Theme.of(context);
-  final dark = theme.brightness == Brightness.dark;
   return Color.alphaBlend(
-    playlistColorValue(color).withValues(alpha: dark ? 0.30 : 0.22),
-    theme.colorScheme.surface,
+    playlistColorValue(color).withValues(alpha: _tintAlpha(context)),
+    Theme.of(context).colorScheme.surface,
+  );
+}
+
+/// Soft tint fading to transparent from [begin] to [end] – starts exactly
+/// like [playlistBackground]. Null = no color.
+LinearGradient? playlistGradient(
+  BuildContext context,
+  PlaylistColor? color, {
+  required AlignmentGeometry begin,
+  required AlignmentGeometry end,
+}) {
+  if (color == null) return null;
+  final base = playlistColorValue(color);
+  return LinearGradient(
+    begin: begin,
+    end: end,
+    colors: [
+      base.withValues(alpha: _tintAlpha(context)),
+      base.withValues(alpha: 0),
+    ],
+  );
+}
+
+/// A playlist row (overview, "Add to playlist…") with its category color
+/// fading out left to right. Ink, not a plain box, so the tap ripple stays
+/// visible on top of it. Without a color the row is returned unchanged.
+Widget playlistTintedRow(
+  BuildContext context,
+  PlaylistColor? color, {
+  required Widget child,
+}) {
+  final gradient = playlistGradient(
+    context,
+    color,
+    begin: AlignmentDirectional.centerStart,
+    end: AlignmentDirectional.centerEnd,
+  );
+  return Ink(
+    decoration: BoxDecoration(gradient: gradient),
+    child: child,
   );
 }
 

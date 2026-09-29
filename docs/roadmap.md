@@ -157,7 +157,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [ ] Praxistest auf dem S25 (Benutzer)
 
 ## Zusatz – Playlist-Farben (2026-09-29)
-- [x] 7 Regenbogenfarben + „Keine Farbe" im Playlist-Menü (Schema v9), Farbton in Übersicht und Playlist-Fenster
+- [x] 7 Regenbogenfarben + „Keine Farbe" im Playlist-Menü (Schema v9), Farbverlauf in Übersicht, Playlist-Fenster und „Zu Playlist hinzufügen…"
 - [ ] Praxistest auf dem S25 (Benutzer)
 
 ## Offene Punkte

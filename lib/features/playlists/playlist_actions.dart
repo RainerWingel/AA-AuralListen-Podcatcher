@@ -98,10 +98,14 @@ Future<Playlist?> choosePlaylist(
               ),
             ),
             for (final p in playlists)
-              ListTile(
-                leading: const Icon(Icons.playlist_play),
-                title: Text(p.name),
-                onTap: () => Navigator.of(sheetContext).pop(p.id),
+              playlistTintedRow(
+                sheetContext,
+                p.color,
+                child: ListTile(
+                  leading: const Icon(Icons.playlist_play),
+                  title: Text(p.name),
+                  onTap: () => Navigator.of(sheetContext).pop(p.id),
+                ),
               ),
             ListTile(
               leading: const Icon(Icons.add),

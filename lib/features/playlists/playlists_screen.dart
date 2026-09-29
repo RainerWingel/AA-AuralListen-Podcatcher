@@ -76,36 +76,39 @@ class _PlaylistTile extends ConsumerWidget {
     final duration = summary.duration > Duration.zero
         ? ' · ${formatEpisodeDuration(l10n, summary.duration)}'
         : '';
-    return ListTile(
-      tileColor: playlistBackground(context, playlist.color),
-      leading: const Icon(Icons.playlist_play, size: 32),
-      title: Text(playlist.name),
-      subtitle: Text(l10n.playlistSummary(summary.count, duration)),
-      onTap: () => context.go(Routes.playlist(playlist.id)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PopupMenuButton<void>(
-            // Screen context: the menu's own context goes away on close.
-            itemBuilder: (_) => playlistMenuItems(
-              context,
-              ref,
-              playlist,
-              onPlaylistScreen: false,
-              canResume: summary.count > 0,
-            ),
-          ),
-          ReorderableDragStartListener(
-            index: index,
-            child: Tooltip(
-              message: l10n.dragToReorder,
-              child: const Padding(
-                padding: EdgeInsets.all(8),
-                child: Icon(Icons.drag_handle),
+    return playlistTintedRow(
+      context,
+      playlist.color,
+      child: ListTile(
+        leading: const Icon(Icons.playlist_play, size: 32),
+        title: Text(playlist.name),
+        subtitle: Text(l10n.playlistSummary(summary.count, duration)),
+        onTap: () => context.go(Routes.playlist(playlist.id)),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PopupMenuButton<void>(
+              // Screen context: the menu's own context goes away on close.
+              itemBuilder: (_) => playlistMenuItems(
+                context,
+                ref,
+                playlist,
+                onPlaylistScreen: false,
+                canResume: summary.count > 0,
               ),
             ),
-          ),
-        ],
+            ReorderableDragStartListener(
+              index: index,
+              child: Tooltip(
+                message: l10n.dragToReorder,
+                child: const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Icon(Icons.drag_handle),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

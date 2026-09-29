@@ -46,12 +46,16 @@ class PlaylistScreen extends ConsumerWidget {
     final entries = ref.watch(playlistEntriesProvider(playlistId));
     final items = entries.value ?? const <PlaylistEntry>[];
 
-    // Category color: whole screen incl. app bar in the soft tint.
-    final background = playlistBackground(context, playlist?.color);
+    // Category color: app bar in the soft tint, below it fading out downwards.
+    final gradient = playlistGradient(
+      context,
+      playlist?.color,
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
     return Scaffold(
-      backgroundColor: background,
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: playlistBackground(context, playlist?.color),
         title: Text(playlist?.name ?? ''),
         actions: [
           if (items.isNotEmpty)
@@ -74,57 +78,61 @@ class PlaylistScreen extends ConsumerWidget {
             ),
         ],
       ),
-      body: entries.isLoading && items.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : items.isEmpty
-          ? EmptyState(
-              icon: Icons.playlist_add,
-              title: l10n.playlistEmpty,
-              hint: l10n.playlistEmptyHint,
-            )
-          : ReorderableListView.builder(
-              buildDefaultDragHandles: false,
-              itemCount: items.length,
-              onReorderItem: (oldIndex, newIndex) => ref
-                  .read(playlistRepositoryProvider)
-                  .move(playlistId, oldIndex, newIndex),
-              itemBuilder: (context, index) {
-                final entry = items[index];
-                return Dismissible(
-                  key: ValueKey(entry.episode.id),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    color: Theme.of(context).colorScheme.errorContainer,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 24),
-                    child: const Icon(Icons.playlist_remove),
-                  ),
-                  onDismissed: (_) => _remove(context, ref, entry),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: EpisodeTile(
-                          episode: entry.episode,
-                          podcast: entry.podcast,
-                          showPodcastTitle: true,
-                          playlistId: playlistId,
-                        ),
-                      ),
-                      ReorderableDragStartListener(
-                        index: index,
-                        child: Tooltip(
-                          message: l10n.dragToReorder,
-                          child: const Padding(
-                            padding: EdgeInsets.fromLTRB(0, 16, 12, 16),
-                            child: Icon(Icons.drag_handle),
+      // Ink (not a plain box) so the episodes' tap ripple stays visible.
+      body: Ink(
+        decoration: BoxDecoration(gradient: gradient),
+        child: entries.isLoading && items.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : items.isEmpty
+            ? EmptyState(
+                icon: Icons.playlist_add,
+                title: l10n.playlistEmpty,
+                hint: l10n.playlistEmptyHint,
+              )
+            : ReorderableListView.builder(
+                buildDefaultDragHandles: false,
+                itemCount: items.length,
+                onReorderItem: (oldIndex, newIndex) => ref
+                    .read(playlistRepositoryProvider)
+                    .move(playlistId, oldIndex, newIndex),
+                itemBuilder: (context, index) {
+                  final entry = items[index];
+                  return Dismissible(
+                    key: ValueKey(entry.episode.id),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: Theme.of(context).colorScheme.errorContainer,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 24),
+                      child: const Icon(Icons.playlist_remove),
+                    ),
+                    onDismissed: (_) => _remove(context, ref, entry),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: EpisodeTile(
+                            episode: entry.episode,
+                            podcast: entry.podcast,
+                            showPodcastTitle: true,
+                            playlistId: playlistId,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                        ReorderableDragStartListener(
+                          index: index,
+                          child: Tooltip(
+                            message: l10n.dragToReorder,
+                            child: const Padding(
+                              padding: EdgeInsets.fromLTRB(0, 16, 12, 16),
+                              child: Icon(Icons.drag_handle),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+      ),
     );
   }
 }

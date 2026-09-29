@@ -22,8 +22,10 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
     Dieselbe Folge woanders gestartet (z. B. auf „Start") ändert den Merker nicht.
 - **Farbe** (Benutzerwunsch 2026-09-29): ⋮ → „Farbe…" → Dialog mit 7 Regenbogenfarben (Rot, Orange, Gelb, Grün, Blau,
   Indigo, Violett) und „Keine Farbe" (`playlist_colors.dart`, gespeichert in `playlists.color`). Die Playlist bekommt
-  in der Übersicht (Kachel) und in ihrem eigenen Fenster (Hintergrund inkl. AppBar) einen sanften Farbton: Farbe mit
-  22 % (hell) bzw. 30 % (dunkel) über die Oberfläche gemischt, damit der Text lesbar bleibt.
+  einen sanften **Farbverlauf** (Farbe mit 22 % hell / 30 % dunkel, auslaufend bis transparent), damit der Text
+  lesbar bleibt: in der Übersicht und im Auswahl-Sheet „Zu Playlist hinzufügen…" je Zeile von links nach rechts
+  (`playlistTintedRow`), im eigenen Fenster AppBar im vollen Farbton und darunter von oben nach unten auslaufend.
+  Als `Ink` gemalt, damit der Tipp-Effekt sichtbar bleibt.
 - **Playlist-Menü ⋮** (Übersicht und geöffnete Playlist, gemeinsam: `playlistMenuItems`), Benutzerwunsch 2026-09-29:
   - **Übersicht:** Fortsetzen (ausgegraut bei leerer Playlist), Alles downloaden, Umbenennen, Löschen.
   - **Geöffnete Playlist:** die drei Sortierungen, Alles downloaden, Umbenennen, Löschen (Sortieren nur hier).

@@ -1604,10 +1604,19 @@ void main() {
     await pumpApp(tester);
     await tester.tap(find.widgetWithText(NavigationDestination, 'Playlists'));
     await settle(tester);
-    Color? tileColor() => tester
-        .widget<ListTile>(find.widgetWithText(ListTile, 'Wiedergabeliste'))
-        .tileColor;
-    expect(tileColor(), isNull);
+    // The tile's gradient (null = no color).
+    Gradient? tileGradient() =>
+        (tester
+                    .widget<Ink>(
+                      find.ancestor(
+                        of: find.widgetWithText(ListTile, 'Wiedergabeliste'),
+                        matching: find.byType(Ink),
+                      ),
+                    )
+                    .decoration!
+                as BoxDecoration)
+            .gradient;
+    expect(tileGradient(), isNull);
 
     await tester.tap(find.byType(PopupMenuButton<void>));
     await settle(tester);
@@ -1631,15 +1640,27 @@ void main() {
       () => db.select(db.playlists).getSingle(),
     );
     expect(playlist!.color, PlaylistColor.green);
-    final green = tileColor();
-    expect(green, isNotNull);
+    // Green, fading to transparent.
+    final colors = (tileGradient()! as LinearGradient).colors;
+    expect(colors.first.a, greaterThan(0));
+    expect(colors.last.a, 0);
+    expect(colors.first.g, greaterThan(colors.first.r));
 
-    // The playlist's own screen uses the same background.
+    // The playlist's own screen: tinted app bar, gradient below.
     await tester.tap(find.text('Wiedergabeliste'));
     await settle(tester);
     expect(
-      tester.widget<Scaffold>(find.byType(Scaffold).last).backgroundColor,
-      green,
+      tester.widget<AppBar>(find.byType(AppBar).last).backgroundColor,
+      isNotNull,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (w) =>
+            w is Ink &&
+            w.decoration is BoxDecoration &&
+            (w.decoration! as BoxDecoration).gradient is LinearGradient,
+      ),
+      findsOneWidget,
     );
 
     // "Keine Farbe" removes it again.
@@ -1653,7 +1674,7 @@ void main() {
     await settle(tester);
     await tester.tap(find.byTooltip('Keine Farbe'));
     await settle(tester);
-    expect(tileColor(), isNull);
+    expect(tileGradient(), isNull);
 
     await disposeApp(tester);
   });
@@ -1678,6 +1699,11 @@ void main() {
       final second = await tester.runAsync(
         () => container.read(playlistRepositoryProvider).create('Unterwegs'),
       );
+      await tester.runAsync(
+        () => container
+            .read(playlistRepositoryProvider)
+            .setColor(second!, PlaylistColor.blue),
+      );
       await settle(tester);
 
       await tester.longPress(find.text('Erste Folge'));
@@ -1694,7 +1720,20 @@ void main() {
       await settle(tester);
       await tester.tap(find.byTooltip('Zu Playlist hinzufügen…'));
       await settle(tester);
-      // Two playlists: the known chooser.
+      // Two playlists: the known chooser, colored playlists tinted there too.
+      Gradient? gradientOf(String name) =>
+          (tester
+                      .widget<Ink>(
+                        find.ancestor(
+                          of: find.widgetWithText(ListTile, name),
+                          matching: find.byType(Ink),
+                        ),
+                      )
+                      .decoration!
+                  as BoxDecoration)
+              .gradient;
+      expect(gradientOf('Unterwegs'), isA<LinearGradient>());
+      expect(gradientOf('Wiedergabeliste'), isNull);
       await tester.tap(find.text('Unterwegs'));
       await settle(tester);
 
