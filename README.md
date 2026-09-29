@@ -6,8 +6,6 @@ Gerät. Geschrieben in Flutter.
 > **Sprache:** Die App ist momentan **nur auf Deutsch** verfügbar. Weitere Sprachen sollen demnächst folgen –
 > alle Texte liegen bereits zentral in einer Übersetzungsdatei (`lib/l10n/app_de.arb`).
 
-Bis zum 29. September 2026 hieß die App „AA-PodcastGuru".
-
 ## Funktionen
 
 **Podcasts finden und abonnieren**
@@ -41,8 +39,8 @@ Bis zum 29. September 2026 hieß die App „AA-PodcastGuru".
 Die App ist (noch) nicht im Play Store. Die signierte APK gibt es unter
 [Releases](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases):
 
-1. `AA-AuralListen-…-arm64-v8a.apk` bzw. bei älteren Releases `AA-PodcastGuru-…-arm64-v8a.apk` herunterladen
-   (64-Bit-ARM, praktisch alle aktuellen Android-Handys).
+1. Beim neuesten Release die Datei `…-arm64-v8a.apk` herunterladen (64-Bit-ARM, praktisch alle aktuellen
+   Android-Handys).
 2. Öffnen und installieren – Android fragt einmalig nach der Erlaubnis, Apps aus dieser Quelle zu installieren.
 3. Empfehlung: In den App-Einstellungen unter **Akku → „Nicht eingeschränkt"** wählen (in der App: Optionen →
    Hören → „Hintergrund-Wiedergabe"), damit Android lange Wiedergaben mit ausgeschaltetem Bildschirm nicht beendet.
