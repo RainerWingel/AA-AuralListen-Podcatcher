@@ -158,9 +158,7 @@ void main() {
           ArchiveFile.string(
             BackupService.manifestName,
             jsonEncode({
-              // The app's former name: backups of the old app must still
-              // restore (moving data to the new application id).
-              'app': 'AA-PodcastGuru',
+              'app': 'AA-AuralListen',
               'format': 1,
               'schemaVersion': 3,
               'createdAt': now.toIso8601String(),
@@ -216,10 +214,10 @@ void main() {
       zipWith({'app': 'Andere App', 'schemaVersion': 1}, [1, 2, 3]),
     );
     await expectRejected(
-      zipWith({'app': 'AA-PodcastGuru', 'schemaVersion': 999}, [1, 2, 3]),
+      zipWith({'app': 'AA-AuralListen', 'schemaVersion': 999}, [1, 2, 3]),
     );
     await expectRejected(
-      zipWith({'app': 'AA-PodcastGuru', 'schemaVersion': 1}, utf8.encode('x')),
+      zipWith({'app': 'AA-AuralListen', 'schemaVersion': 1}, utf8.encode('x')),
     );
     expect(temp.listSync(), isEmpty, reason: 'temp copies are cleaned up');
     await db.close();
@@ -236,6 +234,32 @@ void main() {
       utf8.decode(manifest.content as List<int>),
     ) as Map<String, Object?>;
     expect(json['app'], 'AA-AuralListen');
+  });
+
+  test('backups of the former app "AA-PodcastGuru" are not accepted', () async {
+    final source = await filledDb();
+    final bytes = await serviceFor(source).createBackup();
+    await source.close();
+    final archive = ZipDecoder().decodeBytes(bytes);
+    final renamed = Archive();
+    for (final file in archive.files) {
+      renamed.addFile(
+        file.name == BackupService.manifestName
+            ? ArchiveFile.string(
+                file.name,
+                utf8
+                    .decode(file.content as List<int>)
+                    .replaceFirst('AA-AuralListen', 'AA-PodcastGuru'),
+              )
+            : file,
+      );
+    }
+    final target = await filledDb();
+    await expectLater(
+      serviceFor(target).inspect(ZipEncoder().encodeBytes(renamed)),
+      throwsA(isA<BackupFormatException>()),
+    );
+    await target.close();
   });
 
   test('suggested file name', () async {

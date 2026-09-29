@@ -61,10 +61,6 @@ class BackupService {
   static const formatVersion = 1;
   static const _appId = 'AA-AuralListen';
 
-  /// Backups of the app's former name are still accepted – the only way to
-  /// move data from the old app id (io.github.rainerwingel.aapodcastguru).
-  static const _legacyAppIds = {'AA-PodcastGuru'};
-
   /// Largest backup accepted for restore (guards the RAM).
   static const maxBackupBytes = 200 * 1024 * 1024;
 
@@ -137,8 +133,7 @@ class BackupService {
       throw const BackupFormatException('broken manifest');
     }
     final schema = manifest['schemaVersion'];
-    final app = manifest['app'];
-    if ((app != _appId && !_legacyAppIds.contains(app)) || schema is! int) {
+    if (manifest['app'] != _appId || schema is! int) {
       throw const BackupFormatException('not an AA-AuralListen backup');
     }
     if (schema > _db.schemaVersion) {

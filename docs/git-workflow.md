@@ -1,8 +1,8 @@
 # Git-Workflow
 
 ## Repository
-- GitHub: `RainerWingel/aa-podcast-guru` (**öffentlich**).
-- Remote per SSH-Host-Alias: `git@github.com-home:RainerWingel/aa-podcast-guru.git`
+- GitHub: `RainerWingel/AA-AuralListen-Podcatcher` (**öffentlich**; bis 2026-09-29 `AA-Podcast-Guru`, GitHub leitet weiter).
+- Remote per SSH-Host-Alias: `git@github.com-home:RainerWingel/AA-AuralListen-Podcatcher.git`
   (`~/.ssh/config` → `github.com-home` nutzt `~/.ssh/id_ed25519_home`).
 - Commit-Identität (repo-lokal): `RainerWingel <156608819+RainerWingel@users.noreply.github.com>` –
   **keine** echten Namen/E-Mail-Adressen in Commits.

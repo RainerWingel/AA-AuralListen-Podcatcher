@@ -10,8 +10,8 @@ Optionen → Sicherung → „Abos als OPML exportieren": OPML 2.0 mit allen Abo
 ## Backup
 Optionen → Sicherung → „Backup erstellen" → Speichern-Dialog (`AA-AuralListen-Backup-JJJJ-MM-TT.zip`).
 - ZIP mit `manifest.json` (`app` = `AA-AuralListen`, `format` = 1, `schemaVersion`, `createdAt`) und
-  `aapodcastguru.sqlite` (Dateiname bewusst unverändert). Beim Einlesen wird auch `app` = `AA-PodcastGuru` (alter
-  Name) angenommen – nur so kommen Daten aus der alten App (andere applicationId) in die umbenannte.
+  `aapodcastguru.sqlite` (Dateiname bewusst unverändert). Backups der alten App (`app` = `AA-PodcastGuru`) werden
+  **nicht** angenommen – Benutzerentscheidung 2026-09-29, keine Datenübernahme aus der alten App.
 - Die Datenbank wird mit `VACUUM INTO` als konsistenter, kompakter Schnappschuss kopiert (temporäre Datei im
   App-Cache, wird sofort gelöscht).
 - Enthalten: Abos inkl. Einstellungen, Folgen mit Hörstand, Kapitel, Lesezeichen, Playlists, App-Einstellungen.

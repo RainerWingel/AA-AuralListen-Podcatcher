@@ -14,7 +14,7 @@
   abgeschnitten). Früher „AA-PodcastGuru".
 - applicationId / namespace: `io.github.rainerwingel.aurallisten` (Doppel-L) – **nie mehr ändern**, spätestens ab
   Play-Store-Veröffentlichung unveränderlich. Bis 2026-09-29 `io.github.rainerwingel.aapodcastguru`: für Android eine
-  andere App; Daten kommen per Backup herüber (alte Backups werden angenommen, `backup.md`).
+  andere App, Neustart mit leeren Daten (Backups der alten App werden bewusst nicht angenommen, `backup.md`).
 - Bewusst unverändert (unsichtbar): Dart-Paketname `aapodcastguru`, DB-Datei `aapodcastguru.sqlite`, Keystore
   (Alias `aapodcastguru`, Zertifikat `CN=AA-PodcastGuru`) – ein neuer Schlüssel würde Updates verhindern.
 
@@ -55,8 +55,8 @@ Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für 
 3. APK als `AA-AuralListen-<version>-arm64-v8a.apk` hochladen (bis v1.1.0: `AA-PodcastGuru-…`):
    `gh release create v<version> <apk> --target <volle SHA von origin/main> --title … --notes-file …`
    (kurze SHA lehnt GitHub ab). Notizen auf Deutsch, mit SHA-256 der APK.
-- v1.0.0 (2026-09-27): https://github.com/RainerWingel/AA-Podcast-Guru/releases/tag/v1.0.0
-- v1.1.0 (2026-09-29): https://github.com/RainerWingel/AA-Podcast-Guru/releases/tag/v1.1.0
+- v1.0.0 (2026-09-27): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.0.0
+- v1.1.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.1.0
 
 ## CI (GitHub Actions)
 Bei jedem Push/PR: `flutter pub get` → `dart format --set-exit-if-changed` → `flutter analyze` → `flutter test`
