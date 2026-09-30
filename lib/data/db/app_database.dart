@@ -39,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -116,6 +116,9 @@ class AppDatabase extends _$AppDatabase {
         await customStatement(
           'UPDATE podcasts SET etag = NULL, last_modified = NULL',
         );
+      }
+      if (from < 12) {
+        await m.addColumn(podcasts, podcasts.episodeOwnCount);
       }
     },
     beforeOpen: (details) async {

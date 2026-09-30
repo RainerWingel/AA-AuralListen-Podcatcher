@@ -38,4 +38,15 @@ void main() {
       {1: 195, 3: 196},
     );
   });
+
+  test('own count can be forced for numbered feeds, then with offset', () {
+    expect(
+      episodeNumbers(
+        [ep(1, 5, feed: 195), ep(2, 6), ep(3, 7, feed: 196)],
+        offset: -1,
+        ownCount: true,
+      ),
+      {1: 0, 2: 1, 3: 2},
+    );
+  });
 }

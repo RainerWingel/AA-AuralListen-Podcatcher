@@ -651,6 +651,65 @@ void main() {
     await disposeApp(tester);
   });
 
+  testWidgets(
+    'numbered feed: feed numbers or own count with offset',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      // The feed numbers its (only) episode 42.
+      await tester.runAsync(
+        () => db
+            .update(db.episodes)
+            .write(const EpisodesCompanion(episodeNumber: Value(42))),
+      );
+      await settle(tester);
+      Finder coverNumber(String n) =>
+          find.descendant(of: find.byType(RotatedBox), matching: find.text(n));
+      expect(coverNumber('42'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+      await tester.tap(find.byType(PopupMenuButton<void>));
+      await settle(tester);
+      await tester.tap(find.text('Podcast-Einstellungen'));
+      await settle(tester);
+      await tester.ensureVisible(find.text('Versatz der Zählung'));
+      await settle(tester);
+      // Feed numbers: the offset is not available.
+      expect(
+        find.text('Der Versatz gilt nur für die eigene Zählung.'),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.add))
+            .onPressed,
+        isNull,
+      );
+      await tester.tap(find.text('Eigene Zählung'));
+      await settle(tester);
+      await tester.tap(find.byTooltip('Erhöhen'));
+      await settle(tester);
+      await tester.binding.handlePopRoute();
+      await settle(tester);
+      // Own count (1) + offset 1.
+      expect(coverNumber('2'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('episode number on the cover, with an offset', timeout: timeout, (
     tester,
   ) async {

@@ -245,6 +245,21 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _episodeOwnCountMeta = const VerificationMeta(
+    'episodeOwnCount',
+  );
+  @override
+  late final GeneratedColumn<bool> episodeOwnCount = GeneratedColumn<bool>(
+    'episode_own_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("episode_own_count" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -268,6 +283,7 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     autoPlaylistName,
     episodeCounter,
     episodeNumberOffset,
+    episodeOwnCount,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -437,6 +453,15 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         ),
       );
     }
+    if (data.containsKey('episode_own_count')) {
+      context.handle(
+        _episodeOwnCountMeta,
+        episodeOwnCount.isAcceptableOrUnknown(
+          data['episode_own_count']!,
+          _episodeOwnCountMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -532,6 +557,10 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         DriftSqlType.int,
         data['${effectivePrefix}episode_number_offset'],
       )!,
+      episodeOwnCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}episode_own_count'],
+      )!,
     );
   }
 
@@ -582,6 +611,10 @@ class Podcast extends DataClass implements Insertable<Podcast> {
   /// offset added to the app's own count (not to the feed's numbers).
   final bool episodeCounter;
   final int episodeNumberOffset;
+
+  /// Count by date even if the feed numbers its episodes (v12); only then the
+  /// offset applies to such feeds.
+  final bool episodeOwnCount;
   const Podcast({
     required this.id,
     required this.feedUrl,
@@ -604,6 +637,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     this.autoPlaylistName,
     required this.episodeCounter,
     required this.episodeNumberOffset,
+    required this.episodeOwnCount,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -657,6 +691,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     }
     map['episode_counter'] = Variable<bool>(episodeCounter);
     map['episode_number_offset'] = Variable<int>(episodeNumberOffset);
+    map['episode_own_count'] = Variable<bool>(episodeOwnCount);
     return map;
   }
 
@@ -705,6 +740,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           : Value(autoPlaylistName),
       episodeCounter: Value(episodeCounter),
       episodeNumberOffset: Value(episodeNumberOffset),
+      episodeOwnCount: Value(episodeOwnCount),
     );
   }
 
@@ -743,6 +779,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       episodeNumberOffset: serializer.fromJson<int>(
         json['episodeNumberOffset'],
       ),
+      episodeOwnCount: serializer.fromJson<bool>(json['episodeOwnCount']),
     );
   }
   @override
@@ -774,6 +811,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       'autoPlaylistName': serializer.toJson<String?>(autoPlaylistName),
       'episodeCounter': serializer.toJson<bool>(episodeCounter),
       'episodeNumberOffset': serializer.toJson<int>(episodeNumberOffset),
+      'episodeOwnCount': serializer.toJson<bool>(episodeOwnCount),
     };
   }
 
@@ -799,6 +837,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     Value<String?> autoPlaylistName = const Value.absent(),
     bool? episodeCounter,
     int? episodeNumberOffset,
+    bool? episodeOwnCount,
   }) => Podcast(
     id: id ?? this.id,
     feedUrl: feedUrl ?? this.feedUrl,
@@ -830,6 +869,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
         : this.autoPlaylistName,
     episodeCounter: episodeCounter ?? this.episodeCounter,
     episodeNumberOffset: episodeNumberOffset ?? this.episodeNumberOffset,
+    episodeOwnCount: episodeOwnCount ?? this.episodeOwnCount,
   );
   Podcast copyWithCompanion(PodcastsCompanion data) {
     return Podcast(
@@ -880,6 +920,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       episodeNumberOffset: data.episodeNumberOffset.present
           ? data.episodeNumberOffset.value
           : this.episodeNumberOffset,
+      episodeOwnCount: data.episodeOwnCount.present
+          ? data.episodeOwnCount.value
+          : this.episodeOwnCount,
     );
   }
 
@@ -906,7 +949,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ..write('autoPlaylistId: $autoPlaylistId, ')
           ..write('autoPlaylistName: $autoPlaylistName, ')
           ..write('episodeCounter: $episodeCounter, ')
-          ..write('episodeNumberOffset: $episodeNumberOffset')
+          ..write('episodeNumberOffset: $episodeNumberOffset, ')
+          ..write('episodeOwnCount: $episodeOwnCount')
           ..write(')'))
         .toString();
   }
@@ -934,6 +978,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     autoPlaylistName,
     episodeCounter,
     episodeNumberOffset,
+    episodeOwnCount,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -959,7 +1004,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           other.autoPlaylistId == this.autoPlaylistId &&
           other.autoPlaylistName == this.autoPlaylistName &&
           other.episodeCounter == this.episodeCounter &&
-          other.episodeNumberOffset == this.episodeNumberOffset);
+          other.episodeNumberOffset == this.episodeNumberOffset &&
+          other.episodeOwnCount == this.episodeOwnCount);
 }
 
 class PodcastsCompanion extends UpdateCompanion<Podcast> {
@@ -984,6 +1030,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
   final Value<String?> autoPlaylistName;
   final Value<bool> episodeCounter;
   final Value<int> episodeNumberOffset;
+  final Value<bool> episodeOwnCount;
   const PodcastsCompanion({
     this.id = const Value.absent(),
     this.feedUrl = const Value.absent(),
@@ -1006,6 +1053,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.autoPlaylistName = const Value.absent(),
     this.episodeCounter = const Value.absent(),
     this.episodeNumberOffset = const Value.absent(),
+    this.episodeOwnCount = const Value.absent(),
   });
   PodcastsCompanion.insert({
     this.id = const Value.absent(),
@@ -1029,6 +1077,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.autoPlaylistName = const Value.absent(),
     this.episodeCounter = const Value.absent(),
     this.episodeNumberOffset = const Value.absent(),
+    this.episodeOwnCount = const Value.absent(),
   }) : feedUrl = Value(feedUrl),
        title = Value(title),
        subscribedAt = Value(subscribedAt);
@@ -1054,6 +1103,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Expression<String>? autoPlaylistName,
     Expression<bool>? episodeCounter,
     Expression<int>? episodeNumberOffset,
+    Expression<bool>? episodeOwnCount,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1080,6 +1130,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       if (episodeCounter != null) 'episode_counter': episodeCounter,
       if (episodeNumberOffset != null)
         'episode_number_offset': episodeNumberOffset,
+      if (episodeOwnCount != null) 'episode_own_count': episodeOwnCount,
     });
   }
 
@@ -1105,6 +1156,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Value<String?>? autoPlaylistName,
     Value<bool>? episodeCounter,
     Value<int>? episodeNumberOffset,
+    Value<bool>? episodeOwnCount,
   }) {
     return PodcastsCompanion(
       id: id ?? this.id,
@@ -1129,6 +1181,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       autoPlaylistName: autoPlaylistName ?? this.autoPlaylistName,
       episodeCounter: episodeCounter ?? this.episodeCounter,
       episodeNumberOffset: episodeNumberOffset ?? this.episodeNumberOffset,
+      episodeOwnCount: episodeOwnCount ?? this.episodeOwnCount,
     );
   }
 
@@ -1202,6 +1255,9 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     if (episodeNumberOffset.present) {
       map['episode_number_offset'] = Variable<int>(episodeNumberOffset.value);
     }
+    if (episodeOwnCount.present) {
+      map['episode_own_count'] = Variable<bool>(episodeOwnCount.value);
+    }
     return map;
   }
 
@@ -1228,7 +1284,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           ..write('autoPlaylistId: $autoPlaylistId, ')
           ..write('autoPlaylistName: $autoPlaylistName, ')
           ..write('episodeCounter: $episodeCounter, ')
-          ..write('episodeNumberOffset: $episodeNumberOffset')
+          ..write('episodeNumberOffset: $episodeNumberOffset, ')
+          ..write('episodeOwnCount: $episodeOwnCount')
           ..write(')'))
         .toString();
   }
@@ -4525,6 +4582,7 @@ typedef $$PodcastsTableCreateCompanionBuilder = PodcastsCompanion Function({
   Value<String?> autoPlaylistName,
   Value<bool> episodeCounter,
   Value<int> episodeNumberOffset,
+  Value<bool> episodeOwnCount,
 });
 typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<int> id,
@@ -4548,6 +4606,7 @@ typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<String?> autoPlaylistName,
   Value<bool> episodeCounter,
   Value<int> episodeNumberOffset,
+  Value<bool> episodeOwnCount,
 });
 
 final class $$PodcastsTableReferences
@@ -4686,6 +4745,11 @@ class $$PodcastsTableFilterComposer
 
   ColumnFilters<int> get episodeNumberOffset => $composableBuilder(
     column: $table.episodeNumberOffset,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get episodeOwnCount => $composableBuilder(
+    column: $table.episodeOwnCount,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4828,6 +4892,11 @@ class $$PodcastsTableOrderingComposer
     column: $table.episodeNumberOffset,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get episodeOwnCount => $composableBuilder(
+    column: $table.episodeOwnCount,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PodcastsTableAnnotationComposer
@@ -4929,6 +4998,11 @@ class $$PodcastsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get episodeOwnCount => $composableBuilder(
+    column: $table.episodeOwnCount,
+    builder: (column) => column,
+  );
+
   Expression<T> episodesRefs<T extends Object>(
     Expression<T> Function($$EpisodesTableAnnotationComposer a) f,
   ) {
@@ -5004,6 +5078,7 @@ class $$PodcastsTableTableManager
                 Value<String?> autoPlaylistName = const Value.absent(),
                 Value<bool> episodeCounter = const Value.absent(),
                 Value<int> episodeNumberOffset = const Value.absent(),
+                Value<bool> episodeOwnCount = const Value.absent(),
               }) => PodcastsCompanion(
                 id: id,
                 feedUrl: feedUrl,
@@ -5026,6 +5101,7 @@ class $$PodcastsTableTableManager
                 autoPlaylistName: autoPlaylistName,
                 episodeCounter: episodeCounter,
                 episodeNumberOffset: episodeNumberOffset,
+                episodeOwnCount: episodeOwnCount,
               ),
           createCompanionCallback:
               ({
@@ -5050,6 +5126,7 @@ class $$PodcastsTableTableManager
                 Value<String?> autoPlaylistName = const Value.absent(),
                 Value<bool> episodeCounter = const Value.absent(),
                 Value<int> episodeNumberOffset = const Value.absent(),
+                Value<bool> episodeOwnCount = const Value.absent(),
               }) => PodcastsCompanion.insert(
                 id: id,
                 feedUrl: feedUrl,
@@ -5072,6 +5149,7 @@ class $$PodcastsTableTableManager
                 autoPlaylistName: autoPlaylistName,
                 episodeCounter: episodeCounter,
                 episodeNumberOffset: episodeNumberOffset,
+                episodeOwnCount: episodeOwnCount,
               ),
           withReferenceMapper: (p0) => p0
               .map(

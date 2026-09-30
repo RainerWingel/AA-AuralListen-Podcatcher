@@ -548,6 +548,7 @@ void main() {
       autoDeletePlayed: true,
       episodeCounter: true,
       episodeNumberOffset: 0,
+      episodeOwnCount: false,
     );
     Episode added(DateTime at) => Episode(
       id: 1,

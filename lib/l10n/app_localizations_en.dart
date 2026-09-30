@@ -389,6 +389,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'A narrow strip on the left edge of the covers in episode lists.';
 
   @override
+  String get episodeNumbering => 'Numbering';
+
+  @override
+  String get episodeNumberingFeed => 'Feed numbers';
+
+  @override
+  String get episodeNumberingOwn => 'Own count';
+
+  @override
   String get episodeNumberOffset => 'Counting offset';
 
   @override
@@ -397,7 +406,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get episodeNumberOffsetFeed =>
-      'The feed numbers its episodes itself – the offset does not apply then.';
+      'The offset only applies to the own count.';
 
   @override
   String get episodeNumberDecrease => 'Decrease';

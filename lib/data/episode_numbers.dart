@@ -9,8 +9,14 @@ typedef NumberedEpisode = ({int id, DateTime? pubDate, int? feedNumber});
 ///   must not clash with an official number).
 /// - Otherwise the app counts by publication date over the whole feed:
 ///   oldest = 1 + [offset]. Undated episodes cannot be placed and get none.
-Map<int, int> episodeNumbers(List<NumberedEpisode> episodes, {int offset = 0}) {
-  if (episodes.any((e) => e.feedNumber != null)) {
+/// - [ownCount] forces the app's own count even for numbered feeds (chosen
+///   per podcast); only then the offset applies to them.
+Map<int, int> episodeNumbers(
+  List<NumberedEpisode> episodes, {
+  int offset = 0,
+  bool ownCount = false,
+}) {
+  if (!ownCount && episodes.any((e) => e.feedNumber != null)) {
     return {for (final e in episodes) e.id: ?e.feedNumber};
   }
   final dated = episodes.where((e) => e.pubDate != null).toList()

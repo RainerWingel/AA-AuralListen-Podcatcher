@@ -62,6 +62,11 @@ class Podcasts extends Table {
       boolean().withDefault(const Constant(true))();
   IntColumn get episodeNumberOffset =>
       integer().withDefault(const Constant(0))();
+
+  /// Count by date even if the feed numbers its episodes (v12); only then the
+  /// offset applies to such feeds.
+  BoolColumn get episodeOwnCount =>
+      boolean().withDefault(const Constant(false))();
 }
 
 @DataClassName('Episode')

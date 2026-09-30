@@ -64,9 +64,11 @@ Menü außerdem: Herunterladen / Download abbrechen / Download löschen / Erneut
 gelesen, in allen Folgenlisten (nicht im Player). Regeln: Hat der Feed eigene Nummern (`itunes:episode`), werden die
 gezeigt – Folgen ohne Nummer bekommen dann keine (keine Kollision mit Bonusfolgen). Sonst zählt die App über den ganzen
 Feed nach Veröffentlichungsdatum (älteste = 1, bei gleichem Datum der ältere DB-Eintrag zuerst) plus Versatz; Folgen
-ohne Datum bekommen keine Nummer. Podcast-Einstellungen: Schalter „Folgennummer am Cover" (Standard an) und
-„Versatz der Zählung" als − [Feld] + (−9999…9999, Eingabe mit „Fertig" oder beim Verlassen übernommen; bei
-Feed-Nummern ausgegraut mit Hinweis). Themen-Feeds zählen über den ganzen Feed.
+ohne Datum bekommen keine Nummer. Podcast-Einstellungen: Schalter „Folgennummer am Cover" (Standard an); bei Feeds
+mit eigenen Nummern Auswahl **„Nummerierung: Feed-Nummern | Eigene Zählung"** (Standard Feed-Nummern; fast alle
+Podcasts liefern `itunes:episode`, Benutzerwunsch 2026-10-01); „Versatz der Zählung" als − [Feld] + (−9999…9999,
+Eingabe mit „Fertig" oder beim Verlassen übernommen) gilt **nur für die eigene Zählung** – bei Feed-Nummern
+ausgegraut mit Hinweis. „Eigene Zählung" nummeriert auch Folgen ohne Feed-Nummer. Themen-Feeds zählen über den ganzen Feed.
 Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Außerdem „Zu Playlist hinzufügen…".
 
 ## Playlists

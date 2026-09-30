@@ -740,6 +740,24 @@ abstract class AppLocalizations {
   /// **'Schmaler Streifen am linken Rand der Cover in den Folgenlisten.'**
   String get episodeCounterHint;
 
+  /// No description provided for @episodeNumbering.
+  ///
+  /// In de, this message translates to:
+  /// **'Nummerierung'**
+  String get episodeNumbering;
+
+  /// No description provided for @episodeNumberingFeed.
+  ///
+  /// In de, this message translates to:
+  /// **'Feed-Nummern'**
+  String get episodeNumberingFeed;
+
+  /// No description provided for @episodeNumberingOwn.
+  ///
+  /// In de, this message translates to:
+  /// **'Eigene Zählung'**
+  String get episodeNumberingOwn;
+
   /// No description provided for @episodeNumberOffset.
   ///
   /// In de, this message translates to:
@@ -755,7 +773,7 @@ abstract class AppLocalizations {
   /// No description provided for @episodeNumberOffsetFeed.
   ///
   /// In de, this message translates to:
-  /// **'Der Feed nummeriert seine Folgen selbst – der Versatz gilt dann nicht.'**
+  /// **'Der Versatz gilt nur für die eigene Zählung.'**
   String get episodeNumberOffsetFeed;
 
   /// No description provided for @episodeNumberDecrease.

@@ -389,6 +389,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Schmaler Streifen am linken Rand der Cover in den Folgenlisten.';
 
   @override
+  String get episodeNumbering => 'Nummerierung';
+
+  @override
+  String get episodeNumberingFeed => 'Feed-Nummern';
+
+  @override
+  String get episodeNumberingOwn => 'Eigene Zählung';
+
+  @override
   String get episodeNumberOffset => 'Versatz der Zählung';
 
   @override
@@ -397,7 +406,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get episodeNumberOffsetFeed =>
-      'Der Feed nummeriert seine Folgen selbst – der Versatz gilt dann nicht.';
+      'Der Versatz gilt nur für die eigene Zählung.';
 
   @override
   String get episodeNumberDecrease => 'Verringern';

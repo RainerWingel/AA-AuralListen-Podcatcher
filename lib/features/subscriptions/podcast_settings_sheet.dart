@@ -315,6 +315,9 @@ class _EpisodeCounterSettings extends ConsumerWidget {
     final feedNumbers =
         ref.watch(hasFeedNumbersProvider(podcast.id)).value ?? false;
     final on = podcast.episodeCounter;
+    // The offset belongs to the app's own count: always for feeds without
+    // numbers, for numbered feeds only when chosen (user wish 2026-10-01).
+    final ownCount = !feedNumbers || podcast.episodeOwnCount;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -325,6 +328,29 @@ class _EpisodeCounterSettings extends ConsumerWidget {
           value: on,
           onChanged: (v) => repo.setEpisodeCounter(podcast.id, enabled: v),
         ),
+        if (feedNumbers) ...[
+          Text(l10n.episodeNumbering, style: theme.textTheme.titleSmall),
+          const SizedBox(height: 8),
+          SegmentedButton<bool>(
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(
+                value: false,
+                label: Text(l10n.episodeNumberingFeed),
+                enabled: on,
+              ),
+              ButtonSegment(
+                value: true,
+                label: Text(l10n.episodeNumberingOwn),
+                enabled: on,
+              ),
+            ],
+            selected: {podcast.episodeOwnCount},
+            onSelectionChanged: (v) =>
+                repo.setEpisodeCounter(podcast.id, ownCount: v.single),
+          ),
+          const SizedBox(height: 8),
+        ],
         Row(
           children: [
             Expanded(
@@ -335,15 +361,15 @@ class _EpisodeCounterSettings extends ConsumerWidget {
             ),
             _OffsetStepper(
               value: podcast.episodeNumberOffset,
-              enabled: on && !feedNumbers,
+              enabled: on && ownCount,
               onChanged: (v) => repo.setEpisodeCounter(podcast.id, offset: v),
             ),
           ],
         ),
         Text(
-          feedNumbers
-              ? l10n.episodeNumberOffsetFeed
-              : l10n.episodeNumberOffsetHint,
+          ownCount
+              ? l10n.episodeNumberOffsetHint
+              : l10n.episodeNumberOffsetFeed,
           style: theme.textTheme.bodySmall,
         ),
       ],

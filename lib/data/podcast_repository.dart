@@ -235,25 +235,30 @@ class PodcastRepository {
             e.episodeNumber,
             p.episodeCounter,
             p.episodeNumberOffset,
+            p.episodeOwnCount,
           ])
           ..where(e.podcastId.equals(podcastId));
     return query.watch().map((rows) {
       if (rows.isEmpty || rows.first.read(p.episodeCounter) != true) {
         return const <int, int>{};
       }
-      return episodeNumbers([
-        for (final r in rows)
-          (
-            id: r.read(e.id)!,
-            pubDate: r.read(e.pubDate),
-            feedNumber: r.read(e.episodeNumber),
-          ),
-      ], offset: rows.first.read(p.episodeNumberOffset) ?? 0);
+      return episodeNumbers(
+        [
+          for (final r in rows)
+            (
+              id: r.read(e.id)!,
+              pubDate: r.read(e.pubDate),
+              feedNumber: r.read(e.episodeNumber),
+            ),
+        ],
+        offset: rows.first.read(p.episodeNumberOffset) ?? 0,
+        ownCount: rows.first.read(p.episodeOwnCount) ?? false,
+      );
     });
   }
 
-  /// Whether the feed numbers its episodes itself (then the offset does not
-  /// apply – shown as a hint in the podcast settings).
+  /// Whether the feed numbers its episodes itself (then the podcast settings
+  /// offer the choice between its numbers and the app's own count).
   Stream<bool> watchHasFeedNumbers(int podcastId) =>
       (_db.selectOnly(_db.episodes)
             ..addColumns([_db.episodes.id])
@@ -265,15 +270,21 @@ class PodcastRepository {
           .watch()
           .map((rows) => rows.isNotEmpty);
 
-  /// Episode counter on the covers: on/off and offset (−9999 … 9999).
-  Future<void> setEpisodeCounter(int podcastId, {bool? enabled, int? offset}) =>
-      _updatePodcast(
-        podcastId,
-        PodcastsCompanion(
-          episodeCounter: Value.absentIfNull(enabled),
-          episodeNumberOffset: Value.absentIfNull(offset?.clamp(-9999, 9999)),
-        ),
-      );
+  /// Episode counter on the covers: on/off, own count instead of the feed's
+  /// numbers, and offset (−9999 … 9999).
+  Future<void> setEpisodeCounter(
+    int podcastId, {
+    bool? enabled,
+    bool? ownCount,
+    int? offset,
+  }) => _updatePodcast(
+    podcastId,
+    PodcastsCompanion(
+      episodeCounter: Value.absentIfNull(enabled),
+      episodeOwnCount: Value.absentIfNull(ownCount),
+      episodeNumberOffset: Value.absentIfNull(offset?.clamp(-9999, 9999)),
+    ),
+  );
 
   /// Newest episodes across all subscriptions (home screen).
   Stream<List<EpisodeWithPodcast>> watchLatestEpisodes({int limit = 100}) {

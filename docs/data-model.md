@@ -1,8 +1,8 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 11** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
-v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`; v8: nur Daten – `angefangen` unter 15 s → `neu`, Position 0; v9: `playlists.color`; v10: `podcasts.autoPlaylistId`, `autoPlaylistName`; v11: `episodes.episodeNumber`, `podcasts.episodeCounter`, `episodeNumberOffset`, einmaliges Neulesen aller Feeds). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+Aktuell **schemaVersion 12** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
+v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`; v8: nur Daten – `angefangen` unter 15 s → `neu`, Position 0; v9: `playlists.color`; v10: `podcasts.autoPlaylistId`, `autoPlaylistName`; v11: `episodes.episodeNumber`, `podcasts.episodeCounter`, `episodeNumberOffset`, einmaliges Neulesen aller Feeds; v12: `podcasts.episodeOwnCount`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 0. Neue Tabelle? → auch in `BackupService._restoredTables` eintragen (`backup.md`).
@@ -16,7 +16,7 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 
 | Tabelle | Wichtige Spalten |
 |---------|------------------|
-| `podcasts` ✅ | id, feedUrl (unique), title, author, description, imageUrl, websiteUrl, etag, lastModified, lastRefreshAt, lastError (null = ok), subscribedAt, autoDownloadMode (off/wifiOnly/always), autoDownloadMaxEpisodes (3), autoDownloadThemes (v5, JSON-Liste, null = alle Themen), autoDeletePlayed (true), boostDb (null = global), autoPlaylistId + autoPlaylistName (v10, Ziel-Playlist für Auto-Downloads, ohne FK – gelöschte wird unter dem Namen neu angelegt), episodeCounter (v11, true) + episodeNumberOffset (v11, 0, −9999…9999) |
+| `podcasts` ✅ | id, feedUrl (unique), title, author, description, imageUrl, websiteUrl, etag, lastModified, lastRefreshAt, lastError (null = ok), subscribedAt, autoDownloadMode (off/wifiOnly/always), autoDownloadMaxEpisodes (3), autoDownloadThemes (v5, JSON-Liste, null = alle Themen), autoDeletePlayed (true), boostDb (null = global), autoPlaylistId + autoPlaylistName (v10, Ziel-Playlist für Auto-Downloads, ohne FK – gelöschte wird unter dem Namen neu angelegt), episodeCounter (v11, true) + episodeNumberOffset (v11, 0, −9999…9999), episodeOwnCount (v12, false = Feed-Nummern) |
 | `episodes` ✅ | id, podcastId (FK, ON DELETE CASCADE), guid (unique je Podcast), title, description (Klartext, max. 4000 Zeichen), audioUrl, audioMimeType, audioSizeBytes, durationMs, pubDate, imageUrl, chaptersUrl, theme (v5, z. B. `zum-thema`), episodeNumber (v11, `itunes:episode`), status, positionMs, playedAt, addedAt |
 | `downloads` ✅ (v3) | episodeId (PK, FK → episodes, CASCADE), relativePath (`<id>.<ext>`), state (queued/running/done/failed), sizeBytes, wifiOnly, createdAt, completedAt. Regeln: `eviction.md` |
 | `playlists` ✅ (v4) | id, name, sortOrder, createdAt, lastEpisodeId (v7, zuletzt aus der Playlist gespielte Folge für „Fortsetzen", ohne FK), color (v9, `PlaylistColor` als Name, null = keine). Standard-Playlist „Wiedergabeliste" (`AppDatabase.defaultPlaylistName`) |
