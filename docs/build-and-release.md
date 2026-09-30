@@ -68,7 +68,8 @@ Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für 
 - v1.1.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.1.0
 - v1.2.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.0 – erster
   Release unter dem neuen Namen und Paketnamen (`io.github.rainerwingel.aurallisten`)
-- v1.3.0: vorbereitet (Version 1.3.0+5 gesetzt), Tag/Release erst auf Ansage – erste Version für F-Droid (`f-droid.md`)
+- v1.3.0 (2026-10-01): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.3.0 – erste Version
+  für F-Droid (`f-droid.md`); App-Farbe, Hintergründe, Playlist-Funktionen, Folgennummern, SQLite aus Quellcode
 - v1.2.1 (2026-09-30): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.1 – Englisch,
   Playlist-Fortsetzen und -Farben, Abos-Suche, 15-s-Regel, Download-Fix (http → https)
 
