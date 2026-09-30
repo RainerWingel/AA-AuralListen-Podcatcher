@@ -18,13 +18,26 @@ import 'play_podcast_episodes.dart';
 /// Choices for "keep the newest N unplayed episodes".
 const autoDownloadCounts = <int>[1, 2, 3, 5, 10];
 
-Future<void> showPodcastSettingsSheet(BuildContext context, int podcastId) =>
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (context) => _PodcastSettingsSheet(podcastId: podcastId),
-    );
+/// The settings apply to downloads only when the sheet is closed: switching
+/// auto-download on must not start downloads before the number and the
+/// topics are chosen (bug 2026-09-30).
+Future<void> showPodcastSettingsSheet(
+  BuildContext context,
+  int podcastId,
+) async {
+  final downloads = ProviderScope.containerOf(
+    context,
+    listen: false,
+  ).read(downloadServiceProvider);
+  await showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (context) => _PodcastSettingsSheet(podcastId: podcastId),
+  );
+  // Queue auto-downloads / delete what is now due – once, with the result.
+  unawaited(downloads.runMaintenance());
+}
 
 class _PodcastSettingsSheet extends ConsumerWidget {
   const _PodcastSettingsSheet({required this.podcastId});
@@ -45,8 +58,7 @@ class _PodcastSettingsSheet extends ConsumerWidget {
           autoDownloadMaxEpisodes: max,
           autoDeletePlayed: autoDelete,
         );
-    // Apply immediately: queue auto-downloads / delete what is now due.
-    unawaited(ref.read(downloadServiceProvider).runMaintenance());
+    // Downloads follow when the sheet is closed (showPodcastSettingsSheet).
   }
 
   @override
@@ -56,7 +68,6 @@ class _PodcastSettingsSheet extends ConsumerWidget {
     final podcast = ref.watch(podcastProvider(podcastId)).value;
     if (podcast == null) return const SizedBox(height: 120);
 
-    final autoOn = podcast.autoDownloadMode != AutoDownloadMode.off;
     final themes = ref.watch(podcastThemesProvider(podcastId)).value ?? [];
     return SafeArea(
       child: SingleChildScrollView(
@@ -96,7 +107,8 @@ class _PodcastSettingsSheet extends ConsumerWidget {
               showSelectedIcon: false,
               segments: [
                 for (final n in autoDownloadCounts)
-                  ButtonSegment(value: n, label: Text('$n'), enabled: autoOn),
+                  // Choosable before switching auto-download on.
+                  ButtonSegment(value: n, label: Text('$n')),
               ],
               selected: {podcast.autoDownloadMaxEpisodes},
               onSelectionChanged: (v) => _update(ref, max: v.single),
@@ -156,7 +168,7 @@ class _ThemeFilter extends ConsumerWidget {
           podcast.id,
           selected.containsAll(all) ? null : selected,
         );
-    unawaited(ref.read(downloadServiceProvider).runMaintenance());
+    // Downloads follow when the sheet is closed (showPodcastSettingsSheet).
   }
 
   @override

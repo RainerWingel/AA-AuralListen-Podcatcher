@@ -635,6 +635,16 @@ void main() {
     );
     expect(podcast!.autoDownloadThemes, '["zum-thema"]');
     expect(podcast.autoDownloadMode, AutoDownloadMode.always);
+    // Nothing starts while the settings are still being chosen …
+    expect(downloadEngine.active, isEmpty);
+
+    // … the number is choosable, and closing the sheet applies it all.
+    await tester.tap(find.widgetWithText(SegmentedButton<int>, '1'));
+    await settle(tester);
+    // Close with Android's back button.
+    await tester.binding.handlePopRoute();
+    await settle(tester);
+    expect(find.text('Themen für automatische Downloads'), findsNothing);
     // Only the selected theme was queued.
     expect(downloadEngine.active, hasLength(1));
 

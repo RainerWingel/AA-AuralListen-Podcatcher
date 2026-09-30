@@ -47,7 +47,8 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 
 ### Wartung (`runMaintenance`)
 Reihenfolge: Abgleich → 96-h-Löschung → Speicherlimit → Auto-Download. Läuft beim App-Start (nach dem Refresh), nach jedem
-Pull-to-Refresh, nach Änderung der Podcast-Einstellungen oder des Limits und über „Jetzt aufräumen" (Downloads-Tab, Optionen).
+Pull-to-Refresh, beim **Schließen** der Podcast-Einstellungen (nicht bei jeder Änderung darin – sonst lädt das
+Einschalten von Auto-Download sofort mit der alten Anzahl; Bug 2026-09-30), nach Änderung des Limits und über „Jetzt aufräumen" (Downloads-Tab, Optionen).
 Kein Hintergrund-Job. Gleichzeitige Aufrufe teilen sich einen Lauf.
 
 ### Abgleich (`reconcile`)
