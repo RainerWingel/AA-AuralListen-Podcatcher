@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart' show ThemeMode;
+import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/material.dart' show Color, ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import '../audio/audio_providers.dart';
+import '../core/app_color.dart';
 import '../core/app_language.dart';
 import '../core/clock.dart';
 import 'backup/backup_service.dart';
@@ -246,6 +248,46 @@ final appLanguageProvider = StreamProvider<AppLanguage?>(
       .watch(settingsRepositoryProvider)
       .watch(SettingsKeys.language)
       .map(AppLanguage.fromSetting),
+);
+
+/// Main color chosen in Optionen (default: orange).
+final appColorProvider = StreamProvider<AppColor>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.appColor)
+      .map(AppColor.fromSetting),
+);
+
+/// Main color of the phone's wallpaper (Android 12+ "Material You"); null
+/// where the system offers none (older Android, tests). Read once in
+/// `main.dart` before the first frame ([readWallpaperColor]) and passed in
+/// as an override, so the app never flashes orange at start.
+final wallpaperColorProvider = Provider<Color?>((ref) => null);
+
+Future<Color?> readWallpaperColor() async {
+  try {
+    return (await DynamicColorPlugin.getCorePalette())?.toColorScheme().primary;
+  } on Object {
+    return null;
+  }
+}
+
+/// The color actually in use: "wallpaper" becomes [AppColor.fallback] on
+/// phones without wallpaper colors.
+final effectiveAppColorProvider = Provider<AppColor>((ref) {
+  final chosen = ref.watch(appColorProvider).value ?? AppColor.standard;
+  return chosen == AppColor.wallpaper &&
+          ref.watch(wallpaperColorProvider) == null
+      ? AppColor.fallback
+      : chosen;
+});
+
+/// The seed the app's palette is built from right now.
+final seedColorProvider = Provider<Color>(
+  (ref) =>
+      ref.watch(effectiveAppColorProvider).seed ??
+      ref.watch(wallpaperColorProvider) ??
+      AppColor.fallback.seed!,
 );
 
 /// Light/dark mode chosen in Optionen (default: follow the system).

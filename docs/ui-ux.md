@@ -11,6 +11,12 @@ Geometrie exakt symmetrisch: drei konzentrische Halbellipsen um einen gemeinsame
 Bildschirmmitte (Maße in Bildschirmbreiten, Schrittweite je Bogen gleich).
 Töne = Primärfarbe mit 7–19 % über der Oberfläche (hell/dunkel automatisch), feine helle Kante zwischen den Bögen.
 Liegt hinter dem ganzen Bildschirm inkl. transparenter AppBar; die Liste bleibt unter der AppBar.
+**Downloads-Hintergrund** (Benutzerwunsch 2026-09-30, `lib/core/widgets/squares_background.dart`): Raster aus Quadraten,
+das ein Dreieck in der oberen linken Ecke füllt. „Schritt" = Spalte + Zeile (0 in der Ecke, max. 11): pro Schritt
+Quadrat × 0,92 kleiner, Farbe × 0,88 schwächer; Spalten-/Zeilenbreite pro Index × 1,07 → Abstände wachsen. Keine
+Zufallswerte, Maße in Bildschirmbreiten. Beide Hintergründe über `BackgroundScaffold` (transparente AppBar). Weil Flutter eine
+transparente AppBar als „dunkel" wertet, setzt `BackgroundScaffold` die Statusleisten-Symbole selbst (hell: dunkle
+Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-30).
 
 ## Navigation (untere Leiste)
 1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh
@@ -85,7 +91,12 @@ Hat ein Pull-to-Refresh Umzüge erkannt, meldet eine Infobox „N Podcast(s) umg
 
 ## Optionen
 Abschnitt „Darstellung": System / Hell / Dunkel (`settings['ui.themeMode']`, Dark Mode aus derselben Grundfarbe),
-darunter „Sprache" → Dialog Deutsch / English (`settings['ui.language']`, die App wechselt sofort).
+darunter „Sprache" → Dialog Deutsch / English (`settings['ui.language']`, die App wechselt sofort), dann
+„App-Farbe" → Dialog mit 8 Farbkreisen + „Wie Hintergrundbild" (nur wenn das Handy Wallpaper-Farben liefert,
+Android 12+; `settings['ui.appColor']`, `AppColor`, `lib/features/settings/app_color_picker.dart`). Alles – Knöpfe,
+Balken, Tabs, Punkte und die Hintergründe von Start und Downloads – folgt der Farbe; Cover, rotes Ungespielt-Abzeichen,
+Playlist-Farben und Fehlerrot nicht. **Standard = „Wie Hintergrundbild"**; ohne Wallpaper-Farben Orange (die Zeile
+zeigt dann „Orange"). Die Hintergrundbild-Farbe wird in `main.dart` vor dem ersten Bild gelesen (kein Orange-Aufblitzen).
 Abschnitt „Info" (ganz unten): „Über die App" → Info-Seite (`info_screen.dart`): App-Symbol, Name, **Version + Build
 automatisch von Android** (Kanal `aurallisten/app`, kommt beim Bauen aus `pubspec.yaml`), „Entwickelt von Artem A.",
 Links Datenschutzerklärung und „Quellcode auf GitHub" (öffnen den Browser). **Kein Zahlungslink in der App** –

@@ -1024,14 +1024,80 @@ void main() {
       expect(await itemsOf(playlistId), [episodeId, ep2]);
     });
 
-    test('outside a playlist nothing follows', () async {
-      await handler.playEpisode(episodeId);
+    test('outside any playlist nothing follows', () async {
+      final loose = await addEpisode('lose');
+      await handler.playEpisode(loose);
+      expect(handler.activePlaylistId, isNull);
       engine.complete();
       await pumpEventQueue();
-      expect(handler.currentEpisodeId, episodeId);
+      expect(handler.currentEpisodeId, loose);
       expect(handler.playbackState.value.playing, isFalse);
-      // Played episodes leave all playlists, even when played elsewhere.
+    });
+
+    test(
+      'in exactly one playlist: started elsewhere, it continues there',
+      () async {
+        await handler.playEpisode(episodeId);
+        expect(handler.activePlaylistId, playlistId);
+        expect(handler.mediaItem.value?.extras?['playlistId'], playlistId);
+        expect(await playlists.resumeEpisode(playlistId), episodeId);
+        engine.complete();
+        await pumpEventQueue();
+        expect(handler.currentEpisodeId, ep2);
+        // Played episodes leave all playlists.
+        expect(await itemsOf(playlistId), [ep2, ep3]);
+      },
+    );
+
+    test('adding and removing during playback updates the playlist', () async {
+      Future<void> settle() => pumpEventQueue();
+      int? shown() => handler.mediaItem.value?.extras?['playlistId'] as int?;
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      await settle();
+      expect((handler.activePlaylistId, shown()), (playlistId, playlistId));
+
+      // Also added elsewhere: the active playlist stays.
+      final other = await playlists.create('Unterwegs');
+      await playlists.add(other, episodeId);
+      await settle();
+      expect(handler.activePlaylistId, playlistId);
+
+      // Removed from the active one: the only remaining playlist takes over.
+      await playlists.remove(playlistId, episodeId);
+      await settle();
+      expect((handler.activePlaylistId, shown()), (other, other));
+
+      // Removed from all: no playlist.
+      await playlists.remove(other, episodeId);
+      await settle();
+      expect((handler.activePlaylistId, shown()), (null, null));
+
+      // Added to one again: it becomes active.
+      await playlists.add(playlistId, episodeId);
+      await settle();
+      expect(handler.activePlaylistId, playlistId);
+    });
+
+    test('a played episode leaving the playlist still continues it', () async {
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      await pumpEventQueue();
+      engine.emitPosition(const Duration(minutes: 9, seconds: 50)); // 98 %
+      await pumpEventQueue();
       expect(await itemsOf(playlistId), [ep2, ep3]);
+      expect(handler.activePlaylistId, playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep2);
+    });
+
+    test('in two playlists: started elsewhere, none is active', () async {
+      final other = await playlists.create('Unterwegs');
+      await playlists.add(other, episodeId);
+      await handler.playEpisode(episodeId);
+      expect(handler.activePlaylistId, isNull);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.playbackState.value.playing, isFalse);
     });
 
     test('skip: next starts, skipped stays unplayed in the playlist', () async {
@@ -1064,10 +1130,14 @@ void main() {
       await handler.pause();
       expect(await resume(), ep2);
 
-      // Played outside the playlist: the playlist still remembers ep2.
+      // Played outside the playlist while it is in two playlists (so no
+      // playlist becomes active): the playlist still remembers ep2.
+      final other = await playlists.create('Unterwegs');
+      await playlists.add(other, episodeId);
       await handler.playEpisode(episodeId);
       await handler.pause();
       expect(await resume(), ep2);
+      await playlists.remove(other, episodeId);
 
       // Automatic advance counts as played from the playlist.
       await handler.playEpisode(ep2, playlistId: playlistId);

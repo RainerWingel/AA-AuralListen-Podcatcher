@@ -34,6 +34,8 @@ Future<void> main() async {
       ) ??
       AppLanguage.forDevice(PlatformDispatcher.instance.locale);
   final l10n = lookupAppLocalizations(language.locale);
+  // Before the first frame, so the app starts right away in this color.
+  final wallpaperColor = await readWallpaperColor();
   // The container is created after the handler; the handler only calls this
   // lookup when playback starts, long after both exist.
   late final ProviderContainer container;
@@ -76,6 +78,7 @@ Future<void> main() async {
     overrides: [
       databaseProvider.overrideWithValue(db),
       audioHandlerProvider.overrideWithValue(handler),
+      wallpaperColorProvider.overrideWithValue(wallpaperColor),
     ],
   );
 

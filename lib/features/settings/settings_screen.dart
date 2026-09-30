@@ -12,6 +12,7 @@ import '../../data/settings_keys.dart';
 import '../../data/storage/download_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../downloads/downloads_screen.dart';
+import 'app_color_picker.dart';
 import 'backup_flow.dart';
 import 'language_picker.dart';
 import 'opml_import_flow.dart';
@@ -111,6 +112,7 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: Text(languageName(l10n, language)),
             onTap: () => chooseAppLanguage(context, ref, language),
           ),
+          const AppColorTile(),
           _SectionHeader(l10n.settingsSectionListening),
           ListTile(
             leading: const Icon(Icons.bookmarks_outlined),

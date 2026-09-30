@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
+import '../../core/widgets/background_scaffold.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/info_snack_bar.dart';
+import '../../core/widgets/squares_background.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../data/storage/download_service.dart';
@@ -35,17 +37,16 @@ class DownloadsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final items = ref.watch(downloadItemsProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.navDownloads),
-        actions: [
-          IconButton(
-            tooltip: l10n.cleanUpNow,
-            icon: const Icon(Icons.cleaning_services_outlined),
-            onPressed: () => cleanUpDownloads(context, ref),
-          ),
-        ],
-      ),
+    return BackgroundScaffold(
+      background: const SquaresBackground(),
+      title: Text(l10n.navDownloads),
+      actions: [
+        IconButton(
+          tooltip: l10n.cleanUpNow,
+          icon: const Icon(Icons.cleaning_services_outlined),
+          onPressed: () => cleanUpDownloads(context, ref),
+        ),
+      ],
       body: items.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(l10n.loadError)),

@@ -52,6 +52,7 @@ dependencies:
   audio_session: ^0.2.4
   background_downloader: ^9.5.9
   archive: ^4.3.0
+  dynamic_color: ^2.1.0
 
 dev_dependencies:
   flutter_test:

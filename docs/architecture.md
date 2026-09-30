@@ -13,6 +13,7 @@
 | Dateien | `path_provider`, `file_picker`, `share_plus`, `archive` | System.IO |
 | Bilder | `cached_network_image` mit begrenztem Cache-Manager | – |
 | Routing | `go_router` | – |
+| Farben | `dynamic_color` (nur „App-Farbe: Wie Hintergrundbild", Android 12+) | – |
 | Texte | `flutter gen-l10n`, `de` (Vorlage) + `en` | .resx |
 | Tests | `flutter_test`, `leak_tracker`, `mocktail` | xUnit + Moq |
 

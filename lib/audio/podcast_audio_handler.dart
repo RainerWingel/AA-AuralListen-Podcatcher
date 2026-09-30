@@ -140,6 +140,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   Stream<PlaybackProblem> get problems => _problems.stream;
 
   final _subscriptions = <StreamSubscription<Object?>>[];
+
+  /// Playlist membership of the current episode (only one at a time).
+  StreamSubscription<Set<int>>? _membership;
   Timer? _pauseTimer;
 
   int? _episodeId;
@@ -234,6 +237,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final row = await _playback.load(id);
     if (row == null) return;
     _episodeId = id;
+    _watchMembership(id);
     final saved = (await _settings.get(SettingsKeys.activePlaylistId))
         ?.split(':');
     if (saved != null && saved.length == 2) {
@@ -246,15 +250,22 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   /// Starts [episodeId] (resuming at its saved position, or exactly at
-  /// [startAt], e.g. a bookmark). With [playlistId]
-  /// the playlist becomes active: when the episode ends, the next one of that
-  /// playlist starts. Without it, playback stops at the end.
+  /// [startAt], e.g. a bookmark). With [playlistId] – or without it, when the
+  /// episode is in exactly one playlist – that playlist becomes active: when
+  /// the episode ends, its next one starts. Otherwise playback stops at the end.
   Future<void> playEpisode(
     int episodeId, {
     int? playlistId,
     Duration? startAt,
   }) async {
     _resetRecovery();
+    // The old episode's membership watcher must not act while switching.
+    await _membership?.cancel();
+    _membership = null;
+    // Started elsewhere (Home, Downloads …) but in exactly one playlist:
+    // counts as played from it (user wish 2026-09-30). With several
+    // playlists it is unclear which one is meant – then none.
+    playlistId ??= await _onlyPlaylistOf(episodeId);
     await _setActivePlaylist(episodeId, playlistId);
     if (episodeId == _episodeId && _loaded) {
       mediaItem.add(_withPlaylist(mediaItem.value));
@@ -277,6 +288,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     }
 
     _episodeId = episodeId;
+    _watchMembership(episodeId);
     _loaded = false;
     _exactStart = startAt != null;
     mediaItem.add(_withPlaylist(_toMediaItem(row)));
@@ -302,6 +314,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> resetAfterRestore() async {
     await stop();
     _episodeId = null;
+    await _membership?.cancel();
+    _membership = null;
     _activePlaylistId = null;
     _playlistPosition = -1;
     _setIdlePosition(Duration.zero);
@@ -447,6 +461,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       await s.cancel();
     }
     _subscriptions.clear();
+    await _membership?.cancel();
+    _membership = null;
     await _positions.close();
     await _problems.close();
     await _sleepStates.close();
@@ -455,6 +471,40 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   // --------------------------------------------------------------- internals
+
+  /// Follows the current episode being added to or removed from playlists
+  /// while it plays, so "Aus Playlist …" and what comes next stay right.
+  void _watchMembership(int episodeId) {
+    unawaited(_membership?.cancel());
+    _membership = _playlists
+        ?.watchPlaylistIdsWith(episodeId)
+        // The database re-reports on every playlist change; react only when
+        // this episode's playlists actually changed.
+        .distinct(setEquals)
+        .listen((ids) => _onMembership(episodeId, ids));
+  }
+
+  /// Same rules as when starting: the active playlist stays while it still
+  /// contains the episode; otherwise the only playlist containing it takes
+  /// over, or none.
+  Future<void> _onMembership(int episodeId, Set<int> ids) async {
+    // Played episodes leave all playlists on purpose – the playlist must
+    // still continue with the next one. (The flag stays set after the end
+    // unloads the player; loading the next episode resets it.)
+    if (episodeId != _episodeId || _markedPlayed) return;
+    final active = _activePlaylistId;
+    if (active != null && ids.contains(active)) return;
+    final only = ids.length == 1 ? ids.single : null;
+    if (only == active) return;
+    await _setActivePlaylist(episodeId, only);
+    mediaItem.add(_withPlaylist(mediaItem.value));
+    _broadcastState();
+  }
+
+  Future<int?> _onlyPlaylistOf(int episodeId) async {
+    final ids = await _playlists?.playlistIdsWith(episodeId);
+    return ids != null && ids.length == 1 ? ids.single : null;
+  }
 
   Future<void> _setActivePlaylist(int episodeId, int? playlistId) async {
     final position = playlistId == null

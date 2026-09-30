@@ -22,7 +22,7 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
   (`playlists.lastEpisodeId`, Schema v7) an ihrer gemerkten Position weiter; steht sie nicht mehr in der Playlist
   (gespielt, entfernt), die oberste. Jede Playlist merkt sich ihre eigene Folge.
   - Gemerkt wird, sobald eine Folge aus der Playlist startet (auch automatisches Weiterspielen) und nochmal bei Pause.
-    Dieselbe Folge woanders gestartet (z. B. auf „Start") ändert den Merker nicht.
+    Woanders gestartet zählt nur, wenn die Folge in genau einer Playlist steht (siehe unten).
 - **Farbe** (Benutzerwunsch 2026-09-29): ⋮ → „Farbe…" → Dialog mit 7 Regenbogenfarben (Rot, Orange, Gelb, Grün, Blau,
   Indigo, Violett) und „Keine Farbe" (`playlist_colors.dart`, gespeichert in `playlists.color`). Die Playlist bekommt
   einen sanften **Farbverlauf** (Farbe mit 22 % hell / 30 % dunkel, auslaufend bis transparent), damit der Text
@@ -70,7 +70,16 @@ Abos-Tab → **langes Drücken** auf eine Kachel → Menü (`play_podcast_episod
 - Die „nächste Folge" wird **erst in diesem Moment aus der DB gelesen** – kein Schnappschuss beim Start.
   Dadurch wird eine Folge, die während der Wiedergabe hinzugefügt wurde, automatisch mitgespielt.
 - Ist die Playlist leer, stoppt die Wiedergabe.
-- Wird eine Folge **außerhalb** einer Playlist gestartet, gibt es keine aktive Playlist; nach dem Ende stoppt die Wiedergabe.
+- Wird eine Folge **außerhalb** einer Playlist gestartet (Start, Podcast-Seite, Downloads, Lesezeichen) und steht sie in
+  **genau einer** Playlist, gilt sie als aus dieser Playlist gespielt (Benutzerwunsch 2026-09-30): „Aus Playlist „X““
+  im Player, danach geht es dort weiter, „Fortsetzen" merkt sie sich. Steht sie in keiner oder in mehreren Playlists,
+  gibt es keine aktive Playlist; nach dem Ende stoppt die Wiedergabe.
+- **Während der Wiedergabe** beobachtet der Player, in welchen Playlists die laufende Folge steht
+  (`watchPlaylistIdsWith`, nur echte Änderungen): Die aktive Playlist bleibt, solange die Folge darin steht; wird sie
+  dort entfernt, übernimmt die einzige verbliebene Playlist, sonst keine; kommt sie in genau eine Playlist, wird diese
+  aktiv. Ausnahme: Beim Gespielt-Markieren (98 % / Ende) verlässt sie alle Playlists absichtlich – das wird ignoriert,
+  damit es mit der nächsten Folge weitergeht. Der Beobachter wird beim Folgenwechsel sofort beendet (sonst Wettlauf) und
+  in `dispose` freigegeben.
 - Überspringt der Benutzer eine Folge manuell („Weiter" ⏭ im Vollbild-Player bzw. in der Benachrichtigung), wird sie
   **nicht** als gespielt markiert und **bleibt** in der Playlist.
 - Auch manuelles „Als gespielt markieren" entfernt die Folge aus allen Playlists (Regel sitzt zentral in `markPlayed`).

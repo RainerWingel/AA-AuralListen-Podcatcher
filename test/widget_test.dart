@@ -100,12 +100,15 @@ void main() {
   late FakeDownloadEngine downloadEngine;
   late FakeBatteryOptimization battery;
   late FakeAppPlatform appPlatform;
+  // Wallpaper color of the simulated phone; null = none (Android < 12).
+  Color? wallpaperColor;
 
   setUp(() {
     episodesDir = Directory.systemTemp.createTempSync('widget_episodes_');
     downloadEngine = FakeDownloadEngine(episodesDir);
     battery = FakeBatteryOptimization();
     appPlatform = FakeAppPlatform();
+    wallpaperColor = null;
     db = AppDatabase.forTesting(NativeDatabase.memory());
     engine = FakePlayerEngine();
     handler = PodcastAudioHandler(
@@ -137,6 +140,7 @@ void main() {
           downloadEngineProvider.overrideWithValue(downloadEngine),
           batteryOptimizationProvider.overrideWithValue(battery),
           appPlatformProvider.overrideWithValue(appPlatform),
+          wallpaperColorProvider.overrideWithValue(wallpaperColor),
           episodesDirectoryProvider.overrideWithValue(() async => episodesDir),
           httpClientProvider.overrideWithValue(
             MockClient(
@@ -352,6 +356,8 @@ void main() {
     await settle(tester);
     expect(find.byType(AlertDialog), findsNothing);
     expect(find.widgetWithText(AppBar, 'Einstellungen'), findsOneWidget);
+    // Further down the list in the small test window.
+    await tester.scrollUntilVisible(find.text('OPML-Datei importieren'), 200);
     expect(find.text('OPML-Datei importieren'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
 
@@ -773,6 +779,138 @@ void main() {
         ),
         isNot(AppTheme.titleFontFamily),
       );
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'status bar icons fit the theme on screens with a background',
+    timeout: timeout,
+    (tester) async {
+      await pumpApp(tester);
+      Brightness? icons() => tester
+          .widget<AppBar>(find.byType(AppBar).last)
+          .systemOverlayStyle
+          ?.statusBarIconBrightness;
+      // Light mode (default in tests): dark icons on Home and Downloads.
+      expect(icons(), Brightness.dark);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Downloads'));
+      await settle(tester);
+      expect(icons(), Brightness.dark);
+
+      await tester.runAsync(
+        () => SettingsRepository(db).set(SettingsKeys.themeMode, 'dark'),
+      );
+      await settle(tester);
+      expect(icons(), Brightness.light);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'without a choice the app uses the wallpaper color, else orange',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      wallpaperColor = const Color(0xFF1565C0); // blue wallpaper
+      await pumpApp(tester);
+      final primary = Theme.of(tester.element(find.byType(NavigationBar)))
+          .colorScheme
+          .primary;
+      expect(primary.b, greaterThan(primary.r));
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      expect(
+        find.widgetWithText(ListTile, 'Wie Hintergrundbild'),
+        findsOneWidget,
+      );
+      await disposeApp(tester);
+
+      // Same (unset) choice on a phone without wallpaper colors.
+      wallpaperColor = null;
+      await pumpApp(tester);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      expect(find.widgetWithText(ListTile, 'Orange'), findsOneWidget);
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'the app color can be chosen, also from the wallpaper',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      Color primary() =>
+          Theme.of(tester.element(find.byType(NavigationBar)))
+              .colorScheme
+              .primary;
+      Future<void> choose(String name) async {
+        await tester.tap(find.text('App-Farbe'));
+        await settle(tester);
+        await tester.tap(find.byTooltip(name));
+        await settle(tester);
+      }
+
+      // No wallpaper colors (Android < 12): only the 8 presets.
+      await pumpApp(tester);
+      final orange = primary();
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      await tester.tap(find.text('App-Farbe'));
+      await settle(tester);
+      for (final name in [
+        'Orange',
+        'Rot',
+        'Pink',
+        'Lila',
+        'Blau',
+        'Petrol',
+        'Grün',
+        'Braun',
+      ]) {
+        expect(find.byTooltip(name), findsOneWidget, reason: name);
+      }
+      expect(find.byTooltip('Wie Hintergrundbild'), findsNothing);
+      // The default "wallpaper" shows as what it is here: orange.
+      expect(
+        find.descendant(
+          of: find.byTooltip('Orange'),
+          matching: find.byIcon(Icons.check),
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(find.byTooltip('Blau'));
+      await settle(tester);
+      final blue = primary();
+      expect(blue, isNot(orange));
+      expect(blue.b, greaterThan(blue.r));
+      expect(
+        await tester.runAsync(
+          () => SettingsRepository(db).get(SettingsKeys.appColor),
+        ),
+        'blue',
+      );
+      await disposeApp(tester);
+
+      // Android 12+ with a green wallpaper: the extra option uses it.
+      wallpaperColor = const Color(0xFF2E7D32);
+      await pumpApp(tester);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      await choose('Wie Hintergrundbild');
+      expect(find.text('Wie Hintergrundbild'), findsOneWidget);
+      final fromWallpaper = primary();
+      expect(fromWallpaper.g, greaterThan(fromWallpaper.r));
+      expect(fromWallpaper.g, greaterThan(fromWallpaper.b));
 
       await disposeApp(tester);
     },

@@ -17,10 +17,11 @@ class AuralListenApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final language = ref.watch(appLanguageProvider);
+    final seed = ref.watch(seedColorProvider);
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      theme: AppTheme.light(seed),
+      darkTheme: AppTheme.dark(seed),
       themeMode: ref.watch(themeModeProvider).value ?? ThemeMode.system,
       routerConfig: ref.watch(routerProvider),
       // null = not chosen yet: the picker is shown in the device's language.

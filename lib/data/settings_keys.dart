@@ -13,6 +13,9 @@ abstract final class SettingsKeys {
   /// the app asks on start.
   static const language = 'ui.language';
 
+  /// Main color: an AppColor name (`orange` … `wallpaper`). Missing = orange.
+  static const appColor = 'ui.appColor';
+
   /// Upper limit for all downloaded audio files in bytes (default 5 GB).
   static const downloadLimitBytes = 'downloads.limitBytes';
 

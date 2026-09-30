@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 
-/// Central theme definitions. Castbox-like orange accent.
+/// Central theme definitions. The whole palette is derived from one seed
+/// color, chosen in Optionen (default: Castbox-like orange, AppColor).
 abstract final class AppTheme {
-  static const Color _seed = Color(0xFFF55B23);
-
   /// Screen titles (app bars) in Fredoka – user choice 2026-09-30.
   /// Only the titles: small text stays in the readable system font.
   static const titleFontFamily = 'Fredoka';
 
-  static ThemeData light() => _withTitleFont(
+  static ThemeData light(Color seed) => _withTitleFont(
     ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: _seed),
+      colorScheme: ColorScheme.fromSeed(seedColor: seed),
       useMaterial3: true,
     ),
   );
 
-  static ThemeData dark() => _withTitleFont(
+  static ThemeData dark(Color seed) => _withTitleFont(
     ThemeData(
       colorScheme: ColorScheme.fromSeed(
-        seedColor: _seed,
+        seedColor: seed,
         brightness: Brightness.dark,
       ),
       useMaterial3: true,

@@ -61,6 +61,11 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-29 · **Kein Akku-Ausnahme-Dialog mehr** · nur Status + Knopf zu den App-Einstellungen; das Recht `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` ist für den Play Store heikel.
 - 2026-09-29 · **Play Store geplant** (hebt „nur Sideload" auf) · Datenschutzerklärung nötig, Klartext-HTTP im Datensicherheits-Formular angeben.
 - 2026-09-29 · **Weitere Sprachen geplant** (hebt „Nur Deutsch" auf, Benutzer) · vorerst weiter nur `app_de.arb`; die gen-l10n-Struktur ist dafür schon vorbereitet. README weist darauf hin.
+- 2026-09-30 · **Wählbare App-Farbe + Paket `dynamic_color`** (Benutzer) · 8 feste Farben (Orange, Rot, Pink, Lila, Blau,
+  Petrol, Grün, Braun) + „Wie Hintergrundbild" (Material You, Android 12+) – **Standard** (Benutzer); ohne Wallpaper-Farben
+  (Android ≤ 11) Orange. Feste Auswahl statt Farbrad,
+  damit Kontraste in Hell/Dunkel immer stimmen. `dynamic_color` (Google Material, Apache-2.0, F-Droid-tauglich) liefert
+  nur die Hintergrundbild-Farbe; die Palette baut immer `ColorScheme.fromSeed` (vollständige M3-Rollen).
 - 2026-09-30 · **Titelschrift Fredoka** (Benutzer, aus 6 Vorschlägen; ersetzt das kurz genutzte Playfair Display) ·
   nur AppBar-Titel; als Asset gebündelt
   statt Paket `google_fonts` (kein neues Paket, kein Nachladen aus dem Netz → Datenschutz). Lizenz SIL OFL 1.1,

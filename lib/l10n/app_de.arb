@@ -243,6 +243,15 @@
   "colorBlue": "Blau",
   "colorIndigo": "Indigo",
   "colorViolet": "Violett",
+  "appColor": "App-Farbe",
+  "appColorWallpaper": "Wie Hintergrundbild",
+  "@appColorWallpaper": {
+    "description": "App color taken from the phone's wallpaper (Android 12+ Material You)."
+  },
+  "colorPink": "Pink",
+  "colorPurple": "Lila",
+  "colorTeal": "Petrol",
+  "colorBrown": "Braun",
   "playlistRename": "Umbenennen",
   "playlistDelete": "Playlist löschen",
   "playlistDeleteConfirm": "„{name}“ löschen? Die Folgen selbst bleiben erhalten.",

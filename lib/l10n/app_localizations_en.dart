@@ -422,6 +422,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorViolet => 'Violet';
 
   @override
+  String get appColor => 'App color';
+
+  @override
+  String get appColorWallpaper => 'Match wallpaper';
+
+  @override
+  String get colorPink => 'Pink';
+
+  @override
+  String get colorPurple => 'Purple';
+
+  @override
+  String get colorTeal => 'Teal';
+
+  @override
+  String get colorBrown => 'Brown';
+
+  @override
   String get playlistRename => 'Rename';
 
   @override

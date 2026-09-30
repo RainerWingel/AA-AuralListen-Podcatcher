@@ -422,6 +422,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get colorViolet => 'Violett';
 
   @override
+  String get appColor => 'App-Farbe';
+
+  @override
+  String get appColorWallpaper => 'Wie Hintergrundbild';
+
+  @override
+  String get colorPink => 'Pink';
+
+  @override
+  String get colorPurple => 'Lila';
+
+  @override
+  String get colorTeal => 'Petrol';
+
+  @override
+  String get colorBrown => 'Braun';
+
+  @override
   String get playlistRename => 'Umbenennen';
 
   @override

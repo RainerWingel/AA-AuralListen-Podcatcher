@@ -23,7 +23,7 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 | `playlist_items` ✅ (v4) | PK (playlistId, episodeId), beide FK mit CASCADE, position (aufsteigend, neu = max + 1), addedAt |
 | `chapters` ✅ (v6) | PK (episodeId, startMs), FK CASCADE, title, url, imageUrl. Quellen: `playback.md` |
 | `bookmarks` ✅ (v6) | id, episodeId (FK CASCADE), positionMs, note (null = keine), createdAt |
-| `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb`, `player.activePlaylistId`, `downloads.limitBytes`, `ui.themeMode`, `ui.language` (`de`/`en`, fehlt = noch nicht gewählt) |
+| `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb`, `player.activePlaylistId`, `downloads.limitBytes`, `ui.themeMode`, `ui.language` (`de`/`en`, fehlt = noch nicht gewählt), `ui.appColor` (`AppColor`-Name, fehlt = wallpaper, ohne Wallpaper-Farben orange) |
 | ~~`player_state`~~ | entfällt – letzte Folge und aktive Playlist stehen in `settings` |
 
 ## Episoden-Status

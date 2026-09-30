@@ -806,6 +806,42 @@ abstract class AppLocalizations {
   /// **'Violett'**
   String get colorViolet;
 
+  /// No description provided for @appColor.
+  ///
+  /// In de, this message translates to:
+  /// **'App-Farbe'**
+  String get appColor;
+
+  /// App color taken from the phone's wallpaper (Android 12+ Material You).
+  ///
+  /// In de, this message translates to:
+  /// **'Wie Hintergrundbild'**
+  String get appColorWallpaper;
+
+  /// No description provided for @colorPink.
+  ///
+  /// In de, this message translates to:
+  /// **'Pink'**
+  String get colorPink;
+
+  /// No description provided for @colorPurple.
+  ///
+  /// In de, this message translates to:
+  /// **'Lila'**
+  String get colorPurple;
+
+  /// No description provided for @colorTeal.
+  ///
+  /// In de, this message translates to:
+  /// **'Petrol'**
+  String get colorTeal;
+
+  /// No description provided for @colorBrown.
+  ///
+  /// In de, this message translates to:
+  /// **'Braun'**
+  String get colorBrown;
+
   /// No description provided for @playlistRename.
   ///
   /// In de, this message translates to:

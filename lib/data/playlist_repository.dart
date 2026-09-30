@@ -133,6 +133,14 @@ class PlaylistRepository {
       item.playlistId,
   };
 
+  /// Like [playlistIdsWith], updated whenever the episode is added to or
+  /// removed from a playlist.
+  Stream<Set<int>> watchPlaylistIdsWith(int episodeId) =>
+      (_db.select(_db.playlistItems)
+            ..where((i) => i.episodeId.equals(episodeId)))
+          .watch()
+          .map((items) => {for (final i in items) i.playlistId});
+
   /// "Resume": the episode last played from [playlistId] if it is still in
   /// there, otherwise the first entry. Null = the playlist is empty.
   Future<int?> resumeEpisode(int playlistId) async {
