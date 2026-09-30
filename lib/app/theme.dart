@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 abstract final class AppTheme {
   static const Color _seed = Color(0xFFF55B23);
 
-  /// Screen titles (app bars) in Playfair Display – user choice 2026-09-30.
+  /// Screen titles (app bars) in Fredoka – user choice 2026-09-30.
   /// Only the titles: small text stays in the readable system font.
-  static const titleFontFamily = 'PlayfairDisplay';
+  static const titleFontFamily = 'Fredoka';
 
   static ThemeData light() => _withTitleFont(
     ThemeData(
@@ -30,8 +30,8 @@ abstract final class AppTheme {
       titleTextStyle: theme.textTheme.titleLarge?.copyWith(
         fontFamily: titleFontFamily,
         // Variable font: the weight is chosen via its "wght" axis.
-        fontWeight: FontWeight.w700,
-        fontVariations: const [FontVariation('wght', 700)],
+        fontWeight: FontWeight.w600,
+        fontVariations: const [FontVariation('wght', 600)],
         color: theme.colorScheme.onSurface,
       ),
     ),

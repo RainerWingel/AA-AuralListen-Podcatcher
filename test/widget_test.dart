@@ -747,7 +747,7 @@ void main() {
   });
 
   testWidgets(
-    'screen titles use Playfair Display, tabs do not',
+    'screen titles use the title font, tabs do not',
     timeout: timeout,
     (tester) async {
       await pumpApp(tester);

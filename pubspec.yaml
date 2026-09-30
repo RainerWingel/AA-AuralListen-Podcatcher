@@ -84,11 +84,11 @@ flutter:
     - assets/app_icon.webp
 
   # Screen titles (docs/ui-ux.md). SIL Open Font License, see
-  # assets/fonts/OFL-PlayfairDisplay.txt.
+  # assets/fonts/OFL-Fredoka.txt.
   fonts:
-    - family: PlayfairDisplay
+    - family: Fredoka
       fonts:
-        - asset: assets/fonts/PlayfairDisplay-Variable.ttf
+        - asset: assets/fonts/Fredoka-Variable.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
