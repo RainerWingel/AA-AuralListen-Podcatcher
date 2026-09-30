@@ -1875,6 +1875,29 @@ void main() {
       expect(find.text('Wiedergabeliste', findRichText: true), findsOneWidget);
       expect(find.text('Wiedergabeliste ✅', findRichText: true), findsNothing);
 
+      // Choosing it again asks to remove it; "Abbrechen" keeps it.
+      Future<List<int>> inSecond() async => [
+        for (final e in (await tester.runAsync(
+          () => container.read(playlistRepositoryProvider).entries(second!),
+        ))!)
+          e.episode.id,
+      ];
+      await tester.tap(find.text('Unterwegs ✅', findRichText: true));
+      await settle(tester);
+      expect(find.text('Aus Playlist entfernen?'), findsOneWidget);
+      await tester.tap(find.text('Abbrechen'));
+      await settle(tester);
+      expect(await inSecond(), [episodeId]);
+
+      await tester.tap(find.byTooltip('Zu Playlist hinzufügen…'));
+      await settle(tester);
+      await tester.tap(find.text('Unterwegs ✅', findRichText: true));
+      await settle(tester);
+      await tester.tap(find.widgetWithText(FilledButton, 'Entfernen'));
+      await settle(tester);
+      expect(find.text('Aus „Unterwegs“ entfernt'), findsOneWidget);
+      expect(await inSecond(), isEmpty);
+
       await disposeApp(tester);
     },
   );

@@ -287,6 +287,24 @@
     }
   },
   "removedFromPlaylist": "Aus der Playlist entfernt",
+  "removeFromPlaylistTitle": "Aus Playlist entfernen?",
+  "removeFromPlaylistBody": "Die Folge ist schon in „{name}“. Möchtest du sie daraus entfernen?",
+  "@removeFromPlaylistBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeFromPlaylistAction": "Entfernen",
+  "removedFromNamedPlaylist": "Aus „{name}“ entfernt",
+  "@removedFromNamedPlaylist": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "undo": "Rückgängig",
   "playerNext": "Nächste Folge",
   "playingFromPlaylist": "Aus Playlist „{name}“",

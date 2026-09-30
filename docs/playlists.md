@@ -13,7 +13,8 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
   Ende der gewählten Playlist. Gibt es nur eine
   Playlist, wird direkt hinzugefügt; sonst Auswahl-Sheet (inkl. „Neue Playlist").
   Im Sheet steht rechts neben dem Namen ein ✅, wenn die Folge schon in dieser Playlist ist (`playlistIdsWith`;
-  Screenreader liest „Schon in „X““). Erneutes Hinzufügen meldet wie bisher „Schon in „X““.
+  Screenreader liest „Schon in „X““). Wählt man eine solche Playlist (oder ist sie die einzige), fragt die App
+  „Aus Playlist entfernen?" → „Entfernen" nimmt die Folge heraus (Infobox „Aus „X“ entfernt"), „Abbrechen" lässt alles.
 - Reihenfolge per Drag & Drop (Griff ≡), Entfernen per Wischen nach links (mit „Rückgängig" – fügt am Ende wieder ein).
 - Eine Folge kann in mehreren Playlists stehen, in einer Playlist aber nur einmal.
 - **Fortsetzen** (▶ im Kreis; Benutzerwunsch 2026-09-29): Knopf oben rechts in der geöffneten Playlist und Eintrag im

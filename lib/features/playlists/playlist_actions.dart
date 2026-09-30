@@ -143,7 +143,8 @@ Future<Playlist?> choosePlaylist(
   return (await repo.playlists()).firstWhere((p) => p.id == id);
 }
 
-/// "Zu Playlist hinzufügen…" for one episode.
+/// "Zu Playlist hinzufügen…" for one episode. Choosing a playlist that
+/// already contains it asks whether to remove it from there.
 Future<void> addToPlaylist(
   BuildContext context,
   WidgetRef ref,
@@ -158,9 +159,33 @@ Future<void> addToPlaylist(
     episodeId: episodeId,
   );
   if (playlist == null) return;
-  final added = await ref
-      .read(playlistRepositoryProvider)
-      .add(playlist.id, episodeId);
+  final repo = ref.read(playlistRepositoryProvider);
+  // Already there (✅ in the sheet): offer to take it out instead.
+  if (await repo.positionOf(playlist.id, episodeId) != null) {
+    if (!context.mounted) return;
+    final remove = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.removeFromPlaylistTitle),
+        content: Text(l10n.removeFromPlaylistBody(playlist.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.removeFromPlaylistAction),
+          ),
+        ],
+      ),
+    );
+    if (remove != true) return;
+    await repo.remove(playlist.id, episodeId);
+    showInfoSnackBar(messenger, l10n.removedFromNamedPlaylist(playlist.name));
+    return;
+  }
+  final added = await repo.add(playlist.id, episodeId);
   showInfoSnackBar(
     messenger,
     added

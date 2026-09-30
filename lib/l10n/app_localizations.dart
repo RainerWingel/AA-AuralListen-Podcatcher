@@ -884,6 +884,30 @@ abstract class AppLocalizations {
   /// **'Aus der Playlist entfernt'**
   String get removedFromPlaylist;
 
+  /// No description provided for @removeFromPlaylistTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus Playlist entfernen?'**
+  String get removeFromPlaylistTitle;
+
+  /// No description provided for @removeFromPlaylistBody.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Folge ist schon in „{name}“. Möchtest du sie daraus entfernen?'**
+  String removeFromPlaylistBody(String name);
+
+  /// No description provided for @removeFromPlaylistAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Entfernen'**
+  String get removeFromPlaylistAction;
+
+  /// No description provided for @removedFromNamedPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus „{name}“ entfernt'**
+  String removedFromNamedPlaylist(String name);
+
   /// No description provided for @undo.
   ///
   /// In de, this message translates to:

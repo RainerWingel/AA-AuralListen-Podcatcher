@@ -476,6 +476,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get removedFromPlaylist => 'Aus der Playlist entfernt';
 
   @override
+  String get removeFromPlaylistTitle => 'Aus Playlist entfernen?';
+
+  @override
+  String removeFromPlaylistBody(String name) {
+    return 'Die Folge ist schon in „$name“. Möchtest du sie daraus entfernen?';
+  }
+
+  @override
+  String get removeFromPlaylistAction => 'Entfernen';
+
+  @override
+  String removedFromNamedPlaylist(String name) {
+    return 'Aus „$name“ entfernt';
+  }
+
+  @override
   String get undo => 'Rückgängig';
 
   @override
