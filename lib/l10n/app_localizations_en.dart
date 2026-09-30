@@ -372,6 +372,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'New episodes are downloaded until this many unplayed ones are on the phone. Nothing is deleted by this.';
 
   @override
+  String get autoDownloadPlaylist => 'Add new downloads to playlist';
+
+  @override
+  String get autoDownloadPlaylistNone => 'None';
+
+  @override
+  String get autoDownloadPlaylistHint =>
+      'If the playlist was deleted, the app creates it again with the next download.';
+
+  @override
   String get autoDeletePlayed => 'Delete played episodes';
 
   @override

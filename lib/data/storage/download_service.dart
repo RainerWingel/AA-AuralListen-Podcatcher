@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 
 import '../../core/clock.dart';
 import '../db/app_database.dart';
+import '../playlist_repository.dart';
 import '../podcast_repository.dart'
     show PodcastFilesCleaner, autoDownloadThemesOf;
 import '../settings_keys.dart';
@@ -28,6 +29,7 @@ class DownloadService implements PodcastFilesCleaner {
     required this._clock,
     required this._episodesDirectory,
     required this._currentEpisodeId,
+    this._playlists,
   }) {
     // Listen right away so no completion event can be missed.
     _subscription = _engine.events.listen(_onEvent);
@@ -40,6 +42,9 @@ class DownloadService implements PodcastFilesCleaner {
 
   /// The episode loaded in the player – never deleted automatically.
   final int? Function() _currentEpisodeId;
+
+  /// For the per-podcast target playlist of auto-downloads (optional).
+  final PlaylistRepository? _playlists;
 
   /// Played downloads are deleted this long after they were played.
   static const deletePlayedAfter = Duration(hours: 96);
@@ -349,6 +354,11 @@ class DownloadService implements PodcastFilesCleaner {
           episode.id,
           wifiOnly: podcast.autoDownloadMode == AutoDownloadMode.wifiOnly,
         );
+        // Optional per podcast: also append it to a playlist (skipped if it
+        // is there already).
+        if (await _targetPlaylist(podcast) case final playlistId?) {
+          await _playlists?.add(playlistId, episode.id);
+        }
         queued++;
         missing--;
       }
@@ -357,6 +367,36 @@ class DownloadService implements PodcastFilesCleaner {
   }
 
   // --------------------------------------------------------------- internals
+
+  /// The podcast's target playlist for auto-downloads (null = none). A
+  /// renamed playlist updates the stored name; a deleted one is created again
+  /// under the stored name (user wish 2026-09-30).
+  Future<int?> _targetPlaylist(Podcast podcast) async {
+    final playlists = _playlists;
+    final id = podcast.autoPlaylistId;
+    final name = podcast.autoPlaylistName;
+    if (playlists == null || id == null || name == null) return null;
+    final existing = (await playlists.playlists())
+        .where((p) => p.id == id)
+        .firstOrNull;
+    if (existing != null) {
+      if (existing.name != name) {
+        await _setAutoPlaylist(podcast.id, existing.id, existing.name);
+      }
+      return existing.id;
+    }
+    final created = await playlists.create(name);
+    await _setAutoPlaylist(podcast.id, created, name);
+    return created;
+  }
+
+  Future<void> _setAutoPlaylist(int podcastId, int id, String name) =>
+      (_db.update(_db.podcasts)..where((p) => p.id.equals(podcastId))).write(
+        PodcastsCompanion(
+          autoPlaylistId: Value(id),
+          autoPlaylistName: Value(name),
+        ),
+      );
 
   Future<void> _onEvent(DownloadEvent event) async {
     final id = event.episodeId;

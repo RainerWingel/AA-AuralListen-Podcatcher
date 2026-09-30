@@ -43,6 +43,10 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 - **Themen-Filter** (Netzwerk-Feeds): Ist `autoDownloadThemes` gesetzt, zählen und laden nur Folgen dieser Themen
   (leere Liste = nichts). Folgen ohne Thema fallen bei gesetztem Filter heraus. Neue Themen sind nicht automatisch dabei.
 - Budget: Feed-Größenangabe (`audioSizeBytes`) gegen das Speicherlimit; reicht es nicht, wird gestoppt.
+- **Ziel-Playlist** (optional pro Podcast, „Neue Downloads zur Playlist hinzufügen"; Benutzerwunsch 2026-09-30): jede
+  automatisch eingereihte Folge wird auch ans Ende dieser Playlist gehängt (schon enthalten → übersprungen). Umbenannt →
+  Name wird nachgeführt; gelöscht → beim nächsten Auto-Download unter dem gespeicherten Namen neu angelegt
+  (`DownloadService._targetPlaylist`). Manuelle Downloads betrifft das nicht.
 - Manuelle Downloads (langes Drücken → „Herunterladen") laufen über jedes Netz.
 
 ### Wartung (`runMaintenance`)

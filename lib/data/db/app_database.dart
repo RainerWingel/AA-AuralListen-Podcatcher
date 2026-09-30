@@ -39,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -103,6 +103,10 @@ class AppDatabase extends _$AppDatabase {
       // Before v4 the table was created above, already with this column.
       if (from >= 4 && from < 9) {
         await m.addColumn(playlists, playlists.color);
+      }
+      if (from < 10) {
+        await m.addColumn(podcasts, podcasts.autoPlaylistId);
+        await m.addColumn(podcasts, podcasts.autoPlaylistName);
       }
     },
     beforeOpen: (details) async {

@@ -78,6 +78,7 @@ final downloadServiceProvider = Provider<DownloadService>((ref) {
     clock: ref.watch(clockProvider),
     episodesDirectory: ref.watch(episodesDirectoryProvider),
     currentEpisodeId: () => ref.read(audioHandlerProvider).currentEpisodeId,
+    playlists: ref.watch(playlistRepositoryProvider),
   );
   ref.onDispose(service.dispose);
   return service;

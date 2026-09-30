@@ -397,6 +397,17 @@ class PodcastRepository {
     ),
   );
 
+  /// Playlist for auto-downloaded episodes of this podcast (null = none).
+  /// The name is kept so a deleted playlist can be created again.
+  Future<void> setAutoPlaylist(int podcastId, Playlist? playlist) =>
+      _updatePodcast(
+        podcastId,
+        PodcastsCompanion(
+          autoPlaylistId: Value(playlist?.id),
+          autoPlaylistName: Value(playlist?.name),
+        ),
+      );
+
   // ---------------------------------------------------------------- refresh
 
   /// Refreshes all feeds. Never throws; errors are stored per podcast.

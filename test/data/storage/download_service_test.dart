@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:aapodcastguru/data/db/app_database.dart';
+import 'package:aapodcastguru/data/playlist_repository.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/storage/download_service.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -68,6 +69,7 @@ void main() {
       clock: () => now,
       episodesDirectory: () async => dir,
       currentEpisodeId: () => currentEpisode,
+      playlists: PlaylistRepository(db, () => now),
     );
     await service.start();
     podcastId = await db
@@ -298,6 +300,57 @@ void main() {
       // Already at the maximum → nothing more.
       expect(await service.autoDownload(), 0);
     });
+
+    test(
+      'auto-downloads go into the podcast\'s playlist, even a deleted one',
+      () async {
+        final playlists = PlaylistRepository(db, () => now);
+        final target = await playlists.create('Morgens');
+        await setPodcast(
+          PodcastsCompanion(
+            autoDownloadMode: const Value(AutoDownloadMode.always),
+            autoDownloadMaxEpisodes: const Value(1),
+            autoPlaylistId: Value(target),
+            autoPlaylistName: const Value('Morgens'),
+          ),
+        );
+        Future<List<int>> itemsOf(int id) async => [
+          for (final e in await playlists.entries(id)) e.episode.id,
+        ];
+
+        final first = await addEpisode('1', pubDate: DateTime(2026, 9, 1));
+        await playlists.add(target, first); // already there: not twice
+        expect(await service.autoDownload(), 1);
+        expect(await itemsOf(target), [first]);
+
+        // Renamed: followed, the stored name is updated.
+        await playlists.rename(target, 'Früh');
+        await engine.finish(first, bytes: 10);
+        await (db.update(db.episodes)..where((e) => e.id.equals(first))).write(
+          const EpisodesCompanion(status: Value(EpisodeStatus.played)),
+        );
+        final second = await addEpisode('2', pubDate: DateTime(2026, 9, 2));
+        expect(await service.autoDownload(), 1);
+        expect(await itemsOf(target), [first, second]);
+
+        // Deleted: created again under the stored name.
+        await playlists.delete(target);
+        await engine.finish(second, bytes: 10);
+        await (db.update(db.episodes)..where((e) => e.id.equals(second))).write(
+          const EpisodesCompanion(status: Value(EpisodeStatus.played)),
+        );
+        final third = await addEpisode('3', pubDate: DateTime(2026, 9, 3));
+        expect(await service.autoDownload(), 1);
+        final recreated = (await playlists.playlists()).singleWhere(
+          (p) => p.name == 'Früh',
+        );
+        expect(await itemsOf(recreated.id), [third]);
+        final podcast = await (db.select(
+          db.podcasts,
+        )..where((p) => p.id.equals(podcastId))).getSingle();
+        expect(podcast.autoPlaylistId, recreated.id);
+      },
+    );
 
     test('only selected themes are auto-downloaded', () async {
       await setPodcast(

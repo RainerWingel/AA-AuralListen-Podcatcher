@@ -12,6 +12,7 @@ import '../../data/feed/rss_parser.dart' show themeDisplayName;
 import '../../data/podcast_repository.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../playlists/playlist_colors.dart';
 import 'change_feed_url_dialog.dart';
 import 'play_podcast_episodes.dart';
 
@@ -59,6 +60,54 @@ class _PodcastSettingsSheet extends ConsumerWidget {
           autoDeletePlayed: autoDelete,
         );
     // Downloads follow when the sheet is closed (showPodcastSettingsSheet).
+  }
+
+  /// "Neue Downloads zur Playlist hinzufügen": none or one playlist.
+  Future<void> _chooseAutoPlaylist(
+    BuildContext context,
+    WidgetRef ref,
+    Podcast podcast,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final playlists = await ref.read(playlistRepositoryProvider).playlists();
+    if (!context.mounted) return;
+    // Record wrapper: "none" must be distinguishable from "cancelled".
+    final chosen = await showDialog<({Playlist? playlist})>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(l10n.autoDownloadPlaylist),
+        children: [
+          ListTile(
+            leading: const Icon(Icons.block),
+            title: Text(l10n.autoDownloadPlaylistNone),
+            selected: podcast.autoPlaylistId == null,
+            onTap: () => Navigator.of(context).pop((playlist: null)),
+          ),
+          for (final p in playlists)
+            playlistTintedRow(
+              context,
+              p.color,
+              child: ListTile(
+                leading: const Icon(Icons.playlist_play),
+                title: Text(p.name),
+                selected: p.id == podcast.autoPlaylistId,
+                onTap: () => Navigator.of(context).pop((playlist: p)),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+            child: Text(
+              l10n.autoDownloadPlaylistHint,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ],
+      ),
+    );
+    if (chosen == null) return;
+    await ref
+        .read(podcastRepositoryProvider)
+        .setAutoPlaylist(podcast.id, chosen.playlist);
   }
 
   @override
@@ -114,6 +163,15 @@ class _PodcastSettingsSheet extends ConsumerWidget {
               onSelectionChanged: (v) => _update(ref, max: v.single),
             ),
             const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.playlist_add),
+              title: Text(l10n.autoDownloadPlaylist),
+              subtitle: Text(
+                podcast.autoPlaylistName ?? l10n.autoDownloadPlaylistNone,
+              ),
+              onTap: () => _chooseAutoPlaylist(context, ref, podcast),
+            ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.autoDeletePlayed),

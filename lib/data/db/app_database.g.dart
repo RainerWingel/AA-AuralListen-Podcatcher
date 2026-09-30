@@ -197,6 +197,28 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _autoPlaylistIdMeta = const VerificationMeta(
+    'autoPlaylistId',
+  );
+  @override
+  late final GeneratedColumn<int> autoPlaylistId = GeneratedColumn<int>(
+    'auto_playlist_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _autoPlaylistNameMeta = const VerificationMeta(
+    'autoPlaylistName',
+  );
+  @override
+  late final GeneratedColumn<String> autoPlaylistName = GeneratedColumn<String>(
+    'auto_playlist_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -216,6 +238,8 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     autoDownloadMaxEpisodes,
     autoDeletePlayed,
     boostDb,
+    autoPlaylistId,
+    autoPlaylistName,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -349,6 +373,24 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         boostDb.isAcceptableOrUnknown(data['boost_db']!, _boostDbMeta),
       );
     }
+    if (data.containsKey('auto_playlist_id')) {
+      context.handle(
+        _autoPlaylistIdMeta,
+        autoPlaylistId.isAcceptableOrUnknown(
+          data['auto_playlist_id']!,
+          _autoPlaylistIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('auto_playlist_name')) {
+      context.handle(
+        _autoPlaylistNameMeta,
+        autoPlaylistName.isAcceptableOrUnknown(
+          data['auto_playlist_name']!,
+          _autoPlaylistNameMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -428,6 +470,14 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         DriftSqlType.double,
         data['${effectivePrefix}boost_db'],
       ),
+      autoPlaylistId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}auto_playlist_id'],
+      ),
+      autoPlaylistName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}auto_playlist_name'],
+      ),
     );
   }
 
@@ -467,6 +517,12 @@ class Podcast extends DataClass implements Insertable<Podcast> {
 
   /// Loudness boost in dB; null = use the global default.
   final double? boostDb;
+
+  /// Auto-downloaded episodes are also added to this playlist – schema v10.
+  /// Null = none. No foreign key on purpose: if the playlist was deleted,
+  /// the next auto-download creates it again under [autoPlaylistName].
+  final int? autoPlaylistId;
+  final String? autoPlaylistName;
   const Podcast({
     required this.id,
     required this.feedUrl,
@@ -485,6 +541,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     required this.autoDownloadMaxEpisodes,
     required this.autoDeletePlayed,
     this.boostDb,
+    this.autoPlaylistId,
+    this.autoPlaylistName,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -530,6 +588,12 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     if (!nullToAbsent || boostDb != null) {
       map['boost_db'] = Variable<double>(boostDb);
     }
+    if (!nullToAbsent || autoPlaylistId != null) {
+      map['auto_playlist_id'] = Variable<int>(autoPlaylistId);
+    }
+    if (!nullToAbsent || autoPlaylistName != null) {
+      map['auto_playlist_name'] = Variable<String>(autoPlaylistName);
+    }
     return map;
   }
 
@@ -570,6 +634,12 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       boostDb: boostDb == null && nullToAbsent
           ? const Value.absent()
           : Value(boostDb),
+      autoPlaylistId: autoPlaylistId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(autoPlaylistId),
+      autoPlaylistName: autoPlaylistName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(autoPlaylistName),
     );
   }
 
@@ -602,6 +672,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       ),
       autoDeletePlayed: serializer.fromJson<bool>(json['autoDeletePlayed']),
       boostDb: serializer.fromJson<double?>(json['boostDb']),
+      autoPlaylistId: serializer.fromJson<int?>(json['autoPlaylistId']),
+      autoPlaylistName: serializer.fromJson<String?>(json['autoPlaylistName']),
     );
   }
   @override
@@ -629,6 +701,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       ),
       'autoDeletePlayed': serializer.toJson<bool>(autoDeletePlayed),
       'boostDb': serializer.toJson<double?>(boostDb),
+      'autoPlaylistId': serializer.toJson<int?>(autoPlaylistId),
+      'autoPlaylistName': serializer.toJson<String?>(autoPlaylistName),
     };
   }
 
@@ -650,6 +724,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     int? autoDownloadMaxEpisodes,
     bool? autoDeletePlayed,
     Value<double?> boostDb = const Value.absent(),
+    Value<int?> autoPlaylistId = const Value.absent(),
+    Value<String?> autoPlaylistName = const Value.absent(),
   }) => Podcast(
     id: id ?? this.id,
     feedUrl: feedUrl ?? this.feedUrl,
@@ -673,6 +749,12 @@ class Podcast extends DataClass implements Insertable<Podcast> {
         autoDownloadMaxEpisodes ?? this.autoDownloadMaxEpisodes,
     autoDeletePlayed: autoDeletePlayed ?? this.autoDeletePlayed,
     boostDb: boostDb.present ? boostDb.value : this.boostDb,
+    autoPlaylistId: autoPlaylistId.present
+        ? autoPlaylistId.value
+        : this.autoPlaylistId,
+    autoPlaylistName: autoPlaylistName.present
+        ? autoPlaylistName.value
+        : this.autoPlaylistName,
   );
   Podcast copyWithCompanion(PodcastsCompanion data) {
     return Podcast(
@@ -711,6 +793,12 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ? data.autoDeletePlayed.value
           : this.autoDeletePlayed,
       boostDb: data.boostDb.present ? data.boostDb.value : this.boostDb,
+      autoPlaylistId: data.autoPlaylistId.present
+          ? data.autoPlaylistId.value
+          : this.autoPlaylistId,
+      autoPlaylistName: data.autoPlaylistName.present
+          ? data.autoPlaylistName.value
+          : this.autoPlaylistName,
     );
   }
 
@@ -733,7 +821,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ..write('autoDownloadThemes: $autoDownloadThemes, ')
           ..write('autoDownloadMaxEpisodes: $autoDownloadMaxEpisodes, ')
           ..write('autoDeletePlayed: $autoDeletePlayed, ')
-          ..write('boostDb: $boostDb')
+          ..write('boostDb: $boostDb, ')
+          ..write('autoPlaylistId: $autoPlaylistId, ')
+          ..write('autoPlaylistName: $autoPlaylistName')
           ..write(')'))
         .toString();
   }
@@ -757,6 +847,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     autoDownloadMaxEpisodes,
     autoDeletePlayed,
     boostDb,
+    autoPlaylistId,
+    autoPlaylistName,
   );
   @override
   bool operator ==(Object other) =>
@@ -778,7 +870,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           other.autoDownloadThemes == this.autoDownloadThemes &&
           other.autoDownloadMaxEpisodes == this.autoDownloadMaxEpisodes &&
           other.autoDeletePlayed == this.autoDeletePlayed &&
-          other.boostDb == this.boostDb);
+          other.boostDb == this.boostDb &&
+          other.autoPlaylistId == this.autoPlaylistId &&
+          other.autoPlaylistName == this.autoPlaylistName);
 }
 
 class PodcastsCompanion extends UpdateCompanion<Podcast> {
@@ -799,6 +893,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
   final Value<int> autoDownloadMaxEpisodes;
   final Value<bool> autoDeletePlayed;
   final Value<double?> boostDb;
+  final Value<int?> autoPlaylistId;
+  final Value<String?> autoPlaylistName;
   const PodcastsCompanion({
     this.id = const Value.absent(),
     this.feedUrl = const Value.absent(),
@@ -817,6 +913,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.autoDownloadMaxEpisodes = const Value.absent(),
     this.autoDeletePlayed = const Value.absent(),
     this.boostDb = const Value.absent(),
+    this.autoPlaylistId = const Value.absent(),
+    this.autoPlaylistName = const Value.absent(),
   });
   PodcastsCompanion.insert({
     this.id = const Value.absent(),
@@ -836,6 +934,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.autoDownloadMaxEpisodes = const Value.absent(),
     this.autoDeletePlayed = const Value.absent(),
     this.boostDb = const Value.absent(),
+    this.autoPlaylistId = const Value.absent(),
+    this.autoPlaylistName = const Value.absent(),
   }) : feedUrl = Value(feedUrl),
        title = Value(title),
        subscribedAt = Value(subscribedAt);
@@ -857,6 +957,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Expression<int>? autoDownloadMaxEpisodes,
     Expression<bool>? autoDeletePlayed,
     Expression<double>? boostDb,
+    Expression<int>? autoPlaylistId,
+    Expression<String>? autoPlaylistName,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -878,6 +980,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
         'auto_download_max_episodes': autoDownloadMaxEpisodes,
       if (autoDeletePlayed != null) 'auto_delete_played': autoDeletePlayed,
       if (boostDb != null) 'boost_db': boostDb,
+      if (autoPlaylistId != null) 'auto_playlist_id': autoPlaylistId,
+      if (autoPlaylistName != null) 'auto_playlist_name': autoPlaylistName,
     });
   }
 
@@ -899,6 +1003,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Value<int>? autoDownloadMaxEpisodes,
     Value<bool>? autoDeletePlayed,
     Value<double?>? boostDb,
+    Value<int?>? autoPlaylistId,
+    Value<String?>? autoPlaylistName,
   }) {
     return PodcastsCompanion(
       id: id ?? this.id,
@@ -919,6 +1025,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           autoDownloadMaxEpisodes ?? this.autoDownloadMaxEpisodes,
       autoDeletePlayed: autoDeletePlayed ?? this.autoDeletePlayed,
       boostDb: boostDb ?? this.boostDb,
+      autoPlaylistId: autoPlaylistId ?? this.autoPlaylistId,
+      autoPlaylistName: autoPlaylistName ?? this.autoPlaylistName,
     );
   }
 
@@ -980,6 +1088,12 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     if (boostDb.present) {
       map['boost_db'] = Variable<double>(boostDb.value);
     }
+    if (autoPlaylistId.present) {
+      map['auto_playlist_id'] = Variable<int>(autoPlaylistId.value);
+    }
+    if (autoPlaylistName.present) {
+      map['auto_playlist_name'] = Variable<String>(autoPlaylistName.value);
+    }
     return map;
   }
 
@@ -1002,7 +1116,9 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           ..write('autoDownloadThemes: $autoDownloadThemes, ')
           ..write('autoDownloadMaxEpisodes: $autoDownloadMaxEpisodes, ')
           ..write('autoDeletePlayed: $autoDeletePlayed, ')
-          ..write('boostDb: $boostDb')
+          ..write('boostDb: $boostDb, ')
+          ..write('autoPlaylistId: $autoPlaylistId, ')
+          ..write('autoPlaylistName: $autoPlaylistName')
           ..write(')'))
         .toString();
   }
@@ -4237,6 +4353,8 @@ typedef $$PodcastsTableCreateCompanionBuilder = PodcastsCompanion Function({
   Value<int> autoDownloadMaxEpisodes,
   Value<bool> autoDeletePlayed,
   Value<double?> boostDb,
+  Value<int?> autoPlaylistId,
+  Value<String?> autoPlaylistName,
 });
 typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<int> id,
@@ -4256,6 +4374,8 @@ typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<int> autoDownloadMaxEpisodes,
   Value<bool> autoDeletePlayed,
   Value<double?> boostDb,
+  Value<int?> autoPlaylistId,
+  Value<String?> autoPlaylistName,
 });
 
 final class $$PodcastsTableReferences
@@ -4374,6 +4494,16 @@ class $$PodcastsTableFilterComposer
 
   ColumnFilters<double> get boostDb => $composableBuilder(
     column: $table.boostDb,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get autoPlaylistId => $composableBuilder(
+    column: $table.autoPlaylistId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get autoPlaylistName => $composableBuilder(
+    column: $table.autoPlaylistName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4496,6 +4626,16 @@ class $$PodcastsTableOrderingComposer
     column: $table.boostDb,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get autoPlaylistId => $composableBuilder(
+    column: $table.autoPlaylistId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get autoPlaylistName => $composableBuilder(
+    column: $table.autoPlaylistName,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PodcastsTableAnnotationComposer
@@ -4577,6 +4717,16 @@ class $$PodcastsTableAnnotationComposer
   GeneratedColumn<double> get boostDb =>
       $composableBuilder(column: $table.boostDb, builder: (column) => column);
 
+  GeneratedColumn<int> get autoPlaylistId => $composableBuilder(
+    column: $table.autoPlaylistId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get autoPlaylistName => $composableBuilder(
+    column: $table.autoPlaylistName,
+    builder: (column) => column,
+  );
+
   Expression<T> episodesRefs<T extends Object>(
     Expression<T> Function($$EpisodesTableAnnotationComposer a) f,
   ) {
@@ -4648,6 +4798,8 @@ class $$PodcastsTableTableManager
                 Value<int> autoDownloadMaxEpisodes = const Value.absent(),
                 Value<bool> autoDeletePlayed = const Value.absent(),
                 Value<double?> boostDb = const Value.absent(),
+                Value<int?> autoPlaylistId = const Value.absent(),
+                Value<String?> autoPlaylistName = const Value.absent(),
               }) => PodcastsCompanion(
                 id: id,
                 feedUrl: feedUrl,
@@ -4666,6 +4818,8 @@ class $$PodcastsTableTableManager
                 autoDownloadMaxEpisodes: autoDownloadMaxEpisodes,
                 autoDeletePlayed: autoDeletePlayed,
                 boostDb: boostDb,
+                autoPlaylistId: autoPlaylistId,
+                autoPlaylistName: autoPlaylistName,
               ),
           createCompanionCallback:
               ({
@@ -4686,6 +4840,8 @@ class $$PodcastsTableTableManager
                 Value<int> autoDownloadMaxEpisodes = const Value.absent(),
                 Value<bool> autoDeletePlayed = const Value.absent(),
                 Value<double?> boostDb = const Value.absent(),
+                Value<int?> autoPlaylistId = const Value.absent(),
+                Value<String?> autoPlaylistName = const Value.absent(),
               }) => PodcastsCompanion.insert(
                 id: id,
                 feedUrl: feedUrl,
@@ -4704,6 +4860,8 @@ class $$PodcastsTableTableManager
                 autoDownloadMaxEpisodes: autoDownloadMaxEpisodes,
                 autoDeletePlayed: autoDeletePlayed,
                 boostDb: boostDb,
+                autoPlaylistId: autoPlaylistId,
+                autoPlaylistName: autoPlaylistName,
               ),
           withReferenceMapper: (p0) => p0
               .map(

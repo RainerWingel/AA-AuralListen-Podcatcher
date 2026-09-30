@@ -372,6 +372,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Neue Folgen werden nachgeladen, bis so viele ungespielte heruntergeladen sind. Gelöscht wird dabei nichts.';
 
   @override
+  String get autoDownloadPlaylist => 'Neue Downloads zur Playlist hinzufügen';
+
+  @override
+  String get autoDownloadPlaylistNone => 'Keine';
+
+  @override
+  String get autoDownloadPlaylistHint =>
+      'Wurde die Playlist gelöscht, legt die App sie beim nächsten Download wieder an.';
+
+  @override
   String get autoDeletePlayed => 'Gespielte Folgen löschen';
 
   @override

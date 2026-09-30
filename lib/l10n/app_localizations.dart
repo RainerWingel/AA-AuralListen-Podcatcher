@@ -710,6 +710,24 @@ abstract class AppLocalizations {
   /// **'Neue Folgen werden nachgeladen, bis so viele ungespielte heruntergeladen sind. Gelöscht wird dabei nichts.'**
   String get autoDownloadMaxHint;
 
+  /// No description provided for @autoDownloadPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Downloads zur Playlist hinzufügen'**
+  String get autoDownloadPlaylist;
+
+  /// No description provided for @autoDownloadPlaylistNone.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine'**
+  String get autoDownloadPlaylistNone;
+
+  /// No description provided for @autoDownloadPlaylistHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Wurde die Playlist gelöscht, legt die App sie beim nächsten Download wieder an.'**
+  String get autoDownloadPlaylistHint;
+
   /// No description provided for @autoDeletePlayed.
   ///
   /// In de, this message translates to:

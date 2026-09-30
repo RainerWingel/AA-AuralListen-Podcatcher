@@ -49,6 +49,12 @@ class Podcasts extends Table {
 
   /// Loudness boost in dB; null = use the global default.
   RealColumn get boostDb => real().nullable()();
+
+  /// Auto-downloaded episodes are also added to this playlist – schema v10.
+  /// Null = none. No foreign key on purpose: if the playlist was deleted,
+  /// the next auto-download creates it again under [autoPlaylistName].
+  IntColumn get autoPlaylistId => integer().nullable()();
+  TextColumn get autoPlaylistName => text().nullable()();
 }
 
 @DataClassName('Episode')

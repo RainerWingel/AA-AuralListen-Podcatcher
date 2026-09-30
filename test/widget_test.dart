@@ -651,6 +651,60 @@ void main() {
     await disposeApp(tester);
   });
 
+  testWidgets(
+    'a target playlist for auto-downloads can be chosen',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final podcastId = await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+      await tester.tap(find.byType(PopupMenuButton<void>));
+      await settle(tester);
+      await tester.tap(find.text('Podcast-Einstellungen'));
+      await settle(tester);
+
+      final row = find.widgetWithText(
+        ListTile,
+        'Neue Downloads zur Playlist hinzufügen',
+      );
+      await tester.ensureVisible(row);
+      await settle(tester);
+      expect(
+        find.descendant(of: row, matching: find.text('Keine')),
+        findsOneWidget,
+      );
+      await tester.tap(row);
+      await settle(tester);
+      await tester.tap(find.text('Wiedergabeliste'));
+      await settle(tester);
+      expect(
+        find.descendant(of: row, matching: find.text('Wiedergabeliste')),
+        findsOneWidget,
+      );
+      final podcast = await tester.runAsync(
+        () => (db.select(
+          db.podcasts,
+        )..where((p) => p.id.equals(podcastId!))).getSingle(),
+      );
+      expect(podcast!.autoPlaylistName, 'Wiedergabeliste');
+      expect(podcast.autoPlaylistId, isNotNull);
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('long press on a topic plays only that topic', timeout: timeout, (
     tester,
   ) async {
