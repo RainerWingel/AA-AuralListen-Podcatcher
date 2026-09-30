@@ -125,6 +125,14 @@ class PlaylistRepository {
             ..limit(1))
           .getSingleOrNull();
 
+  /// Ids of all playlists that contain [episodeId].
+  Future<Set<int>> playlistIdsWith(int episodeId) async => {
+    for (final item in await (_db.select(
+      _db.playlistItems,
+    )..where((i) => i.episodeId.equals(episodeId))).get())
+      item.playlistId,
+  };
+
   /// "Resume": the episode last played from [playlistId] if it is still in
   /// there, otherwise the first entry. Null = the playlist is empty.
   Future<int?> resumeEpisode(int playlistId) async {

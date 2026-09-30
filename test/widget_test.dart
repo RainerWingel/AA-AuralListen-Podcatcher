@@ -1868,6 +1868,13 @@ void main() {
       );
       expect(entries!.map((e) => e.episode.id), [episodeId]);
 
+      // Opening the chooser again: ✅ marks the playlist that has it.
+      await tester.tap(find.byTooltip('Zu Playlist hinzufügen…'));
+      await settle(tester);
+      expect(find.text('Unterwegs ✅', findRichText: true), findsOneWidget);
+      expect(find.text('Wiedergabeliste', findRichText: true), findsOneWidget);
+      expect(find.text('Wiedergabeliste ✅', findRichText: true), findsNothing);
+
       await disposeApp(tester);
     },
   );

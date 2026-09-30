@@ -181,6 +181,17 @@ void main() {
     expect(await color(), isNull);
   });
 
+  test('playlistIdsWith lists the playlists containing an episode', () async {
+    final a = await addEpisode('A');
+    final first = (await repo.playlists()).single.id;
+    final second = await repo.create('Zweite');
+    expect(await repo.playlistIdsWith(a), isEmpty);
+    await repo.add(second, a);
+    expect(await repo.playlistIdsWith(a), {second});
+    await repo.add(first, a);
+    expect(await repo.playlistIdsWith(a), {first, second});
+  });
+
   test('nextAfter reads the current state', () async {
     final list = (await repo.playlists()).single.id;
     final a = await addEpisode('A');

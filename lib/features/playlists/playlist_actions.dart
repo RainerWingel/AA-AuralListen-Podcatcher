@@ -71,14 +71,19 @@ Future<bool> deletePlaylist(
 
 /// Picks a playlist: with exactly one it is used directly, otherwise a
 /// sheet lets the user choose (or create a new one). Null = cancelled.
+/// With [episodeId], playlists that already contain it get a ✅.
 Future<Playlist?> choosePlaylist(
   BuildContext context,
   WidgetRef ref, {
   required String title,
+  int? episodeId,
 }) async {
   final l10n = AppLocalizations.of(context);
   final repo = ref.read(playlistRepositoryProvider);
   final playlists = await repo.playlists();
+  final containing = episodeId == null
+      ? const <int>{}
+      : await repo.playlistIdsWith(episodeId);
   if (!context.mounted) return null;
   int? chosen;
   if (playlists.length == 1) {
@@ -103,7 +108,20 @@ Future<Playlist?> choosePlaylist(
                 p.color,
                 child: ListTile(
                   leading: const Icon(Icons.playlist_play),
-                  title: Text(p.name),
+                  // ✅ right next to the name: the episode is already there.
+                  title: Text.rich(
+                    TextSpan(
+                      text: p.name,
+                      children: [
+                        if (containing.contains(p.id))
+                          const TextSpan(text: ' ✅'),
+                      ],
+                    ),
+                    // Screen readers: "Schon in „X“" instead of the emoji.
+                    semanticsLabel: containing.contains(p.id)
+                        ? l10n.alreadyInPlaylist(p.name)
+                        : null,
+                  ),
                   onTap: () => Navigator.of(sheetContext).pop(p.id),
                 ),
               ),
@@ -137,6 +155,7 @@ Future<void> addToPlaylist(
     context,
     ref,
     title: l10n.addToPlaylist,
+    episodeId: episodeId,
   );
   if (playlist == null) return;
   final added = await ref
