@@ -1,9 +1,16 @@
 # UI / UX
 
 Vorbild: **Castbox**. Material 3, Deutsch und Englisch, Hell/Dunkel (Dunkel ab M7).
-Schrift: **Bildschirmtitel (AppBar) in Playfair Display** fett (Benutzerwahl 2026-09-30, `AppTheme.titleFontFamily`,
-über `appBarTheme.titleTextStyle`); alles andere inkl. Tab-Beschriftungen in der Systemschrift. Die Schrift liegt als
-variable TTF in `assets/fonts/` (Gewicht über die `wght`-Achse), Lizenz SIL OFL 1.1 (`OFL-PlayfairDisplay.txt`).
+Schrift: **Bildschirmtitel (AppBar) in Fredoka** halbfett (600) (Benutzerwahl 2026-09-30, zuerst Playfair Display,
+dann gewechselt; `AppTheme.titleFontFamily`, über `appBarTheme.titleTextStyle`); alles andere inkl. Tab-Beschriftungen
+in der Systemschrift. Die Schrift liegt als variable TTF in `assets/fonts/` (Gewicht über die `wght`-Achse), Lizenz
+SIL OFL 1.1 (`OFL-Fredoka.txt`).
+**Start-Bildschirm-Hintergrund** (Benutzerwunsch 2026-09-30): drei ineinanderliegende Bögen oben, außen am kräftigsten,
+nach innen in die normale Fläche auslaufend (`lib/core/widgets/arch_background.dart`, `CustomPainter`, Vektor).
+Geometrie exakt symmetrisch: drei konzentrische Halbellipsen um einen gemeinsamen Mittelpunkt auf der senkrechten
+Bildschirmmitte (Maße in Bildschirmbreiten, Schrittweite je Bogen gleich).
+Töne = Primärfarbe mit 7–19 % über der Oberfläche (hell/dunkel automatisch), feine helle Kante zwischen den Bögen.
+Liegt hinter dem ganzen Bildschirm inkl. transparenter AppBar; die Liste bleibt unter der AppBar.
 
 ## Navigation (untere Leiste)
 1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh

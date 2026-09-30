@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
+import '../../core/widgets/arch_background.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
@@ -18,39 +19,50 @@ class HomeScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final episodes = ref.watch(latestEpisodesProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.appTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.search,
-            icon: const Icon(Icons.search),
-            onPressed: () => context.go(Routes.search),
+    // The arches cover the whole screen, including behind the title bar;
+    // the list itself stays below the bar.
+    return Stack(
+      children: [
+        const Positioned.fill(child: ArchBackground()),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            title: Text(l10n.appTitle),
+            actions: [
+              IconButton(
+                tooltip: l10n.search,
+                icon: const Icon(Icons.search),
+                onPressed: () => context.go(Routes.search),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => refreshAllFeeds(context, ref),
-        child: episodes.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(child: Text(l10n.loadError)),
-          data: (items) => items.isEmpty
-              ? EmptyState(
-                  icon: Icons.headphones,
-                  title: l10n.homeEmpty,
-                  hint: l10n.homeEmptyHint,
-                )
-              : ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: items.length,
-                  itemBuilder: (context, index) => EpisodeTile(
-                    episode: items[index].episode,
-                    podcast: items[index].podcast,
-                    showPodcastTitle: true,
-                  ),
-                ),
+          body: RefreshIndicator(
+            onRefresh: () => refreshAllFeeds(context, ref),
+            child: episodes.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(child: Text(l10n.loadError)),
+              data: (items) => items.isEmpty
+                  ? EmptyState(
+                      icon: Icons.headphones,
+                      title: l10n.homeEmpty,
+                      hint: l10n.homeEmptyHint,
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: items.length,
+                      itemBuilder: (context, index) => EpisodeTile(
+                        episode: items[index].episode,
+                        podcast: items[index].podcast,
+                        showPodcastTitle: true,
+                      ),
+                    ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
