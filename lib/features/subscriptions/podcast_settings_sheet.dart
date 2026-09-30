@@ -89,6 +89,7 @@ class _PodcastSettingsSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(l10n.autoDownloadMax, style: theme.textTheme.titleSmall),
+            Text(l10n.autoDownloadMaxHint, style: theme.textTheme.bodySmall),
             const SizedBox(height: 8),
             SegmentedButton<int>(
               showSelectedIcon: false,

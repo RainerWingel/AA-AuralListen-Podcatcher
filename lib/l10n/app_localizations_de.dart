@@ -365,7 +365,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoDownloadAlways => 'Immer';
 
   @override
-  String get autoDownloadMax => 'Neueste ungespielte Folgen behalten';
+  String get autoDownloadMax => 'Anzahl ungespielter Folgen auf dem Gerät';
+
+  @override
+  String get autoDownloadMaxHint =>
+      'Neue Folgen werden nachgeladen, bis so viele ungespielte heruntergeladen sind. Gelöscht wird dabei nichts.';
 
   @override
   String get autoDeletePlayed => 'Gespielte Folgen löschen';

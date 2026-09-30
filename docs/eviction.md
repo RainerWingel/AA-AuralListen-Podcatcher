@@ -36,7 +36,8 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 - **Ungespielte Downloads werden nie wegen des Limits gelöscht**; stattdessen lädt Auto-Download nichts Neues mehr.
 
 ### Auto-Download
-- Pro Podcast (Podcast → ⋮ → Podcast-Einstellungen): Aus / Nur WLAN / Immer, „Neueste ungespielte Folgen behalten": 1/2/3/5/10.
+- Pro Podcast (Podcast → ⋮ → Podcast-Einstellungen): Aus / Nur WLAN / Immer, „Anzahl ungespielter Folgen auf dem Gerät" (bis 2026-09-30:
+  „Neueste ungespielte Folgen behalten" – umbenannt, weil es nichts löscht): 1/2/3/5/10, mit Hinweiszeile darunter.
 - Geladen werden die **neuesten** Folgen mit Status `neu` ohne Download, bis N ungespielte Downloads existieren.
   Fehlgeschlagene zählen nicht mit und werden nicht automatisch erneut versucht (Knopf „Erneut herunterladen").
 - **Themen-Filter** (Netzwerk-Feeds): Ist `autoDownloadThemes` gesetzt, zählen und laden nur Folgen dieser Themen

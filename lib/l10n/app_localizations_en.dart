@@ -365,7 +365,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoDownloadAlways => 'Always';
 
   @override
-  String get autoDownloadMax => 'Keep newest unplayed episodes';
+  String get autoDownloadMax => 'Number of unplayed episodes on the phone';
+
+  @override
+  String get autoDownloadMaxHint =>
+      'New episodes are downloaded until this many unplayed ones are on the phone. Nothing is deleted by this.';
 
   @override
   String get autoDeletePlayed => 'Delete played episodes';

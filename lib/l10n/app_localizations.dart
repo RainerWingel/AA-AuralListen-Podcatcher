@@ -701,8 +701,14 @@ abstract class AppLocalizations {
   /// No description provided for @autoDownloadMax.
   ///
   /// In de, this message translates to:
-  /// **'Neueste ungespielte Folgen behalten'**
+  /// **'Anzahl ungespielter Folgen auf dem Gerät'**
   String get autoDownloadMax;
+
+  /// No description provided for @autoDownloadMaxHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue Folgen werden nachgeladen, bis so viele ungespielte heruntergeladen sind. Gelöscht wird dabei nichts.'**
+  String get autoDownloadMaxHint;
 
   /// No description provided for @autoDeletePlayed.
   ///
