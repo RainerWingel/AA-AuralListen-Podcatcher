@@ -8,8 +8,12 @@ const appName = 'AA-AuralListen Podcatcher';
 /// Developer as shown on the info page and in the privacy policy.
 const appDeveloper = 'Artem A.';
 
+/// German privacy policy (legally binding); [privacyPolicyUrlEn] is the
+/// English translation, opened when the app runs in English.
 const privacyPolicyUrl =
     'https://rainerwingel.github.io/AA-AuralListen-Podcatcher/datenschutz/';
+const privacyPolicyUrlEn =
+    'https://rainerwingel.github.io/AA-AuralListen-Podcatcher/privacy/';
 const sourceCodeUrl =
     'https://github.com/RainerWingel/AA-AuralListen-Podcatcher';
 

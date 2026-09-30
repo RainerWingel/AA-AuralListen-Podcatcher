@@ -7,3 +7,4 @@ exclude:
 include:
   - index.md
   - datenschutz.md
+  - privacy.md

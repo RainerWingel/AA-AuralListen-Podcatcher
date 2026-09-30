@@ -67,7 +67,11 @@ class InfoScreen extends ConsumerWidget {
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(l10n.infoPrivacy),
             trailing: const Icon(Icons.open_in_new),
-            onTap: () => _open(context, ref, privacyPolicyUrl),
+            onTap: () => _open(
+              context,
+              ref,
+              l10n.localeName == 'en' ? privacyPolicyUrlEn : privacyPolicyUrl,
+            ),
           ),
           // Support (PayPal) lives on GitHub, not in the app: no payment
           // link in the app (Google Play policy), docs/decisions.md.

@@ -5,10 +5,12 @@ permalink: /datenschutz/
 
 # Datenschutzerklärung
 
+[English version](../privacy/)
+
 **App:** AA-AuralListen Podcatcher (Android, Paketname `io.github.rainerwingel.aurallisten`)
 **Entwickler:** Artem A. · Kontakt: über die
 [Issues des GitHub-Projekts](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
-**Stand:** 29. September 2026
+**Stand:** 30. September 2026
 
 ## Kurz gesagt
 
@@ -44,6 +46,9 @@ App selbst überträgt dabei nichts. Auf GitHub gelten die Datenschutzbestimmung
 
 Manche Podcast-Anbieter liefern Dateien noch über unverschlüsseltes `http://` aus. Die App lädt sie trotzdem, damit
 diese Podcasts funktionieren; solche Übertragungen sind dann nicht verschlüsselt.
+
+Die App-Farbe „Wie Hintergrundbild" liest die Farben deines Hintergrundbilds aus dem Android-System. Das geschieht nur
+auf dem Gerät; übertragen wird dabei nichts.
 
 ## Berechtigungen
 
