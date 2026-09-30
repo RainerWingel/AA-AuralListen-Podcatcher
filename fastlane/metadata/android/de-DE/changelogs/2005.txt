@@ -1,0 +1,9 @@
+Erste Version auf F-Droid.
+• Deutsch und Englisch
+• App-Farbe inkl. Hintergrundbild-Farben, neue Hintergründe
+• Playlists: Fortsetzen, Farben, „Aus Playlist“ live
+• Suche in den Abos
+• Folgennummern auf den Covern
+• Alle Folgen eines Podcasts/Themas spielen oder markieren
+• Auto-Downloads in eine Playlist
+• Behoben: Downloads bei http→https-Umleitung, Statusleisten-Symbole

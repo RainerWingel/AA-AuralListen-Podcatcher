@@ -61,6 +61,11 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-29 · **Kein Akku-Ausnahme-Dialog mehr** · nur Status + Knopf zu den App-Einstellungen; das Recht `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` ist für den Play Store heikel.
 - 2026-09-29 · **Play Store geplant** (hebt „nur Sideload" auf) · Datenschutzerklärung nötig, Klartext-HTTP im Datensicherheits-Formular angeben.
 - 2026-09-29 · **Weitere Sprachen geplant** (hebt „Nur Deutsch" auf, Benutzer) · vorerst weiter nur `app_de.arb`; die gen-l10n-Struktur ist dafür schon vorbereitet. README weist darauf hin.
+- 2026-10-01 · **F-Droid-Vorbereitung** (Benutzer) · Lizenz **GPL-3.0-only**. SQLite wird aus der offiziellen Quelle
+  (`third_party/sqlite`, 3.53.4) kompiliert statt vom `sqlite3`-Hook heruntergeladen – F-Droid verlangt Bau komplett aus
+  Quellcode; eigene Builds sind damit identisch. Release-APK ohne `key.properties` ist unsigniert (F-Droid signiert
+  selbst; Play Store später mit eigenem Upload-Schlüssel unberührt). Erste F-Droid-Version: 1.3.0 (Build 5). Screenshots
+  macht der Benutzer. Details: `f-droid.md`.
 - 2026-09-30 · **Wählbare App-Farbe + Paket `dynamic_color`** (Benutzer) · 8 feste Farben (Orange, Rot, Pink, Lila, Blau,
   Petrol, Grün, Braun) + „Wie Hintergrundbild" (Material You, Android 12+) – **Standard** (Benutzer); ohne Wallpaper-Farben
   (Android ≤ 11) Orange. Feste Auswahl statt Farbrad,

@@ -1,0 +1,36 @@
+<p>AA-AuralListen Podcatcher ist eine private Podcast-App für Android. Sie spielt nur Audio-Podcasts, braucht kein Konto, zeigt keine Werbung und trackt nichts. Alles, was du in der App machst, bleibt auf deinem Handy – einen Server des Entwicklers gibt es nicht.</p>
+
+<p><b>Finden und abonnieren</b></p>
+<ul>
+<li>Suche über Apple Podcasts und fyyd.de, Abo per RSS-Adresse, OPML-Import und -Export</li>
+<li>Aktualisieren per Herunterziehen; umgezogene Podcasts (neue Feed-Adresse) werden übernommen</li>
+<li>Rote Zahl ungespielter Folgen an jedem Abo; Suche innerhalb deiner Abos</li>
+</ul>
+
+<p><b>Hören</b></p>
+<ul>
+<li>Wiedergabe im Hintergrund mit Benachrichtigung, Sperrbildschirm- und Bluetooth-Tasten</li>
+<li>Sprünge −15 s / +30 s, Lautstärke-Boost (global oder pro Podcast), Sleep-Timer mit sanftem Ausblenden</li>
+<li>Kapitel (Podlove, JSON, ID3) mit „Skip“ je Kapitel, Lesezeichen mit Notiz</li>
+<li>Merkt sich die Position jeder Folge; robust bei Netzproblemen</li>
+</ul>
+
+<p><b>Playlists</b></p>
+<ul>
+<li>Mehrere Playlists mit automatischem Weiterspielen, Farben, Sortieren und „Fortsetzen“</li>
+<li>Alle neuen oder ungespielten Folgen eines Podcasts oder eines einzelnen Themas abspielen</li>
+</ul>
+
+<p><b>Downloads</b></p>
+<ul>
+<li>Manuelle oder automatische Downloads pro Podcast, wahlweise direkt in eine Playlist</li>
+<li>Gespielte Downloads werden nach 96 Stunden gelöscht; einstellbares Speicherlimit</li>
+</ul>
+
+<p><b>Außerdem</b></p>
+<ul>
+<li>Deutsch und Englisch, hell und dunkel, App-Farbe aus dem Hintergrundbild (Android 12+)</li>
+<li>Folgennummern auf den Covern, Backup und Wiederherstellung</li>
+</ul>
+
+<p>Die Podcast-Suche nutzt die iTunes Search API von Apple und fyyd.de; dein Suchbegriff wird dorthin übertragen. Alles andere verbindet sich direkt mit den Podcast-Anbietern.</p>

@@ -74,8 +74,16 @@ flutter test
 flutter build apk --release --split-per-abi
 ```
 
-Die Release-Signatur kommt aus `android/key.properties` (nicht im Repo). Fehlt die Datei, wird mit dem
-Debug-Schlüssel signiert – die APK läuft, lässt sich aber nicht als Update über die offiziellen Releases installieren.
+Die Release-Signatur kommt aus `android/key.properties` (nicht im Repo). Fehlt die Datei, bleibt die Release-APK
+**unsigniert** – so erwartet es F-Droid, das aus dem Quellcode baut und selbst signiert. Zum Installieren einer eigenen
+Version ohne Schlüssel `flutter build apk --debug` verwenden.
+
+## Lizenz
+
+AA-AuralListen Podcatcher ist freie Software: **GNU General Public License v3.0** (siehe [LICENSE](LICENSE)).
+Du darfst die App verwenden, untersuchen, verändern und weitergeben – veränderte Versionen müssen ebenfalls unter der
+GPL-3.0 mit Quellcode weitergegeben werden. Die Titelschrift Fredoka steht unter der SIL Open Font License 1.1
+(`assets/fonts/OFL-Fredoka.txt`).
 
 ## Projekt
 

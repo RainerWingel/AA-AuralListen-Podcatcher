@@ -34,7 +34,7 @@ Neues Motiv: `source.webp` ersetzen, Skript laufen lassen, Vorschau-PNG prüfen,
 - Release-APKs werden mit einem eigenen Keystore signiert. Updates lassen sich nur mit **demselben** Keystore
   über die bestehende Installation spielen – bei Verlust: Neuinstallation + Datenverlust (Backup vorher!).
 - Keystore: `~/keys/aapodcastguru-release.jks` (außerhalb des Repos, Alias `aapodcastguru`), Zugangsdaten in
-  `android/key.properties` (gitignored). Ohne diese Datei signiert Gradle mit Debug-Keys (z. B. in der CI).
+  `android/key.properties` (gitignored). Ohne diese Datei bleibt die Release-APK unsigniert (für F-Droid, `f-droid.md`); Debug-Builds (CI) sind nicht betroffen.
 - Keystore + Passwort zusätzlich sicher sichern (Passwortmanager / externes Medium).
 
 ## Secrets
@@ -68,6 +68,7 @@ Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für 
 - v1.1.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.1.0
 - v1.2.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.0 – erster
   Release unter dem neuen Namen und Paketnamen (`io.github.rainerwingel.aurallisten`)
+- v1.3.0: vorbereitet (Version 1.3.0+5 gesetzt), Tag/Release erst auf Ansage – erste Version für F-Droid (`f-droid.md`)
 - v1.2.1 (2026-09-30): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.1 – Englisch,
   Playlist-Fortsetzen und -Farben, Abos-Suche, 15-s-Regel, Download-Fix (http → https)
 

@@ -51,8 +51,13 @@ android {
 
     buildTypes {
         release {
-            // Without key.properties (e.g. in CI) fall back to debug keys so the build still works.
-            signingConfig = signingConfigs.getByName(if (hasReleaseKeystore) "release" else "debug")
+            // With key.properties: signed with the release key (own releases,
+            // later the Play Store upload). Without it the release APK stays
+            // unsigned – F-Droid builds from source and signs with its own key.
+            // (Debug builds and CI are not affected.)
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 }

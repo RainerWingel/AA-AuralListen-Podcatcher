@@ -1,0 +1,36 @@
+<p>AA-AuralListen Podcatcher is a private podcast app for Android. It plays audio podcasts only, needs no account, shows no ads and does no tracking. Everything you do in the app stays on your phone – there is no server of the developer.</p>
+
+<p><b>Find and subscribe</b></p>
+<ul>
+<li>Search Apple Podcasts and fyyd.de, subscribe by RSS address, import and export OPML</li>
+<li>Pull to refresh; moved podcasts (new feed address) are followed automatically</li>
+<li>Red counter of unplayed episodes on each subscription; search within your subscriptions</li>
+</ul>
+
+<p><b>Listening</b></p>
+<ul>
+<li>Background playback with notification, lock screen and Bluetooth controls</li>
+<li>Skip −15 s / +30 s, volume boost (global or per podcast), sleep timer with gentle fade-out</li>
+<li>Chapters (Podlove, JSON, ID3) with per-chapter skip, bookmarks with notes</li>
+<li>Remembers the position of every episode; robust against network problems</li>
+</ul>
+
+<p><b>Playlists</b></p>
+<ul>
+<li>Several playlists that continue automatically, with colors, sorting and "Resume"</li>
+<li>Play all new or unplayed episodes of a podcast or of a single topic</li>
+</ul>
+
+<p><b>Downloads</b></p>
+<ul>
+<li>Manual or automatic downloads per podcast, optionally into a playlist</li>
+<li>Played downloads are deleted after 96 hours; adjustable storage limit</li>
+</ul>
+
+<p><b>More</b></p>
+<ul>
+<li>German and English, light and dark mode, app color from your wallpaper (Android 12+)</li>
+<li>Episode numbers on the covers, backup and restore</li>
+</ul>
+
+<p>The podcast search uses Apple's iTunes Search API and fyyd.de; your search term is sent to them. Everything else connects directly to the podcast providers.</p>

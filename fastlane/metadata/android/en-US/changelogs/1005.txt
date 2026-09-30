@@ -1,0 +1,9 @@
+First F-Droid release.
+• German and English
+• App color incl. wallpaper colors, new backgrounds
+• Playlists: Resume, colors, live "From playlist"
+• Search within subscriptions
+• Episode numbers on covers
+• Play or mark all episodes of a podcast or topic
+• Auto-downloads into a playlist
+• Fixes: downloads with http→https redirects, status bar icons

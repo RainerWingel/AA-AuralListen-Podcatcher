@@ -29,6 +29,7 @@ Alles Fachliche steht in Themen-Dateien unter `docs/`.
 | `docs/git-workflow.md` | Nur `main` (keine Branches/PRs), Commits, Übergabe zwischen Agenten | jedem Commit |
 | `docs/decisions.md` | Entscheidungslog | vor Architektur-/Umfangsänderungen |
 | `docs/datenschutz.md` | **Öffentliche** Datenschutzerklärung (GitHub Pages, Play Store) | neuen Netzwerkzugriffen, Berechtigungen, Datenspeicherung |
+| `docs/f-droid.md` | F-Droid: Rezept, Store-Texte (fastlane), Regeln (keine Google-Dienste, keine Binär-Downloads) | neuen Paketen, Build, Release |
 | `docs/privacy.md` | Englische Fassung der Datenschutzerklärung – **immer zusammen** mit `datenschutz.md` ändern | wie `datenschutz.md` |
 
 ## Grundregeln (immer gültig)
