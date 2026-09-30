@@ -115,10 +115,13 @@ class PodcastRepository {
   /// initial import when subscribing never counts as fresh (docs/playlists.md).
   /// With [since] only those published at or after it ("Ungespielte Episoden
   /// seit … spielen"); episodes without a date are left out then.
+  /// With [theme] only episodes of that sub-series (network feeds, long press
+  /// on a topic in the podcast settings).
   Future<List<Episode>> unplayedEpisodes(
     int podcastId, {
     required bool freshOnly,
     DateTime? since,
+    String? theme,
   }) async {
     final podcast = await (_db.select(
       _db.podcasts,
@@ -136,6 +139,9 @@ class PodcastRepository {
       ]);
     if (since != null) {
       query.where((e) => e.pubDate.isBiggerOrEqualValue(since));
+    }
+    if (theme != null) {
+      query.where((e) => e.theme.equals(theme));
     }
     if (freshOnly) {
       query.where(

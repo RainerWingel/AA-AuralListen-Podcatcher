@@ -6,6 +6,7 @@ import '../../audio/audio_providers.dart';
 import '../../core/clock.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
+import '../../data/feed/rss_parser.dart' show themeDisplayName;
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
@@ -14,16 +15,26 @@ enum _PlayChoice { fresh, since, all }
 
 /// Long press on a subscription tile: "Alle neuen Episoden spielen",
 /// "Ungespielte Episoden seit … spielen", "Alle ungespielten Episoden
-/// spielen" (docs/playlists.md).
+/// spielen" (docs/playlists.md). With [theme] (long press on a topic in the
+/// podcast settings) only that topic's episodes count.
 Future<void> showPodcastPlayMenu(
   BuildContext context,
   WidgetRef ref,
-  Podcast podcast,
-) async {
+  Podcast podcast, {
+  String? theme,
+}) async {
   final l10n = AppLocalizations.of(context);
   final repo = ref.read(podcastRepositoryProvider);
-  final fresh = await repo.unplayedEpisodes(podcast.id, freshOnly: true);
-  final unplayed = await repo.unplayedEpisodes(podcast.id, freshOnly: false);
+  final fresh = await repo.unplayedEpisodes(
+    podcast.id,
+    freshOnly: true,
+    theme: theme,
+  );
+  final unplayed = await repo.unplayedEpisodes(
+    podcast.id,
+    freshOnly: false,
+    theme: theme,
+  );
   if (!context.mounted) return;
   // The sheet's own context is gone once it closes: the flow uses [context].
   final choice = await showModalBottomSheet<_PlayChoice>(
@@ -39,8 +50,10 @@ Future<void> showPodcastPlayMenu(
           children: [
             ListTile(
               title: Text(
-                podcast.title,
-                maxLines: 1,
+                theme == null
+                    ? podcast.title
+                    : '${podcast.title} · ${themeDisplayName(theme)}',
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(sheetContext).textTheme.titleMedium,
               ),
@@ -88,7 +101,7 @@ Future<void> showPodcastPlayMenu(
         title: l10n.playUnplayedEpisodes,
       );
     case _PlayChoice.since:
-      await _playUnplayedSince(context, ref, podcast, unplayed);
+      await _playUnplayedSince(context, ref, podcast, unplayed, theme: theme);
   }
 }
 
@@ -97,8 +110,9 @@ Future<void> _playUnplayedSince(
   BuildContext context,
   WidgetRef ref,
   Podcast podcast,
-  List<Episode> unplayed,
-) async {
+  List<Episode> unplayed, {
+  String? theme,
+}) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   final now = ref.read(clockProvider)();
@@ -125,7 +139,12 @@ Future<void> _playUnplayedSince(
   final since = DateTime(picked.year, picked.month, picked.day);
   final episodes = await ref
       .read(podcastRepositoryProvider)
-      .unplayedEpisodes(podcast.id, freshOnly: false, since: since);
+      .unplayedEpisodes(
+        podcast.id,
+        freshOnly: false,
+        since: since,
+        theme: theme,
+      );
   if (!context.mounted) return;
   if (episodes.isEmpty) {
     showInfoSnackBar(

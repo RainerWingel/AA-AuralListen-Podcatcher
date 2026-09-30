@@ -13,6 +13,7 @@ import '../../data/podcast_repository.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import 'change_feed_url_dialog.dart';
+import 'play_podcast_episodes.dart';
 
 /// Choices for "keep the newest N unplayed episodes".
 const autoDownloadCounts = <int>[1, 2, 3, 5, 10];
@@ -190,30 +191,36 @@ class _ThemeFilter extends ConsumerWidget {
         ),
         Text(l10n.autoDownloadThemesHint, style: theme.textTheme.bodySmall),
         for (final t in themes)
-          CheckboxListTile(
-            contentPadding: EdgeInsets.zero,
-            value: selected.contains(t.theme),
-            onChanged: (checked) => _save(
-              ref,
-              checked == true
-                  ? {...selected, t.theme}
-                  : ({...selected}..remove(t.theme)),
-            ),
-            secondary: CoverImage(
-              url: t.imageUrl ?? podcast.imageUrl,
-              size: 48,
-            ),
-            title: Text(themeDisplayName(t.theme)),
-            subtitle: Text(
-              l10n.themeSubtitle(
-                t.count,
-                t.latest == null
-                    ? '–'
-                    : formatEpisodeDate(
-                        t.latest!,
-                        now: now,
-                        locale: l10n.localeName,
-                      ),
+          // Long press: play this topic's episodes (same menu as on a
+          // subscription, limited to the topic).
+          GestureDetector(
+            onLongPress: () =>
+                showPodcastPlayMenu(context, ref, podcast, theme: t.theme),
+            child: CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              value: selected.contains(t.theme),
+              onChanged: (checked) => _save(
+                ref,
+                checked == true
+                    ? {...selected, t.theme}
+                    : ({...selected}..remove(t.theme)),
+              ),
+              secondary: CoverImage(
+                url: t.imageUrl ?? podcast.imageUrl,
+                size: 48,
+              ),
+              title: Text(themeDisplayName(t.theme)),
+              subtitle: Text(
+                l10n.themeSubtitle(
+                  t.count,
+                  t.latest == null
+                      ? '–'
+                      : formatEpisodeDate(
+                          t.latest!,
+                          now: now,
+                          locale: l10n.localeName,
+                        ),
+                ),
               ),
             ),
           ),

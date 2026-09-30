@@ -44,7 +44,10 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
   - Umbenennen, Farbe…, Playlist löschen.
 
 ## Ganze Podcasts in eine Playlist (Benutzerwunsch 2026-09-28)
-Abos-Tab → **langes Drücken** auf eine Kachel → Menü (`play_podcast_episodes.dart`):
+Abos-Tab → **langes Drücken** auf eine Kachel → Menü (`play_podcast_episodes.dart`); dasselbe Menü gibt es für ein einzelnes **Thema**
+(Netzwerk-Feeds wie WRINT): Podcast-Einstellungen → „Themen für automatische Downloads" → langes Drücken auf ein Thema
+(Benutzerwunsch 2026-09-30). Dann zählen nur Folgen dieses Themas (`unplayedEpisodes(theme: …)`), Titel „Podcast · Thema";
+schon enthaltene Folgen werden wie immer übersprungen:
 1. **„Alle neuen Episoden spielen"** – nur **frische** Folgen.
 2. **„Ungespielte Episoden seit … spielen"** – Kalender (öffnet auf heute, frühestes Datum = älteste ungespielte
    Folge): ungespielte Folgen mit Veröffentlichungsdatum **ab Beginn des gewählten Tags**; Folgen ohne Datum zählen

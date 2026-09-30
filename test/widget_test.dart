@@ -641,6 +641,70 @@ void main() {
     await disposeApp(tester);
   });
 
+  testWidgets('long press on a topic plays only that topic', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(NavigationBar)),
+    );
+    await tester.runAsync(
+      () => container
+          .read(podcastRepositoryProvider)
+          .subscribe('https://wrint.example.com/feed'),
+    );
+    final playlistId = (await tester.runAsync(
+      () => db.select(db.playlists).getSingle(),
+    ))!.id;
+    await settle(tester);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+    await settle(tester);
+    await tester.tap(find.text('WRINT'));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    await tester.tap(find.text('Podcast-Einstellungen'));
+    await settle(tester);
+    Future<void> playTopicAll() async {
+      await tester.ensureVisible(find.text('Die Wrintheit'));
+      await settle(tester);
+      await tester.longPress(find.text('Die Wrintheit'));
+      await settle(tester);
+      // The menu is limited to the topic: 1 of the 2 unplayed episodes.
+      expect(find.text('WRINT · Die Wrintheit'), findsOneWidget);
+      expect(find.text('1 Folge'), findsOneWidget);
+      await tester.tap(find.text('Alle ungespielten Episoden spielen'));
+      await settle(tester);
+    }
+
+    await playTopicAll();
+    final entries = await tester.runAsync(
+      () => container.read(playlistRepositoryProvider).entries(playlistId),
+    );
+    expect(entries!.map((e) => e.episode.title), ['Wrintheit A']);
+    expect(
+      find.text('1 Folge zu „Wiedergabeliste“ hinzugefügt.'),
+      findsOneWidget,
+    );
+
+    // Again: nothing is added twice.
+    await playTopicAll();
+    expect(
+      find.textContaining('Alle Folgen waren schon in „Wiedergabeliste“'),
+      findsOneWidget,
+    );
+    final again = await tester.runAsync(
+      () => container.read(playlistRepositoryProvider).entries(playlistId),
+    );
+    expect(again, hasLength(1));
+
+    await disposeApp(tester);
+  });
+
   testWidgets('chapters and bookmarks in the player', timeout: timeout, (
     tester,
   ) async {
