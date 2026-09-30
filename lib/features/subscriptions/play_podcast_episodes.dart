@@ -11,7 +11,7 @@ import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
 
-enum _PlayChoice { fresh, since, all }
+enum _PlayChoice { fresh, since, all, markAll }
 
 /// Long press on a subscription tile: "Alle neuen Episoden spielen",
 /// "Ungespielte Episoden seit … spielen", "Alle ungespielten Episoden
@@ -35,6 +35,11 @@ Future<void> showPodcastPlayMenu(
     freshOnly: false,
     theme: theme,
   );
+  final total = await ref
+      .read(playbackRepositoryProvider)
+      .countEpisodes(podcast.id, theme: theme);
+  // "Mark all as unplayed" only when every affected episode is played.
+  final allPlayed = total > 0 && unplayed.isEmpty;
   if (!context.mounted) return;
   // The sheet's own context is gone once it closes: the flow uses [context].
   final choice = await showModalBottomSheet<_PlayChoice>(
@@ -79,6 +84,16 @@ Future<void> showPodcastPlayMenu(
               enabled: unplayed.isNotEmpty,
               onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.all),
             ),
+            const Divider(),
+            ListTile(
+              leading: Icon(allPlayed ? Icons.remove_done : Icons.done_all),
+              title: Text(
+                allPlayed ? l10n.markAllUnplayed : l10n.markAllPlayed,
+              ),
+              subtitle: Text(l10n.episodeCount(total)),
+              enabled: total > 0,
+              onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.markAll),
+            ),
           ],
         ),
       ),
@@ -102,6 +117,61 @@ Future<void> showPodcastPlayMenu(
       );
     case _PlayChoice.since:
       await _playUnplayedSince(context, ref, podcast, unplayed, theme: theme);
+    case _PlayChoice.markAll:
+      await _markAll(
+        context,
+        ref,
+        podcast,
+        theme: theme,
+        played: !allPlayed,
+        count: allPlayed ? total : unplayed.length,
+      );
+  }
+}
+
+/// "Alle als gespielt / ungespielt markieren" for the podcast or [theme],
+/// after a confirmation with the number of episodes changed.
+Future<void> _markAll(
+  BuildContext context,
+  WidgetRef ref,
+  Podcast podcast, {
+  required String? theme,
+  required bool played,
+  required int count,
+}) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(played ? l10n.markAllPlayed : l10n.markAllUnplayed),
+      content: Text(
+        played
+            ? '${l10n.markAllPlayedConfirm(count)}\n\n'
+                  '${l10n.markPlayedUntilHint}'
+            : '${l10n.markAllUnplayedConfirm(count)}\n\n'
+                  '${l10n.markUnplayedSinceHint}',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(l10n.markAction),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true) return;
+  final playback = ref.read(playbackRepositoryProvider);
+  if (played) {
+    final marked = await playback.markAllPlayed(podcast.id, theme: theme);
+    showInfoSnackBar(messenger, l10n.markPlayedUntilDone(marked));
+  } else {
+    final marked = await playback.markAllUnplayed(podcast.id, theme: theme);
+    showInfoSnackBar(messenger, l10n.markUnplayedSinceDone(marked));
   }
 }
 

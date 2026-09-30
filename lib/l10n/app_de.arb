@@ -579,6 +579,27 @@
     }
   },
   "markUnplayedSinceDone": "{count, plural, =1{1 Folge} other{{count} Folgen}} als ungespielt markiert",
+  "markAllPlayed": "Alle als gespielt markieren",
+  "@markAllPlayed": {
+    "description": "Play menu of a podcast or topic: switches to markAllUnplayed only when every affected episode is played."
+  },
+  "markAllUnplayed": "Alle als ungespielt markieren",
+  "markAllPlayedConfirm": "{count, plural, =1{1 Folge} other{{count} Folgen}} als gespielt markieren?",
+  "@markAllPlayedConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "markAllUnplayedConfirm": "{count, plural, =1{1 gespielte Folge} other{{count} gespielte Folgen}} als ungespielt markieren?",
+  "@markAllUnplayedConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "@markUnplayedSinceDone": {
     "placeholders": {
       "count": {

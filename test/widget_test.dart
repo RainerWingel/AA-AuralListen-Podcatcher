@@ -676,7 +676,16 @@ void main() {
       await settle(tester);
       // The menu is limited to the topic: 1 of the 2 unplayed episodes.
       expect(find.text('WRINT · Die Wrintheit'), findsOneWidget);
-      expect(find.text('1 Folge'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.widgetWithText(
+            ListTile,
+            'Alle ungespielten Episoden spielen',
+          ),
+          matching: find.text('1 Folge'),
+        ),
+        findsOneWidget,
+      );
       await tester.tap(find.text('Alle ungespielten Episoden spielen'));
       await settle(tester);
     }
@@ -701,6 +710,36 @@ void main() {
       () => container.read(playlistRepositoryProvider).entries(playlistId),
     );
     expect(again, hasLength(1));
+
+    // "Mark all as played" for the topic, then it offers the opposite.
+    Future<void> openTopicMenu() async {
+      await tester.ensureVisible(find.text('Die Wrintheit'));
+      await settle(tester);
+      await tester.longPress(find.text('Die Wrintheit'));
+      await settle(tester);
+    }
+
+    await openTopicMenu();
+    await tester.tap(find.text('Alle als gespielt markieren'));
+    await settle(tester);
+    expect(
+      find.textContaining('1 Folge als gespielt markieren?'),
+      findsOneWidget,
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Markieren'));
+    await settle(tester);
+    expect(find.text('1 Folge als gespielt markiert'), findsOneWidget);
+    await openTopicMenu();
+    expect(find.text('Alle als ungespielt markieren'), findsOneWidget);
+    expect(find.text('Alle als gespielt markieren'), findsNothing);
+    // The other topic is untouched.
+    await tester.tapAt(const Offset(10, 10)); // close the menu
+    await settle(tester);
+    await tester.ensureVisible(find.text('Zum Thema'));
+    await settle(tester);
+    await tester.longPress(find.text('Zum Thema'));
+    await settle(tester);
+    expect(find.text('Alle als gespielt markieren'), findsOneWidget);
 
     await disposeApp(tester);
   });

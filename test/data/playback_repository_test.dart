@@ -130,6 +130,52 @@ void main() {
     });
   });
 
+  test('markAllPlayed / markAllUnplayed for a podcast or one theme', () async {
+    Future<void> setTheme(int id, String theme) =>
+        (db.update(db.episodes)..where((e) => e.id.equals(id))).write(
+          EpisodesCompanion(theme: Value(theme)),
+        );
+    final a = await addEpisode('a'); // no date: included too
+    final b = await addEpisode('b', pubDate: DateTime(2026, 1, 1));
+    final c = await addEpisode('c', pubDate: DateTime(2026, 2, 1));
+    await setTheme(a, 'zum-thema');
+    await setTheme(b, 'zum-thema');
+    await setTheme(c, 'wrintheit');
+    final playlistId = (await db.select(db.playlists).getSingle()).id;
+    await db
+        .into(db.playlistItems)
+        .insert(
+          PlaylistItemsCompanion.insert(
+            playlistId: playlistId,
+            episodeId: a,
+            position: 0,
+            addedAt: now,
+          ),
+        );
+
+    expect(await playback.countEpisodes(podcastId), 3);
+    expect(await playback.countEpisodes(podcastId, theme: 'zum-thema'), 2);
+
+    // Only the theme; played episodes leave the playlists.
+    expect(await playback.markAllPlayed(podcastId, theme: 'zum-thema'), 2);
+    expect((await episode(a)).status, EpisodeStatus.played);
+    expect((await episode(a)).playedAt, isNotNull);
+    expect((await episode(c)).status, EpisodeStatus.newEpisode);
+    expect(await db.select(db.playlistItems).get(), isEmpty);
+    expect(await playback.markAllPlayed(podcastId, theme: 'zum-thema'), 0);
+
+    expect(await playback.markAllUnplayed(podcastId, theme: 'zum-thema'), 2);
+    final back = await episode(b);
+    expect(
+      (back.status, back.playedAt, back.positionMs),
+      (EpisodeStatus.newEpisode, null, 0),
+    );
+
+    // Whole podcast.
+    expect(await playback.markAllPlayed(podcastId), 3);
+    expect(await playback.markAllUnplayed(podcastId), 3);
+  });
+
   group('markUnplayedSince', () {
     final since = DateTime(2026, 9, 10);
 

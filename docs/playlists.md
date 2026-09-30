@@ -53,6 +53,10 @@ schon enthaltene Folgen werden wie immer übersprungen:
    Folge): ungespielte Folgen mit Veröffentlichungsdatum **ab Beginn des gewählten Tags**; Folgen ohne Datum zählen
    nicht. Keine passenden → Infobox „Keine ungespielten Folgen seit dem …".
 3. **„Alle ungespielten Episoden spielen"** – alle Folgen mit Status neu oder angefangen.
+4. **„Alle als gespielt markieren"** (unter einem Trennstrich; Benutzerwunsch 2026-09-30): alle Folgen des Podcasts bzw.
+   des Themas, auch ohne Datum – Regeln wie „Als gespielt markieren bis …" (verlassen alle Playlists, Downloads nach
+   96 h weg). Sind **alle** betroffenen Folgen schon gespielt, heißt der Eintrag **„Alle als ungespielt markieren"**
+   (werden wieder neu). Beides mit Rückfrage samt Anzahl (`PlaybackRepository.markAllPlayed` / `markAllUnplayed`).
 - **Frisch** ist kein eigener Status (kein Enum/Feld): berechnet aus `episodes.addedAt` (erster Abruf, spätere Refreshes
   ändern es nicht) – jünger als 96 h (`PodcastRepository.freshFor`; zuerst 24 h, auf Wunsch 96 h) **und** nicht beim Abonnieren mitgekommen
   (`addedAt > podcasts.subscribedAt`; sonst wären nach dem Abo alle 200 Altfolgen „neu"). Gespielte zählen nie.

@@ -1502,6 +1502,30 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als ungespielt markiert'**
   String markUnplayedSinceDone(int count);
 
+  /// Play menu of a podcast or topic: switches to markAllUnplayed only when every affected episode is played.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle als gespielt markieren'**
+  String get markAllPlayed;
+
+  /// No description provided for @markAllUnplayed.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle als ungespielt markieren'**
+  String get markAllUnplayed;
+
+  /// No description provided for @markAllPlayedConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Folge} other{{count} Folgen}} als gespielt markieren?'**
+  String markAllPlayedConfirm(int count);
+
+  /// No description provided for @markAllUnplayedConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 gespielte Folge} other{{count} gespielte Folgen}} als ungespielt markieren?'**
+  String markAllUnplayedConfirm(int count);
+
   /// No description provided for @playlistSortDateAscending.
   ///
   /// In de, this message translates to:

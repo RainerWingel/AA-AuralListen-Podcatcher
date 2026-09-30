@@ -906,6 +906,34 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get markAllPlayed => 'Alle als gespielt markieren';
+
+  @override
+  String get markAllUnplayed => 'Alle als ungespielt markieren';
+
+  @override
+  String markAllPlayedConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen',
+      one: '1 Folge',
+    );
+    return '$_temp0 als gespielt markieren?';
+  }
+
+  @override
+  String markAllUnplayedConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gespielte Folgen',
+      one: '1 gespielte Folge',
+    );
+    return '$_temp0 als ungespielt markieren?';
+  }
+
+  @override
   String get playlistSortDateAscending => 'Aufsteigend nach Datum sortieren';
 
   @override

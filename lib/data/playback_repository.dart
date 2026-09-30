@@ -149,6 +149,67 @@ class PlaybackRepository {
         ),
       );
 
+  Expression<bool> _ofPodcast($EpisodesTable e, int podcastId, String? theme) =>
+      e.podcastId.equals(podcastId) &
+      (theme == null ? const Constant(true) : e.theme.equals(theme));
+
+  /// Number of all episodes of a podcast (or of one [theme]).
+  Future<int> countEpisodes(int podcastId, {String? theme}) async {
+    final count = _db.episodes.id.count();
+    return await (_db.selectOnly(_db.episodes)
+              ..addColumns([count])
+              ..where(_ofPodcast(_db.episodes, podcastId, theme)))
+            .map((r) => r.read(count))
+            .getSingle() ??
+        0;
+  }
+
+  /// "Alle als gespielt markieren" (whole podcast or one [theme]): like
+  /// [markPlayedUntil], but for every not yet played episode, undated ones
+  /// too. Returns the number of episodes marked.
+  Future<int> markAllPlayed(int podcastId, {String? theme}) =>
+      _db.transaction(() async {
+        final ids =
+            await (_db.selectOnly(_db.episodes)
+                  ..addColumns([_db.episodes.id])
+                  ..where(
+                    _ofPodcast(_db.episodes, podcastId, theme) &
+                        _db.episodes.status
+                            .equalsValue(EpisodeStatus.played)
+                            .not(),
+                  ))
+                .map((r) => r.read(_db.episodes.id)!)
+                .get();
+        if (ids.isEmpty) return 0;
+        await (_db.update(_db.episodes)..where((e) => e.id.isIn(ids))).write(
+          EpisodesCompanion(
+            status: const Value(EpisodeStatus.played),
+            playedAt: Value(_clock()),
+            positionMs: const Value(0),
+          ),
+        );
+        await (_db.delete(
+          _db.playlistItems,
+        )..where((i) => i.episodeId.isIn(ids))).go();
+        return ids.length;
+      });
+
+  /// "Alle als ungespielt markieren": all played episodes of the podcast (or
+  /// [theme]) become new again, like [markUnplayedSince]. Returns the count.
+  Future<int> markAllUnplayed(int podcastId, {String? theme}) =>
+      (_db.update(_db.episodes)..where(
+            (e) =>
+                _ofPodcast(e, podcastId, theme) &
+                e.status.equalsValue(EpisodeStatus.played),
+          ))
+          .write(
+            const EpisodesCompanion(
+              status: Value(EpisodeStatus.newEpisode),
+              playedAt: Value(null),
+              positionMs: Value(0),
+            ),
+          );
+
   /// Manual "mark as unplayed": cancels the eviction timer.
   Future<void> markUnplayed(int episodeId) => _update(
     episodeId,
