@@ -382,6 +382,30 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wurde die Playlist gelöscht, legt die App sie beim nächsten Download wieder an.';
 
   @override
+  String get episodeCounter => 'Folgennummer am Cover';
+
+  @override
+  String get episodeCounterHint =>
+      'Schmaler Streifen am linken Rand der Cover in den Folgenlisten.';
+
+  @override
+  String get episodeNumberOffset => 'Versatz der Zählung';
+
+  @override
+  String get episodeNumberOffsetHint =>
+      'Wird zur Zählung ab der ältesten Folge addiert – z. B. −1, damit sie die 0 bekommt.';
+
+  @override
+  String get episodeNumberOffsetFeed =>
+      'Der Feed nummeriert seine Folgen selbst – der Versatz gilt dann nicht.';
+
+  @override
+  String get episodeNumberDecrease => 'Verringern';
+
+  @override
+  String get episodeNumberIncrease => 'Erhöhen';
+
+  @override
   String get autoDeletePlayed => 'Gespielte Folgen löschen';
 
   @override

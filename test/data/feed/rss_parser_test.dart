@@ -77,6 +77,20 @@ void main() {
     expect(feed.imageUrl, 'https://example.com/rss.jpg');
   });
 
+  test('reads itunes:episode as the episode number', () {
+    final feed = parser.parse(
+      '<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">'
+      '<channel><title>T</title>'
+      '<item><title>A</title><itunes:episode>42</itunes:episode>'
+      '<enclosure url="https://example.com/1.mp3"/></item>'
+      '<item><title>B</title><itunes:episode>bonus</itunes:episode>'
+      '<enclosure url="https://example.com/2.mp3"/></item>'
+      '<item><title>C</title><enclosure url="https://example.com/3.mp3"/></item>'
+      '</channel></rss>',
+    );
+    expect(feed.episodes.map((e) => e.episodeNumber), [42, null, null]);
+  });
+
   test('HTML entities in titles are decoded', () {
     final feed = parser.parse(
       '<rss><channel><title>Tom&amp;nbsp;&amp;amp; Jerry</title>'

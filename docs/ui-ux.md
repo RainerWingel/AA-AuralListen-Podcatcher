@@ -59,6 +59,14 @@ laufende Folge hervorgehoben; eine **gespielte** Folge gilt nur als laufend, sol
 nach dem Ende zeigt sie den Haken, auch wenn der Mini-Player sie noch anzeigt). Gespielte Folgen: Bild, Titel und Untertitel mit 50 % Deckkraft wie bei Castbox
 (`EpisodeTile.playedOpacity`), Haken bleibt voll sichtbar, die gerade laufende Folge wird nie abgeblendet. **Tippen = abspielen.** **Langes Drücken** = Menü: Abspielen, Als gespielt / ungespielt markieren.
 Menü außerdem: Herunterladen / Download abbrechen / Download löschen / Erneut herunterladen (je nach Zustand).
+**Folgennummer am Cover** (Benutzerwunsch 2026-09-30, `lib/data/episode_numbers.dart`, `_NumberedCover` in
+`episode_tile.dart`): schmaler halbtransparenter schwarzer Streifen am linken Cover-Rand, Zahl weiß, von unten nach oben
+gelesen, in allen Folgenlisten (nicht im Player). Regeln: Hat der Feed eigene Nummern (`itunes:episode`), werden die
+gezeigt – Folgen ohne Nummer bekommen dann keine (keine Kollision mit Bonusfolgen). Sonst zählt die App über den ganzen
+Feed nach Veröffentlichungsdatum (älteste = 1, bei gleichem Datum der ältere DB-Eintrag zuerst) plus Versatz; Folgen
+ohne Datum bekommen keine Nummer. Podcast-Einstellungen: Schalter „Folgennummer am Cover" (Standard an) und
+„Versatz der Zählung" als − [Feld] + (−9999…9999, Eingabe mit „Fertig" oder beim Verlassen übernommen; bei
+Feed-Nummern ausgegraut mit Hinweis). Themen-Feeds zählen über den ganzen Feed.
 Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Außerdem „Zu Playlist hinzufügen…".
 
 ## Playlists

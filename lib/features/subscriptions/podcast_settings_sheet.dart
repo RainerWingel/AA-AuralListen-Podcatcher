@@ -185,6 +185,8 @@ class _PodcastSettingsSheet extends ConsumerWidget {
             if (themes.length >= 2)
               _ThemeFilter(podcast: podcast, themes: themes),
             const Divider(height: 24),
+            _EpisodeCounterSettings(podcast: podcast),
+            const Divider(height: 24),
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.rss_feed),
@@ -294,6 +296,158 @@ class _ThemeFilter extends ConsumerWidget {
               ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// "Folgennummer am Cover": on/off and the counting offset (docs/ui-ux.md).
+class _EpisodeCounterSettings extends ConsumerWidget {
+  const _EpisodeCounterSettings({required this.podcast});
+
+  final Podcast podcast;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final repo = ref.read(podcastRepositoryProvider);
+    final feedNumbers =
+        ref.watch(hasFeedNumbersProvider(podcast.id)).value ?? false;
+    final on = podcast.episodeCounter;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.episodeCounter),
+          subtitle: Text(l10n.episodeCounterHint),
+          value: on,
+          onChanged: (v) => repo.setEpisodeCounter(podcast.id, enabled: v),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                l10n.episodeNumberOffset,
+                style: theme.textTheme.bodyLarge,
+              ),
+            ),
+            _OffsetStepper(
+              value: podcast.episodeNumberOffset,
+              enabled: on && !feedNumbers,
+              onChanged: (v) => repo.setEpisodeCounter(podcast.id, offset: v),
+            ),
+          ],
+        ),
+        Text(
+          feedNumbers
+              ? l10n.episodeNumberOffsetFeed
+              : l10n.episodeNumberOffsetHint,
+          style: theme.textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+}
+
+/// Small numeric up/down control, −9999 … 9999: − and + buttons around a
+/// field that also accepts typing (applied on "done" or when leaving it).
+class _OffsetStepper extends StatefulWidget {
+  const _OffsetStepper({
+    required this.value,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  static const min = -9999;
+  static const max = 9999;
+
+  final int value;
+  final bool enabled;
+  final ValueChanged<int> onChanged;
+
+  @override
+  State<_OffsetStepper> createState() => _OffsetStepperState();
+}
+
+class _OffsetStepperState extends State<_OffsetStepper> {
+  late final _controller = TextEditingController(text: '${widget.value}');
+  final _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(() {
+      if (!_focus.hasFocus) _commit();
+    });
+  }
+
+  @override
+  void didUpdateWidget(_OffsetStepper old) {
+    super.didUpdateWidget(old);
+    // Show the stored value unless the user is typing.
+    if (!_focus.hasFocus && _controller.text != '${widget.value}') {
+      _controller.text = '${widget.value}';
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  void _set(int value) {
+    final clamped = value.clamp(_OffsetStepper.min, _OffsetStepper.max);
+    _controller.text = '$clamped';
+    if (clamped != widget.value) widget.onChanged(clamped);
+  }
+
+  void _commit() => _set(
+    int.tryParse(_controller.text.trim().replaceAll('−', '-')) ?? widget.value,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final enabled = widget.enabled;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          tooltip: l10n.episodeNumberDecrease,
+          icon: const Icon(Icons.remove),
+          onPressed: enabled && widget.value > _OffsetStepper.min
+              ? () => _set(widget.value - 1)
+              : null,
+        ),
+        SizedBox(
+          width: 64,
+          child: TextField(
+            controller: _controller,
+            focusNode: _focus,
+            enabled: enabled,
+            textAlign: TextAlign.center,
+            keyboardType: const TextInputType.numberWithOptions(signed: true),
+            textInputAction: TextInputAction.done,
+            maxLength: 5,
+            decoration: const InputDecoration(
+              isDense: true,
+              counterText: '',
+              border: OutlineInputBorder(),
+            ),
+            onSubmitted: (_) => _commit(),
+          ),
+        ),
+        IconButton(
+          tooltip: l10n.episodeNumberIncrease,
+          icon: const Icon(Icons.add),
+          onPressed: enabled && widget.value < _OffsetStepper.max
+              ? () => _set(widget.value + 1)
+              : null,
+        ),
       ],
     );
   }

@@ -55,6 +55,13 @@ class Podcasts extends Table {
   /// the next auto-download creates it again under [autoPlaylistName].
   IntColumn get autoPlaylistId => integer().nullable()();
   TextColumn get autoPlaylistName => text().nullable()();
+
+  /// Episode number on the covers (v11, docs/ui-ux.md): on/off and the
+  /// offset added to the app's own count (not to the feed's numbers).
+  BoolColumn get episodeCounter =>
+      boolean().withDefault(const Constant(true))();
+  IntColumn get episodeNumberOffset =>
+      integer().withDefault(const Constant(0))();
 }
 
 @DataClassName('Episode')
@@ -80,6 +87,9 @@ class Episodes extends Table {
 
   /// Sub-series of a network feed, e.g. `zum-thema` (v5). See feeds-and-directories.md.
   TextColumn get theme => text().nullable()();
+
+  /// The feed's own episode number (`itunes:episode`), v11.
+  IntColumn get episodeNumber => integer().nullable()();
 
   TextColumn get status => textEnum<EpisodeStatus>().withDefault(
     Constant(EpisodeStatus.newEpisode.name),

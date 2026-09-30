@@ -41,6 +41,8 @@ void main() {
           autoDownloadMode: AutoDownloadMode.off,
           autoDownloadMaxEpisodes: 3,
           autoDeletePlayed: true,
+          episodeCounter: true,
+          episodeNumberOffset: 0,
         );
     final xml = buildOpml([
       podcast(1, 'Freak Show', 'https://feeds.metaebene.me/freakshow/mp3'),

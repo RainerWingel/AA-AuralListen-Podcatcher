@@ -170,7 +170,14 @@ class EpisodeTile extends ConsumerWidget {
       onLongPress: () => _showMenu(context, ref),
       selected: isCurrent,
       leading: dim(
-        CoverImage(url: episode.imageUrl ?? podcast.imageUrl, size: 56),
+        _NumberedCover(
+          episodeId: episode.id,
+          podcastId: podcast.id,
+          cover: CoverImage(
+            url: episode.imageUrl ?? podcast.imageUrl,
+            size: _coverSize,
+          ),
+        ),
       ),
       title: dim(
         Text(episode.title, maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -265,5 +272,68 @@ class _DownloadIndicator extends ConsumerWidget {
       ),
     };
     return Padding(padding: const EdgeInsets.only(right: 6), child: icon);
+  }
+}
+
+const double _coverSize = 56;
+
+/// The cover with the episode number (if any) in a narrow dark strip on its
+/// left edge, reading bottom to top (docs/ui-ux.md "Folgennummer").
+class _NumberedCover extends ConsumerWidget {
+  const _NumberedCover({
+    required this.episodeId,
+    required this.podcastId,
+    required this.cover,
+  });
+
+  final int episodeId;
+  final int podcastId;
+  final Widget cover;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final number = ref.watch(
+      episodeNumbersProvider(podcastId).select((n) => n.value?[episodeId]),
+    );
+    if (number == null) return cover;
+    return ClipRRect(
+      // Same corners as CoverImage at this size.
+      borderRadius: BorderRadius.circular(6),
+      child: SizedBox.square(
+        dimension: _coverSize,
+        child: Stack(
+          children: [
+            cover,
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 15,
+                color: Colors.black.withValues(alpha: 0.6),
+                alignment: Alignment.center,
+                child: RotatedBox(
+                  quarterTurns: 3,
+                  child: FittedBox(
+                    // Long numbers (e.g. "-1234") shrink to the cover height.
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '$number',
+                      maxLines: 1,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

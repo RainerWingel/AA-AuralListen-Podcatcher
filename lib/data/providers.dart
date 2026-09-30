@@ -148,6 +148,18 @@ final subscriptionEpisodeSearchProvider = FutureProvider.autoDispose
           ref.watch(podcastRepositoryProvider).searchEpisodes(query),
     );
 
+/// Cover numbers of a podcast's episodes (episode id → number).
+final episodeNumbersProvider = StreamProvider.autoDispose
+    .family<Map<int, int>, int>(
+      (ref, podcastId) =>
+          ref.watch(podcastRepositoryProvider).watchEpisodeNumbers(podcastId),
+    );
+
+final hasFeedNumbersProvider = StreamProvider.autoDispose.family<bool, int>(
+  (ref, podcastId) =>
+      ref.watch(podcastRepositoryProvider).watchHasFeedNumbers(podcastId),
+);
+
 /// Unplayed episodes per podcast id (badges in the subscriptions grid).
 final unplayedCountsProvider = StreamProvider.autoDispose<Map<int, int>>(
   (ref) => ref.watch(podcastRepositoryProvider).watchUnplayedCounts(),

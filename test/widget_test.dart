@@ -651,6 +651,69 @@ void main() {
     await disposeApp(tester);
   });
 
+  testWidgets('episode number on the cover, with an offset', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://example.com/feed'),
+    );
+    await settle(tester);
+    Finder coverNumber(String n) =>
+        find.descendant(of: find.byType(RotatedBox), matching: find.text(n));
+    // On by default: the only (oldest) episode is number 1.
+    expect(coverNumber('1'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+    await settle(tester);
+    await tester.tap(find.text('Widget-Podcast'));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    await tester.tap(find.text('Podcast-Einstellungen'));
+    await settle(tester);
+    await tester.ensureVisible(find.text('Versatz der Zählung'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Erhöhen'));
+    await settle(tester);
+    await tester.tap(find.byTooltip('Erhöhen'));
+    await settle(tester);
+    // Typing works too: −1 makes the first episode 0.
+    await tester.enterText(
+      find
+          .descendant(of: find.byType(Row), matching: find.byType(TextField))
+          .last,
+      '-1',
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await settle(tester);
+    await tester.binding.handlePopRoute(); // close the settings
+    await settle(tester);
+    expect(coverNumber('0'), findsOneWidget);
+
+    // Switched off: no number.
+    await tester.tap(find.byType(PopupMenuButton<void>));
+    await settle(tester);
+    await tester.tap(find.text('Podcast-Einstellungen'));
+    await settle(tester);
+    await tester.ensureVisible(find.text('Folgennummer am Cover'));
+    await settle(tester);
+    await tester.tap(find.text('Folgennummer am Cover'));
+    await settle(tester);
+    await tester.binding.handlePopRoute();
+    await settle(tester);
+    expect(find.byType(RotatedBox), findsNothing);
+
+    await disposeApp(tester);
+  });
+
   testWidgets(
     'a target playlist for auto-downloads can be chosen',
     timeout: timeout,
@@ -1212,7 +1275,13 @@ void main() {
     await tester.tap(find.text('Feed-Adresse ändern'));
     await settle(tester);
 
-    await tester.enterText(find.byType(TextField), 'example.com/neu');
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      'example.com/neu',
+    );
     await tester.tap(find.text('Übernehmen'));
     await settle(tester);
 

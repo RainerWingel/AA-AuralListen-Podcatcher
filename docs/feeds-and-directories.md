@@ -28,6 +28,7 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
 - `pubDate`: RFC 822 inkl. üblicher Abweichungen (Zonennamen, 2-stellige Jahre, ohne Sekunden) + ISO 8601.
 - `itunes:duration`: Sekunden, `MM:SS`, `HH:MM:SS`.
 - Show-Notes werden zu Klartext (max. 4000 Zeichen).
+- `itunes:episode` (ganze Zahl ≥ 0) → `episodes.episodeNumber` für die Folgennummer am Cover (`ui-ux.md`).
 - Titel (Podcast, Folge): HTML-Entities wie `&nbsp;`, `&#8211;` werden dekodiert, Leerraum zusammengefasst (`cleanTitle`),
   Tags bleiben stehen. Bleibt nichts übrig, gilt die Audio-Adresse als Titel. Bestehende Folgen: beim nächsten Refresh.
 - Folgen-Identität: `guid`, Fallback `enclosure url`.

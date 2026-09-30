@@ -41,6 +41,7 @@ class ParsedEpisode {
     this.imageUrl,
     this.chaptersUrl,
     this.theme,
+    this.episodeNumber,
     this.chapters = const [],
   });
 
@@ -57,6 +58,9 @@ class ParsedEpisode {
 
   /// Sub-series key (see [episodeThemeFromLink]).
   final String? theme;
+
+  /// The feed's episode number (`itunes:episode`), if it has one.
+  final int? episodeNumber;
 
   /// Podlove Simple Chapters embedded in the feed (`<psc:chapters>`).
   final List<ParsedChapter> chapters;
@@ -175,6 +179,12 @@ class RssParser {
           _attr(_ns(item, _Ns.podcast, 'chapters'), 'url') ??
           _attr(_ns(item, _Ns.podcast, 'chapters'), 'href'),
       theme: episodeThemeFromLink(_text(item.getElement('link'))),
+      episodeNumber: switch (int.tryParse(
+        _text(_ns(item, _Ns.itunes, 'episode')) ?? '',
+      )) {
+        final n? when n >= 0 => n,
+        _ => null,
+      },
       chapters: _pscChapters(item),
     );
   }

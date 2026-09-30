@@ -728,6 +728,48 @@ abstract class AppLocalizations {
   /// **'Wurde die Playlist gelöscht, legt die App sie beim nächsten Download wieder an.'**
   String get autoDownloadPlaylistHint;
 
+  /// No description provided for @episodeCounter.
+  ///
+  /// In de, this message translates to:
+  /// **'Folgennummer am Cover'**
+  String get episodeCounter;
+
+  /// No description provided for @episodeCounterHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Schmaler Streifen am linken Rand der Cover in den Folgenlisten.'**
+  String get episodeCounterHint;
+
+  /// No description provided for @episodeNumberOffset.
+  ///
+  /// In de, this message translates to:
+  /// **'Versatz der Zählung'**
+  String get episodeNumberOffset;
+
+  /// No description provided for @episodeNumberOffsetHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Wird zur Zählung ab der ältesten Folge addiert – z. B. −1, damit sie die 0 bekommt.'**
+  String get episodeNumberOffsetHint;
+
+  /// No description provided for @episodeNumberOffsetFeed.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Feed nummeriert seine Folgen selbst – der Versatz gilt dann nicht.'**
+  String get episodeNumberOffsetFeed;
+
+  /// No description provided for @episodeNumberDecrease.
+  ///
+  /// In de, this message translates to:
+  /// **'Verringern'**
+  String get episodeNumberDecrease;
+
+  /// No description provided for @episodeNumberIncrease.
+  ///
+  /// In de, this message translates to:
+  /// **'Erhöhen'**
+  String get episodeNumberIncrease;
+
   /// No description provided for @autoDeletePlayed.
   ///
   /// In de, this message translates to:

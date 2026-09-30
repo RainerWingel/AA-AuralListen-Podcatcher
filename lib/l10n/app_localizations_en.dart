@@ -382,6 +382,30 @@ class AppLocalizationsEn extends AppLocalizations {
       'If the playlist was deleted, the app creates it again with the next download.';
 
   @override
+  String get episodeCounter => 'Episode number on the cover';
+
+  @override
+  String get episodeCounterHint =>
+      'A narrow strip on the left edge of the covers in episode lists.';
+
+  @override
+  String get episodeNumberOffset => 'Counting offset';
+
+  @override
+  String get episodeNumberOffsetHint =>
+      'Added to the count from the oldest episode – e.g. −1 so that it gets 0.';
+
+  @override
+  String get episodeNumberOffsetFeed =>
+      'The feed numbers its episodes itself – the offset does not apply then.';
+
+  @override
+  String get episodeNumberDecrease => 'Decrease';
+
+  @override
+  String get episodeNumberIncrease => 'Increase';
+
+  @override
   String get autoDeletePlayed => 'Delete played episodes';
 
   @override

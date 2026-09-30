@@ -33,6 +33,7 @@ Sideload per APK, Play Store geplant (Name „AA-AuralListen Podcatcher"). Deuts
 | F22 | Ungespielt-Zähler | rotes Abzeichen je Abo-Kachel, „99+" ab 100 → `ui-ux.md` |
 | F21 | Kapitel überspringen | Chip „Skip" je Kapitel, nur im Arbeitsspeicher → `playback.md` |
 | F29 | Sprache Deutsch / Englisch | Abfrage beim ersten Start, Optionen → Sprache → `ui-ux.md` |
+| F30 | Folgennummer am Cover | Feed-Nummer oder eigene Zählung + Versatz, pro Podcast → `ui-ux.md` |
 | F20 | Podcast-Umzug | 301/308, `itunes:new-feed-url`, manuell „Feed-Adresse ändern" → `feeds-and-directories.md` |
 | F18 | Auto-Download nach Thema | Netzwerk-Feeds wie WRINT: nur angehakte Themen laden → `feeds-and-directories.md` |
 

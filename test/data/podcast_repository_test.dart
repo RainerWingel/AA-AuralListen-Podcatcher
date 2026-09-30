@@ -396,6 +396,43 @@ void main() {
     },
   );
 
+  test('watchEpisodeNumbers follows switch and offset', () async {
+    final podcastId = await db
+        .into(db.podcasts)
+        .insert(
+          PodcastsCompanion.insert(
+            feedUrl: 'https://example.com/n',
+            title: 'N',
+            subscribedAt: clockNow,
+          ),
+        );
+    Future<int> add(String guid, int day) => db
+        .into(db.episodes)
+        .insert(
+          EpisodesCompanion.insert(
+            podcastId: podcastId,
+            guid: guid,
+            title: guid,
+            audioUrl: 'https://example.com/$guid.mp3',
+            pubDate: Value(DateTime.utc(2026, 1, day)),
+            addedAt: clockNow,
+          ),
+        );
+    final first = await add('a', 1);
+    final second = await add('b', 2);
+    Future<Map<int, int>> numbers() =>
+        repo.watchEpisodeNumbers(podcastId).first;
+
+    expect(await numbers(), {first: 1, second: 2});
+    await repo.setEpisodeCounter(podcastId, offset: -1);
+    expect(await numbers(), {first: 0, second: 1});
+    await repo.setEpisodeCounter(podcastId, offset: 20000); // clamped
+    expect(await numbers(), {first: 10000, second: 10001});
+    await repo.setEpisodeCounter(podcastId, enabled: false);
+    expect(await numbers(), isEmpty);
+    expect(await repo.watchHasFeedNumbers(podcastId).first, isFalse);
+  });
+
   test('unsubscribe deletes episodes and evicts cover images', () async {
     server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
     final id = await repo.subscribe('https://example.com/feed');
@@ -509,6 +546,8 @@ void main() {
       autoDownloadMode: AutoDownloadMode.off,
       autoDownloadMaxEpisodes: 3,
       autoDeletePlayed: true,
+      episodeCounter: true,
+      episodeNumberOffset: 0,
     );
     Episode added(DateTime at) => Episode(
       id: 1,
