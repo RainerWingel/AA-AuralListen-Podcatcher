@@ -56,6 +56,14 @@ void main() {
           ),
         );
     await db
+        .into(db.episodeNotes)
+        .insert(
+          EpisodeNotesCompanion.insert(
+            episodeId: Value(episodeId),
+            notes: 'Shownotes',
+          ),
+        );
+    await db
         .into(db.bookmarks)
         .insert(
           BookmarksCompanion.insert(
@@ -131,6 +139,10 @@ void main() {
     );
     expect((await target.select(target.chapters).getSingle()).title, 'Kapitel');
     expect((await target.select(target.bookmarks).getSingle()).note, 'Notiz');
+    expect(
+      (await target.select(target.episodeNotes).getSingle()).notes,
+      'Shownotes',
+    );
     expect(await target.select(target.playlistItems).get(), hasLength(1));
     expect((await target.select(target.settings).getSingle()).value, '6');
     // Audio files are not part of a backup.

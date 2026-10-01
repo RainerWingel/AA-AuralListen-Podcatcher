@@ -70,6 +70,7 @@ class BackupService {
   List<TableInfo<Table, Object?>> get _restoredTables => [
     _db.podcasts,
     _db.episodes,
+    _db.episodeNotes,
     _db.chapters,
     _db.bookmarks,
     _db.playlists,

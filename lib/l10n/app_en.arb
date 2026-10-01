@@ -150,6 +150,7 @@
   "playlistSummary": "{count, plural, =0{Empty} =1{1 episode} other{{count} episodes}}{duration}",
   "addToPlaylist": "Add to playlist…",
   "episodeDescription": "Description",
+  "episodeNoDescription": "This episode has no description.",
   "addedToPlaylist": "Added to “{name}”",
   "alreadyInPlaylist": "Already in “{name}”",
   "removedFromPlaylist": "Removed from the playlist",

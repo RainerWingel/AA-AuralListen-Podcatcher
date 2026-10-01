@@ -998,6 +998,12 @@ abstract class AppLocalizations {
   /// **'Beschreibung'**
   String get episodeDescription;
 
+  /// No description provided for @episodeNoDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Für diese Folge gibt es keine Beschreibung.'**
+  String get episodeNoDescription;
+
   /// No description provided for @addedToPlaylist.
   ///
   /// In de, this message translates to:

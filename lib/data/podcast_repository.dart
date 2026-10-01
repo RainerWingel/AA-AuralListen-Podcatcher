@@ -95,15 +95,11 @@ class PodcastRepository {
     _db.podcasts,
   )..where((p) => p.id.equals(id))).watchSingleOrNull();
 
-  /// Show notes (plain text) of one episode; only this column is read.
-  Future<String?> episodeDescription(int episodeId) {
-    final description = _db.episodes.description;
-    return (_db.selectOnly(_db.episodes)
-          ..addColumns([description])
-          ..where(_db.episodes.id.equals(episodeId)))
-        .map((row) => row.read(description))
-        .getSingleOrNull();
-  }
+  /// Show notes of one episode (text plus links, see `parseNotes`);
+  /// read only when they are shown.
+  Future<String?> episodeNotes(int episodeId) async => (await (_db.select(
+    _db.episodeNotes,
+  )..where((n) => n.episodeId.equals(episodeId))).getSingleOrNull())?.notes;
 
   Stream<List<Episode>> watchEpisodes(int podcastId) =>
       (_db.select(_db.episodes)
@@ -198,12 +194,18 @@ class PodcastRepository {
         .replaceAll('_', r'\_');
     final pattern = '%$escaped%';
     final inTitle = _db.episodes.title.like(pattern, escapeChar: r'\');
-    final inNotes = _db.episodes.description.like(pattern, escapeChar: r'\');
+    final inNotes = _db.episodeNotes.notes.like(pattern, escapeChar: r'\');
     final rows =
         await (_db.select(_db.episodes).join([
                 innerJoin(
                   _db.podcasts,
                   _db.podcasts.id.equalsExp(_db.episodes.podcastId),
+                ),
+                // Joined for the filter only; the result reads no notes.
+                leftOuterJoin(
+                  _db.episodeNotes,
+                  _db.episodeNotes.episodeId.equalsExp(_db.episodes.id),
+                  useColumns: false,
                 ),
               ])
               ..where(inTitle | inNotes)
@@ -674,7 +676,51 @@ class PodcastRepository {
     DateTime now,
   ) async {
     await _upsertEpisodeRows(podcastId, episodes, now);
+    await _storeEpisodeNotes(podcastId, episodes);
     await _storeFeedChapters(podcastId, episodes);
+  }
+
+  /// Show notes go to their own table (episode lists never load them).
+  Future<void> _storeEpisodeNotes(
+    int podcastId,
+    List<ParsedEpisode> episodes,
+  ) async {
+    final id = _db.episodes.id;
+    final guid = _db.episodes.guid;
+    final ids = {
+      for (final row
+          in await (_db.selectOnly(_db.episodes)
+                ..addColumns([id, guid])
+                ..where(_db.episodes.podcastId.equals(podcastId)))
+              .get())
+        row.read(guid)!: row.read(id)!,
+    };
+    final withoutNotes = <int>[];
+    await _db.batch((batch) {
+      for (final e in episodes) {
+        final episodeId = ids[e.guid];
+        if (episodeId == null) continue;
+        final notes = e.notes;
+        if (notes == null || notes.isEmpty) {
+          withoutNotes.add(episodeId);
+          continue;
+        }
+        batch.insert(
+          _db.episodeNotes,
+          EpisodeNotesCompanion.insert(
+            episodeId: Value(episodeId),
+            notes: notes,
+          ),
+          mode: InsertMode.insertOrReplace,
+        );
+      }
+      if (withoutNotes.isNotEmpty) {
+        batch.deleteWhere(
+          _db.episodeNotes,
+          (n) => n.episodeId.isIn(withoutNotes),
+        );
+      }
+    });
   }
 
   /// Podlove chapters from the feed – only for episodes without chapters yet,
@@ -740,7 +786,6 @@ class PodcastRepository {
           audioUrl: e.audioUrl,
           audioMimeType: Value(e.audioMimeType),
           audioSizeBytes: Value(e.audioSizeBytes),
-          description: Value(e.description),
           durationMs: Value(e.duration?.inMilliseconds),
           pubDate: Value(e.pubDate),
           imageUrl: Value(e.imageUrl),
@@ -755,7 +800,6 @@ class PodcastRepository {
             audioUrl: Value(e.audioUrl),
             audioMimeType: Value(e.audioMimeType),
             audioSizeBytes: Value(e.audioSizeBytes),
-            description: Value(e.description),
             durationMs: Value(e.duration?.inMilliseconds),
             pubDate: Value(e.pubDate),
             imageUrl: Value(e.imageUrl),

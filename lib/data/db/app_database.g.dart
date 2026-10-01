@@ -1757,7 +1757,9 @@ class Episode extends DataClass implements Insertable<Episode> {
   final String guid;
   final String title;
 
-  /// Plain text, shortened (see docs/eviction.md).
+  /// Unused since v13 (always NULL): show notes live in [EpisodeNotes], so
+  /// episode lists do not load them into memory. Kept because dropping a
+  /// column would rebuild the table (foreign keys of downloads, playlists …).
   final String? description;
   final String audioUrl;
   final String? audioMimeType;
@@ -4483,6 +4485,210 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
   }
 }
 
+class $EpisodeNotesTable extends EpisodeNotes
+    with TableInfo<$EpisodeNotesTable, EpisodeNote> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EpisodeNotesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _episodeIdMeta = const VerificationMeta(
+    'episodeId',
+  );
+  @override
+  late final GeneratedColumn<int> episodeId = GeneratedColumn<int>(
+    'episode_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES episodes (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [episodeId, notes];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'episode_notes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EpisodeNote> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('episode_id')) {
+      context.handle(
+        _episodeIdMeta,
+        episodeId.isAcceptableOrUnknown(data['episode_id']!, _episodeIdMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_notesMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {episodeId};
+  @override
+  EpisodeNote map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EpisodeNote(
+      episodeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}episode_id'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      )!,
+    );
+  }
+
+  @override
+  $EpisodeNotesTable createAlias(String alias) {
+    return $EpisodeNotesTable(attachedDatabase, alias);
+  }
+}
+
+class EpisodeNote extends DataClass implements Insertable<EpisodeNote> {
+  final int episodeId;
+  final String notes;
+  const EpisodeNote({required this.episodeId, required this.notes});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['episode_id'] = Variable<int>(episodeId);
+    map['notes'] = Variable<String>(notes);
+    return map;
+  }
+
+  EpisodeNotesCompanion toCompanion(bool nullToAbsent) {
+    return EpisodeNotesCompanion(
+      episodeId: Value(episodeId),
+      notes: Value(notes),
+    );
+  }
+
+  factory EpisodeNote.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EpisodeNote(
+      episodeId: serializer.fromJson<int>(json['episodeId']),
+      notes: serializer.fromJson<String>(json['notes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'episodeId': serializer.toJson<int>(episodeId),
+      'notes': serializer.toJson<String>(notes),
+    };
+  }
+
+  EpisodeNote copyWith({int? episodeId, String? notes}) => EpisodeNote(
+    episodeId: episodeId ?? this.episodeId,
+    notes: notes ?? this.notes,
+  );
+  EpisodeNote copyWithCompanion(EpisodeNotesCompanion data) {
+    return EpisodeNote(
+      episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
+      notes: data.notes.present ? data.notes.value : this.notes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EpisodeNote(')
+          ..write('episodeId: $episodeId, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(episodeId, notes);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EpisodeNote &&
+          other.episodeId == this.episodeId &&
+          other.notes == this.notes);
+}
+
+class EpisodeNotesCompanion extends UpdateCompanion<EpisodeNote> {
+  final Value<int> episodeId;
+  final Value<String> notes;
+  const EpisodeNotesCompanion({
+    this.episodeId = const Value.absent(),
+    this.notes = const Value.absent(),
+  });
+  EpisodeNotesCompanion.insert({
+    this.episodeId = const Value.absent(),
+    required String notes,
+  }) : notes = Value(notes);
+  static Insertable<EpisodeNote> custom({
+    Expression<int>? episodeId,
+    Expression<String>? notes,
+  }) {
+    return RawValuesInsertable({
+      if (episodeId != null) 'episode_id': episodeId,
+      if (notes != null) 'notes': notes,
+    });
+  }
+
+  EpisodeNotesCompanion copyWith({
+    Value<int>? episodeId,
+    Value<String>? notes,
+  }) {
+    return EpisodeNotesCompanion(
+      episodeId: episodeId ?? this.episodeId,
+      notes: notes ?? this.notes,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (episodeId.present) {
+      map['episode_id'] = Variable<int>(episodeId.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EpisodeNotesCompanion(')
+          ..write('episodeId: $episodeId, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4494,6 +4700,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PlaylistItemsTable playlistItems = $PlaylistItemsTable(this);
   late final $ChaptersTable chapters = $ChaptersTable(this);
   late final $BookmarksTable bookmarks = $BookmarksTable(this);
+  late final $EpisodeNotesTable episodeNotes = $EpisodeNotesTable(this);
   late final Index episodesPubDate = Index(
     'episodes_pub_date',
     'CREATE INDEX episodes_pub_date ON episodes (pub_date)',
@@ -4511,6 +4718,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     playlistItems,
     chapters,
     bookmarks,
+    episodeNotes,
     episodesPubDate,
   ];
   @override
@@ -4556,6 +4764,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('bookmarks', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'episodes',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('episode_notes', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -5333,6 +5548,24 @@ final class $$EpisodesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$EpisodeNotesTable, List<EpisodeNote>>
+  _episodeNotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.episodeNotes,
+    aliasName: 'episodes__id__episode_notes__episode_id',
+  );
+
+  $$EpisodeNotesTableProcessedTableManager get episodeNotesRefs {
+    final manager = $$EpisodeNotesTableTableManager(
+      $_db,
+      $_db.episodeNotes,
+    ).filter((f) => f.episodeId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_episodeNotesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$EpisodesTableFilterComposer
@@ -5544,6 +5777,31 @@ class $$EpisodesTableFilterComposer
           }) => $$BookmarksTableFilterComposer(
             $db: $db,
             $table: $db.bookmarks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> episodeNotesRefs(
+    Expression<bool> Function($$EpisodeNotesTableFilterComposer f) f,
+  ) {
+    final $$EpisodeNotesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.episodeNotes,
+      getReferencedColumn: (t) => t.episodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EpisodeNotesTableFilterComposer(
+            $db: $db,
+            $table: $db.episodeNotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5868,6 +6126,31 @@ class $$EpisodesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> episodeNotesRefs<T extends Object>(
+    Expression<T> Function($$EpisodeNotesTableAnnotationComposer a) f,
+  ) {
+    final $$EpisodeNotesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.episodeNotes,
+      getReferencedColumn: (t) => t.episodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EpisodeNotesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.episodeNotes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$EpisodesTableTableManager
@@ -5889,6 +6172,7 @@ class $$EpisodesTableTableManager
             bool playlistItemsRefs,
             bool chaptersRefs,
             bool bookmarksRefs,
+            bool episodeNotesRefs,
           })
         > {
   $$EpisodesTableTableManager(_$AppDatabase db, $EpisodesTable table)
@@ -5997,6 +6281,7 @@ class $$EpisodesTableTableManager
                 playlistItemsRefs = false,
                 chaptersRefs = false,
                 bookmarksRefs = false,
+                episodeNotesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -6005,6 +6290,7 @@ class $$EpisodesTableTableManager
                     if (playlistItemsRefs) db.playlistItems,
                     if (chaptersRefs) db.chapters,
                     if (bookmarksRefs) db.bookmarks,
+                    if (episodeNotesRefs) db.episodeNotes,
                   ],
                   addJoins:
                       <
@@ -6122,6 +6408,27 @@ class $$EpisodesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (episodeNotesRefs)
+                        await $_getPrefetchedData<
+                          Episode,
+                          $EpisodesTable,
+                          EpisodeNote
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EpisodesTableReferences
+                              ._episodeNotesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EpisodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).episodeNotesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.episodeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6148,6 +6455,7 @@ typedef $$EpisodesTableProcessedTableManager =
         bool playlistItemsRefs,
         bool chaptersRefs,
         bool bookmarksRefs,
+        bool episodeNotesRefs,
       })
     >;
 typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
@@ -7957,6 +8265,251 @@ typedef $$BookmarksTableProcessedTableManager =
       Bookmark,
       PrefetchHooks Function({bool episodeId})
     >;
+typedef $$EpisodeNotesTableCreateCompanionBuilder =
+    EpisodeNotesCompanion Function({
+      Value<int> episodeId,
+      required String notes,
+    });
+typedef $$EpisodeNotesTableUpdateCompanionBuilder =
+    EpisodeNotesCompanion Function({Value<int> episodeId, Value<String> notes});
+
+final class $$EpisodeNotesTableReferences
+    extends BaseReferences<_$AppDatabase, $EpisodeNotesTable, EpisodeNote> {
+  $$EpisodeNotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $EpisodesTable _episodeIdTable(_$AppDatabase db) =>
+      db.episodes.createAlias('episode_notes__episode_id__episodes__id');
+
+  $$EpisodesTableProcessedTableManager get episodeId {
+    final $_column = $_itemColumn<int>('episode_id')!;
+
+    final manager = $$EpisodesTableTableManager(
+      $_db,
+      $_db.episodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_episodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EpisodeNotesTableFilterComposer
+    extends Composer<_$AppDatabase, $EpisodeNotesTable> {
+  $$EpisodeNotesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EpisodesTableFilterComposer get episodeId {
+    final $$EpisodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.episodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EpisodesTableFilterComposer(
+            $db: $db,
+            $table: $db.episodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EpisodeNotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $EpisodeNotesTable> {
+  $$EpisodeNotesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EpisodesTableOrderingComposer get episodeId {
+    final $$EpisodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.episodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EpisodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.episodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EpisodeNotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EpisodeNotesTable> {
+  $$EpisodeNotesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  $$EpisodesTableAnnotationComposer get episodeId {
+    final $$EpisodesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.episodeId,
+      referencedTable: $db.episodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EpisodesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.episodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EpisodeNotesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EpisodeNotesTable,
+          EpisodeNote,
+          $$EpisodeNotesTableFilterComposer,
+          $$EpisodeNotesTableOrderingComposer,
+          $$EpisodeNotesTableAnnotationComposer,
+          $$EpisodeNotesTableCreateCompanionBuilder,
+          $$EpisodeNotesTableUpdateCompanionBuilder,
+          (EpisodeNote, $$EpisodeNotesTableReferences),
+          EpisodeNote,
+          PrefetchHooks Function({bool episodeId})
+        > {
+  $$EpisodeNotesTableTableManager(_$AppDatabase db, $EpisodeNotesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EpisodeNotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EpisodeNotesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EpisodeNotesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> episodeId = const Value.absent(),
+            Value<String> notes = const Value.absent(),
+          }) => EpisodeNotesCompanion(episodeId: episodeId, notes: notes),
+          createCompanionCallback:
+              ({
+                Value<int> episodeId = const Value.absent(),
+                required String notes,
+              }) => EpisodeNotesCompanion.insert(
+                episodeId: episodeId,
+                notes: notes,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$EpisodeNotesTable, EpisodeNote>(table),
+                  $$EpisodeNotesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({episodeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (episodeId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.episodeId,
+                        referencedTable: $$EpisodeNotesTableReferences
+                            ._episodeIdTable(db),
+                        referencedColumn: $$EpisodeNotesTableReferences
+                            ._episodeIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EpisodeNotesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EpisodeNotesTable,
+      EpisodeNote,
+      $$EpisodeNotesTableFilterComposer,
+      $$EpisodeNotesTableOrderingComposer,
+      $$EpisodeNotesTableAnnotationComposer,
+      $$EpisodeNotesTableCreateCompanionBuilder,
+      $$EpisodeNotesTableUpdateCompanionBuilder,
+      (EpisodeNote, $$EpisodeNotesTableReferences),
+      EpisodeNote,
+      PrefetchHooks Function({bool episodeId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7977,4 +8530,6 @@ class $AppDatabaseManager {
       $$ChaptersTableTableManager(_db, _db.chapters);
   $$BookmarksTableTableManager get bookmarks =>
       $$BookmarksTableTableManager(_db, _db.bookmarks);
+  $$EpisodeNotesTableTableManager get episodeNotes =>
+      $$EpisodeNotesTableTableManager(_db, _db.episodeNotes);
 }

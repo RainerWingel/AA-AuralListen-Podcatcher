@@ -295,6 +295,7 @@
   },
   "addToPlaylist": "Zu Playlist hinzufügen…",
   "episodeDescription": "Beschreibung",
+  "episodeNoDescription": "Für diese Folge gibt es keine Beschreibung.",
   "addedToPlaylist": "Zu „{name}“ hinzugefügt",
   "@addedToPlaylist": {
     "placeholders": {

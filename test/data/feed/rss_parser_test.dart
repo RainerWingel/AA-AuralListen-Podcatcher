@@ -45,7 +45,7 @@ void main() {
       expect(ep.pubDate, DateTime.utc(2025, 6, 10, 2));
       expect(ep.imageUrl, 'https://example.com/ep2.jpg');
       expect(ep.chaptersUrl, 'https://example.com/ep2-chapters.json');
-      expect(ep.description, 'Lange Shownotes\nZweiter Absatz');
+      expect(ep.notes, 'Lange Shownotes\nZweiter Absatz');
     });
 
     test('falls back to the enclosure URL as guid', () {

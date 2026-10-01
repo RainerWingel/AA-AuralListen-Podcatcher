@@ -80,7 +80,9 @@ class Episodes extends Table {
   TextColumn get guid => text()();
   TextColumn get title => text()();
 
-  /// Plain text, shortened (see docs/eviction.md).
+  /// Unused since v13 (always NULL): show notes live in [EpisodeNotes], so
+  /// episode lists do not load them into memory. Kept because dropping a
+  /// column would rebuild the table (foreign keys of downloads, playlists …).
   TextColumn get description => text().nullable()();
   TextColumn get audioUrl => text()();
   TextColumn get audioMimeType => text().nullable()();
@@ -189,6 +191,18 @@ class Chapters extends Table {
 
   @override
   Set<Column> get primaryKey => {episodeId, startMs};
+}
+
+/// Show notes per episode (schema v13), read only when shown (episode menu,
+/// player). Plain text plus links, see `htmlToNotes` in core/text_utils.dart.
+@DataClassName('EpisodeNote')
+class EpisodeNotes extends Table {
+  IntColumn get episodeId =>
+      integer().references(Episodes, #id, onDelete: KeyAction.cascade)();
+  TextColumn get notes => text()();
+
+  @override
+  Set<Column> get primaryKey => {episodeId};
 }
 
 /// Bookmarks with an optional note (schema v6). Kept when the audio file is

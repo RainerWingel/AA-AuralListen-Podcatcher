@@ -30,4 +30,44 @@ void main() {
     // Unknown or impossible entities stay as they are (no crash).
     expect(cleanTitle('x &foo; &#99999999; y'), 'x &foo; &#99999999; y');
   });
+
+  group('show notes', () {
+    test('keeps web links, drops other markup', () {
+      final notes = htmlToNotes(
+        '<p>Intro <b>fett</b></p>'
+        '<ul><li><a href="https://a.example/x?y=1&amp;z=2">Link A</a></li>'
+        '<li><a href="javascript:alert(1)">Böse</a></li>'
+        '<li><a href="https://b.example">https://b.example</a></li></ul>',
+      );
+      expect(
+        notes,
+        'Intro fett\n\n• Link Ahttps://a.example/x?y=1&z=2\n'
+        '• Böse\n• https://b.example',
+      );
+      expect(parseNotes(notes), [
+        (text: 'Intro fett\n\n• ', url: null),
+        (text: 'Link A', url: 'https://a.example/x?y=1&z=2'),
+        (text: '\n• Böse\n• ', url: null),
+        (text: 'https://b.example', url: 'https://b.example'),
+      ]);
+    });
+
+    test('bare addresses in plain text become links', () {
+      expect(parseNotes('Siehe https://x.example/a. Danke'), [
+        (text: 'Siehe ', url: null),
+        (text: 'https://x.example/a', url: 'https://x.example/a'),
+        (text: '. Danke', url: null),
+      ]);
+    });
+
+    test('cutting never splits a link', () {
+      final notes = htmlToNotes(
+        'abc <a href="https://x.example/long">Linktext</a>',
+        maxLength: 10,
+      );
+      expect(notes, 'abc…');
+      // Marker characters from the feed itself are removed.
+      expect(htmlToNotes('abc'), 'abc');
+    });
+  });
 }

@@ -1754,13 +1754,17 @@ void main() {
           tester.element(find.byType(NavigationBar)),
         ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
       );
-      await tester.runAsync(
-        () => db
-            .update(db.episodes)
-            .write(
-              const EpisodesCompanion(description: Value('Darin: Testthemen')),
-            ),
-      );
+      await tester.runAsync(() async {
+        final episode = await db.select(db.episodes).getSingle();
+        await db
+            .into(db.episodeNotes)
+            .insert(
+              EpisodeNotesCompanion.insert(
+                episodeId: Value(episode.id),
+                notes: 'Darin: Testthemen \uE000Mehr\uE001https://example.com/x\uE002',
+              ),
+            );
+      });
       await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
       await settle(tester);
       await tester.tap(find.text('Widget-Podcast'));
@@ -1770,8 +1774,17 @@ void main() {
       await settle(tester);
       await tester.tap(find.text('Beschreibung'));
       await settle(tester);
-      expect(find.text('Darin: Testthemen'), findsOneWidget);
-      Navigator.of(tester.element(find.text('Darin: Testthemen'))).pop();
+      final notes = find.textContaining(
+        'Darin: Testthemen',
+        findRichText: true,
+      );
+      expect(notes, findsOneWidget);
+      // The link shows only its text, not the address.
+      expect(
+        find.textContaining('example.com', findRichText: true),
+        findsNothing,
+      );
+      Navigator.of(tester.element(notes)).pop();
       await settle(tester);
 
       await tester.tap(find.text('Erste Folge'));
@@ -1779,11 +1792,11 @@ void main() {
       await tester.tap(find.byType(MiniPlayer));
       await settle(tester);
       // Collapsed at first; the text appears when opened.
-      expect(find.text('Darin: Testthemen'), findsNothing);
+      expect(notes, findsNothing);
       await tester.ensureVisible(find.text('Beschreibung'));
       await tester.tap(find.text('Beschreibung'));
       await settle(tester);
-      expect(find.text('Darin: Testthemen'), findsOneWidget);
+      expect(notes, findsOneWidget);
 
       await disposeApp(tester);
     },

@@ -48,7 +48,7 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
   Slider mit „verstrichen" / „-verbleibend", −15 s / Play / +30 s, „Boost: …" (öffnet Auswahl). Pfeil nach unten schließt.
   Darunter „Kapitel x/n: Titel" (falls vorhanden; tippen → Kapitel-Liste) und Knöpfe „Lesezeichen setzen", Sleep-Timer (Stoppuhr;
   aktiv: „noch mm:ss" bzw. „Bis Folgenende"), „Lesezeichen (n)". Ganz unten aufklappbarer Bereich „Beschreibung"
-  (Shownotes, zugeklappt, nur wenn vorhanden; Benutzerwunsch 2026-10-01).
+  (Shownotes mit Links, zugeklappt, nur wenn vorhanden; Benutzerwunsch 2026-10-01).
   Kapitel-Liste: Titel, darunter Startzeit, rechts Chip „Skip" (übersprungen = durchgestrichen) → `playback.md`.
 - **Boost-Auswahl** (Bottom-Sheet): Aus / +3 / +6 / +9 / +12 dB, Schalter „Nur für diesen Podcast".
 
@@ -75,9 +75,10 @@ Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskrei
 Playlist-Symbol (`playlist_add_check`, Tooltip „In einer Playlist"), solange die Folge in mindestens einer Playlist
 steht – live aus der DB (`episodesInPlaylistsProvider`), verschwindet beim Entfernen aus der letzten Playlist; in der
 Playlist-Ansicht selbst nicht angezeigt (Benutzerwunsch 2026-10-01).
-Langes Drücken → Menü mit „Beschreibung" (nur wenn die Folge Shownotes hat; Sheet mit Titel und Text, markierbar,
-`lib/features/episodes/episode_description.dart`). Shownotes sind reiner Text (aus dem HTML des Feeds, max. 4000 Zeichen,
-Links gehen verloren – `data-model.md`). Außerdem „Zu Playlist hinzufügen…".
+Langes Drücken → Menü mit „Beschreibung" (Sheet mit Titel und Shownotes, markierbar, Links antippbar → Browser;
+ohne Shownotes „Für diese Folge gibt es keine Beschreibung."; `lib/features/episodes/episode_description.dart`).
+Shownotes = Text mit Absätzen, Aufzählungen (•) und Links, kein HTML (`data-model.md` → `episode_notes`); auch nackte
+Adressen im Text werden zu Links. Außerdem „Zu Playlist hinzufügen…".
 
 ## Playlists
 - **Playlists-Tab:** Liste mit Name und „N Folgen · Dauer", Griff ≡ zum Sortieren, ⋮ (Fortsetzen, Alles downloaden,

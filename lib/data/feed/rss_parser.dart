@@ -35,7 +35,7 @@ class ParsedEpisode {
     required this.audioUrl,
     this.audioMimeType,
     this.audioSizeBytes,
-    this.description,
+    this.notes,
     this.duration,
     this.pubDate,
     this.imageUrl,
@@ -50,7 +50,9 @@ class ParsedEpisode {
   final String audioUrl;
   final String? audioMimeType;
   final int? audioSizeBytes;
-  final String? description;
+
+  /// Show notes in the stored format (text plus links, see htmlToNotes).
+  final String? notes;
   final Duration? duration;
   final DateTime? pubDate;
   final String? imageUrl;
@@ -168,9 +170,7 @@ class RssParser {
       audioUrl: audioUrl,
       audioMimeType: mimeType,
       audioSizeBytes: size != null && size > 0 ? size : null,
-      description: rawDescription == null
-          ? null
-          : htmlToPlainText(rawDescription),
+      notes: rawDescription == null ? null : htmlToNotes(rawDescription),
       duration: parseFeedDuration(_text(_ns(item, _Ns.itunes, 'duration'))),
       pubDate: parseFeedDate(_text(item.getElement('pubDate'))),
       imageUrl: _attr(_ns(item, _Ns.itunes, 'image'), 'href'),

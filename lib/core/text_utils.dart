@@ -74,3 +74,112 @@ String htmlToPlainText(String html, {int maxLength = maxDescriptionLength}) {
   }
   return text;
 }
+
+// ------------------------------------------------------------ show notes
+//
+// Episode show notes are stored as plain text plus links (docs/data-model.md
+// "episode_notes"): a link is `texturl` (Unicode private use
+// characters, never part of real text). No HTML is kept – lean on purpose,
+// see docs/decisions.md.
+
+/// Maximum stored length of show notes including link addresses.
+const int maxNotesLength = 6000;
+
+const String _linkStart = '';
+const String _linkUrl = '';
+const String _linkEnd = '';
+
+final RegExp _markers = RegExp('[$_linkStart$_linkUrl$_linkEnd]');
+final RegExp _anchor = RegExp(
+  r'''<a\s[^>]*?href\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>(.*?)</a\s*>''',
+  caseSensitive: false,
+  dotAll: true,
+);
+final RegExp _listItem = RegExp(r'<\s*li(\s[^>]*)?>', caseSensitive: false);
+final RegExp _listItemEnd = RegExp(r'<\s*/li\s*>', caseSensitive: false);
+final RegExp _anyWhitespace = RegExp(r'\s+');
+final RegExp _storedLink = RegExp(
+  '$_linkStart([^$_linkStart$_linkUrl$_linkEnd]*)'
+  '$_linkUrl([^$_linkStart$_linkUrl$_linkEnd]*)$_linkEnd',
+);
+final RegExp _bareUrl = RegExp(r'''https?://[^\s<>"' ]+''');
+final RegExp _trailingPunctuation = RegExp(r'[.,;:!?)\]]+$');
+
+bool _isWebUrl(String url) {
+  final uri = Uri.tryParse(url);
+  return uri != null &&
+      (uri.scheme == 'http' || uri.scheme == 'https') &&
+      uri.host.isNotEmpty;
+}
+
+/// Converts HTML show notes to the stored notes format: paragraphs and list
+/// items become line breaks, `<a href>` links (http/https only) are kept,
+/// everything else is dropped. Capped at [maxLength].
+String htmlToNotes(String html, {int maxLength = maxNotesLength}) {
+  var text = html
+      .replaceAll(_markers, '')
+      .replaceAllMapped(_anchor, (m) {
+        final url = decodeHtmlEntities(m[1] ?? m[2] ?? '').trim();
+        final label = decodeHtmlEntities(m[3]!.replaceAll(_anyTag, ''))
+            .replaceAll(_anyWhitespace, ' ')
+            .trim();
+        if (label.isEmpty) return '';
+        // A link whose text is its address needs no marker: shown as is
+        // and linked on display like any bare address.
+        if (!_isWebUrl(url) || label == url) return label;
+        return '$_linkStart$label$_linkUrl$url$_linkEnd';
+      })
+      // Each item starts its own line; the end tag adds none.
+      .replaceAll(_listItemEnd, '')
+      .replaceAll(_listItem, '\n• ');
+  text = decodeHtmlEntities(
+    text.replaceAll(_blockTags, '\n').replaceAll(_anyTag, ''),
+  );
+  text = text
+      .replaceAll('\r', '')
+      .replaceAll(_spaces, ' ')
+      .replaceAll(_blankLines, '\n\n')
+      .trim();
+  if (text.length > maxLength) {
+    text = text.substring(0, maxLength);
+    // Never cut a link in half: drop an unfinished one.
+    final open = text.lastIndexOf(_linkStart);
+    if (open > text.lastIndexOf(_linkEnd)) text = text.substring(0, open);
+    text = '${text.trimRight()}…';
+  }
+  return text;
+}
+
+/// One piece of stored show notes: plain text, or a link if [url] is set.
+typedef NotesPart = ({String text, String? url});
+
+/// Splits stored notes into text and links. Bare web addresses in the text
+/// become links too (also covers notes stored before links were kept).
+List<NotesPart> parseNotes(String notes) {
+  final parts = <NotesPart>[];
+  void addText(String text) {
+    var start = 0;
+    for (final m in _bareUrl.allMatches(text)) {
+      final raw = m[0]!;
+      final url = raw.replaceFirst(_trailingPunctuation, '');
+      if (!_isWebUrl(url)) continue;
+      if (m.start > start) {
+        parts.add((text: text.substring(start, m.start), url: null));
+      }
+      parts.add((text: url, url: url));
+      start = m.start + url.length;
+    }
+    if (start < text.length) {
+      parts.add((text: text.substring(start), url: null));
+    }
+  }
+
+  var start = 0;
+  for (final m in _storedLink.allMatches(notes)) {
+    addText(notes.substring(start, m.start));
+    parts.add((text: m[1]!, url: m[2]!));
+    start = m.end;
+  }
+  addText(notes.substring(start));
+  return parts;
+}

@@ -22,6 +22,7 @@ typedef EpisodeWithPodcast = ({Episode episode, Podcast podcast});
     PlaylistItems,
     Chapters,
     Bookmarks,
+    EpisodeNotes,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -39,7 +40,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -119,6 +120,20 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 12) {
         await m.addColumn(podcasts, podcasts.episodeOwnCount);
+      }
+      if (from < 13) {
+        await m.createTable(episodeNotes);
+        // Move the notes out of the episode rows (lists load those rows).
+        await customStatement(
+          'INSERT INTO episode_notes (episode_id, notes) '
+          'SELECT id, description FROM episodes '
+          "WHERE description IS NOT NULL AND description <> ''",
+        );
+        await customStatement('UPDATE episodes SET description = NULL');
+        // Re-read every feed once so the notes get their links.
+        await customStatement(
+          'UPDATE podcasts SET etag = NULL, last_modified = NULL',
+        );
       }
     },
     beforeOpen: (details) async {

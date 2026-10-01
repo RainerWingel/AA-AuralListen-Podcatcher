@@ -534,6 +534,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get episodeDescription => 'Beschreibung';
 
   @override
+  String get episodeNoDescription =>
+      'Für diese Folge gibt es keine Beschreibung.';
+
+  @override
   String addedToPlaylist(String name) {
     return 'Zu „$name“ hinzugefügt';
   }

@@ -368,19 +368,31 @@ void main() {
               subscribedAt: clockNow,
             ),
           );
-      Future<void> add(String title, String? notes, int year) => db
-          .into(db.episodes)
-          .insert(
-            EpisodesCompanion.insert(
-              podcastId: podcastId,
-              guid: title,
-              title: title,
-              audioUrl: 'https://example.com/$title.mp3',
-              description: Value(notes),
-              pubDate: Value(DateTime.utc(year)),
-              addedAt: clockNow,
-            ),
-          );
+      Future<void> add(String title, String? notes, int year) async {
+        final id = await db
+            .into(db.episodes)
+            .insert(
+              EpisodesCompanion.insert(
+                podcastId: podcastId,
+                guid: title,
+                title: title,
+                audioUrl: 'https://example.com/$title.mp3',
+                pubDate: Value(DateTime.utc(year)),
+                addedAt: clockNow,
+              ),
+            );
+        if (notes != null) {
+          await db
+              .into(db.episodeNotes)
+              .insert(
+                EpisodeNotesCompanion.insert(
+                  episodeId: Value(id),
+                  notes: notes,
+                ),
+              );
+        }
+      }
+
       await add('CRE195 Das Gehirn', null, 2012);
       await add('CRE200 Neuronen', 'Wie das Gehirn lernt', 2014);
       await add('CRE201 Sterne', 'Astronomie', 2015);

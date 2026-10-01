@@ -192,4 +192,34 @@ void main() {
     await verifier.migrateAndValidate(db, db.schemaVersion);
     await db.close();
   });
+
+  test('upgrade v12 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(12);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v13 moves show notes into episode_notes', () async {
+    final schema = await verifier.schemaAt(12);
+    schema.rawDatabase.execute(
+      'INSERT INTO podcasts (id, feed_url, title, subscribed_at, etag) '
+      "VALUES (1, 'https://example.com/feed', 'P', 1767225600, 'e1')",
+    );
+    schema.rawDatabase.execute(
+      'INSERT INTO episodes '
+      '(id, podcast_id, guid, title, audio_url, added_at, description) '
+      "VALUES (1, 1, 'a', 'A', 'u1', 1767225600, 'Notizen A'), "
+      "(2, 1, 'b', 'B', 'u2', 1767225600, NULL), "
+      "(3, 1, 'c', 'C', 'u3', 1767225600, '')",
+    );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    final notes = await db.select(db.episodeNotes).get();
+    expect(notes.map((n) => (n.episodeId, n.notes)), [(1, 'Notizen A')]);
+    // Episode rows no longer carry the text; feeds are read again once.
+    final episodes = await db.select(db.episodes).get();
+    expect(episodes.every((e) => e.description == null), isTrue);
+    expect((await db.select(db.podcasts).getSingle()).etag, isNull);
+    await db.close();
+  });
 }

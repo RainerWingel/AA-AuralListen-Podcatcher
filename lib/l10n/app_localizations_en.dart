@@ -533,6 +533,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get episodeDescription => 'Description';
 
   @override
+  String get episodeNoDescription => 'This episode has no description.';
+
+  @override
   String addedToPlaylist(String name) {
     return 'Added to “$name”';
   }

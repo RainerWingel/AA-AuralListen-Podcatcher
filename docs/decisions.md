@@ -80,3 +80,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Datumsformate und Dezimaltrenner folgen der gewählten Sprache. Sprachnamen stehen in jeder ARB-Datei in der
   eigenen Sprache („Deutsch", „English").
 - 2026-09-29 · **Kein Trinkgeld in der App** (Benutzer) · weder Google Play Billing noch externer Zahlungslink; die Info-Seite verlinkt nur GitHub, dort steht der PayPal-Link (README, `.github/FUNDING.yml`). Keine Play-Richtlinienprobleme, keine Händler-Pflichtangaben.
+- 2026-10-01 · **Shownotes ohne HTML-Paket, eigene Tabelle** (Benutzer, Eviction wichtig) · Statt `flutter_html` o. Ä.
+  (Folgepakete, Bilder aus dem Netz → Datenschutz, ~3× Speicher) behält der Parser nur Absätze, Aufzählungen und
+  http/https-Links in einem schlanken Eigenformat; Links öffnet der vorhandene `openUrl`-Kanal. Shownotes liegen in
+  `episode_notes` statt in `episodes`, damit Listen sie nicht laden (`data-model.md`).

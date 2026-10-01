@@ -90,6 +90,9 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
 - Positions-Updates des Players gedrosselt in die DB schreiben (alle 5 s + bei Pause/Seek/Stopp/Folgenwechsel). ✅
 - Lange Listen nur mit `ListView.builder`; Bilder mit `memCacheWidth`/`cacheWidth` dekodieren.
 - Feed-XML nach dem Parsen verwerfen; Beschreibungen gekürzt speichern.
+- Shownotes in eigener Tabelle `episode_notes`: Folgenlisten laden sie nie, nur das geöffnete Sheet bzw. der
+  Player-Bereich (`episodeNotesProvider`, autoDispose). Die Tipp-Erkenner der Links (`TapGestureRecognizer`) gehören
+  dem State von `NotesText` und werden in `dispose()` bzw. bei neuem Text freigegeben. ✅
 - Keine unbegrenzt wachsenden Listen/Maps in Services. Beispiel: `ChapterSkips` merkt höchstens 20 Folgen,
   sein Stream-Controller wird in `PodcastAudioHandler.dispose()` geschlossen. ✅
 

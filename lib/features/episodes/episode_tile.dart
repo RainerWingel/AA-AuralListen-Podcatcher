@@ -98,20 +98,19 @@ class EpisodeTile extends ConsumerWidget {
                     .playEpisode(episode.id, playlistId: playlistId);
               },
             ),
-            if (episode.description case final description?
-                when description.isNotEmpty)
-              ListTile(
-                leading: const Icon(Icons.notes),
-                title: Text(l10n.episodeDescription),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  showEpisodeDescriptionSheet(
-                    outerContext,
-                    title: episode.title,
-                    description: description,
-                  );
-                },
-              ),
+            // Notes are loaded only when opened (not with the list).
+            ListTile(
+              leading: const Icon(Icons.notes),
+              title: Text(l10n.episodeDescription),
+              onTap: () {
+                Navigator.of(context).pop();
+                showEpisodeDescriptionSheet(
+                  outerContext,
+                  episodeId: episode.id,
+                  title: episode.title,
+                );
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.playlist_add),
               title: Text(l10n.addToPlaylist),
