@@ -952,7 +952,7 @@ void main() {
 
     // Chapters from the feed.
     expect(find.text('Kapitel 1/2: Begrüßung'), findsOneWidget);
-    await tester.tap(find.text('Kapitel (2)'));
+    await tester.tap(find.text('Kapitel 1/2: Begrüßung'));
     await settle(tester);
     await tester.tap(find.text('Hauptteil'));
     await settle(tester);
@@ -969,8 +969,8 @@ void main() {
     expect(find.text('Lesezeichen (1)'), findsOneWidget);
 
     // "Skip" marks a chapter in memory; choosing it later un-skips it.
-    await tester.ensureVisible(find.text('Kapitel (2)'));
-    await tester.tap(find.text('Kapitel (2)'));
+    await tester.ensureVisible(find.text('Kapitel 2/2: Hauptteil'));
+    await tester.tap(find.text('Kapitel 2/2: Hauptteil'));
     await settle(tester);
     await tester.tap(find.widgetWithText(FilterChip, 'Skip').first);
     await settle(tester);

@@ -44,7 +44,8 @@ class CurrentChapterLine extends ConsumerWidget {
   }
 }
 
-/// Buttons under the player controls: chapters, add bookmark, bookmarks.
+/// Buttons under the player controls: add bookmark, sleep timer, bookmarks.
+/// The chapter list opens from [CurrentChapterLine].
 class ChapterBookmarkButtons extends ConsumerWidget {
   const ChapterBookmarkButtons({required this.episodeId, super.key});
 
@@ -72,19 +73,12 @@ class ChapterBookmarkButtons extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final chapters = ref.watch(chaptersProvider(episodeId)).value ?? const [];
     final bookmarks =
         ref.watch(episodeBookmarksProvider(episodeId)).value ?? const [];
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: 4,
       children: [
-        if (chapters.isNotEmpty)
-          TextButton.icon(
-            onPressed: () => showChaptersSheet(context, episodeId),
-            icon: const Icon(Icons.format_list_numbered),
-            label: Text('${l10n.chapters} (${chapters.length})'),
-          ),
         TextButton.icon(
           onPressed: () => _addBookmark(context, ref),
           icon: const Icon(Icons.bookmark_add_outlined),

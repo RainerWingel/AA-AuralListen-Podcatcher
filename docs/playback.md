@@ -168,8 +168,8 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
    (M4A/AAC-Kapitel werden nicht gelesen.)
 - Geladen wird erst, wenn der Vollbild-Player die Folge zeigt (`chaptersProvider` → `ensureLoaded`), pro App-Sitzung
   höchstens ein Versuch pro Folge (auch ohne Ergebnis).
-- Anzeige: unter dem Slider „Kapitel 3/7: Titel" (tippen → Liste); Knopf „Kapitel (n)" → Liste mit Startzeit,
-  aktuelles Kapitel hervorgehoben, Tippen springt dorthin.
+- Anzeige: unter dem Slider „Kapitel 3/7: Titel" (einziger Zugang, tippen → Liste mit Startzeit,
+  aktuelles Kapitel hervorgehoben, Tippen springt dorthin). Ein eigener Knopf „Kapitel (n)" wurde entfernt (doppelt).
 - Werkzeug: `dart run tool/smoke_chapters.dart <Feed-URL>` prüft ID3-Kapitel echter Folgen.
 
 ### Kapitel überspringen („Skip", Benutzerwunsch)
