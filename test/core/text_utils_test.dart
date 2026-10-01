@@ -41,15 +41,25 @@ void main() {
       );
       expect(
         notes,
-        'Intro fett\n\n• Link Ahttps://a.example/x?y=1&z=2\n'
+        'Intro fett\n• \uE000Link A\uE001https://a.example/x?y=1&z=2\uE002\n'
         '• Böse\n• https://b.example',
       );
       expect(parseNotes(notes), [
-        (text: 'Intro fett\n\n• ', url: null),
+        (text: 'Intro fett\n• ', url: null),
         (text: 'Link A', url: 'https://a.example/x?y=1&z=2'),
         (text: '\n• Böse\n• ', url: null),
         (text: 'https://b.example', url: 'https://b.example'),
       ]);
+    });
+
+    test('list items stay compact, bullet on the same line', () {
+      expect(
+        htmlToNotes(
+          '<p>Gäste</p>\n<ul>\n<li>\n<p>Linus</p>\n</li>\n'
+          '<li>\n<p><a href="https://l.example">l.example</a></p>\n</li>\n</ul>',
+        ),
+        'Gäste\n• Linus\n• \uE000l.example\uE001https://l.example\uE002',
+      );
     });
 
     test('bare addresses in plain text become links', () {
@@ -67,7 +77,7 @@ void main() {
       );
       expect(notes, 'abc…');
       // Marker characters from the feed itself are removed.
-      expect(htmlToNotes('abc'), 'abc');
+      expect(htmlToNotes('a\uE000b\uE002c'), 'abc');
     });
   });
 }

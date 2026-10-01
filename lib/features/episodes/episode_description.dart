@@ -17,6 +17,9 @@ Future<void> showEpisodeDescriptionSheet(
   context: context,
   showDragHandle: true,
   isScrollControlled: true,
+  // Above the mini player and navigation bar, below the status bar.
+  useRootNavigator: true,
+  useSafeArea: true,
   builder: (context) => ConstrainedBox(
     // Long show notes scroll inside the sheet instead of covering the screen.
     constraints: BoxConstraints(

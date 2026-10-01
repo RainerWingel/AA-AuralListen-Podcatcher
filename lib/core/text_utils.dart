@@ -78,16 +78,16 @@ String htmlToPlainText(String html, {int maxLength = maxDescriptionLength}) {
 // ------------------------------------------------------------ show notes
 //
 // Episode show notes are stored as plain text plus links (docs/data-model.md
-// "episode_notes"): a link is `texturl` (Unicode private use
+// "episode_notes"): a link is `\uE000text\uE001url\uE002` (Unicode private use
 // characters, never part of real text). No HTML is kept – lean on purpose,
 // see docs/decisions.md.
 
 /// Maximum stored length of show notes including link addresses.
 const int maxNotesLength = 6000;
 
-const String _linkStart = '';
-const String _linkUrl = '';
-const String _linkEnd = '';
+const String _linkStart = '\uE000';
+const String _linkUrl = '\uE001';
+const String _linkEnd = '\uE002';
 
 final RegExp _markers = RegExp('[$_linkStart$_linkUrl$_linkEnd]');
 final RegExp _anchor = RegExp(
@@ -98,6 +98,10 @@ final RegExp _anchor = RegExp(
 final RegExp _listItem = RegExp(r'<\s*li(\s[^>]*)?>', caseSensitive: false);
 final RegExp _listItemEnd = RegExp(r'<\s*/li\s*>', caseSensitive: false);
 final RegExp _anyWhitespace = RegExp(r'\s+');
+// "•" followed by line breaks (item content in its own <p>) → same line.
+final RegExp _bulletBreak = RegExp(r'•[ \t]*\n\s*');
+// Blank lines before a list item → one line break (compact lists).
+final RegExp _blankBeforeBullet = RegExp(r'\n[ \t]*\n\s*(?=• )');
 final RegExp _storedLink = RegExp(
   '$_linkStart([^$_linkStart$_linkUrl$_linkEnd]*)'
   '$_linkUrl([^$_linkStart$_linkUrl$_linkEnd]*)$_linkEnd',
@@ -139,6 +143,8 @@ String htmlToNotes(String html, {int maxLength = maxNotesLength}) {
       .replaceAll('\r', '')
       .replaceAll(_spaces, ' ')
       .replaceAll(_blankLines, '\n\n')
+      .replaceAll(_bulletBreak, '• ')
+      .replaceAll(_blankBeforeBullet, '\n')
       .trim();
   if (text.length > maxLength) {
     text = text.substring(0, maxLength);
