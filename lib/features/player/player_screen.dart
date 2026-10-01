@@ -105,6 +105,10 @@ class PlayerScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
+                        // Above the seek bar, so the playlist context sits
+                        // with the title (user request 2026-10-01).
+                        if (item.extras?['playlistId'] case final int id)
+                          _PlaylistRow(playlistId: id),
                         const SizedBox(height: 16),
                         _SeekBar(total: item.duration),
                         if (item.extras?['episodeId'] case final int id)
@@ -120,8 +124,6 @@ class PlayerScreen extends ConsumerWidget {
                         ),
                         if (item.extras?['episodeId'] case final int id)
                           ChapterBookmarkButtons(episodeId: id),
-                        if (item.extras?['playlistId'] case final int id)
-                          _PlaylistRow(playlistId: id),
                         const SizedBox(height: 8),
                         if (podcastId != null) _BoostButton(podcastId),
                         const SizedBox(height: 16),

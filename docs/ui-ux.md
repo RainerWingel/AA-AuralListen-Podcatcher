@@ -81,7 +81,8 @@ Playlist-Ansicht selbst nicht angezeigt (Benutzerwunsch 2026-10-01). Außerdem �
 - **Playlist:** Folgen in Reihenfolge (mit Podcast-Name), Griff ≡ zum Verschieben, nach links wischen = entfernen
   (Snackbar mit „Rückgängig"). Tippen spielt ab und macht die Playlist aktiv. AppBar: ▶ „Fortsetzen" (zuletzt gespielte Folge, sonst oben), ⋮ mit
   Sortieren.
-- **Vollbild-Player:** Bei aktiver Playlist Zeile „Aus Playlist „X"" mit ⏭ „Nächste Folge".
+- **Vollbild-Player:** Bei aktiver Playlist Zeile „Aus Playlist „X"" mit ⏭ „Nächste Folge" – unter dem
+  Podcast-Namen, über dem Positionsregler.
 
 ## Downloads-Tab
 Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %" /
