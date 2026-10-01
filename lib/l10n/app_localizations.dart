@@ -992,6 +992,12 @@ abstract class AppLocalizations {
   /// **'Zu Playlist hinzufügen…'**
   String get addToPlaylist;
 
+  /// No description provided for @episodeDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Beschreibung'**
+  String get episodeDescription;
+
   /// No description provided for @addedToPlaylist.
   ///
   /// In de, this message translates to:

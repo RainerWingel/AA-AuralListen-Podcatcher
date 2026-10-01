@@ -154,6 +154,13 @@ final subscriptionEpisodeSearchProvider = FutureProvider.autoDispose
     );
 
 /// Cover numbers of a podcast's episodes (episode id → number).
+/// Show notes of one episode (player "Description" section).
+final episodeDescriptionProvider = FutureProvider.autoDispose
+    .family<String?, int>(
+      (ref, episodeId) =>
+          ref.watch(podcastRepositoryProvider).episodeDescription(episodeId),
+    );
+
 final episodeNumbersProvider = StreamProvider.autoDispose
     .family<Map<int, int>, int>(
       (ref, podcastId) =>

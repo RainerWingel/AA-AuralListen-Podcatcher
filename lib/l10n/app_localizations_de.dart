@@ -531,6 +531,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addToPlaylist => 'Zu Playlist hinzufügen…';
 
   @override
+  String get episodeDescription => 'Beschreibung';
+
+  @override
   String addedToPlaylist(String name) {
     return 'Zu „$name“ hinzugefügt';
   }

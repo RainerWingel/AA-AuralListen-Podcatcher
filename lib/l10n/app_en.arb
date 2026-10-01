@@ -149,6 +149,7 @@
   "playlistEmptyHint": "Long-press an episode → “Add to playlist…”",
   "playlistSummary": "{count, plural, =0{Empty} =1{1 episode} other{{count} episodes}}{duration}",
   "addToPlaylist": "Add to playlist…",
+  "episodeDescription": "Description",
   "addedToPlaylist": "Added to “{name}”",
   "alreadyInPlaylist": "Already in “{name}”",
   "removedFromPlaylist": "Removed from the playlist",

@@ -530,6 +530,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addToPlaylist => 'Add to playlist…';
 
   @override
+  String get episodeDescription => 'Description';
+
+  @override
   String addedToPlaylist(String name) {
     return 'Added to “$name”';
   }

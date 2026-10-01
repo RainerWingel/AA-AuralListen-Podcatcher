@@ -47,7 +47,8 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast (davor ✓-Download-Symbol „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist),
   Slider mit „verstrichen" / „-verbleibend", −15 s / Play / +30 s, „Boost: …" (öffnet Auswahl). Pfeil nach unten schließt.
   Darunter „Kapitel x/n: Titel" (falls vorhanden; tippen → Kapitel-Liste) und Knöpfe „Lesezeichen setzen", Sleep-Timer (Stoppuhr;
-  aktiv: „noch mm:ss" bzw. „Bis Folgenende"), „Lesezeichen (n)".
+  aktiv: „noch mm:ss" bzw. „Bis Folgenende"), „Lesezeichen (n)". Ganz unten aufklappbarer Bereich „Beschreibung"
+  (Shownotes, zugeklappt, nur wenn vorhanden; Benutzerwunsch 2026-10-01).
   Kapitel-Liste: Titel, darunter Startzeit, rechts Chip „Skip" (übersprungen = durchgestrichen) → `playback.md`.
 - **Boost-Auswahl** (Bottom-Sheet): Aus / +3 / +6 / +9 / +12 dB, Schalter „Nur für diesen Podcast".
 
@@ -73,7 +74,10 @@ ausgegraut mit Hinweis. „Eigene Zählung" nummeriert auch Folgen ohne Feed-Num
 Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Daneben
 Playlist-Symbol (`playlist_add_check`, Tooltip „In einer Playlist"), solange die Folge in mindestens einer Playlist
 steht – live aus der DB (`episodesInPlaylistsProvider`), verschwindet beim Entfernen aus der letzten Playlist; in der
-Playlist-Ansicht selbst nicht angezeigt (Benutzerwunsch 2026-10-01). Außerdem „Zu Playlist hinzufügen…".
+Playlist-Ansicht selbst nicht angezeigt (Benutzerwunsch 2026-10-01).
+Langes Drücken → Menü mit „Beschreibung" (nur wenn die Folge Shownotes hat; Sheet mit Titel und Text, markierbar,
+`lib/features/episodes/episode_description.dart`). Shownotes sind reiner Text (aus dem HTML des Feeds, max. 4000 Zeichen,
+Links gehen verloren – `data-model.md`). Außerdem „Zu Playlist hinzufügen…".
 
 ## Playlists
 - **Playlists-Tab:** Liste mit Name und „N Folgen · Dauer", Griff ≡ zum Sortieren, ⋮ (Fortsetzen, Alles downloaden,

@@ -294,6 +294,7 @@
     }
   },
   "addToPlaylist": "Zu Playlist hinzufügen…",
+  "episodeDescription": "Beschreibung",
   "addedToPlaylist": "Zu „{name}“ hinzugefügt",
   "@addedToPlaylist": {
     "placeholders": {

@@ -9,6 +9,7 @@ import '../../core/widgets/cover_image.dart';
 import '../../data/db/app_database.dart' show DownloadState;
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../episodes/episode_description.dart';
 import 'boost_sheet.dart';
 import 'chapters_and_bookmarks.dart';
 import 'player_controls.dart';
@@ -126,6 +127,8 @@ class PlayerScreen extends ConsumerWidget {
                           ChapterBookmarkButtons(episodeId: id),
                         const SizedBox(height: 8),
                         if (podcastId != null) _BoostButton(podcastId),
+                        if (item.extras?['episodeId'] case final int id)
+                          EpisodeDescriptionSection(episodeId: id),
                         const SizedBox(height: 16),
                       ],
                     ),

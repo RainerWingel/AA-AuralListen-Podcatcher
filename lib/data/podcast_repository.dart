@@ -95,6 +95,16 @@ class PodcastRepository {
     _db.podcasts,
   )..where((p) => p.id.equals(id))).watchSingleOrNull();
 
+  /// Show notes (plain text) of one episode; only this column is read.
+  Future<String?> episodeDescription(int episodeId) {
+    final description = _db.episodes.description;
+    return (_db.selectOnly(_db.episodes)
+          ..addColumns([description])
+          ..where(_db.episodes.id.equals(episodeId)))
+        .map((row) => row.read(description))
+        .getSingleOrNull();
+  }
+
   Stream<List<Episode>> watchEpisodes(int podcastId) =>
       (_db.select(_db.episodes)
             ..where((e) => e.podcastId.equals(podcastId))

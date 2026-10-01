@@ -11,6 +11,7 @@ import '../../data/podcast_repository.dart' show isFreshEpisode;
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
+import 'episode_description.dart';
 
 /// One episode row: cover, title, date · duration, listening state.
 /// Tap plays the episode, long press opens the episode menu.
@@ -73,6 +74,8 @@ class EpisodeTile extends ConsumerWidget {
     return showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      // Six entries are taller than the default 9/16 of the screen.
+      isScrollControlled: true,
       builder: (context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -95,6 +98,20 @@ class EpisodeTile extends ConsumerWidget {
                     .playEpisode(episode.id, playlistId: playlistId);
               },
             ),
+            if (episode.description case final description?
+                when description.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.notes),
+                title: Text(l10n.episodeDescription),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showEpisodeDescriptionSheet(
+                    outerContext,
+                    title: episode.title,
+                    description: description,
+                  );
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.playlist_add),
               title: Text(l10n.addToPlaylist),

@@ -1741,6 +1741,55 @@ void main() {
   );
 
   testWidgets(
+    'show notes in the episode menu and in the player',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await tester.runAsync(
+        () => db
+            .update(db.episodes)
+            .write(
+              const EpisodesCompanion(description: Value('Darin: Testthemen')),
+            ),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+
+      await tester.longPress(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.text('Beschreibung'));
+      await settle(tester);
+      expect(find.text('Darin: Testthemen'), findsOneWidget);
+      Navigator.of(tester.element(find.text('Darin: Testthemen'))).pop();
+      await settle(tester);
+
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      // Collapsed at first; the text appears when opened.
+      expect(find.text('Darin: Testthemen'), findsNothing);
+      await tester.ensureVisible(find.text('Beschreibung'));
+      await tester.tap(find.text('Beschreibung'));
+      await settle(tester);
+      expect(find.text('Darin: Testthemen'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'long press on a subscription plays its unplayed episodes',
     timeout: timeout,
     (tester) async {
