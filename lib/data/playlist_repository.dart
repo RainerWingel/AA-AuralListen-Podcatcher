@@ -141,6 +141,16 @@ class PlaylistRepository {
           .watch()
           .map((items) => {for (final i in items) i.playlistId});
 
+  /// Ids of all episodes that are in at least one playlist; emits again
+  /// whenever an episode is added to or removed from any playlist.
+  Stream<Set<int>> watchEpisodeIdsInPlaylists() {
+    final episodeId = _db.playlistItems.episodeId;
+    return (_db.selectOnly(_db.playlistItems, distinct: true)
+          ..addColumns([episodeId]))
+        .watch()
+        .map((rows) => {for (final r in rows) r.read(episodeId)!});
+  }
+
   /// "Resume": the episode last played from [playlistId] if it is still in
   /// there, otherwise the first entry. Null = the playlist is empty.
   Future<int?> resumeEpisode(int playlistId) async {

@@ -191,6 +191,7 @@
   "downloadDelete": "Download löschen",
   "downloadRetry": "Erneut herunterladen",
   "downloadDone": "Heruntergeladen",
+  "episodeInPlaylist": "In einer Playlist",
   "downloadFailed": "Download fehlgeschlagen",
   "downloadQueued": "Wartet …",
   "downloadWifiWaiting": "Wartet auf WLAN …",

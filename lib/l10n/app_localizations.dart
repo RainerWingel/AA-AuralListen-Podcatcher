@@ -614,6 +614,12 @@ abstract class AppLocalizations {
   /// **'Heruntergeladen'**
   String get downloadDone;
 
+  /// No description provided for @episodeInPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'In einer Playlist'**
+  String get episodeInPlaylist;
+
   /// No description provided for @downloadFailed.
   ///
   /// In de, this message translates to:

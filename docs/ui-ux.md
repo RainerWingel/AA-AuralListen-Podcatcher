@@ -69,7 +69,10 @@ mit eigenen Nummern Auswahl **„Nummerierung: Feed-Nummern | Eigene Zählung"**
 Podcasts liefern `itunes:episode`, Benutzerwunsch 2026-10-01); „Versatz der Zählung" als − [Feld] + (−9999…9999,
 Eingabe mit „Fertig" oder beim Verlassen übernommen) gilt **nur für die eigene Zählung** – bei Feed-Nummern
 ausgegraut mit Hinweis. „Eigene Zählung" nummeriert auch Folgen ohne Feed-Nummer. Themen-Feeds zählen über den ganzen Feed.
-Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Außerdem „Zu Playlist hinzufügen…".
+Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Daneben
+Playlist-Symbol (`playlist_add_check`, Tooltip „In einer Playlist"), solange die Folge in mindestens einer Playlist
+steht – live aus der DB (`episodesInPlaylistsProvider`), verschwindet beim Entfernen aus der letzten Playlist; in der
+Playlist-Ansicht selbst nicht angezeigt (Benutzerwunsch 2026-10-01). Außerdem „Zu Playlist hinzufügen…".
 
 ## Playlists
 - **Playlists-Tab:** Liste mit Name und „N Folgen · Dauer", Griff ≡ zum Sortieren, ⋮ (Fortsetzen, Alles downloaden,

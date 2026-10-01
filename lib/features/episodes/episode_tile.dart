@@ -191,6 +191,9 @@ class EpisodeTile extends ConsumerWidget {
             Row(
               children: [
                 _DownloadIndicator(episodeId: episode.id),
+                // Inside a playlist the mark would always be on.
+                if (playlistId == null)
+                  _PlaylistIndicator(episodeId: episode.id),
                 Expanded(
                   child: Text(
                     meta,
@@ -272,6 +275,34 @@ class _DownloadIndicator extends ConsumerWidget {
       ),
     };
     return Padding(padding: const EdgeInsets.only(right: 6), child: icon);
+  }
+}
+
+/// Small icon next to the download mark: the episode is in a playlist.
+class _PlaylistIndicator extends ConsumerWidget {
+  const _PlaylistIndicator({required this.episodeId});
+
+  final int episodeId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final inPlaylist = ref.watch(
+      episodesInPlaylistsProvider.select(
+        (ids) => ids.value?.contains(episodeId) ?? false,
+      ),
+    );
+    if (!inPlaylist) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: Tooltip(
+        message: AppLocalizations.of(context).episodeInPlaylist,
+        child: Icon(
+          Icons.playlist_add_check,
+          size: 16,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
   }
 }
 

@@ -86,6 +86,7 @@
   "downloadDelete": "Delete download",
   "downloadRetry": "Download again",
   "downloadDone": "Downloaded",
+  "episodeInPlaylist": "In a playlist",
   "downloadFailed": "Download failed",
   "downloadQueued": "Waiting …",
   "downloadWifiWaiting": "Waiting for Wi-Fi …",

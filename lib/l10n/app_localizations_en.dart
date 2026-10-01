@@ -318,6 +318,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadDone => 'Downloaded';
 
   @override
+  String get episodeInPlaylist => 'In a playlist';
+
+  @override
   String get downloadFailed => 'Download failed';
 
   @override

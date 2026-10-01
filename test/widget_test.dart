@@ -1690,6 +1690,57 @@ void main() {
   );
 
   testWidgets(
+    'playlist mark follows adding to and removing from playlists',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      final playlists = container.read(playlistRepositoryProvider);
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final first = await tester.runAsync(() => playlists.create('Eins'));
+      final second = await tester.runAsync(() => playlists.create('Zwei'));
+      final episode = await tester.runAsync(
+        () => (db.select(
+          db.episodes,
+        )..where((e) => e.title.equals('Erste Folge'))).getSingle(),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+
+      final mark = find.byTooltip('In einer Playlist');
+      expect(mark, findsNothing);
+
+      await tester.runAsync(() => playlists.add(first!, episode!.id));
+      await tester.runAsync(() => playlists.add(second!, episode!.id));
+      await settle(tester);
+      // One mark for the episode, however many playlists contain it.
+      expect(mark, findsOneWidget);
+
+      await tester.runAsync(() => playlists.remove(first!, episode!.id));
+      await settle(tester);
+      expect(mark, findsOneWidget);
+
+      await tester.runAsync(() => playlists.remove(second!, episode!.id));
+      await settle(tester);
+      expect(mark, findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'long press on a subscription plays its unplayed episodes',
     timeout: timeout,
     (tester) async {

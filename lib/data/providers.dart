@@ -125,6 +125,11 @@ final playlistEntriesProvider = StreamProvider.autoDispose
       (ref, id) => ref.watch(playlistRepositoryProvider).watchEntries(id),
     );
 
+/// Episodes in at least one playlist (playlist mark in the episode rows).
+final episodesInPlaylistsProvider = StreamProvider.autoDispose<Set<int>>(
+  (ref) => ref.watch(playlistRepositoryProvider).watchEpisodeIdsInPlaylists(),
+);
+
 final directorySearchProvider = Provider<DirectorySearch>((ref) {
   final client = ref.watch(httpClientProvider);
   return DirectorySearch([ItunesDirectory(client), FyydDirectory(client)]);
