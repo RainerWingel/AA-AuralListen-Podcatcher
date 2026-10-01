@@ -62,6 +62,12 @@ void main() {
       );
     });
 
+    test('older stored notes are compacted on display', () {
+      expect(parseNotes('Gäste\n\n•\nLinus\n\n• Tim'), [
+        (text: 'Gäste\n• Linus\n• Tim', url: null),
+      ]);
+    });
+
     test('bare addresses in plain text become links', () {
       expect(parseNotes('Siehe https://x.example/a. Danke'), [
         (text: 'Siehe ', url: null),

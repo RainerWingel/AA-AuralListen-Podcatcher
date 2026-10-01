@@ -161,7 +161,11 @@ typedef NotesPart = ({String text, String? url});
 
 /// Splits stored notes into text and links. Bare web addresses in the text
 /// become links too (also covers notes stored before links were kept).
-List<NotesPart> parseNotes(String notes) {
+List<NotesPart> parseNotes(String stored) {
+  // Notes stored before lists were compacted get the same treatment here.
+  final notes = stored
+      .replaceAll(_bulletBreak, '• ')
+      .replaceAll(_blankBeforeBullet, '\n');
   final parts = <NotesPart>[];
   void addText(String text) {
     var start = 0;
