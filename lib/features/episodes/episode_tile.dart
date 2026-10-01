@@ -341,7 +341,9 @@ class _NumberedCover extends ConsumerWidget {
               bottom: 0,
               child: Container(
                 width: 15,
-                color: Colors.black.withValues(alpha: 0.6),
+                // 85 % transparent so the cover shows through (user
+                // request 2026-10-01); a text shadow keeps the number legible.
+                color: Colors.black.withValues(alpha: 0.15),
                 alignment: Alignment.center,
                 child: RotatedBox(
                   quarterTurns: 3,
@@ -356,6 +358,7 @@ class _NumberedCover extends ConsumerWidget {
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         height: 1,
+                        shadows: [Shadow(blurRadius: 2)],
                       ),
                     ),
                   ),
