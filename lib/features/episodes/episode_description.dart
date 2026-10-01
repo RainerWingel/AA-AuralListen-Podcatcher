@@ -27,7 +27,13 @@ Future<void> showEpisodeDescriptionSheet(
     ),
     child: ListView(
       shrinkWrap: true,
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      // The end of the text stays above Android's navigation buttons.
+      padding: EdgeInsets.fromLTRB(
+        24,
+        0,
+        24,
+        24 + MediaQuery.viewPaddingOf(context).bottom,
+      ),
       children: [
         Text(title, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 12),
