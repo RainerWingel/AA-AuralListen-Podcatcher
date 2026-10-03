@@ -310,6 +310,23 @@ class PlaylistRepository {
         }
       });
 
+  /// "Als nächstes spielen": puts [episodeId] directly behind
+  /// [afterEpisodeId]; an entry already in the playlist is moved there.
+  /// Without [afterEpisodeId] in the playlist it goes to the end.
+  Future<void> insertAfter(
+    int playlistId,
+    int episodeId, {
+    required int afterEpisodeId,
+  }) => _db.transaction(() async {
+    await add(playlistId, episodeId);
+    final ids = (await entries(
+      playlistId,
+    )).map((e) => e.item.episodeId).toList()..remove(episodeId);
+    final at = ids.indexOf(afterEpisodeId);
+    ids.insert(at < 0 ? ids.length : at + 1, episodeId);
+    await _writeOrder(playlistId, ids);
+  });
+
   /// Moves the entry at [oldIndex] to [newIndex] (display order; [newIndex]
   /// is the final index, as ReorderableListView.onReorderItem reports it).
   Future<void> move(int playlistId, int oldIndex, int newIndex) async {

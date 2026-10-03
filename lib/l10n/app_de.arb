@@ -325,6 +325,39 @@
     }
   },
   "addToPlaylist": "Zu Playlist hinzufügen…",
+  "playNext": "Als Nächstes spielen",
+  "playNextHint": "Direkt nach der laufenden Folge in „{playlist}“",
+  "@playNextHint": {
+    "placeholders": {
+      "playlist": {
+        "type": "String"
+      }
+    }
+  },
+  "playNextDone": "Folgt als Nächstes in „{playlist}“.",
+  "@playNextDone": {
+    "placeholders": {
+      "playlist": {
+        "type": "String"
+      }
+    }
+  },
+  "appendToPlaylist": "Ans Ende der Playlist „{playlist}“ anfügen",
+  "@appendToPlaylist": {
+    "placeholders": {
+      "playlist": {
+        "type": "String"
+      }
+    }
+  },
+  "appendToPlaylistDone": "Ans Ende von „{playlist}“ angefügt.",
+  "@appendToPlaylistDone": {
+    "placeholders": {
+      "playlist": {
+        "type": "String"
+      }
+    }
+  },
   "episodeDescription": "Beschreibung",
   "episodeNoDescription": "Für diese Folge gibt es keine Beschreibung.",
   "addedToPlaylist": "Zu „{name}“ hinzugefügt",

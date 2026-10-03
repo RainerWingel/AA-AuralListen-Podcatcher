@@ -76,6 +76,16 @@ abspielen" (`playFromPodcastMenu`; nichts Passendes → Infobox). Schon enthalte
   Folgen in der Playlist (angefangene an ihrer Position), danach geht es nach den Regeln unten weiter.
 - Infobox: „n Folgen zu „X" hinzugefügt." bzw. „Alle Folgen waren schon in „X" – Wiedergabe startet."
 
+## „Als Nächstes spielen" / „Ans Ende anfügen" (Benutzerwunsch 2026-10-03)
+Läuft gerade eine Folge aus einer **aktiven** Playlist X (Zeile „Aus Playlist „X"" voll sichtbar; eine nur angebotene,
+halbtransparente zählt nicht), hat das Menü beim langen Drücken auf eine **andere** Folge außerhalb der Playlist-Ansicht
+(Start, Podcast-Seite, Suche …) zwei weitere Einträge (`episode_tile.dart`):
+- **„Als Nächstes spielen"** (Untertitel „Direkt nach der laufenden Folge in „X""): fügt sie direkt hinter der laufenden
+  Folge in X ein; steht sie schon woanders in X, wird sie dorthin verschoben (`PlaylistRepository.insertAfter`).
+- **„Ans Ende der Playlist „X" anfügen"**: hängt sie hinten an – nur aktiv, wenn sie noch nicht in X steht.
+Für die laufende Folge selbst gibt es beide Einträge nicht. Die nächste Folge wird am Ende ohnehin frisch aus der DB
+gelesen, die neue Reihenfolge gilt also sofort.
+
 ## Abspielverhalten
 - Startet der Benutzer eine Folge **aus einer Playlist**, wird diese Playlist zur **aktiven Playlist**.
 - Erreicht die Folge ihr **Ende** (Dateiende; keine 98-%-Regel mehr, Benutzerwunsch 2026-10-03):

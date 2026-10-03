@@ -72,6 +72,25 @@ void main() {
     expect((await repo.playlists()).last.name, 'Unterwegs');
   });
 
+  test('insertAfter: "play next" adds or moves behind an episode', () async {
+    final list = await repo.create('Q');
+    final a = await addEpisode('A');
+    final b = await addEpisode('B');
+    final c = await addEpisode('C');
+    final d = await addEpisode('D');
+    await repo.addAll(list, [a, b, c]);
+
+    await repo.insertAfter(list, d, afterEpisodeId: a); // new one
+    expect(await titles(list), ['A', 'D', 'B', 'C']);
+    await repo.insertAfter(list, c, afterEpisodeId: a); // moved forward
+    expect(await titles(list), ['A', 'C', 'D', 'B']);
+    await repo.insertAfter(list, a, afterEpisodeId: b); // moved back
+    expect(await titles(list), ['C', 'D', 'B', 'A']);
+    final e = await addEpisode('E');
+    await repo.insertAfter(list, e, afterEpisodeId: 9999); // unknown: end
+    expect(await titles(list), ['C', 'D', 'B', 'A', 'E']);
+  });
+
   test('addAll appends in order and skips episodes already there', () async {
     final playlistId = (await db.select(db.playlists).getSingle()).id;
     final a = await addEpisode('a');

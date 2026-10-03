@@ -1052,6 +1052,36 @@ abstract class AppLocalizations {
   /// **'Zu Playlist hinzufügen…'**
   String get addToPlaylist;
 
+  /// No description provided for @playNext.
+  ///
+  /// In de, this message translates to:
+  /// **'Als Nächstes spielen'**
+  String get playNext;
+
+  /// No description provided for @playNextHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Direkt nach der laufenden Folge in „{playlist}“'**
+  String playNextHint(String playlist);
+
+  /// No description provided for @playNextDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Folgt als Nächstes in „{playlist}“.'**
+  String playNextDone(String playlist);
+
+  /// No description provided for @appendToPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Ans Ende der Playlist „{playlist}“ anfügen'**
+  String appendToPlaylist(String playlist);
+
+  /// No description provided for @appendToPlaylistDone.
+  ///
+  /// In de, this message translates to:
+  /// **'Ans Ende von „{playlist}“ angefügt.'**
+  String appendToPlaylistDone(String playlist);
+
   /// No description provided for @episodeDescription.
   ///
   /// In de, this message translates to:

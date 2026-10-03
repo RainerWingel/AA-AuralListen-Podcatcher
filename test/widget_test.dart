@@ -2064,6 +2064,98 @@ void main() {
   );
 
   testWidgets(
+    'while a playlist plays: "play next" and "add to the end" in the menu',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      final playlists = container.read(playlistRepositoryProvider);
+      final podcastId = await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final first = (await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      ))!.id;
+      Future<int> add(String guid, int day) async => (await tester.runAsync(
+        () => db
+            .into(db.episodes)
+            .insert(
+              EpisodesCompanion.insert(
+                podcastId: podcastId!,
+                guid: guid,
+                title: 'Folge $guid',
+                audioUrl: 'https://example.com/$guid.mp3',
+                pubDate: Value(DateTime.utc(2025, 6, day)),
+                addedAt: DateTime.now(),
+              ),
+            ),
+      ))!;
+      final later = await add('später', 11);
+      final extra = await add('extra', 12);
+      final list = (await tester.runAsync(
+        () => db.select(db.playlists).getSingle(),
+      ))!.id;
+      await tester.runAsync(() => playlists.addAll(list, [first, later]));
+      final ids = (first: first, later: later, extra: extra, list: list);
+      // Start the first episode from the playlist, like a user.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Playlists'));
+      await settle(tester);
+      await tester.tap(find.text('Wiedergabeliste'));
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      expect(handler.activePlaylistId, ids.list);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      // The mini player shows the podcast name too.
+      await tester.tap(find.text('Widget-Podcast').first);
+      await settle(tester);
+
+      // Not in the playlist yet: both entries, "end" enabled.
+      await tester.longPress(find.text('Folge extra'));
+      await settle(tester);
+      expect(find.text('Als Nächstes spielen'), findsOneWidget);
+      await tester.tap(find.text('Als Nächstes spielen'));
+      await settle(tester);
+      Future<List<int>> order() async => [
+        for (final e in (await tester.runAsync(
+          () => playlists.entries(ids.list),
+        ))!)
+          e.item.episodeId,
+      ];
+      expect(await order(), [ids.first, ids.extra, ids.later]);
+
+      // Now in it: "add to the end" is disabled.
+      await tester.longPress(find.text('Folge extra'));
+      await settle(tester);
+      final append = tester.widget<ListTile>(
+        find.widgetWithText(
+          ListTile,
+          'Ans Ende der Playlist „Wiedergabeliste“ anfügen',
+        ),
+      );
+      expect(append.enabled, isFalse);
+      Navigator.of(tester.element(find.text('Als Nächstes spielen'))).pop();
+      await settle(tester);
+
+      // The currently playing episode gets no queue entries.
+      await tester.longPress(find.text('Erste Folge').first);
+      await settle(tester);
+      expect(find.text('Als Nächstes spielen'), findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'podcast page menu: play all unplayed episodes',
     timeout: timeout,
     (tester) async {

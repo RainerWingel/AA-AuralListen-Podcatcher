@@ -569,6 +569,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addToPlaylist => 'Add to playlist…';
 
   @override
+  String get playNext => 'Play next';
+
+  @override
+  String playNextHint(String playlist) {
+    return 'Right after the current episode in “$playlist”';
+  }
+
+  @override
+  String playNextDone(String playlist) {
+    return 'Plays next in “$playlist”.';
+  }
+
+  @override
+  String appendToPlaylist(String playlist) {
+    return 'Add to the end of “$playlist”';
+  }
+
+  @override
+  String appendToPlaylistDone(String playlist) {
+    return 'Added to the end of “$playlist”.';
+  }
+
+  @override
   String get episodeDescription => 'Description';
 
   @override

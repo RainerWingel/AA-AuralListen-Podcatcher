@@ -5,6 +5,7 @@ import '../../audio/audio_providers.dart';
 import '../../core/clock.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/playback_repository.dart' show PlaybackRepository;
 import '../../data/podcast_repository.dart' show isFreshEpisode;
@@ -34,11 +35,36 @@ class EpisodeTile extends ConsumerWidget {
   /// Played episodes: thumbnail and text half transparent (like Castbox).
   static const playedOpacity = 0.5;
 
-  Future<void> _showMenu(BuildContext context, WidgetRef ref) {
+  Future<void> _showMenu(BuildContext context, WidgetRef ref) async {
     // The sheet's own context is gone once it closes; dialogs/snackbars that
     // follow a menu action use the tile's context.
     final outerContext = context;
     final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    // Queue entries (user wish 2026-10-03): only outside a playlist view,
+    // while another episode plays from an active playlist ("Aus Playlist
+    // „X“" fully visible in the player).
+    final handler = ref.read(audioHandlerProvider);
+    final playlists = ref.read(playlistRepositoryProvider);
+    final activeId = handler.activePlaylistId;
+    final currentId = handler.currentEpisodeId;
+    final queue =
+        playlistId == null &&
+            activeId != null &&
+            currentId != null &&
+            currentId != episode.id
+        ? (
+            id: activeId,
+            current: currentId,
+            name: (await playlists.playlists())
+                .where((p) => p.id == activeId)
+                .firstOrNull
+                ?.name,
+            contains: (await playlists.playlistIdsWith(episode.id))
+                .contains(activeId),
+          )
+        : null;
+    if (!context.mounted) return;
     final playback = ref.read(playbackRepositoryProvider);
     final downloads = ref.read(downloadServiceProvider);
     final download = ref.read(downloadStatesProvider).value?[episode.id];
@@ -77,67 +103,110 @@ class EpisodeTile extends ConsumerWidget {
       // Six entries are taller than the default 9/16 of the screen.
       isScrollControlled: true,
       builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text(
-                episode.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleSmall,
+        // Up to eight entries: scroll instead of overflowing (large fonts).
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(
+                  episode.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.play_arrow),
-              title: Text(l10n.playerPlay),
-              onTap: () {
-                Navigator.of(context).pop();
-                ref
-                    .read(audioHandlerProvider)
-                    .playEpisode(episode.id, playlistId: playlistId);
-              },
-            ),
-            // Notes are loaded only when opened (not with the list).
-            ListTile(
-              leading: const Icon(Icons.notes),
-              title: Text(l10n.episodeDescription),
-              onTap: () {
-                Navigator.of(context).pop();
-                showEpisodeDescriptionSheet(
-                  outerContext,
-                  episodeId: episode.id,
-                  title: episode.title,
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.playlist_add),
-              title: Text(l10n.addToPlaylist),
-              onTap: () {
-                Navigator.of(context).pop();
-                addToPlaylist(outerContext, ref, episode.id);
-              },
-            ),
-            ListTile(
-              leading: Icon(downloadIcon),
-              title: Text(downloadLabel),
-              onTap: () {
-                Navigator.of(context).pop();
-                onDownload();
-              },
-            ),
-            ListTile(
-              leading: Icon(played ? Icons.replay : Icons.check),
-              title: Text(played ? l10n.markUnplayed : l10n.markPlayed),
-              onTap: () {
-                Navigator.of(context).pop();
-                played
-                    ? playback.markUnplayed(episode.id)
-                    : playback.markPlayed(episode.id);
-              },
-            ),
-          ],
+              ListTile(
+                leading: const Icon(Icons.play_arrow),
+                title: Text(l10n.playerPlay),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  ref
+                      .read(audioHandlerProvider)
+                      .playEpisode(episode.id, playlistId: playlistId);
+                },
+              ),
+              // Notes are loaded only when opened (not with the list).
+              ListTile(
+                leading: const Icon(Icons.notes),
+                title: Text(l10n.episodeDescription),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showEpisodeDescriptionSheet(
+                    outerContext,
+                    episodeId: episode.id,
+                    title: episode.title,
+                  );
+                },
+              ),
+              if (queue case (
+                :final id,
+                :final current,
+                name: final name?,
+                :final contains,
+              )) ...[
+                ListTile(
+                  leading: const Icon(Icons.queue_play_next),
+                  title: Text(l10n.playNext),
+                  subtitle: Text(l10n.playNextHint(name)),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    playlists
+                        .insertAfter(id, episode.id, afterEpisodeId: current)
+                        .then(
+                          (_) => showInfoSnackBar(
+                            messenger,
+                            l10n.playNextDone(name),
+                          ),
+                        );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.playlist_add),
+                  title: Text(l10n.appendToPlaylist(name)),
+                  // Only when it is not in that playlist yet.
+                  enabled: !contains,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    playlists
+                        .add(id, episode.id)
+                        .then(
+                          (_) => showInfoSnackBar(
+                            messenger,
+                            l10n.appendToPlaylistDone(name),
+                          ),
+                        );
+                  },
+                ),
+              ],
+              ListTile(
+                leading: const Icon(Icons.playlist_add),
+                title: Text(l10n.addToPlaylist),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  addToPlaylist(outerContext, ref, episode.id);
+                },
+              ),
+              ListTile(
+                leading: Icon(downloadIcon),
+                title: Text(downloadLabel),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  onDownload();
+                },
+              ),
+              ListTile(
+                leading: Icon(played ? Icons.replay : Icons.check),
+                title: Text(played ? l10n.markUnplayed : l10n.markPlayed),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  played
+                      ? playback.markUnplayed(episode.id)
+                      : playback.markPlayed(episode.id);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
