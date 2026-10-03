@@ -10,7 +10,7 @@ permalink: /privacy/
 **App:** AA-AuralListen Podcatcher (Android, package name `io.github.rainerwingel.aurallisten`)
 **Developer:** Artem A. · Contact: via the
 [issues of the GitHub project](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
-**Last updated:** September 30, 2026
+**Last updated:** October 3, 2026
 
 ## In short
 
