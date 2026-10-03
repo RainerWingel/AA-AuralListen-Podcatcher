@@ -51,7 +51,7 @@ class PlayerScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final item = ref.watch(mediaItemProvider).value;
+    final item = ref.watch(mediaItemProvider).value?.mediaItem;
 
     return Scaffold(
       appBar: AppBar(
@@ -109,7 +109,10 @@ class PlayerScreen extends ConsumerWidget {
                         // Above the seek bar, so the playlist context sits
                         // with the title (user request 2026-10-01).
                         if (item.extras?['playlistId'] case final int id)
-                          _PlaylistRow(playlistId: id),
+                          _PlaylistRow(playlistId: id)
+                        else if (item.extras?['suggestedPlaylistId']
+                            case final int id)
+                          _PlaylistRow(playlistId: id, offered: true),
                         const SizedBox(height: 16),
                         _SeekBar(total: item.duration),
                         if (item.extras?['episodeId'] case final int id)
@@ -217,17 +220,23 @@ class _BoostButton extends ConsumerWidget {
 }
 
 /// "Aus Playlist „X“" plus the "next episode" button.
+///
+/// [offered]: the episode was started elsewhere but is in this playlist –
+/// shown half transparent; playback stops at the end unless the user taps
+/// the row, which makes the playlist active (docs/playlists.md).
 class _PlaylistRow extends ConsumerWidget {
-  const _PlaylistRow({required this.playlistId});
+  const _PlaylistRow({required this.playlistId, this.offered = false});
 
   final int playlistId;
+  final bool offered;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final name = ref.watch(playlistProvider(playlistId)).value?.name;
     if (name == null) return const SizedBox.shrink();
-    return Row(
+    final handler = ref.read(audioHandlerProvider);
+    final row = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Icon(Icons.playlist_play, size: 20),
@@ -240,11 +249,23 @@ class _PlaylistRow extends ConsumerWidget {
           ),
         ),
         IconButton(
-          tooltip: l10n.playerNext,
+          tooltip: offered ? l10n.playlistContinueOffer : l10n.playerNext,
           icon: const Icon(Icons.skip_next),
-          onPressed: ref.read(audioHandlerProvider).skipToNext,
+          // While only offered, ⏭ also just switches the playlist on.
+          onPressed: offered
+              ? handler.continueWithSuggestedPlaylist
+              : handler.skipToNext,
         ),
       ],
+    );
+    if (!offered) return row;
+    return Tooltip(
+      message: l10n.playlistContinueOffer,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: handler.continueWithSuggestedPlaylist,
+        child: Opacity(opacity: 0.5, child: row),
+      ),
     );
   }
 }

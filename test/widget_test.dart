@@ -1803,6 +1803,58 @@ void main() {
   );
 
   testWidgets(
+    'started elsewhere: the playlist is only offered until tapped',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      final playlists = container.read(playlistRepositoryProvider);
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final list = await tester.runAsync(() => playlists.create('Unterwegs'));
+      await tester.runAsync(() async {
+        final episode = await db.select(db.episodes).getSingle();
+        await playlists.add(list!, episode.id);
+      });
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+
+      final row = find.text('Aus Playlist „Unterwegs“');
+      Finder dimmed() => find.ancestor(
+        of: row,
+        matching: find.byWidgetPredicate(
+          (w) => w is Opacity && w.opacity == 0.5,
+        ),
+      );
+      expect(row, findsOneWidget);
+      expect(dimmed(), findsOneWidget);
+      expect(handler.activePlaylistId, isNull);
+
+      await tester.tap(row);
+      await settle(tester);
+      expect(dimmed(), findsNothing);
+      expect(handler.activePlaylistId, list);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'long press on a subscription plays its unplayed episodes',
     timeout: timeout,
     (tester) async {

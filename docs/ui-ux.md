@@ -87,7 +87,8 @@ Adressen im Text werden zu Links. Außerdem „Zu Playlist hinzufügen…".
 - **Playlist:** Folgen in Reihenfolge (mit Podcast-Name), Griff ≡ zum Verschieben, nach links wischen = entfernen
   (Snackbar mit „Rückgängig"). Tippen spielt ab und macht die Playlist aktiv. AppBar: ▶ „Fortsetzen" (zuletzt gespielte Folge, sonst oben), ⋮ mit
   Sortieren.
-- **Vollbild-Player:** Bei aktiver Playlist Zeile „Aus Playlist „X"" mit ⏭ „Nächste Folge" – unter dem
+- **Vollbild-Player:** Bei aktiver Playlist Zeile „Aus Playlist „X"" mit ⏭ „Nächste Folge"; nur angeboten (Folge
+  anderswo gestartet) halbtransparent, Antippen aktiviert sie (`playlists.md`) – unter dem
   Podcast-Namen, über dem Positionsregler.
 
 ## Downloads-Tab

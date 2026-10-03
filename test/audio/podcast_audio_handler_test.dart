@@ -1161,19 +1161,41 @@ void main() {
     });
 
     test(
-      'in exactly one playlist: started elsewhere, it continues there',
+      'in exactly one playlist: started elsewhere, it is only offered',
       () async {
         await handler.playEpisode(episodeId);
-        expect(handler.activePlaylistId, playlistId);
-        expect(handler.mediaItem.value?.extras?['playlistId'], playlistId);
-        expect(await playlists.resumeEpisode(playlistId), episodeId);
+        expect(handler.activePlaylistId, isNull);
+        expect(handler.suggestedPlaylistId, playlistId);
+        final extras = handler.mediaItem.value?.extras;
+        expect(
+          (extras?['playlistId'], extras?['suggestedPlaylistId']),
+          (null, playlistId),
+        );
+        expect(
+          handler.playbackState.value.controls,
+          isNot(contains(MediaControl.skipToNext)),
+        );
+        // Not tapped: playback stops at the end.
         engine.complete();
         await pumpEventQueue();
-        expect(handler.currentEpisodeId, ep2);
-        // Played episodes leave all playlists.
-        expect(await itemsOf(playlistId), [ep2, ep3]);
+        expect(handler.currentEpisodeId, episodeId);
+        expect(handler.playbackState.value.playing, isFalse);
       },
     );
+
+    test('offered playlist tapped: it continues there', () async {
+      await handler.playEpisode(episodeId);
+      await handler.continueWithSuggestedPlaylist();
+      expect(handler.activePlaylistId, playlistId);
+      expect(handler.suggestedPlaylistId, isNull);
+      expect(handler.mediaItem.value?.extras?['playlistId'], playlistId);
+      expect(await playlists.resumeEpisode(playlistId), episodeId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep2);
+      // Played episodes leave all playlists.
+      expect(await itemsOf(playlistId), [ep2, ep3]);
+    });
 
     test('adding and removing during playback updates the playlist', () async {
       Future<void> settle() => pumpEventQueue();
@@ -1188,19 +1210,28 @@ void main() {
       await settle();
       expect(handler.activePlaylistId, playlistId);
 
-      // Removed from the active one: the only remaining playlist takes over.
+      // Removed from the active one: the only remaining playlist is offered.
       await playlists.remove(playlistId, episodeId);
       await settle();
-      expect((handler.activePlaylistId, shown()), (other, other));
+      expect((handler.activePlaylistId, shown()), (null, null));
+      expect(handler.suggestedPlaylistId, other);
 
       // Removed from all: no playlist.
       await playlists.remove(other, episodeId);
       await settle();
-      expect((handler.activePlaylistId, shown()), (null, null));
+      expect(
+        (handler.activePlaylistId, handler.suggestedPlaylistId),
+        (null, null),
+      );
 
-      // Added to one again: it becomes active.
+      // Added to one again: offered, active only after a tap.
       await playlists.add(playlistId, episodeId);
       await settle();
+      expect(
+        (handler.activePlaylistId, handler.suggestedPlaylistId),
+        (null, playlistId),
+      );
+      await handler.continueWithSuggestedPlaylist();
       expect(handler.activePlaylistId, playlistId);
     });
 

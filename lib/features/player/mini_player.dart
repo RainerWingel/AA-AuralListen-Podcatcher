@@ -15,7 +15,7 @@ class MiniPlayer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final item = ref.watch(mediaItemProvider).value;
+    final item = ref.watch(mediaItemProvider).value?.mediaItem;
     if (item == null) return const SizedBox.shrink();
 
     final theme = Theme.of(context);

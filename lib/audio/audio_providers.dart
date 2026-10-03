@@ -14,8 +14,17 @@ final audioHandlerProvider = Provider<PodcastAudioHandler>(
 );
 
 /// What is playing / was played last (null = mini player hidden).
-final mediaItemProvider = StreamProvider<MediaItem?>(
-  (ref) => ref.watch(audioHandlerProvider).mediaItem,
+/// What the player shows. [MediaItem] compares by id only, so an update of
+/// the same episode (corrected duration, playlist offered/active) would be
+/// swallowed by Riverpod; this wrapper has no `==` – every update counts.
+class PlayerItem {
+  const PlayerItem(this.mediaItem);
+
+  final MediaItem? mediaItem;
+}
+
+final mediaItemProvider = StreamProvider<PlayerItem>(
+  (ref) => ref.watch(audioHandlerProvider).mediaItem.map(PlayerItem.new),
 );
 
 final playbackStateProvider = StreamProvider<PlaybackState>(

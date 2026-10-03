@@ -163,6 +163,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Playlist the current episode was started from, and the episode's
   /// position in it (kept after the episode was removed at 98 %).
   int? _activePlaylistId;
+
+  /// Playlist containing the episode although it was started elsewhere:
+  /// only offered (dimmed "Aus Playlist …"); it becomes active – playback
+  /// continues there at the end – only when the user taps it.
+  int? _suggestedPlaylistId;
   int _playlistPosition = -1;
 
   bool _loaded = false;
@@ -207,6 +212,21 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   int? get currentEpisodeId => _episodeId;
 
   int? get activePlaylistId => _activePlaylistId;
+
+  /// See [_suggestedPlaylistId].
+  int? get suggestedPlaylistId => _suggestedPlaylistId;
+
+  /// The user tapped the dimmed "Aus Playlist …": continue with that
+  /// playlist when the episode ends.
+  Future<void> continueWithSuggestedPlaylist() async {
+    final id = _episodeId;
+    final suggested = _suggestedPlaylistId;
+    if (id == null || suggested == null) return;
+    _suggestedPlaylistId = null;
+    await _setActivePlaylist(id, suggested);
+    mediaItem.add(_withPlaylist(mediaItem.value));
+    _broadcastState();
+  }
 
   /// Current position – also correct while no audio is loaded.
   Duration get position => _loaded ? _engine.position : _idlePosition;
@@ -287,11 +307,19 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await _membership?.cancel();
     _membership = null;
     // Started elsewhere (Home, Downloads …) but in exactly one playlist:
-    // counts as played from it (user wish 2026-09-30). With several
-    // playlists it is unclear which one is meant – then none.
-    playlistId ??= await _onlyPlaylistOf(episodeId);
-    await _setActivePlaylist(episodeId, playlistId);
-    if (episodeId == _episodeId && _loaded) {
+    // that playlist is only offered; it continues there only after the user
+    // taps "Aus Playlist …" (user wish 2026-10-03, before: automatically).
+    // With several playlists it is unclear which one is meant – then none.
+    // Tapping the episode playing right now keeps its playlist state.
+    final same = episodeId == _episodeId;
+    if (playlistId != null || !same) {
+      _suggestedPlaylistId = playlistId == null
+          ? await _onlyPlaylistOf(episodeId)
+          : null;
+      await _setActivePlaylist(episodeId, playlistId);
+    }
+    if (same && _loaded) {
+      _watchMembership(episodeId);
       mediaItem.add(_withPlaylist(mediaItem.value));
       if (startAt != null) await seek(startAt);
       return play();
@@ -341,6 +369,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await _membership?.cancel();
     _membership = null;
     _activePlaylistId = null;
+    _suggestedPlaylistId = null;
     _playlistPosition = -1;
     _setIdlePosition(Duration.zero);
     mediaItem.add(null);
@@ -509,8 +538,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   /// Same rules as when starting: the active playlist stays while it still
-  /// contains the episode; otherwise the only playlist containing it takes
-  /// over, or none.
+  /// contains the episode; otherwise the only playlist containing it is
+  /// offered (not active until the user taps it), or none.
   Future<void> _onMembership(int episodeId, Set<int> ids) async {
     // Played episodes leave all playlists on purpose – the playlist must
     // still continue with the next one. (The flag stays set after the end
@@ -519,8 +548,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final active = _activePlaylistId;
     if (active != null && ids.contains(active)) return;
     final only = ids.length == 1 ? ids.single : null;
-    if (only == active) return;
-    await _setActivePlaylist(episodeId, only);
+    if (active == null && only == _suggestedPlaylistId) return;
+    if (active != null) await _setActivePlaylist(episodeId, null);
+    _suggestedPlaylistId = only;
     mediaItem.add(_withPlaylist(mediaItem.value));
     _broadcastState();
   }
@@ -577,7 +607,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   MediaItem? _withPlaylist(MediaItem? item) => item?.copyWith(
-    extras: {...?item.extras, 'playlistId': _activePlaylistId},
+    extras: {
+      ...?item.extras,
+      'playlistId': _activePlaylistId,
+      'suggestedPlaylistId': _suggestedPlaylistId,
+    },
   );
 
   int? get _currentPodcastId => mediaItem.value?.extras?['podcastId'] as int?;

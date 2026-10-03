@@ -590,6 +590,12 @@ abstract class AppLocalizations {
   /// **'Herunterladen'**
   String get download;
 
+  /// No description provided for @playlistContinueOffer.
+  ///
+  /// In de, this message translates to:
+  /// **'Antippen: am Ende mit der nächsten Folge dieser Playlist weitermachen'**
+  String get playlistContinueOffer;
+
   /// No description provided for @downloadCancel.
   ///
   /// In de, this message translates to:

@@ -151,7 +151,9 @@ class EpisodeTile extends ConsumerWidget {
     // The mini player keeps showing the last episode after it finished; a
     // played episode only counts as current while it still plays (the last
     // 2 % after the 98 % mark), otherwise it shows as played (user report).
-    final inPlayer = ref.watch(mediaItemProvider).value?.id == '${episode.id}';
+    final inPlayer =
+        ref.watch(mediaItemProvider.select((s) => s.value?.mediaItem?.id)) ==
+        '${episode.id}';
     final playing = ref.watch(playbackStateProvider).value?.playing ?? false;
     final isCurrent =
         inPlayer && (episode.status != EpisodeStatus.played || playing);

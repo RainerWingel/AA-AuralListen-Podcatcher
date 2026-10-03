@@ -78,13 +78,16 @@ schon enthaltene Folgen werden wie immer übersprungen:
   Dadurch wird eine Folge, die während der Wiedergabe hinzugefügt wurde, automatisch mitgespielt.
 - Ist die Playlist leer, stoppt die Wiedergabe.
 - Wird eine Folge **außerhalb** einer Playlist gestartet (Start, Podcast-Seite, Downloads, Lesezeichen) und steht sie in
-  **genau einer** Playlist, gilt sie als aus dieser Playlist gespielt (Benutzerwunsch 2026-09-30): „Aus Playlist „X““
-  im Player, danach geht es dort weiter, „Fortsetzen" merkt sie sich. Steht sie in keiner oder in mehreren Playlists,
-  gibt es keine aktive Playlist; nach dem Ende stoppt die Wiedergabe.
+  **genau einer** Playlist, wird diese Playlist nur **angeboten** (Benutzerwunsch 2026-10-03, ersetzt die Regel vom
+  2026-09-30 „gilt automatisch als aus der Playlist gespielt"): Zeile „Aus Playlist „X““ im Player **halbtransparent
+  (50 %)**, kein ⏭ in der Benachrichtigung, „Fortsetzen" merkt sie sich nicht, **am Ende stoppt die Wiedergabe**.
+  Tippt der Benutzer auf die Zeile (oder ihr ⏭), wird die Playlist aktiv (`continueWithSuggestedPlaylist`): Zeile voll
+  sichtbar, am Ende startet die nächste Folge der Playlist. Steht sie in keiner oder in mehreren Playlists, gibt es
+  weder Angebot noch aktive Playlist. Tippt man die gerade laufende Folge erneut an, bleibt ihr Playlist-Zustand.
 - **Während der Wiedergabe** beobachtet der Player, in welchen Playlists die laufende Folge steht
   (`watchPlaylistIdsWith`, nur echte Änderungen): Die aktive Playlist bleibt, solange die Folge darin steht; wird sie
-  dort entfernt, übernimmt die einzige verbliebene Playlist, sonst keine; kommt sie in genau eine Playlist, wird diese
-  aktiv. Ausnahme: Beim Gespielt-Markieren (98 % / Ende) verlässt sie alle Playlists absichtlich – das wird ignoriert,
+  dort entfernt, wird die einzige verbliebene Playlist nur **angeboten**, sonst keine; kommt sie in genau eine Playlist,
+  wird diese angeboten (aktiv erst nach Antippen). Ausnahme: Beim Gespielt-Markieren (98 % / Ende) verlässt sie alle Playlists absichtlich – das wird ignoriert,
   damit es mit der nächsten Folge weitergeht. Der Beobachter wird beim Folgenwechsel sofort beendet (sonst Wettlauf) und
   in `dispose` freigegeben.
 - Überspringt der Benutzer eine Folge manuell („Weiter" ⏭ im Vollbild-Player bzw. in der Benachrichtigung), wird sie
@@ -98,7 +101,10 @@ schon enthaltene Folgen werden wie immer übersprungen:
   mit der kleinsten Position **größer** als diese – gelesen im Moment des Wechsels. Vor dem Entfernen (98 %) wird die
   Position neu gelesen, falls der Benutzer inzwischen umsortiert hat.
 - Aktive Playlist + Position stehen in `settings['player.activePlaylistId']` (`"<id>:<position>"`) und überleben einen
-  App-Neustart. Die Playlist-ID steht auch in `mediaItem.extras['playlistId']` (für den Vollbild-Player).
+  App-Neustart. Die Playlist-ID steht auch in `mediaItem.extras['playlistId']` (für den Vollbild-Player), die angebotene
+  in `extras['suggestedPlaylistId']` (nur im Speicher; nach Neustart ergibt sie der Playlist-Beobachter neu).
+- `MediaItem` vergleicht nur die ID – der UI-Provider `mediaItemProvider` liefert deshalb eine Hülle `PlayerItem` ohne
+  `==`, sonst kämen Änderungen derselben Folge (Dauer, Playlist) nicht in der Oberfläche an.
 
 ## Tests
 Unit-Tests für: Weiterspielen, Hinzufügen während der Wiedergabe, leere Playlist, Überspringen (bleibt drin, ungespielt),

@@ -306,6 +306,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get download => 'Download';
 
   @override
+  String get playlistContinueOffer =>
+      'Tap to continue with this playlist\'s next episode at the end';
+
+  @override
   String get downloadCancel => 'Cancel download';
 
   @override

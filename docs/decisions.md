@@ -84,3 +84,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   (Folgepakete, Bilder aus dem Netz → Datenschutz, ~3× Speicher) behält der Parser nur Absätze, Aufzählungen und
   http/https-Links in einem schlanken Eigenformat; Links öffnet der vorhandene `openUrl`-Kanal. Shownotes liegen in
   `episode_notes` statt in `episodes`, damit Listen sie nicht laden (`data-model.md`).
+- 2026-10-03 · **Anderswo gestartete Folge: Playlist nur anbieten** (Benutzer) · Ersetzt die Regel vom 2026-09-30
+  (Folge in genau einer Playlist galt automatisch als aus ihr gespielt → am Ende startete ungewollt die nächste).
+  Jetzt halbtransparente Zeile „Aus Playlist …", aktiv erst nach Antippen; sonst stoppt die Wiedergabe am Ende.
