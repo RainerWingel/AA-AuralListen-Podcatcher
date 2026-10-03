@@ -19,7 +19,8 @@ reports and no server of the developer. Everything you create in the app stays o
 
 ## What the app stores on your device
 
-- Subscribed podcasts, episode lists, listening positions, playlists, bookmarks and settings – in a database in the
+- Subscribed podcasts, episode lists, listening positions, playlists, bookmarks, the playback history (the last 100
+  episodes played to the end, can be cleared in the options) and settings – in a database in the
   app's private storage.
 - Downloaded episodes and cached cover images – also in the app's private storage.
 

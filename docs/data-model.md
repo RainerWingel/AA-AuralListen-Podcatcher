@@ -1,12 +1,12 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 18** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
+Aktuell **schemaVersion 19** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
 v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`; v8: nur Daten – `angefangen` unter 15 s → `neu`, Position 0; v9: `playlists.color`; v10: `podcasts.autoPlaylistId`, `autoPlaylistName`; v11: `episodes.episodeNumber`, `podcasts.episodeCounter`, `episodeNumberOffset`, einmaliges Neulesen aller Feeds; v12: `podcasts.episodeOwnCount`; v13: `episode_notes`, Shownotes aus `episodes.description` dorthin verschoben,
 einmaliges Neulesen aller Feeds für die Links; v14: nur Daten – Shownotes-Grenze 6000 → 18000 Zeichen, einmaliges
 Neulesen aller Feeds; v15: nur Daten – einmaliges Neulesen aller Feeds, stellt Feed-Dauern wieder her, die der Player
 mit einer falschen VBR-Schätzung überschrieben hatte, `playback.md`; v16: `podcasts.streamVaries`; v17: `podcasts.fundingUrl`, `fundingLabel`, einmaliges Neulesen aller Feeds; v18: `episodes.season`, `podcasts.serial`,
-einmaliges Neulesen aller Feeds). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+einmaliges Neulesen aller Feeds; v19: `play_history`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 0. Neue Tabelle? → auch in `BackupService._restoredTables` eintragen (`backup.md`).
@@ -28,6 +28,7 @@ Fremdschlüsseln neu aufbauen würde), audioUrl, audioMimeType, audioSizeBytes, 
 | `playlist_items` ✅ (v4) | PK (playlistId, episodeId), beide FK mit CASCADE, position (aufsteigend, neu = max + 1), addedAt |
 | `chapters` ✅ (v6) | PK (episodeId, startMs), FK CASCADE, title, url, imageUrl. Quellen: `playback.md` |
 | `episode_notes` ✅ (v13) | episodeId (PK, FK → episodes, CASCADE), notes. Shownotes **getrennt von `episodes`**, damit Folgenlisten sie nicht in den Arbeitsspeicher laden; gelesen nur beim Anzeigen (`episodeNotesProvider`, autoDispose). Format: Text mit Zeilenumbrüchen und „• " für Aufzählungen, Links als `\uE000Text\uE001URL\uE002` (nur http/https), max. **18000** Zeichen inkl. URLs (Benutzerwunsch 2026-10-03, vorher 6000; nur beim Anzeigen im Speicher), Links werden beim Kürzen nie zerteilt (`htmlToNotes`/`parseNotes` in `lib/core/text_utils.dart`). Beim Feed-Refresh neu geschrieben; Folge ohne Shownotes → Zeile gelöscht. Die Abos-Suche sucht auch hier. |
+| `play_history` ✅ (v19) | id, feedUrl, guid, episodeTitle, podcastTitle, imageUrl, durationMs, playedAt. Abspielverlauf, max. 100 neueste; **ohne FK**, damit Einträge das Abo-Kündigen überleben; eindeutig über feedUrl + guid (`playback.md`) |
 | `bookmarks` ✅ (v6) | id, episodeId (FK CASCADE), positionMs, note (null = keine), createdAt |
 | `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb`, `player.activePlaylistId`, `player.showTotalTime` (`true` = Gesamtlänge statt Restzeit, fehlt = Restzeit), `player.speed` (Abspieltempo, fehlt = 1,0), `downloads.limitBytes`, `ui.themeMode`, `ui.language` (`de`/`en`, fehlt = noch nicht gewählt), `ui.appColor` (`AppColor`-Name, fehlt = wallpaper, ohne Wallpaper-Farben orange) |
 | ~~`player_state`~~ | entfällt – letzte Folge und aktive Playlist stehen in `settings` |

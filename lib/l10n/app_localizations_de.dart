@@ -697,6 +697,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookmarksEmpty => 'Keine Lesezeichen';
 
   @override
+  String get history => 'Abspielverlauf';
+
+  @override
+  String get historySubtitle => 'Die letzten 100 zu Ende gehörten Folgen';
+
+  @override
+  String get historyEmpty => 'Noch keine Folge zu Ende gehört';
+
+  @override
+  String get historyEmptyHint =>
+      'Hier erscheinen Folgen, sobald sie bis zum Ende abgespielt wurden.';
+
+  @override
+  String get historyClear => 'Verlauf löschen';
+
+  @override
+  String get historyClearConfirm =>
+      'Den ganzen Abspielverlauf löschen? Folgen und Hörstände bleiben erhalten.';
+
+  @override
+  String get historyClearAction => 'Löschen';
+
+  @override
+  String get historyEpisodeGone => 'Diese Folge ist nicht mehr in deinen Abos.';
+
+  @override
   String get bookmarksEmptyHint => 'Im Player auf „Lesezeichen setzen“ tippen.';
 
   @override

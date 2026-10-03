@@ -146,7 +146,7 @@ zeigt dann „Orange"). Die Hintergrundbild-Farbe wird in `main.dart` vor dem er
 Abschnitt „Info" (ganz unten): „Über die App" → Info-Seite (`info_screen.dart`): App-Symbol, Name, **Version + Build
 automatisch von Android** (Kanal `aurallisten/app`, kommt beim Bauen aus `pubspec.yaml`), „Entwickelt von Artem A.",
 Links Datenschutzerklärung und „Quellcode auf GitHub" (öffnen den Browser). **Kein Zahlungslink in der App** –
-freiwillige Unterstützung (PayPal) steht auf GitHub (README „Unterstützen", Sponsor-Knopf via `.github/FUNDING.yml`). Abschnitt „Hören": Lesezeichen (alle), „Hintergrund-Wiedergabe" (Akku-Status, → `playback.md`). Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
+freiwillige Unterstützung (PayPal) steht auf GitHub (README „Unterstützen", Sponsor-Knopf via `.github/FUNDING.yml`). Abschnitt „Hören": Lesezeichen (alle), **„Abspielverlauf"** (`playback.md`), „Hintergrund-Wiedergabe" (Akku-Status, → `playback.md`). Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
 Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wiederherstellen (`backup.md`).
 
 ## Infoboxen (SnackBars)

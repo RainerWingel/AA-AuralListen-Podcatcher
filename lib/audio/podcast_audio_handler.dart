@@ -29,6 +29,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     this._playlists,
     this._checkStream,
     this._deleteDownload,
+    this._onFinished,
     this.stopAfterPause = const Duration(minutes: 10),
     this.stallCheckInterval = const Duration(seconds: 10),
     this.recoveryRetryDelay = const Duration(seconds: 15),
@@ -65,6 +66,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Deletes a broken download (DownloadService.delete).
   final Future<void> Function(int episodeId)? _deleteDownload;
+
+  /// Called when an episode was played to the end ("Abspielverlauf").
+  final Future<void> Function(int episodeId)? _onFinished;
 
   static const rewindInterval = Duration(seconds: 15);
   static const fastForwardInterval = Duration(seconds: 30);
@@ -838,6 +842,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       if (id != null && !_markedPlayed) {
         _markedPlayed = true;
         await _playback.markFinished(id, playlistId: _activePlaylistId);
+        await _onFinished?.call(id);
       }
       await stop();
       if (sleepAtEnd) {

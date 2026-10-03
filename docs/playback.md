@@ -235,3 +235,14 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
 - Langes Drücken bearbeitet die Notiz, Papierkorb löscht (Infobox).
 - Lesezeichen bleiben erhalten, wenn die Audiodatei per Eviction gelöscht wurde (dann wird gestreamt); beim Abo-Kündigen
   werden sie mit den Folgen gelöscht.
+
+## Abspielverlauf (Benutzerwunsch 2026-10-03)
+- Optionen → „Abspielverlauf" (`/einstellungen/verlauf`, `lib/features/history/history_screen.dart`): alle Folgen, die
+  **bis zum Ende** gelaufen sind (Dateiende bzw. letztes Kapitel übersprungen – nicht manuelles „Als gespielt
+  markieren"), neueste zuerst: Cover, Titel, Podcast, Datum + Uhrzeit.
+- Höchstens die **100** neuesten (`HistoryRepository.maxEntries`); dieselbe Folge erneut zu Ende gehört → ihr Eintrag
+  rutscht nach oben (Schlüssel Feed-Adresse + guid), kein Duplikat.
+- Eigene Tabelle `play_history` mit einer **Kopie** der Anzeigedaten, ohne Fremdschlüssel: **Abo kündigen löscht nichts**
+  daraus. Tippen spielt die Folge, solange sie (noch oder wieder) abonniert ist, sonst Infobox „Diese Folge ist nicht
+  mehr in deinen Abos.". Papierkorb oben → „Verlauf löschen" mit Rückfrage.
+- Eingetragen vom Player über den Rückruf `onFinished` (`main.dart` → `HistoryRepository.addFinished`).

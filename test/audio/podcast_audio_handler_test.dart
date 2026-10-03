@@ -108,6 +108,25 @@ void main() {
     expect(engine.loadedUri, Uri.file('/data/episodes/$episodeId.mp3'));
   });
 
+  test('only an episode played to the end goes into the history', () async {
+    final finished = <int>[];
+    await handler.dispose();
+    engine = FakePlayerEngine();
+    handler = PodcastAudioHandler(
+      engine: engine,
+      playback: PlaybackRepository(db, () => now),
+      settings: settings,
+      onFinished: (id) async => finished.add(id),
+    );
+    await handler.playEpisode(episodeId);
+    await handler.pause();
+    expect(finished, isEmpty);
+    await handler.play();
+    engine.complete();
+    await pumpEventQueue();
+    expect(finished, [episodeId]);
+  });
+
   test('stores the duration reported by the player', () async {
     await handler.playEpisode(episodeId);
     expect(

@@ -20,7 +20,8 @@ deinem Gerät.
 
 ## Was die App auf deinem Gerät speichert
 
-- Abonnierte Podcasts, Folgenlisten, Hörpositionen, Playlists, Lesezeichen und Einstellungen – in einer Datenbank
+- Abonnierte Podcasts, Folgenlisten, Hörpositionen, Playlists, Lesezeichen, der Abspielverlauf (die letzten 100 zu
+  Ende gehörten Folgen, in den Optionen löschbar) und Einstellungen – in einer Datenbank
   im privaten Speicher der App.
 - Heruntergeladene Folgen und zwischengespeicherte Cover-Bilder – ebenfalls im privaten Speicher der App.
 

@@ -695,6 +695,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarksEmpty => 'No bookmarks';
 
   @override
+  String get history => 'Playback history';
+
+  @override
+  String get historySubtitle => 'The last 100 episodes played to the end';
+
+  @override
+  String get historyEmpty => 'No episode played to the end yet';
+
+  @override
+  String get historyEmptyHint =>
+      'Episodes show up here once they have been played to the end.';
+
+  @override
+  String get historyClear => 'Clear history';
+
+  @override
+  String get historyClearConfirm =>
+      'Clear the whole playback history? Episodes and listening positions stay.';
+
+  @override
+  String get historyClearAction => 'Clear';
+
+  @override
+  String get historyEpisodeGone =>
+      'This episode is no longer in your subscriptions.';
+
+  @override
   String get bookmarksEmptyHint => 'Tap “Add bookmark” in the player.';
 
   @override

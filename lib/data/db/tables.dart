@@ -233,3 +233,20 @@ class Bookmarks extends Table {
   TextColumn get note => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 }
+
+/// Episodes played to the end, newest first, at most
+/// [HistoryRepository.maxEntries] (schema v19, docs/data-model.md). A copy of
+/// the shown data without a foreign key: entries stay when a subscription
+/// ends (user wish 2026-10-03). Identified by feed address + guid, so a
+/// replay moves the entry up instead of adding a second one.
+@DataClassName('HistoryEntry')
+class PlayHistory extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get feedUrl => text()();
+  TextColumn get guid => text()();
+  TextColumn get episodeTitle => text()();
+  TextColumn get podcastTitle => text()();
+  TextColumn get imageUrl => text().nullable()();
+  IntColumn get durationMs => integer().nullable()();
+  DateTimeColumn get playedAt => dateTime()();
+}

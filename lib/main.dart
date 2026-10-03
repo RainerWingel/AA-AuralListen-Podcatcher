@@ -12,6 +12,7 @@ import 'audio/podcast_audio_handler.dart';
 import 'audio/stream_check.dart';
 import 'core/app_language.dart';
 import 'data/db/app_database.dart';
+import 'data/history_repository.dart';
 import 'data/playback_repository.dart';
 import 'data/playlist_repository.dart';
 import 'data/providers.dart';
@@ -52,6 +53,7 @@ Future<void> main() async {
           checkStream(container.read(httpClientProvider), uri),
       deleteDownload: (id) =>
           container.read(downloadServiceProvider).delete(id),
+      onFinished: HistoryRepository(db, DateTime.now).addFinished,
     ),
     // Reuse the bounded cover cache instead of a second, separate image cache.
     cacheManager: CoverCacheManager.instance,

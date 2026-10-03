@@ -76,6 +76,7 @@ class BackupService {
     _db.playlists,
     _db.playlistItems,
     _db.settings,
+    _db.playHistory,
   ];
 
   // ------------------------------------------------------------------ backup

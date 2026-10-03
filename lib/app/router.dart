@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/bookmarks/bookmarks_screen.dart';
 import '../features/downloads/downloads_screen.dart';
 import '../features/episodes/home_screen.dart';
+import '../features/history/history_screen.dart';
 import '../features/player/player_screen.dart';
 import '../features/playlists/playlist_screen.dart';
 import '../features/playlists/playlists_screen.dart';
@@ -88,6 +89,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'lesezeichen',
                     builder: (context, state) => const BookmarksScreen(),
+                  ),
+                  GoRoute(
+                    path: 'verlauf',
+                    builder: (context, state) => const HistoryScreen(),
                   ),
                   GoRoute(
                     path: 'info',

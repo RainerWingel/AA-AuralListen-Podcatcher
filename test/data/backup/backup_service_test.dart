@@ -56,6 +56,17 @@ void main() {
           ),
         );
     await db
+        .into(db.playHistory)
+        .insert(
+          PlayHistoryCompanion.insert(
+            feedUrl: 'https://example.com/$title',
+            guid: 'g',
+            episodeTitle: 'Verlauf',
+            podcastTitle: title,
+            playedAt: now,
+          ),
+        );
+    await db
         .into(db.episodeNotes)
         .insert(
           EpisodeNotesCompanion.insert(
@@ -142,6 +153,10 @@ void main() {
     expect(
       (await target.select(target.episodeNotes).getSingle()).notes,
       'Shownotes',
+    );
+    expect(
+      (await target.select(target.playHistory).getSingle()).episodeTitle,
+      'Verlauf',
     );
     expect(await target.select(target.playlistItems).get(), hasLength(1));
     expect((await target.select(target.settings).getSingle()).value, '6');

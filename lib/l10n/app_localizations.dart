@@ -1238,6 +1238,54 @@ abstract class AppLocalizations {
   /// **'Keine Lesezeichen'**
   String get bookmarksEmpty;
 
+  /// No description provided for @history.
+  ///
+  /// In de, this message translates to:
+  /// **'Abspielverlauf'**
+  String get history;
+
+  /// No description provided for @historySubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Die letzten 100 zu Ende gehörten Folgen'**
+  String get historySubtitle;
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Folge zu Ende gehört'**
+  String get historyEmpty;
+
+  /// No description provided for @historyEmptyHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Hier erscheinen Folgen, sobald sie bis zum Ende abgespielt wurden.'**
+  String get historyEmptyHint;
+
+  /// No description provided for @historyClear.
+  ///
+  /// In de, this message translates to:
+  /// **'Verlauf löschen'**
+  String get historyClear;
+
+  /// No description provided for @historyClearConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'Den ganzen Abspielverlauf löschen? Folgen und Hörstände bleiben erhalten.'**
+  String get historyClearConfirm;
+
+  /// No description provided for @historyClearAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Löschen'**
+  String get historyClearAction;
+
+  /// No description provided for @historyEpisodeGone.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Folge ist nicht mehr in deinen Abos.'**
+  String get historyEpisodeGone;
+
   /// No description provided for @bookmarksEmptyHint.
   ///
   /// In de, this message translates to:

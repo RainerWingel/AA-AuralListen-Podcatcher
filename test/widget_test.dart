@@ -2156,6 +2156,48 @@ void main() {
   );
 
   testWidgets(
+    'Optionen → Abspielverlauf lists played episodes, tap plays again',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      await tester.ensureVisible(find.text('Abspielverlauf'));
+      await tester.tap(find.text('Abspielverlauf'));
+      await settle(tester);
+      expect(find.text('Noch keine Folge zu Ende gehört'), findsOneWidget);
+
+      final episode = await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      );
+      await tester.runAsync(
+        () =>
+            container.read(historyRepositoryProvider).addFinished(episode!.id),
+      );
+      await settle(tester);
+      expect(find.text('Erste Folge'), findsOneWidget);
+
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      expect(handler.currentEpisodeId, episode!.id);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'podcast page menu: play all unplayed episodes',
     timeout: timeout,
     (tester) async {

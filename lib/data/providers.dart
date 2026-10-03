@@ -17,6 +17,7 @@ import 'chapters/chapter_service.dart';
 import 'db/app_database.dart';
 import 'directory/directory_search.dart';
 import 'feed/feed_fetcher.dart';
+import 'history_repository.dart';
 import 'opml_importer.dart';
 import 'playback_repository.dart';
 import 'playlist_repository.dart';
@@ -248,6 +249,16 @@ final chaptersProvider = StreamProvider.autoDispose.family<List<Chapter>, int>((
   unawaited(service.ensureLoaded(episodeId));
   return service.watch(episodeId);
 });
+
+final historyRepositoryProvider = Provider<HistoryRepository>(
+  (ref) =>
+      HistoryRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+);
+
+/// "Abspielverlauf", newest first.
+final playHistoryProvider = StreamProvider.autoDispose<List<HistoryEntry>>(
+  (ref) => ref.watch(historyRepositoryProvider).watchAll(),
+);
 
 final bookmarkRepositoryProvider = Provider<BookmarkRepository>(
   (ref) =>

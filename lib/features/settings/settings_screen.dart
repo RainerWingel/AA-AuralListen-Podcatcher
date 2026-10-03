@@ -119,6 +119,12 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l10n.bookmarks),
             onTap: () => context.go(Routes.bookmarks),
           ),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: Text(l10n.history),
+            subtitle: Text(l10n.historySubtitle),
+            onTap: () => context.go(Routes.history),
+          ),
           const _BackgroundPlaybackTile(),
           _SectionHeader(l10n.settingsSectionSubscriptions),
           ListTile(
