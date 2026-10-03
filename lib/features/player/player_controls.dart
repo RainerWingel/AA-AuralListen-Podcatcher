@@ -24,12 +24,21 @@ class PlayPauseButton extends ConsumerWidget {
         (state.processingState == AudioProcessingState.loading ||
             state.processingState == AudioProcessingState.buffering);
 
+    // The button sizes itself by its content: the spinner sits in a box as
+    // big as the icon, so the button keeps its size while loading.
     final icon = busy
         ? SizedBox.square(
-            dimension: size * 0.7,
-            child: CircularProgressIndicator(
-              strokeWidth: 2.5,
-              color: filled ? Theme.of(context).colorScheme.onPrimary : null,
+            dimension: size,
+            child: Center(
+              child: SizedBox.square(
+                dimension: size * 0.7,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: filled
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : null,
+                ),
+              ),
             ),
           )
         : Icon(playing ? Icons.pause : Icons.play_arrow, size: size);
