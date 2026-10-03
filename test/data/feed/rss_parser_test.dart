@@ -201,4 +201,44 @@ void main() {
 </channel></rss>''');
     expect(feed.newFeedUrl, 'https://neu.example.com/feed');
   });
+
+  group('website and support link', () {
+    ParsedFeed parse(String channelExtra) => parser.parse('''
+<rss version="2.0" xmlns:podcast="https://podcastindex.org/namespace/1.0">
+  <channel>
+    <title>P</title>
+    $channelExtra
+  </channel>
+</rss>''');
+
+    test('reads podcast:funding with its text', () {
+      final feed = parse(
+        '<link>https://example.com/</link>'
+        '<podcast:funding url="https://steadyhq.com/de/p">'
+        '  Unterstütze uns auf Steady </podcast:funding>'
+        '<podcast:funding url="https://paypal.me/p">PayPal</podcast:funding>',
+      );
+      expect(feed.websiteUrl, 'https://example.com/');
+      // The first one wins.
+      expect(feed.fundingUrl, 'https://steadyhq.com/de/p');
+      expect(feed.fundingLabel, 'Unterstütze uns auf Steady');
+    });
+
+    test('only web links are kept', () {
+      final feed = parse(
+        '<link>javascript:alert(1)</link>'
+        '<podcast:funding url="mailto:x@example.com">Mail</podcast:funding>',
+      );
+      expect(feed.websiteUrl, isNull);
+      expect((feed.fundingUrl, feed.fundingLabel), (null, null));
+    });
+
+    test('funding without text has no label', () {
+      final feed = parse('<podcast:funding url="https://ko-fi.com/p"/>');
+      expect(
+        (feed.fundingUrl, feed.fundingLabel),
+        ('https://ko-fi.com/p', null),
+      );
+    });
+  });
 }

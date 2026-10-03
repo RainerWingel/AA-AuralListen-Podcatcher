@@ -85,6 +85,8 @@
   "markUnplayed": "Mark as unplayed",
   "settingsTitle": "Settings",
   "download": "Download",
+  "podcastWebsite": "Website",
+  "podcastSupport": "Support",
   "playlistContinueOffer": "Tap to continue with this playlist's next episode at the end",
   "downloadCancel": "Cancel download",
   "downloadDelete": "Delete download",

@@ -84,6 +84,28 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _fundingUrlMeta = const VerificationMeta(
+    'fundingUrl',
+  );
+  @override
+  late final GeneratedColumn<String> fundingUrl = GeneratedColumn<String>(
+    'funding_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _fundingLabelMeta = const VerificationMeta(
+    'fundingLabel',
+  );
+  @override
+  late final GeneratedColumn<String> fundingLabel = GeneratedColumn<String>(
+    'funding_label',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _etagMeta = const VerificationMeta('etag');
   @override
   late final GeneratedColumn<String> etag = GeneratedColumn<String>(
@@ -284,6 +306,8 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     description,
     imageUrl,
     websiteUrl,
+    fundingUrl,
+    fundingLabel,
     etag,
     lastModified,
     lastRefreshAt,
@@ -357,6 +381,21 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
       context.handle(
         _websiteUrlMeta,
         websiteUrl.isAcceptableOrUnknown(data['website_url']!, _websiteUrlMeta),
+      );
+    }
+    if (data.containsKey('funding_url')) {
+      context.handle(
+        _fundingUrlMeta,
+        fundingUrl.isAcceptableOrUnknown(data['funding_url']!, _fundingUrlMeta),
+      );
+    }
+    if (data.containsKey('funding_label')) {
+      context.handle(
+        _fundingLabelMeta,
+        fundingLabel.isAcceptableOrUnknown(
+          data['funding_label']!,
+          _fundingLabelMeta,
+        ),
       );
     }
     if (data.containsKey('etag')) {
@@ -524,6 +563,14 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         DriftSqlType.string,
         data['${effectivePrefix}website_url'],
       ),
+      fundingUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}funding_url'],
+      ),
+      fundingLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}funding_label'],
+      ),
       etag: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}etag'],
@@ -612,6 +659,10 @@ class Podcast extends DataClass implements Insertable<Podcast> {
   final String? description;
   final String? imageUrl;
   final String? websiteUrl;
+
+  /// "Support" link from `podcast:funding` and its text (v17).
+  final String? fundingUrl;
+  final String? fundingLabel;
   final String? etag;
   final String? lastModified;
   final DateTime? lastRefreshAt;
@@ -657,6 +708,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     this.description,
     this.imageUrl,
     this.websiteUrl,
+    this.fundingUrl,
+    this.fundingLabel,
     this.etag,
     this.lastModified,
     this.lastRefreshAt,
@@ -691,6 +744,12 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     }
     if (!nullToAbsent || websiteUrl != null) {
       map['website_url'] = Variable<String>(websiteUrl);
+    }
+    if (!nullToAbsent || fundingUrl != null) {
+      map['funding_url'] = Variable<String>(fundingUrl);
+    }
+    if (!nullToAbsent || fundingLabel != null) {
+      map['funding_label'] = Variable<String>(fundingLabel);
     }
     if (!nullToAbsent || etag != null) {
       map['etag'] = Variable<String>(etag);
@@ -748,6 +807,12 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       websiteUrl: websiteUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(websiteUrl),
+      fundingUrl: fundingUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fundingUrl),
+      fundingLabel: fundingLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fundingLabel),
       etag: etag == null && nullToAbsent ? const Value.absent() : Value(etag),
       lastModified: lastModified == null && nullToAbsent
           ? const Value.absent()
@@ -794,6 +859,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       description: serializer.fromJson<String?>(json['description']),
       imageUrl: serializer.fromJson<String?>(json['imageUrl']),
       websiteUrl: serializer.fromJson<String?>(json['websiteUrl']),
+      fundingUrl: serializer.fromJson<String?>(json['fundingUrl']),
+      fundingLabel: serializer.fromJson<String?>(json['fundingLabel']),
       etag: serializer.fromJson<String?>(json['etag']),
       lastModified: serializer.fromJson<String?>(json['lastModified']),
       lastRefreshAt: serializer.fromJson<DateTime?>(json['lastRefreshAt']),
@@ -831,6 +898,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       'description': serializer.toJson<String?>(description),
       'imageUrl': serializer.toJson<String?>(imageUrl),
       'websiteUrl': serializer.toJson<String?>(websiteUrl),
+      'fundingUrl': serializer.toJson<String?>(fundingUrl),
+      'fundingLabel': serializer.toJson<String?>(fundingLabel),
       'etag': serializer.toJson<String?>(etag),
       'lastModified': serializer.toJson<String?>(lastModified),
       'lastRefreshAt': serializer.toJson<DateTime?>(lastRefreshAt),
@@ -862,6 +931,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     Value<String?> description = const Value.absent(),
     Value<String?> imageUrl = const Value.absent(),
     Value<String?> websiteUrl = const Value.absent(),
+    Value<String?> fundingUrl = const Value.absent(),
+    Value<String?> fundingLabel = const Value.absent(),
     Value<String?> etag = const Value.absent(),
     Value<String?> lastModified = const Value.absent(),
     Value<DateTime?> lastRefreshAt = const Value.absent(),
@@ -886,6 +957,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     description: description.present ? description.value : this.description,
     imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
     websiteUrl: websiteUrl.present ? websiteUrl.value : this.websiteUrl,
+    fundingUrl: fundingUrl.present ? fundingUrl.value : this.fundingUrl,
+    fundingLabel: fundingLabel.present ? fundingLabel.value : this.fundingLabel,
     etag: etag.present ? etag.value : this.etag,
     lastModified: lastModified.present ? lastModified.value : this.lastModified,
     lastRefreshAt: lastRefreshAt.present
@@ -925,6 +998,12 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       websiteUrl: data.websiteUrl.present
           ? data.websiteUrl.value
           : this.websiteUrl,
+      fundingUrl: data.fundingUrl.present
+          ? data.fundingUrl.value
+          : this.fundingUrl,
+      fundingLabel: data.fundingLabel.present
+          ? data.fundingLabel.value
+          : this.fundingLabel,
       etag: data.etag.present ? data.etag.value : this.etag,
       lastModified: data.lastModified.present
           ? data.lastModified.value
@@ -980,6 +1059,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ..write('description: $description, ')
           ..write('imageUrl: $imageUrl, ')
           ..write('websiteUrl: $websiteUrl, ')
+          ..write('fundingUrl: $fundingUrl, ')
+          ..write('fundingLabel: $fundingLabel, ')
           ..write('etag: $etag, ')
           ..write('lastModified: $lastModified, ')
           ..write('lastRefreshAt: $lastRefreshAt, ')
@@ -1009,6 +1090,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     description,
     imageUrl,
     websiteUrl,
+    fundingUrl,
+    fundingLabel,
     etag,
     lastModified,
     lastRefreshAt,
@@ -1037,6 +1120,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           other.description == this.description &&
           other.imageUrl == this.imageUrl &&
           other.websiteUrl == this.websiteUrl &&
+          other.fundingUrl == this.fundingUrl &&
+          other.fundingLabel == this.fundingLabel &&
           other.etag == this.etag &&
           other.lastModified == this.lastModified &&
           other.lastRefreshAt == this.lastRefreshAt &&
@@ -1063,6 +1148,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
   final Value<String?> description;
   final Value<String?> imageUrl;
   final Value<String?> websiteUrl;
+  final Value<String?> fundingUrl;
+  final Value<String?> fundingLabel;
   final Value<String?> etag;
   final Value<String?> lastModified;
   final Value<DateTime?> lastRefreshAt;
@@ -1087,6 +1174,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.description = const Value.absent(),
     this.imageUrl = const Value.absent(),
     this.websiteUrl = const Value.absent(),
+    this.fundingUrl = const Value.absent(),
+    this.fundingLabel = const Value.absent(),
     this.etag = const Value.absent(),
     this.lastModified = const Value.absent(),
     this.lastRefreshAt = const Value.absent(),
@@ -1112,6 +1201,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.description = const Value.absent(),
     this.imageUrl = const Value.absent(),
     this.websiteUrl = const Value.absent(),
+    this.fundingUrl = const Value.absent(),
+    this.fundingLabel = const Value.absent(),
     this.etag = const Value.absent(),
     this.lastModified = const Value.absent(),
     this.lastRefreshAt = const Value.absent(),
@@ -1139,6 +1230,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Expression<String>? description,
     Expression<String>? imageUrl,
     Expression<String>? websiteUrl,
+    Expression<String>? fundingUrl,
+    Expression<String>? fundingLabel,
     Expression<String>? etag,
     Expression<String>? lastModified,
     Expression<DateTime>? lastRefreshAt,
@@ -1164,6 +1257,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       if (description != null) 'description': description,
       if (imageUrl != null) 'image_url': imageUrl,
       if (websiteUrl != null) 'website_url': websiteUrl,
+      if (fundingUrl != null) 'funding_url': fundingUrl,
+      if (fundingLabel != null) 'funding_label': fundingLabel,
       if (etag != null) 'etag': etag,
       if (lastModified != null) 'last_modified': lastModified,
       if (lastRefreshAt != null) 'last_refresh_at': lastRefreshAt,
@@ -1194,6 +1289,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Value<String?>? description,
     Value<String?>? imageUrl,
     Value<String?>? websiteUrl,
+    Value<String?>? fundingUrl,
+    Value<String?>? fundingLabel,
     Value<String?>? etag,
     Value<String?>? lastModified,
     Value<DateTime?>? lastRefreshAt,
@@ -1219,6 +1316,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
       websiteUrl: websiteUrl ?? this.websiteUrl,
+      fundingUrl: fundingUrl ?? this.fundingUrl,
+      fundingLabel: fundingLabel ?? this.fundingLabel,
       etag: etag ?? this.etag,
       lastModified: lastModified ?? this.lastModified,
       lastRefreshAt: lastRefreshAt ?? this.lastRefreshAt,
@@ -1262,6 +1361,12 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     }
     if (websiteUrl.present) {
       map['website_url'] = Variable<String>(websiteUrl.value);
+    }
+    if (fundingUrl.present) {
+      map['funding_url'] = Variable<String>(fundingUrl.value);
+    }
+    if (fundingLabel.present) {
+      map['funding_label'] = Variable<String>(fundingLabel.value);
     }
     if (etag.present) {
       map['etag'] = Variable<String>(etag.value);
@@ -1328,6 +1433,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           ..write('description: $description, ')
           ..write('imageUrl: $imageUrl, ')
           ..write('websiteUrl: $websiteUrl, ')
+          ..write('fundingUrl: $fundingUrl, ')
+          ..write('fundingLabel: $fundingLabel, ')
           ..write('etag: $etag, ')
           ..write('lastModified: $lastModified, ')
           ..write('lastRefreshAt: $lastRefreshAt, ')
@@ -4841,6 +4948,8 @@ typedef $$PodcastsTableCreateCompanionBuilder = PodcastsCompanion Function({
   Value<String?> description,
   Value<String?> imageUrl,
   Value<String?> websiteUrl,
+  Value<String?> fundingUrl,
+  Value<String?> fundingLabel,
   Value<String?> etag,
   Value<String?> lastModified,
   Value<DateTime?> lastRefreshAt,
@@ -4866,6 +4975,8 @@ typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<String?> description,
   Value<String?> imageUrl,
   Value<String?> websiteUrl,
+  Value<String?> fundingUrl,
+  Value<String?> fundingLabel,
   Value<String?> etag,
   Value<String?> lastModified,
   Value<DateTime?> lastRefreshAt,
@@ -4949,6 +5060,16 @@ class $$PodcastsTableFilterComposer
 
   ColumnFilters<String> get websiteUrl => $composableBuilder(
     column: $table.websiteUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fundingUrl => $composableBuilder(
+    column: $table.fundingUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fundingLabel => $composableBuilder(
+    column: $table.fundingLabel,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5103,6 +5224,16 @@ class $$PodcastsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get fundingUrl => $composableBuilder(
+    column: $table.fundingUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fundingLabel => $composableBuilder(
+    column: $table.fundingLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get etag => $composableBuilder(
     column: $table.etag,
     builder: (column) => ColumnOrderings(column),
@@ -5215,6 +5346,16 @@ class $$PodcastsTableAnnotationComposer
 
   GeneratedColumn<String> get websiteUrl => $composableBuilder(
     column: $table.websiteUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get fundingUrl => $composableBuilder(
+    column: $table.fundingUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get fundingLabel => $composableBuilder(
+    column: $table.fundingLabel,
     builder: (column) => column,
   );
 
@@ -5354,6 +5495,8 @@ class $$PodcastsTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<String?> imageUrl = const Value.absent(),
                 Value<String?> websiteUrl = const Value.absent(),
+                Value<String?> fundingUrl = const Value.absent(),
+                Value<String?> fundingLabel = const Value.absent(),
                 Value<String?> etag = const Value.absent(),
                 Value<String?> lastModified = const Value.absent(),
                 Value<DateTime?> lastRefreshAt = const Value.absent(),
@@ -5378,6 +5521,8 @@ class $$PodcastsTableTableManager
                 description: description,
                 imageUrl: imageUrl,
                 websiteUrl: websiteUrl,
+                fundingUrl: fundingUrl,
+                fundingLabel: fundingLabel,
                 etag: etag,
                 lastModified: lastModified,
                 lastRefreshAt: lastRefreshAt,
@@ -5404,6 +5549,8 @@ class $$PodcastsTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<String?> imageUrl = const Value.absent(),
                 Value<String?> websiteUrl = const Value.absent(),
+                Value<String?> fundingUrl = const Value.absent(),
+                Value<String?> fundingLabel = const Value.absent(),
                 Value<String?> etag = const Value.absent(),
                 Value<String?> lastModified = const Value.absent(),
                 Value<DateTime?> lastRefreshAt = const Value.absent(),
@@ -5428,6 +5575,8 @@ class $$PodcastsTableTableManager
                 description: description,
                 imageUrl: imageUrl,
                 websiteUrl: websiteUrl,
+                fundingUrl: fundingUrl,
+                fundingLabel: fundingLabel,
                 etag: etag,
                 lastModified: lastModified,
                 lastRefreshAt: lastRefreshAt,

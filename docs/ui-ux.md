@@ -20,7 +20,10 @@ Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-3
 
 ## Navigation (untere Leiste)
 1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh
-2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen.
+2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen. Im Kopf des
+   Podcast-Details unter der Beschreibung (falls im Feed) antippbare Links: 🌐 Website (angezeigt als Host ohne „www.",
+   z. B. „freakshow.fm") und ♡ Unterstützen (Text aus `podcast:funding`, sonst „Unterstützen"); öffnen im Browser
+   (Benutzerwunsch 2026-10-03).
    Rotes Zahlen-Abzeichen oben rechts = ungespielte Folgen (neu + angefangen), ab 100 „99+", bei 0 keins
    (`watchUnplayedCounts`: eine gruppierte Abfrage für alle Abos). Feed-Fehler: rotes Symbol oben links.
 3. **Playlists** – Liste der Playlists → Inhalt mit Drag & Drop

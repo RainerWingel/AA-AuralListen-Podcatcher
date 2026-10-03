@@ -109,6 +109,9 @@ final RegExp _storedLink = RegExp(
 final RegExp _bareUrl = RegExp(r'''https?://[^\s<>"' ]+''');
 final RegExp _trailingPunctuation = RegExp(r'[.,;:!?)\]]+$');
 
+/// True for an absolute http(s) address – the only links the app opens.
+bool isWebUrl(String url) => _isWebUrl(url);
+
 bool _isWebUrl(String url) {
   final uri = Uri.tryParse(url);
   return uri != null &&

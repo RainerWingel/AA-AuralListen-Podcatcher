@@ -13,6 +13,8 @@ class ParsedFeed {
     this.description,
     this.imageUrl,
     this.websiteUrl,
+    this.fundingUrl,
+    this.fundingLabel,
     this.newFeedUrl,
   });
 
@@ -21,6 +23,11 @@ class ParsedFeed {
   final String? description;
   final String? imageUrl;
   final String? websiteUrl;
+
+  /// First `podcast:funding` link (http/https only) and its text, e.g.
+  /// "Unterstütze uns auf Steady".
+  final String? fundingUrl;
+  final String? fundingLabel;
 
   /// Announced new address of the feed (`<itunes:new-feed-url>`), set by the
   /// publisher when the podcast moves to another host.
@@ -133,6 +140,11 @@ class RssParser {
         _text(channel.getElement('description')) ??
         _text(_ns(channel, _Ns.itunes, 'summary'));
 
+    final funding = _ns(channel, _Ns.podcast, 'funding');
+    final fundingUrl = _attr(funding, 'url');
+    final hasFunding = fundingUrl != null && isWebUrl(fundingUrl);
+    final website = _text(channel.getElement('link'));
+
     return ParsedFeed(
       title: title,
       author: _text(_ns(channel, _Ns.itunes, 'author')),
@@ -140,7 +152,14 @@ class RssParser {
       imageUrl:
           _attr(_ns(channel, _Ns.itunes, 'image'), 'href') ??
           _text(channel.getElement('image')?.getElement('url')),
-      websiteUrl: _text(channel.getElement('link')),
+      websiteUrl: website != null && isWebUrl(website) ? website : null,
+      fundingUrl: hasFunding ? fundingUrl : null,
+      fundingLabel: hasFunding
+          ? switch (_text(funding)) {
+              final label? => cleanTitle(label),
+              null => null,
+            }
+          : null,
       newFeedUrl: _text(_ns(channel, _Ns.itunes, 'new-feed-url')),
       episodes: episodes,
     );

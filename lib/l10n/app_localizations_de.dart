@@ -319,6 +319,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get download => 'Herunterladen';
 
   @override
+  String get podcastWebsite => 'Website';
+
+  @override
+  String get podcastSupport => 'Unterstützen';
+
+  @override
   String get playlistContinueOffer =>
       'Antippen: am Ende mit der nächsten Folge dieser Playlist weitermachen';
 

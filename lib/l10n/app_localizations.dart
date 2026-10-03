@@ -608,6 +608,18 @@ abstract class AppLocalizations {
   /// **'Herunterladen'**
   String get download;
 
+  /// No description provided for @podcastWebsite.
+  ///
+  /// In de, this message translates to:
+  /// **'Website'**
+  String get podcastWebsite;
+
+  /// No description provided for @podcastSupport.
+  ///
+  /// In de, this message translates to:
+  /// **'Unterstützen'**
+  String get podcastSupport;
+
   /// No description provided for @playlistContinueOffer.
   ///
   /// In de, this message translates to:

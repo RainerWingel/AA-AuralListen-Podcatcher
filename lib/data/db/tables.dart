@@ -24,6 +24,10 @@ class Podcasts extends Table {
   TextColumn get imageUrl => text().nullable()();
   TextColumn get websiteUrl => text().nullable()();
 
+  /// "Support" link from `podcast:funding` and its text (v17).
+  TextColumn get fundingUrl => text().nullable()();
+  TextColumn get fundingLabel => text().nullable()();
+
   // HTTP caching for conditional GET.
   TextColumn get etag => text().nullable()();
   TextColumn get lastModified => text().nullable()();

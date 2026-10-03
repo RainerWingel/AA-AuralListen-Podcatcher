@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
+import '../../core/app_platform.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
@@ -178,8 +180,57 @@ class _Header extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
             ),
           ],
+          if (podcast.websiteUrl != null || podcast.fundingUrl != null) ...[
+            const SizedBox(height: 4),
+            _PodcastLinks(podcast: podcast),
+          ],
         ],
       ),
+    );
+  }
+}
+
+/// Website and "support" link (`podcast:funding`) from the feed, opened in
+/// the browser (user wish 2026-10-03).
+class _PodcastLinks extends ConsumerWidget {
+  const _PodcastLinks({required this.podcast});
+
+  final Podcast podcast;
+
+  Future<void> _open(BuildContext context, WidgetRef ref, String url) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final failed = AppLocalizations.of(context).infoLinkFailed;
+    if (!await ref.read(appPlatformProvider).openUrl(url)) {
+      showInfoSnackBar(messenger, failed);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    Widget link(IconData icon, String label, String url) => TextButton.icon(
+      onPressed: () => _open(context, ref, url),
+      icon: Icon(icon, size: 18),
+      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+    return Wrap(
+      spacing: 8,
+      children: [
+        if (podcast.websiteUrl case final url?)
+          // The host is more telling than "Website", e.g. "freakshow.fm".
+          link(
+            Icons.language,
+            Uri.tryParse(url)?.host.replaceFirst(RegExp(r'^www\.'), '') ??
+                l10n.podcastWebsite,
+            url,
+          ),
+        if (podcast.fundingUrl case final url?)
+          link(
+            Icons.favorite_outline,
+            podcast.fundingLabel ?? l10n.podcastSupport,
+            url,
+          ),
+      ],
     );
   }
 }

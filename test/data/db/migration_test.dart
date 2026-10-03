@@ -266,4 +266,11 @@ void main() {
     await verifier.migrateAndValidate(db, db.schemaVersion);
     await db.close();
   });
+
+  test('upgrade v16 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(16);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
 }

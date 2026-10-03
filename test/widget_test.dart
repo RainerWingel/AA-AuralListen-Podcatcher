@@ -1937,6 +1937,52 @@ void main() {
   );
 
   testWidgets(
+    'podcast page links to the website and the support page',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      await tester.runAsync(
+        () => db
+            .update(db.podcasts)
+            .write(
+              const PodcastsCompanion(
+                websiteUrl: Value('https://www.example.com/podcast'),
+                fundingUrl: Value('https://steadyhq.com/de/p'),
+                fundingLabel: Value('Unterstütze uns auf Steady'),
+              ),
+            ),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+
+      await tester.tap(find.text('example.com'));
+      await settle(tester);
+      await tester.tap(find.text('Unterstütze uns auf Steady'));
+      await settle(tester);
+      expect(appPlatform.opened, [
+        'https://www.example.com/podcast',
+        'https://steadyhq.com/de/p',
+      ]);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'long press on a subscription plays its unplayed episodes',
     timeout: timeout,
     (tester) async {
