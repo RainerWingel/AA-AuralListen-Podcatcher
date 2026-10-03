@@ -6,7 +6,7 @@ UI (Mini-/Vollbild-Player, EpisodeTile)      Benachrichtigung / Sperrbildschirm 
                  \                                   /
                   PodcastAudioHandler  (lib/audio/podcast_audio_handler.dart)
                   – eine Instanz, erstellt in main() via AudioService.init
-                  – Regeln: Position, 98 %, Fortsetzen, Boost, Pause-Timeout
+                  – Regeln: Position, Gespielt am Ende, Fortsetzen, Boost, Pause-Timeout
                  /                                   \
    PlayerEngine (Interface)                   PlaybackRepository / SettingsRepository (DB)
    └─ JustAudioEngine (just_audio/ExoPlayer)
@@ -135,9 +135,9 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
   (`PodcastAudioHandler.resumeStart`; der Mini-Player zeigt dann 0:00). Ausnahme: nach einer Unterbrechung
   (Netzfehler, Hänger) oder einem Sprung ohne geladenes Audio geht es exakt an der Stelle weiter.
 - Erst ab **15 s** gilt eine Folge als `angefangen` – neu wie erneut abgespielt (`data-model.md` → Episoden-Status).
-- Folge ≥ **98 %** der (vom Player gemeldeten) Dauer → `gespielt`, `playedAt` = jetzt, Position = 0.
-  Danach wird die Position dieser Folge nicht mehr überschrieben.
-- Ende der Datei → `gespielt` (falls noch nicht), Player wird gestoppt. (Ab M5: nächste Playlist-Folge.)
+- **Erst das Ende der Datei** macht eine Folge `gespielt` (`playedAt` = jetzt, Position = 0), Player wird gestoppt, ggf.
+  nächste Playlist-Folge (`playlists.md`). Die frühere **98-%-Regel ist abgeschafft** (Benutzerwunsch 2026-10-03): bis
+  zur letzten Sekunde wird die Position normal gespeichert, die Folge bleibt in ihren Playlists.
 - Eine gespielte Folge erneut abspielen → startet bei 0; ab 15 s ist sie wieder `angefangen` (`playedAt` gelöscht → keine
   Löschung nach 96 h), darunter bleibt sie `gespielt`.
 - Die vom Player gemeldete Dauer wird in `episodes.durationMs` übernommen (genauer als die Feed-Angabe) – **außer** sie

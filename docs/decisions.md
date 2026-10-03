@@ -87,3 +87,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-03 · **Anderswo gestartete Folge: Playlist nur anbieten** (Benutzer) · Ersetzt die Regel vom 2026-09-30
   (Folge in genau einer Playlist galt automatisch als aus ihr gespielt → am Ende startete ungewollt die nächste).
   Jetzt halbtransparente Zeile „Aus Playlist …", aktiv erst nach Antippen; sonst stoppt die Wiedergabe am Ende.
+- 2026-10-03 · **„Gespielt" erst am Dateiende, 98-%-Regel abgeschafft** (Benutzer) · Ersetzt „Gespielt = ≥ 98 %"
+  (2026-09-27). Die Sonderfälle der 98-%-Regel (Folge verließ die Playlists vor dem Ende, Beobachter-Ausnahme,
+  Positions-Nachlesen) entfallen; am Ende: nächste lesen → markieren → stoppen → weiter. Auto-Löschen bleibt 96 h nach
+  „gespielt"; nicht gespielte Folgen werden nie automatisch gelöscht.

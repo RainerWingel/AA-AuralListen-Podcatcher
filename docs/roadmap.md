@@ -33,7 +33,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 
 ## M3 – Player → erste produktiv nutzbare Version
 - [x] `audio_service`-Handler, Benachrichtigung, Sperrbildschirm, Bluetooth
-- [x] Streaming, −15 s / +30 s, Hörposition, 98 %-Regel
+- [x] Streaming, −15 s / +30 s, Hörposition, Gespielt-Regel (bis 2026-10-03 98 %, jetzt Dateiende)
 - [x] Lautstärke-Boost (global + pro Podcast)
 - [x] Mini-Player + Vollbild-Player
 - [x] Folge antippen = abspielen; langes Drücken: Menü (als gespielt / ungespielt markieren)

@@ -70,7 +70,7 @@ schon enthaltene Folgen werden wie immer übersprungen:
 
 ## Abspielverhalten
 - Startet der Benutzer eine Folge **aus einer Playlist**, wird diese Playlist zur **aktiven Playlist**.
-- Erreicht die Folge ≥ 98 % bzw. ihr Ende:
+- Erreicht die Folge ihr **Ende** (Dateiende; keine 98-%-Regel mehr, Benutzerwunsch 2026-10-03):
   1. Folge wird als **gespielt** markiert (`playedAt` gesetzt).
   2. Folge wird **automatisch aus allen Playlists entfernt**, in denen sie steht (nicht nur aus der aktiven).
   3. Die **nächste Folge derselben Playlist startet automatisch**.
@@ -87,19 +87,18 @@ schon enthaltene Folgen werden wie immer übersprungen:
 - **Während der Wiedergabe** beobachtet der Player, in welchen Playlists die laufende Folge steht
   (`watchPlaylistIdsWith`, nur echte Änderungen): Die aktive Playlist bleibt, solange die Folge darin steht; wird sie
   dort entfernt, wird die einzige verbliebene Playlist nur **angeboten**, sonst keine; kommt sie in genau eine Playlist,
-  wird diese angeboten (aktiv erst nach Antippen). Ausnahme: Beim Gespielt-Markieren (98 % / Ende) verlässt sie alle Playlists absichtlich – das wird ignoriert,
-  damit es mit der nächsten Folge weitergeht. Der Beobachter wird beim Folgenwechsel sofort beendet (sonst Wettlauf) und
-  in `dispose` freigegeben.
+  wird diese angeboten (aktiv erst nach Antippen). Der Beobachter wird beim Folgenwechsel und am Ende der Folge (vor dem
+  Gespielt-Markieren, das sie absichtlich aus allen Playlists nimmt) sofort beendet und in `dispose` freigegeben.
 - Überspringt der Benutzer eine Folge manuell („Weiter" ⏭ im Vollbild-Player bzw. in der Benachrichtigung), wird sie
   **nicht** als gespielt markiert und **bleibt** in der Playlist.
 - Auch manuelles „Als gespielt markieren" entfernt die Folge aus allen Playlists (Regel sitzt zentral in `markPlayed`).
 
 ### Umsetzungsdetails
-- Die Folge verschwindet bereits bei **98 %** aus den Playlists (dann wird sie „gespielt"); gestartet wird die nächste
-  aber erst am **Ende** der Datei.
+- Am Ende (`PodcastAudioHandler._complete`) in dieser Reihenfolge: nächste Folge lesen (die laufende steht noch in der
+  Playlist, ihre Position wird frisch gelesen – Umsortieren während der Wiedergabe zählt), Playlist-Beobachter beenden,
+  als gespielt markieren (entfernt sie aus allen Playlists), stoppen, nächste starten.
 - Der Handler merkt sich die **Position** der laufenden Folge in der aktiven Playlist. Die nächste Folge ist der Eintrag
-  mit der kleinsten Position **größer** als diese – gelesen im Moment des Wechsels. Vor dem Entfernen (98 %) wird die
-  Position neu gelesen, falls der Benutzer inzwischen umsortiert hat.
+  mit der kleinsten Position **größer** als diese – gelesen im Moment des Wechsels.
 - Aktive Playlist + Position stehen in `settings['player.activePlaylistId']` (`"<id>:<position>"`) und überleben einen
   App-Neustart. Die Playlist-ID steht auch in `mediaItem.extras['playlistId']` (für den Vollbild-Player), die angebotene
   in `extras['suggestedPlaylistId']` (nur im Speicher; nach Neustart ergibt sie der Playlist-Beobachter neu).

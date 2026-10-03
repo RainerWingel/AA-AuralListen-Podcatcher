@@ -118,7 +118,7 @@
   "episodeNumberDecrease": "Decrease",
   "episodeNumberIncrease": "Increase",
   "autoDeletePlayed": "Delete played episodes",
-  "autoDeletePlayedHint": "96 hours after an episode has been played to 98 %",
+  "autoDeletePlayedHint": "96 hours after an episode has been played to the end",
   "settingsSectionDownloads": "Downloads",
   "downloadLimit": "Storage limit for downloads",
   "downloadLimitHint": "When the limit is reached, played episodes are deleted first. Unplayed episodes are never deleted automatically – nothing new is downloaded instead.",

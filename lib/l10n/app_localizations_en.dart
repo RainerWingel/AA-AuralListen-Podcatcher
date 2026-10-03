@@ -426,7 +426,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get autoDeletePlayedHint =>
-      '96 hours after an episode has been played to 98 %';
+      '96 hours after an episode has been played to the end';
 
   @override
   String get settingsSectionDownloads => 'Downloads';

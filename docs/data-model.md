@@ -39,7 +39,8 @@ Fremdschlüsseln neu aufbauen würde), audioUrl, audioMimeType, audioSizeBytes, 
   `playedAt` unverändert), ab 15 s wird sie `angefangen` (`playedAt` gelöscht).
 - Migration v8 (einmalig): Folgen, die nach der alten Regel schon nach wenigen Sekunden `angefangen` wurden
   (Position < 15 s), sind wieder `neu` mit Position 0. Gilt auch für ältere Backups beim Wiederherstellen.
-- **Gespielt** = Hörposition ≥ **98 %** der Dauer (oder Ende erreicht). `playedAt` wird dabei gesetzt –
+- **Gespielt** = die Datei ist **bis zum Ende** abgelaufen (Benutzerwunsch 2026-10-03; vorher ab 98 %), oder manuell
+  markiert, oder letztes Kapitel übersprungen. `playedAt` wird dabei gesetzt –
   daran hängt die 96-h-Löschregel (`eviction.md`).
 - Manuell „als gespielt / ungespielt markieren" (langes Drücken auf eine Folge). „Ungespielt" → `neu`, Position 0, `playedAt` = null.
 - Podcast → ⋮ → „Als gespielt markieren bis …": alle **ungespielten** Folgen mit `pubDate` bis einschließlich des gewählten

@@ -83,9 +83,6 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Minimum distance between two position writes to the database.
   static const saveInterval = Duration(seconds: 5);
 
-  /// From this share of the duration on, an episode counts as played.
-  static const playedThreshold = 0.98;
-
   /// A long pause releases the player and ends the foreground service.
   final Duration stopAfterPause;
 
@@ -161,7 +158,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   int? _episodeId;
 
   /// Playlist the current episode was started from, and the episode's
-  /// position in it (kept after the episode was removed at 98 %).
+  /// position in it (kept after the episode left it at its end).
   int? _activePlaylistId;
 
   /// Playlist containing the episode although it was started elsewhere:
@@ -541,10 +538,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// contains the episode; otherwise the only playlist containing it is
   /// offered (not active until the user taps it), or none.
   Future<void> _onMembership(int episodeId, Set<int> ids) async {
-    // Played episodes leave all playlists on purpose – the playlist must
-    // still continue with the next one. (The flag stays set after the end
-    // unloads the player; loading the next episode resets it.)
-    if (episodeId != _episodeId || _markedPlayed) return;
+    if (episodeId != _episodeId) return;
     final active = _activePlaylistId;
     if (active != null && ids.contains(active)) return;
     final only = ids.length == 1 ? ids.single : null;
@@ -578,17 +572,6 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         '$playlistId:$position',
       );
     }
-  }
-
-  /// Marks as played (also removes it from all playlists). The playlist
-  /// position is refreshed first, in case the user reordered meanwhile.
-  Future<void> _markPlayed(int episodeId) async {
-    final playlistId = _activePlaylistId;
-    if (playlistId != null) {
-      final position = await _playlists?.positionOf(playlistId, episodeId);
-      if (position != null) _playlistPosition = position;
-    }
-    await _playback.markPlayed(episodeId);
   }
 
   /// Next episode of the active playlist, read from the DB right now.
@@ -777,13 +760,6 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       final skip = chapterSkips.target(id, position);
       if (skip != null) return _skipTo(skip.to, duration);
     }
-    if (duration != null &&
-        duration > Duration.zero &&
-        position.inMilliseconds >= duration.inMilliseconds * playedThreshold) {
-      _markedPlayed = true;
-      await _markPlayed(id);
-      return;
-    }
     if ((position - _lastSaved).abs() >= saveInterval) {
       _lastSaved = position;
       await _persistPosition(id, position);
@@ -827,26 +803,34 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (state.processing == EngineProcessing.completed) await _complete();
   }
 
-  /// End of the episode: mark played, unload, continue with the playlist.
+  /// End of the file – only then an episode counts as played (user rule
+  /// 2026-10-03, before: from 98 %). Order matters: read the next playlist
+  /// episode first, because marking played removes this one from all
+  /// playlists; then mark, unload, continue.
   Future<void> _complete() async {
     if (_completing) return;
     _completing = true;
     try {
       final id = _episodeId;
+      // Sleep timer "Bis Ende der Folge": stay stopped, then it is off.
+      final sleepAtEnd = _sleepTimer is SleepTimerAtEpisodeEnd;
+      final next = sleepAtEnd ? null : await _nextInPlaylist();
+      // Leaving the playlists now is intended, not a membership change.
+      await _membership?.cancel();
+      _membership = null;
       if (id != null && !_markedPlayed) {
         _markedPlayed = true;
-        await _markPlayed(id);
+        await _playback.markPlayed(id);
       }
       await stop();
-      if (_sleepTimer is SleepTimerAtEpisodeEnd) {
-        // Sleep timer "Bis Ende der Folge": stay stopped, then it is off.
+      if (sleepAtEnd) {
         setSleepTimer(const SleepTimerOff());
+      } else if (next != null) {
+        await playEpisode(next, playlistId: _activePlaylistId);
         return;
       }
-      final next = await _nextInPlaylist();
-      if (next != null) {
-        await playEpisode(next, playlistId: _activePlaylistId);
-      }
+      // Stays the shown episode: follow its playlists again.
+      if (id != null && id == _episodeId) _watchMembership(id);
     } finally {
       _completing = false;
     }

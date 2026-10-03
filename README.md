@@ -26,7 +26,7 @@ Gerät. Geschrieben in Flutter.
 - Sprünge −15 s / +30 s, Lautstärke-Boost (global oder pro Podcast)
 - Kapitel (Podlove, JSON, ID3) mit „Skip" je Kapitel, Lesezeichen mit Notiz
 - Sleep-Timer: 5 / 15 / 30 / 60 Minuten, eigene Zeit oder bis Ende der Folge – mit sanftem Ausblenden
-- Hörposition wird gemerkt; ab 98 % gilt eine Folge als gespielt
+- Hörposition wird gemerkt; bis zum Ende gehört gilt eine Folge als gespielt
 - Robust bei Netzproblemen: Hänger-Erkennung, Fortsetzen an der richtigen Stelle, klare Meldungen
 
 **Playlists**

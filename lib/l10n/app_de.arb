@@ -240,7 +240,7 @@
   "episodeNumberDecrease": "Verringern",
   "episodeNumberIncrease": "Erhöhen",
   "autoDeletePlayed": "Gespielte Folgen löschen",
-  "autoDeletePlayedHint": "96 Stunden nachdem eine Folge zu 98 % gespielt wurde",
+  "autoDeletePlayedHint": "96 Stunden nachdem eine Folge zu Ende gespielt wurde",
   "settingsSectionDownloads": "Downloads",
   "downloadLimit": "Speicherlimit für Downloads",
   "downloadLimitHint": "Ist das Limit erreicht, werden zuerst gespielte Folgen gelöscht. Ungespielte werden nie automatisch gelöscht – es wird nur nichts Neues mehr geladen.",

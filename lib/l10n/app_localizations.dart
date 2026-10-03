@@ -809,7 +809,7 @@ abstract class AppLocalizations {
   /// No description provided for @autoDeletePlayedHint.
   ///
   /// In de, this message translates to:
-  /// **'96 Stunden nachdem eine Folge zu 98 % gespielt wurde'**
+  /// **'96 Stunden nachdem eine Folge zu Ende gespielt wurde'**
   String get autoDeletePlayedHint;
 
   /// No description provided for @settingsSectionDownloads.

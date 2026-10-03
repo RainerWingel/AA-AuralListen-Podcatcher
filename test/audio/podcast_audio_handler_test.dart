@@ -275,19 +275,24 @@ void main() {
     expect((saved.positionMs, saved.status), (0, EpisodeStatus.inProgress));
   });
 
-  test('marks as played at 98 % and never overwrites that', () async {
+  test('only the end of the file marks as played (no 98 % rule)', () async {
     await handler.playEpisode(episodeId);
 
-    engine.emitPosition(const Duration(minutes: 9, seconds: 48)); // 98 %
-    await pumpEventQueue();
-    var e = await episode();
-    expect(e.status, EpisodeStatus.played);
-    expect(e.playedAt!.isAtSameMomentAs(now), isTrue);
-
-    engine.emitPosition(const Duration(minutes: 9, seconds: 58));
+    engine.emitPosition(const Duration(minutes: 9, seconds: 58)); // 99.7 %
     await handler.pause();
+    var e = await episode();
+    expect(e.status, EpisodeStatus.inProgress);
+    expect(
+      e.positionMs,
+      const Duration(minutes: 9, seconds: 58).inMilliseconds,
+    );
+
+    await handler.play();
+    engine.complete();
+    await pumpEventQueue();
     e = await episode();
     expect(e.status, EpisodeStatus.played);
+    expect(e.playedAt!.isAtSameMomentAs(now), isTrue);
     expect(e.positionMs, 0);
   });
 
@@ -1112,16 +1117,26 @@ void main() {
       },
     );
 
-    test('98 % already removes the episode from the playlist', () async {
+    test('stays in the playlist until the very end', () async {
       await handler.playEpisode(episodeId, playlistId: playlistId);
-      engine.emitPosition(const Duration(minutes: 9, seconds: 50));
+      engine.emitPosition(const Duration(minutes: 9, seconds: 59));
       await pumpEventQueue();
-      expect(await itemsOf(playlistId), [ep2, ep3]);
+      expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+      expect(handler.activePlaylistId, playlistId);
 
-      // The end still continues with the episode that followed it.
       engine.complete();
       await pumpEventQueue();
+      expect(await itemsOf(playlistId), [ep2, ep3]);
       expect(handler.currentEpisodeId, ep2);
+    });
+
+    test('reordered meanwhile: the end continues with the new next', () async {
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      // Move the current episode behind ep2: next is ep3 now.
+      await playlists.move(playlistId, 0, 1);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep3);
     });
 
     test('an episode added during playback is played too', () async {
@@ -1235,16 +1250,14 @@ void main() {
       expect(handler.activePlaylistId, playlistId);
     });
 
-    test('a played episode leaving the playlist still continues it', () async {
-      await handler.playEpisode(episodeId, playlistId: playlistId);
+    test('last episode of the playlist: stops, playlist done', () async {
+      await handler.playEpisode(ep3, playlistId: playlistId);
       await pumpEventQueue();
-      engine.emitPosition(const Duration(minutes: 9, seconds: 50)); // 98 %
-      await pumpEventQueue();
-      expect(await itemsOf(playlistId), [ep2, ep3]);
-      expect(handler.activePlaylistId, playlistId);
       engine.complete();
       await pumpEventQueue();
-      expect(handler.currentEpisodeId, ep2);
+      expect(handler.currentEpisodeId, ep3);
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(await itemsOf(playlistId), [episodeId, ep2]);
     });
 
     test('in two playlists: started elsewhere, none is active', () async {

@@ -33,8 +33,9 @@ class PlaybackRepository {
   /// a few seconds of listening in do not take away its "new" state.
   static const inProgressFrom = Duration(seconds: 15);
 
-  /// Stores the listening position. Played episodes are left alone, so the
-  /// last seconds after the 98 % mark cannot turn them back into "in progress".
+  /// Stores the listening position. Played episodes are left alone, so a
+  /// late position report after the end cannot turn them back into "in
+  /// progress" (replays restart via [restartPlayed]).
   /// The status only moves forward: new → in progress at [inProgressFrom];
   /// below that it stays as it is (also when seeking back to the start).
   Future<void> savePosition(int episodeId, Duration position) =>
@@ -52,7 +53,7 @@ class PlaybackRepository {
             ),
           );
 
-  /// Marks as played (≥ 98 % or finished) and removes the episode from ALL
+  /// Marks as played (end of the file or manually) and removes it from ALL
   /// playlists (docs/playlists.md). `playedAt` starts the 96 h eviction timer.
   Future<void> markPlayed(int episodeId) => _db.transaction(() async {
     await _update(

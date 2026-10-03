@@ -23,10 +23,10 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
    sind, während die App geschlossen war.
 
 ### Automatisches Löschen (Regel des Benutzers)
-- Eine Folge gilt als **gespielt**, sobald ≥ 98 % gespielt wurden (`data-model.md`).
+- Eine Folge gilt als **gespielt**, sobald sie bis zum Ende abgelaufen ist (`data-model.md`; bis 2026-10-03: ab 98 %).
 - Heruntergeladene, **gespielte** Folgen werden **96 Stunden nach `playedAt`** automatisch gelöscht
   (sofern „Gespielte Folgen löschen" für den Podcast an ist – Standard: an).
-- Folgen **unter 98 %** werden **nie** automatisch gelöscht.
+- **Nicht gespielte** Folgen werden **nie** automatisch gelöscht.
 - Die Folge im Player wird nie automatisch gelöscht.
 - Wird eine Folge wieder „ungespielt" markiert oder erneut abgespielt, entfällt die Löschung (`playedAt` = null).
 
