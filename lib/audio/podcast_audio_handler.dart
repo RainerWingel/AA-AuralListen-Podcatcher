@@ -346,6 +346,21 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await play();
   }
 
+  /// Offered playback speeds (user wish 2026-10-03); 1 = off.
+  static const speeds = <double>[1, 1.2, 1.5, 2];
+
+  /// Playback speed for all episodes, stored in the settings.
+  double get speed => _speed;
+  double _speed = 1;
+
+  @override
+  Future<void> setSpeed(double speed) async {
+    _speed = speed;
+    await _settings.set(SettingsKeys.playbackSpeed, '$speed');
+    await _engine.setSpeed(speed);
+    _broadcastState();
+  }
+
   /// Applies a new boost level: for the current podcast only, or globally.
   Future<void> setBoost(double db, {required bool forPodcastOnly}) async {
     final podcastId = _currentPodcastId;
@@ -654,6 +669,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _knownPosition = start;
     _retriedReachable = false;
     await _engine.setBoostDb(await _boostFor(row.podcast));
+    _speed = await _settings.getDouble(SettingsKeys.playbackSpeed) ?? 1;
+    await _engine.setSpeed(_speed);
 
     _loaded = true;
     _broadcastState();
@@ -1137,6 +1154,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
                 EngineProcessing.completed => AudioProcessingState.completed,
               },
         playing: playing,
+        // Lets the notification's progress bar run at the right pace.
+        speed: _speed,
         updatePosition: position,
         bufferedPosition: _engine.bufferedPosition,
       ),

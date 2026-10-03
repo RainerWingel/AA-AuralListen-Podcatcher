@@ -77,6 +77,14 @@ final batteryExemptProvider = FutureProvider.autoDispose<bool>(
   (ref) => ref.watch(batteryOptimizationProvider).isExempt(),
 );
 
+/// Playback speed for all podcasts (1 = normal).
+final playbackSpeedProvider = StreamProvider.autoDispose<double>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.playbackSpeed)
+      .map((value) => double.tryParse(value ?? '') ?? 1),
+);
+
 final globalBoostProvider = StreamProvider.autoDispose<double>(
   (ref) => ref
       .watch(settingsRepositoryProvider)

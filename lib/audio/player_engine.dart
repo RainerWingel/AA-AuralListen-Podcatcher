@@ -84,6 +84,9 @@ abstract interface class PlayerEngine {
   /// Playback volume 0…1 (sleep timer fade-out); independent of the boost.
   Future<void> setVolume(double volume);
 
+  /// Playback speed (1 = normal); the pitch stays the same.
+  Future<void> setSpeed(double speed);
+
   Future<void> dispose();
 }
 
@@ -203,6 +206,9 @@ class JustAudioEngine implements PlayerEngine {
 
   @override
   Future<void> setVolume(double volume) => _player.setVolume(volume);
+
+  @override
+  Future<void> setSpeed(double speed) => _player.setSpeed(speed);
 
   @override
   Future<void> dispose() => _player.dispose();

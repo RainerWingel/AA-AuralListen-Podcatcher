@@ -181,6 +181,16 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
   ein falscher Tipp kostet nur einen Hinweis).
 - Regressionstests: Gruppe „stream the server builds anew per request" in `test/audio/podcast_audio_handler_test.dart`.
 
+## Abspielgeschwindigkeit (Benutzerwunsch 2026-10-03)
+- Knopf „Tempo: …" rechts neben „Boost: …" im Vollbild-Player → Auswahl **Aus (1,0x) · 1,2x · 1,5x · 2,0x**
+  (`lib/features/player/speed_sheet.dart`, `PodcastAudioHandler.speeds`).
+- Gilt für **alle** Podcasts, gespeichert in `settings['player.speed']` (fehlt = 1,0), bei jedem Laden neu gesetzt
+  (`_load`); Tonhöhe bleibt (ExoPlayer). `PlaybackState.speed` wird mitgemeldet, damit der Fortschritt in der
+  Benachrichtigung richtig läuft; `setSpeed` ist auch die audio_service-Aktion.
+- Zeitanzeigen laufen in Audio-Zeit (also schneller). Bei Restzeit-Anzeige und Tempo ≠ 1 steht dahinter in Klammern
+  die **tatsächliche** Restzeit: „-1:05:00 (-43:20)" = Rest ÷ Tempo. Zu breit (schmaler Bildschirm, große Schrift) →
+  die rechte Zeit wird verkleinert statt abgeschnitten. Sleep-Timer und Hänger-Erkennung zählen echte Zeit.
+
 ## Lautstärke-Boost
 - Android `LoudnessEnhancer` über `just_audio` (`AndroidLoudnessEnhancer`), Zielverstärkung in dB; 0 = aus.
 - Stufen: Aus / +3 / +6 / +9 / +12 dB (Auswahl im Vollbild-Player → „Boost: …").

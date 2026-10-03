@@ -274,6 +274,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get boostTitle => 'Volume boost';
 
   @override
+  String get speedTitle => 'Playback speed';
+
+  @override
+  String speedOff(String value) {
+    return 'Off ($value)';
+  }
+
+  @override
+  String speedButton(String value) {
+    return 'Speed: $value';
+  }
+
+  @override
   String get boostOff => 'Off';
 
   @override

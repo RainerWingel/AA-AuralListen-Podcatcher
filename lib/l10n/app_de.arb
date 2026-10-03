@@ -164,6 +164,23 @@
   "playerOpen": "Player öffnen",
   "nowPlaying": "Läuft gerade",
   "boostTitle": "Lautstärke-Boost",
+  "speedTitle": "Abspielgeschwindigkeit",
+  "speedOff": "Aus ({value})",
+  "@speedOff": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "speedButton": "Tempo: {value}",
+  "@speedButton": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "boostOff": "Aus",
   "boostValue": "+{db} dB",
   "@boostValue": {

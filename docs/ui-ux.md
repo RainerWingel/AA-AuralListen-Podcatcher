@@ -46,7 +46,8 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
   dünner Fortschrittsbalken, Cover, Titel, Podcast, Play/Pause (Kreisel beim Puffern). Tippen → Vollbild-Player.
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast (davor ✓-Download-Symbol „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist),
   Slider mit „verstrichen" / „-verbleibend" (Tippen auf die rechte Zeit wechselt zur Gesamtlänge und zurück, gemerkt in
-  `settings['player.showTotalTime']`, Benutzerwunsch 2026-10-03), −15 s / Play / +30 s, „Boost: …" (öffnet Auswahl). Pfeil nach unten schließt.
+  `settings['player.showTotalTime']`, Benutzerwunsch 2026-10-03; bei Tempo ≠ 1 zusätzlich „(-tatsächliche Restzeit)"),
+  −15 s / Play / +30 s, „Boost: …" und daneben „Tempo: …" (öffnen je eine Auswahl, `playback.md`). Pfeil nach unten schließt.
   Darunter „Kapitel x/n: Titel" (falls vorhanden; tippen → Kapitel-Liste) und Knöpfe „Lesezeichen setzen", Sleep-Timer (Stoppuhr;
   aktiv: „noch mm:ss" bzw. „Bis Folgenende"), „Lesezeichen (n)". Ganz unten aufklappbarer Bereich „Beschreibung"
   (Shownotes mit Links, zugeklappt, nur wenn vorhanden; Benutzerwunsch 2026-10-01).

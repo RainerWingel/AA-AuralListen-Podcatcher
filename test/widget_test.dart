@@ -1898,6 +1898,45 @@ void main() {
   );
 
   testWidgets(
+    'speed button: choice is shown, remaining time gets the real time',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+
+      expect(find.text('-1:05:00'), findsOneWidget);
+      await tester.ensureVisible(find.text('Tempo: Aus'));
+      await tester.tap(find.text('Tempo: Aus'));
+      await settle(tester);
+      expect(find.text('Aus (1,0x)'), findsOneWidget);
+      await tester.tap(find.text('1,5x'));
+      await settle(tester);
+      Navigator.of(tester.element(find.text('Abspielgeschwindigkeit'))).pop();
+      await settle(tester);
+
+      expect(find.text('Tempo: 1,5x'), findsOneWidget);
+      expect(handler.speed, 1.5);
+      // 65 min at 1.5x take 43:20.
+      expect(find.text('-1:05:00 (-43:20)'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'long press on a subscription plays its unplayed episodes',
     timeout: timeout,
     (tester) async {

@@ -3,6 +3,9 @@ abstract final class SettingsKeys {
   /// Episode id shown in the mini player after an app restart.
   static const lastEpisodeId = 'player.lastEpisodeId';
 
+  /// Playback speed for all podcasts: 1.0, 1.2, 1.5 or 2.0 (missing = 1.0).
+  static const playbackSpeed = 'player.speed';
+
   /// Global loudness boost in dB (default 0 = off).
   static const boostDb = 'player.boostDb';
 

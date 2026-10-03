@@ -14,6 +14,7 @@ import '../episodes/episode_description.dart';
 import 'boost_sheet.dart';
 import 'chapters_and_bookmarks.dart';
 import 'player_controls.dart';
+import 'speed_sheet.dart';
 
 /// "Downloaded" mark in front of the podcast name – only when the file is
 /// complete (playback then comes from the phone, not the network).
@@ -130,7 +131,16 @@ class PlayerScreen extends ConsumerWidget {
                         if (item.extras?['episodeId'] case final int id)
                           ChapterBookmarkButtons(episodeId: id),
                         const SizedBox(height: 8),
-                        if (podcastId != null) _BoostButton(podcastId),
+                        // Boost and speed side by side (wrap on narrow
+                        // screens or large fonts).
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 8,
+                          children: [
+                            if (podcastId != null) _BoostButton(podcastId),
+                            const _SpeedButton(),
+                          ],
+                        ),
                         if (item.extras?['episodeId'] case final int id)
                           EpisodeDescriptionSection(episodeId: id),
                         const SizedBox(height: 16),
@@ -192,7 +202,16 @@ class _SeekBarState extends ConsumerState<_SeekBar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(formatClock(shown)),
-              _TotalOrRemaining(total: total, shown: shown),
+              const SizedBox(width: 8),
+              // "-1:05:00 (-43:20)" may not fit narrow screens or large
+              // fonts: shrink rather than overflow.
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: _TotalOrRemaining(total: total, shown: shown),
+                ),
+              ),
             ],
           ),
         ),
@@ -212,6 +231,12 @@ class _TotalOrRemaining extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final showTotal = ref.watch(showTotalTimeProvider).value ?? false;
+    final speed = ref.watch(playbackSpeedProvider).value ?? 1;
+    final remaining = total - shown;
+    // Faster than normal: also the time it really takes, in brackets.
+    final effective = speed == 1
+        ? ''
+        : ' (-${formatClock(remaining * (1 / speed))})';
     final settings = ref.read(settingsRepositoryProvider);
     return InkWell(
       borderRadius: BorderRadius.circular(8),
@@ -222,8 +247,27 @@ class _TotalOrRemaining extends ConsumerWidget {
         // A comfortable tap target around the short text.
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Text(
-          showTotal ? formatClock(total) : '-${formatClock(total - shown)}',
+          showTotal
+              ? formatClock(total)
+              : '-${formatClock(remaining)}$effective',
         ),
+      ),
+    );
+  }
+}
+
+class _SpeedButton extends ConsumerWidget {
+  const _SpeedButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final speed = ref.watch(playbackSpeedProvider).value ?? 1;
+    return TextButton.icon(
+      onPressed: () => showSpeedSheet(context),
+      icon: const Icon(Icons.speed),
+      label: Text(
+        l10n.speedButton(speed == 1 ? l10n.boostOff : formatSpeed(l10n, speed)),
       ),
     );
   }

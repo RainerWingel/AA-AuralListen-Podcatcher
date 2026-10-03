@@ -536,6 +536,24 @@ abstract class AppLocalizations {
   /// **'Lautstärke-Boost'**
   String get boostTitle;
 
+  /// No description provided for @speedTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Abspielgeschwindigkeit'**
+  String get speedTitle;
+
+  /// No description provided for @speedOff.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus ({value})'**
+  String speedOff(String value);
+
+  /// No description provided for @speedButton.
+  ///
+  /// In de, this message translates to:
+  /// **'Tempo: {value}'**
+  String speedButton(String value);
+
   /// No description provided for @boostOff.
   ///
   /// In de, this message translates to:

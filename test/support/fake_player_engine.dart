@@ -167,6 +167,12 @@ class FakePlayerEngine implements PlayerEngine {
     if (value == 0) calls.add('volume zero');
   }
 
+  /// Current playback speed.
+  double speed = 1;
+
+  @override
+  Future<void> setSpeed(double value) async => speed = value;
+
   @override
   Future<void> dispose() async {
     await _state.close();

@@ -242,6 +242,27 @@ void main() {
     });
   });
 
+  test('playback speed: stored, applied on every load, reported', () async {
+    await handler.playEpisode(episodeId);
+    expect(engine.speed, 1);
+
+    await handler.setSpeed(1.5);
+    expect(engine.speed, 1.5);
+    expect(handler.playbackState.value.speed, 1.5);
+    expect(await settings.getDouble(SettingsKeys.playbackSpeed), 1.5);
+
+    // A new player (app restart) picks the stored speed up when loading.
+    await handler.dispose();
+    engine = FakePlayerEngine();
+    handler = PodcastAudioHandler(
+      engine: engine,
+      playback: PlaybackRepository(db, () => now),
+      settings: settings,
+    );
+    await handler.playEpisode(episodeId);
+    expect(engine.speed, 1.5);
+  });
+
   test('saves the position at most every 5 s and on pause', () async {
     final fresh = await addEpisode('2');
     await handler.playEpisode(fresh);
