@@ -165,6 +165,22 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 - Grenzen: Ohne Feed-Dauer keine Erkennung. Kleine Abweichungen (eingefügte Werbung) bleiben beim normalen Laden.
 - Regressionstests: Gruppe „VBR MP3 whose length the player only estimates" in `test/audio/podcast_audio_handler_test.dart`.
 
+### Streams mit wechselnder Werbung (Benutzerwunsch 2026-10-03)
+- Manche Server bauen die Datei **bei jeder Anfrage neu** zusammen (dynamisch eingefügte Werbung; gesehen: gleiche Folge
+  11,12 / 11,63 / 11,66 MB je nach Anfrage). Lädt die App neu (Pause > 10 min, Netzfehler), zeigt die gespeicherte Zeit
+  in der neuen Datei woandershin – Versatz etwa um den Längenunterschied der Werbung.
+- **Erkennen** (`PodcastAudioHandler._checkStreamVaries`, nur Streams): Dauer des ersten Ladens je Folge in dieser
+  App-Sitzung merken (höchstens 50 Folgen). Weicht ein späteres Laden um > **2 s** ab → `podcasts.streamVaries = true`
+  und Hinweis `PlaybackProblem.streamChanged` („Die Folge kam beim Neuladen anders an … Heruntergeladen passiert das
+  nicht.") mit Knopf **„Herunterladen"**.
+- **Umgehen:** Wird eine Folge eines markierten Podcasts gestreamt, einmal je Folge und Sitzung der Tipp
+  `PlaybackProblem.streamVaries` („… Tipp: Folge herunterladen.") mit Knopf „Herunterladen". Heruntergeladene Dateien
+  sind fest – kein Versatz, keine Prüfung.
+- Grenze: Liefert der Server **innerhalb** einer Wiedergabe (ExoPlayer setzt die Verbindung mit einer Range-Anfrage fort)
+  eine andere Variante, merkt das weder ExoPlayer noch die App. Die Markierung bleibt dauerhaft (kein Zurücksetzen nötig:
+  ein falscher Tipp kostet nur einen Hinweis).
+- Regressionstests: Gruppe „stream the server builds anew per request" in `test/audio/podcast_audio_handler_test.dart`.
+
 ## Lautstärke-Boost
 - Android `LoudnessEnhancer` über `just_audio` (`AndroidLoudnessEnhancer`), Zielverstärkung in dB; 0 = aus.
 - Stufen: Aus / +3 / +6 / +9 / +12 dB (Auswahl im Vollbild-Player → „Boost: …").

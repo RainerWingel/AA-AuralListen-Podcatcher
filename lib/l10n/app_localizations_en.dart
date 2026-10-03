@@ -856,6 +856,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'This episode is in a format that cannot be played.';
 
   @override
+  String get playbackStreamChanged =>
+      'The episode arrived differently after reloading (e.g. other ads) – the position may be off. Downloaded episodes are not affected.';
+
+  @override
+  String get playbackStreamVaries =>
+      'This podcast inserts changing ads when streaming – resuming may be inaccurate. Tip: download the episode.';
+
+  @override
   String get playNewEpisodes => 'Play all new episodes';
 
   @override

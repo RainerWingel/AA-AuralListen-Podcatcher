@@ -561,6 +561,7 @@ void main() {
       episodeCounter: true,
       episodeNumberOffset: 0,
       episodeOwnCount: false,
+      streamVaries: false,
     );
     Episode added(DateTime at) => Episode(
       id: 1,

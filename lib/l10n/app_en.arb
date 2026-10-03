@@ -230,6 +230,8 @@
   "playbackBrokenDownload": "The download was damaged and has been deleted. The episode is now streamed.",
   "playbackEpisodeGone": "This episode is no longer available from the provider.",
   "playbackUnsupported": "This episode is in a format that cannot be played.",
+  "playbackStreamChanged": "The episode arrived differently after reloading (e.g. other ads) – the position may be off. Downloaded episodes are not affected.",
+  "playbackStreamVaries": "This podcast inserts changing ads when streaming – resuming may be inaccurate. Tip: download the episode.",
   "playNewEpisodes": "Play all new episodes",
   "playNewEpisodesHint": "{count, plural, =0{No new episodes in the last 96 hours} =1{1 episode from the last 96 hours} other{{count} episodes from the last 96 hours}}",
   "playUnplayedEpisodes": "Play all unplayed episodes",

@@ -858,6 +858,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann.';
 
   @override
+  String get playbackStreamChanged =>
+      'Die Folge kam beim Neuladen anders an (z. B. andere Werbung) – die Stelle kann abweichen. Heruntergeladen passiert das nicht.';
+
+  @override
+  String get playbackStreamVaries =>
+      'Dieser Podcast fügt beim Streamen wechselnde Werbung ein – Fortsetzen kann ungenau sein. Tipp: Folge herunterladen.';
+
+  @override
   String get playNewEpisodes => 'Alle neuen Episoden spielen';
 
   @override

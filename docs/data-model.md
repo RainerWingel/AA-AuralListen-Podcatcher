@@ -1,11 +1,11 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 15** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
+Aktuell **schemaVersion 16** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
 v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`; v8: nur Daten – `angefangen` unter 15 s → `neu`, Position 0; v9: `playlists.color`; v10: `podcasts.autoPlaylistId`, `autoPlaylistName`; v11: `episodes.episodeNumber`, `podcasts.episodeCounter`, `episodeNumberOffset`, einmaliges Neulesen aller Feeds; v12: `podcasts.episodeOwnCount`; v13: `episode_notes`, Shownotes aus `episodes.description` dorthin verschoben,
 einmaliges Neulesen aller Feeds für die Links; v14: nur Daten – Shownotes-Grenze 6000 → 18000 Zeichen, einmaliges
 Neulesen aller Feeds; v15: nur Daten – einmaliges Neulesen aller Feeds, stellt Feed-Dauern wieder her, die der Player
-mit einer falschen VBR-Schätzung überschrieben hatte, `playback.md`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+mit einer falschen VBR-Schätzung überschrieben hatte, `playback.md`; v16: `podcasts.streamVaries`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 0. Neue Tabelle? → auch in `BackupService._restoredTables` eintragen (`backup.md`).
@@ -19,7 +19,7 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 
 | Tabelle | Wichtige Spalten |
 |---------|------------------|
-| `podcasts` ✅ | id, feedUrl (unique), title, author, description, imageUrl, websiteUrl, etag, lastModified, lastRefreshAt, lastError (null = ok), subscribedAt, autoDownloadMode (off/wifiOnly/always), autoDownloadMaxEpisodes (3), autoDownloadThemes (v5, JSON-Liste, null = alle Themen), autoDeletePlayed (true), boostDb (null = global), autoPlaylistId + autoPlaylistName (v10, Ziel-Playlist für Auto-Downloads, ohne FK – gelöschte wird unter dem Namen neu angelegt), episodeCounter (v11, true) + episodeNumberOffset (v11, 0, −9999…9999), episodeOwnCount (v12, false = Feed-Nummern) |
+| `podcasts` ✅ | id, feedUrl (unique), title, author, description, imageUrl, websiteUrl, etag, lastModified, lastRefreshAt, lastError (null = ok), subscribedAt, autoDownloadMode (off/wifiOnly/always), autoDownloadMaxEpisodes (3), autoDownloadThemes (v5, JSON-Liste, null = alle Themen), autoDeletePlayed (true), boostDb (null = global), autoPlaylistId + autoPlaylistName (v10, Ziel-Playlist für Auto-Downloads, ohne FK – gelöschte wird unter dem Namen neu angelegt), episodeCounter (v11, true) + episodeNumberOffset (v11, 0, −9999…9999), episodeOwnCount (v12, false = Feed-Nummern), streamVaries (v16, false; Server liefert Streams je Anfrage anders → Download-Tipp, `playback.md`) |
 | `episodes` ✅ | id, podcastId (FK, ON DELETE CASCADE), guid (unique je Podcast), title, description (**seit v13 unbenutzt, immer NULL** – Spalte bleibt, weil Löschen die Tabelle samt
 Fremdschlüsseln neu aufbauen würde), audioUrl, audioMimeType, audioSizeBytes, durationMs, pubDate, imageUrl, chaptersUrl, theme (v5, z. B. `zum-thema`), episodeNumber (v11, `itunes:episode`), status, positionMs, playedAt, addedAt |
 | `downloads` ✅ (v3) | episodeId (PK, FK → episodes, CASCADE), relativePath (`<id>.<ext>`), state (queued/running/done/failed), sizeBytes, wifiOnly, createdAt, completedAt. Regeln: `eviction.md` |

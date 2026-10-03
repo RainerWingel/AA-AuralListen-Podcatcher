@@ -236,6 +236,13 @@ class PlaybackRepository {
     EpisodesCompanion(durationMs: Value(duration.inMilliseconds)),
   );
 
+  /// Remembers that the podcast's server builds streamed files anew per
+  /// request (see PodcastAudioHandler, docs/playback.md).
+  Future<void> markStreamVaries(int podcastId) =>
+      (_db.update(_db.podcasts)..where((p) => p.id.equals(podcastId))).write(
+        const PodcastsCompanion(streamVaries: Value(true)),
+      );
+
   /// Per-podcast loudness boost; null = use the global default.
   Future<void> setPodcastBoost(int podcastId, double? boostDb) =>
       (_db.update(_db.podcasts)..where((p) => p.id.equals(podcastId))).write(

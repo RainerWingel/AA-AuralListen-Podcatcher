@@ -518,6 +518,8 @@
   "playbackBrokenDownload": "Der Download war beschädigt und wurde gelöscht. Die Folge wird jetzt gestreamt.",
   "playbackEpisodeGone": "Diese Folge ist beim Anbieter nicht mehr verfügbar.",
   "playbackUnsupported": "Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann.",
+  "playbackStreamChanged": "Die Folge kam beim Neuladen anders an (z. B. andere Werbung) – die Stelle kann abweichen. Heruntergeladen passiert das nicht.",
+  "playbackStreamVaries": "Dieser Podcast fügt beim Streamen wechselnde Werbung ein – Fortsetzen kann ungenau sein. Tipp: Folge herunterladen.",
   "playNewEpisodes": "Alle neuen Episoden spielen",
   "playNewEpisodesHint": "{count, plural, =0{Keine neuen Folgen in den letzten 96 Stunden} =1{1 Folge aus den letzten 96 Stunden} other{{count} Folgen aus den letzten 96 Stunden}}",
   "@playNewEpisodesHint": {

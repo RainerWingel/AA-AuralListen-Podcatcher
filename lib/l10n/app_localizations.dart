@@ -1484,6 +1484,18 @@ abstract class AppLocalizations {
   /// **'Diese Folge liegt in einem Format vor, das nicht abgespielt werden kann.'**
   String get playbackUnsupported;
 
+  /// No description provided for @playbackStreamChanged.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Folge kam beim Neuladen anders an (z. B. andere Werbung) – die Stelle kann abweichen. Heruntergeladen passiert das nicht.'**
+  String get playbackStreamChanged;
+
+  /// No description provided for @playbackStreamVaries.
+  ///
+  /// In de, this message translates to:
+  /// **'Dieser Podcast fügt beim Streamen wechselnde Werbung ein – Fortsetzen kann ungenau sein. Tipp: Folge herunterladen.'**
+  String get playbackStreamVaries;
+
   /// No description provided for @playNewEpisodes.
   ///
   /// In de, this message translates to:

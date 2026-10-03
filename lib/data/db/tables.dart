@@ -67,6 +67,11 @@ class Podcasts extends Table {
   /// offset applies to such feeds.
   BoolColumn get episodeOwnCount =>
       boolean().withDefault(const Constant(false))();
+
+  /// The server delivered a streamed episode differently on a reload (e.g.
+  /// newly inserted ads), so resuming a stream can land elsewhere (v16).
+  /// Set by the player; the app then recommends downloading (playback.md).
+  BoolColumn get streamVaries => boolean().withDefault(const Constant(false))();
 }
 
 @DataClassName('Episode')

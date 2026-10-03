@@ -94,6 +94,13 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// server make files a bit longer than the feed says).
   static const estimatedDurationTolerance = Duration(minutes: 1);
 
+  /// Duration change between two loads of the same stream that means the
+  /// server delivered a different file (decoders vary by a few frames).
+  static const streamVariesTolerance = Duration(seconds: 2);
+
+  /// At most this many episodes are remembered for the stream checks.
+  static const maxStreamChecks = 50;
+
   /// Hang detection (docs/playback.md): while playing, the position is
   /// checked this often; [stallChecks] checks without progress = hanging.
   final Duration stallCheckInterval;
@@ -179,6 +186,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Episode row as it was before the current load (feed duration).
   Episode? _loadingEpisode;
+
+  /// Streamed episodes: duration of their first load in this app session,
+  /// to notice a server that builds the file anew per request (ads).
+  /// Bounded like everything kept in memory (docs/eviction.md).
+  final _streamDurations = <int, Duration>{};
+
+  /// Episodes that got the "download instead" hint in this session.
+  final _streamHints = <int>{};
 
   /// Position shown while no audio is loaded (after app start, after stop).
   Duration _idlePosition = Duration.zero;
@@ -607,12 +622,18 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     // own (an estimate must neither be stored nor compared with itself).
     _loadingEpisode = episode;
     final reported = await _engine.load(source, initialPosition: start);
+    var duration = reported;
     if (_durationLooksEstimated(reported, episode)) {
       // ExoPlayer guessed the length of a VBR MP3 from its first frame:
       // every seek (resume, reload after a pause) lands elsewhere. Load
       // again with exact seeking (docs/playback.md "VBR-MP3").
-      await _engine.load(source, initialPosition: start, exactMp3Seeking: true);
+      duration = await _engine.load(
+        source,
+        initialPosition: start,
+        exactMp3Seeking: true,
+      );
     }
+    if (!_sourceIsLocal) await _checkStreamVaries(id, row.podcast, duration);
     _knownPosition = start;
     _retriedReachable = false;
     await _engine.setBoostDb(await _boostFor(row.podcast));
@@ -621,6 +642,43 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _broadcastState();
     _markedPlayed = false;
     _lastSaved = start;
+  }
+
+  /// Notices a server that delivers a stream differently on each request
+  /// (e.g. newly inserted ads): the saved time then points elsewhere in the
+  /// new file. Marks the podcast and recommends downloading – right away if
+  /// it just happened, otherwise once per episode for marked podcasts.
+  Future<void> _checkStreamVaries(
+    int id,
+    Podcast podcast,
+    Duration? duration,
+  ) async {
+    if (duration != null && duration > Duration.zero) {
+      final first = _streamDurations[id];
+      if (first == null) {
+        if (_streamDurations.length >= maxStreamChecks) {
+          _streamDurations.remove(_streamDurations.keys.first);
+        }
+        _streamDurations[id] = duration;
+      } else if ((duration - first).abs() > streamVariesTolerance) {
+        _streamDurations[id] = duration;
+        if (!podcast.streamVaries) await _playback.markStreamVaries(podcast.id);
+        _rememberHint(id);
+        _emitProblem(PlaybackProblem.streamChanged);
+        return;
+      }
+    }
+    if (podcast.streamVaries && !_streamHints.contains(id)) {
+      _rememberHint(id);
+      _emitProblem(PlaybackProblem.streamVaries);
+    }
+  }
+
+  void _rememberHint(int id) {
+    if (_streamHints.length >= maxStreamChecks) {
+      _streamHints.remove(_streamHints.first);
+    }
+    _streamHints.add(id);
   }
 
   /// True if the player's duration is far off the feed's for an MP3 – the
@@ -1101,6 +1159,13 @@ enum PlaybackProblem {
 
   /// The file cannot be played (format/decoder).
   unsupportedFormat,
+
+  /// A reload got a differently built stream (e.g. other ads): the place
+  /// may be off. Downloading avoids it.
+  streamChanged,
+
+  /// Streaming an episode of a podcast known for [streamChanged].
+  streamVaries,
 }
 
 /// Cause of a failure, see [PodcastAudioHandler._handleFailure].

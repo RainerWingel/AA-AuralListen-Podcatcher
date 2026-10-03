@@ -259,4 +259,11 @@ void main() {
     expect((await db.select(db.podcasts).getSingle()).etag, isNull);
     await db.close();
   });
+
+  test('upgrade v15 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(15);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
 }

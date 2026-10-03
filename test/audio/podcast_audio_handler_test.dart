@@ -177,6 +177,71 @@ void main() {
     });
   });
 
+  group('stream the server builds anew per request (inserted ads)', () {
+    Future<Podcast> podcast() => (db.select(
+      db.podcasts,
+    )..where((p) => p.id.equals(podcastId))).getSingle();
+
+    Future<void> reloadAfterLongPause() async {
+      await handler.pause();
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      await handler.play();
+    }
+
+    test('a reload with another length warns and marks the podcast', () async {
+      final problems = <PlaybackProblem>[];
+      final sub = handler.problems.listen(problems.add);
+      addTearDown(sub.cancel);
+
+      await handler.playEpisode(episodeId);
+      // Same file again (a few frames do not count).
+      engine.fakeDuration = const Duration(minutes: 10, seconds: 1);
+      await reloadAfterLongPause();
+      expect(problems, isEmpty);
+      expect((await podcast()).streamVaries, isFalse);
+
+      // Other ads this time: 30 s longer.
+      engine.fakeDuration = const Duration(minutes: 10, seconds: 31);
+      await reloadAfterLongPause();
+      expect(problems, [PlaybackProblem.streamChanged]);
+      expect((await podcast()).streamVaries, isTrue);
+    });
+
+    test('marked podcast: one download tip per streamed episode', () async {
+      await (db.update(db.podcasts)..where((p) => p.id.equals(podcastId)))
+          .write(const PodcastsCompanion(streamVaries: Value(true)));
+      final problems = <PlaybackProblem>[];
+      final sub = handler.problems.listen(problems.add);
+      addTearDown(sub.cancel);
+
+      await handler.playEpisode(episodeId);
+      await reloadAfterLongPause();
+      expect(problems, [PlaybackProblem.streamVaries]);
+    });
+
+    test('downloaded files are not checked', () async {
+      await handler.dispose();
+      engine = FakePlayerEngine();
+      handler = PodcastAudioHandler(
+        engine: engine,
+        playback: PlaybackRepository(db, () => now),
+        settings: settings,
+        localAudioFile: (id) async => File('/data/episodes/$id.mp3'),
+        stopAfterPause: const Duration(milliseconds: 50),
+      );
+      await (db.update(db.podcasts)..where((p) => p.id.equals(podcastId)))
+          .write(const PodcastsCompanion(streamVaries: Value(true)));
+      final problems = <PlaybackProblem>[];
+      final sub = handler.problems.listen(problems.add);
+      addTearDown(sub.cancel);
+
+      await handler.playEpisode(episodeId);
+      engine.fakeDuration = const Duration(minutes: 11);
+      await reloadAfterLongPause();
+      expect(problems, isEmpty);
+    });
+  });
+
   test('saves the position at most every 5 s and on pause', () async {
     final fresh = await addEpisode('2');
     await handler.playEpisode(fresh);

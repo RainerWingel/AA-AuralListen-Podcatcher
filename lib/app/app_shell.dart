@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../audio/audio_providers.dart';
 import '../audio/podcast_audio_handler.dart';
 import '../core/widgets/info_snack_bar.dart';
+import '../data/providers.dart';
 import '../features/player/mini_player.dart';
 import '../l10n/app_localizations.dart';
 
@@ -21,13 +22,33 @@ class AppShell extends ConsumerWidget {
     ref.listen(playbackProblemsProvider, (_, next) {
       final problem = next.value?.problem;
       if (problem == null) return;
-      showInfoSnackBar(ScaffoldMessenger.of(context), switch (problem) {
-        PlaybackProblem.loadFailed => l10n.playbackLoadFailed,
-        PlaybackProblem.stalled => l10n.playbackStalled,
-        PlaybackProblem.brokenDownload => l10n.playbackBrokenDownload,
-        PlaybackProblem.episodeGone => l10n.playbackEpisodeGone,
-        PlaybackProblem.unsupportedFormat => l10n.playbackUnsupported,
-      });
+      // Streams the server builds anew per request: offer the download
+      // for the episode playing now (docs/playback.md).
+      final episodeId = ref.read(audioHandlerProvider).currentEpisodeId;
+      final download = episodeId == null
+          ? null
+          : SnackBarAction(
+              label: l10n.download,
+              onPressed: () =>
+                  ref.read(downloadServiceProvider).download(episodeId),
+            );
+      showInfoSnackBar(
+        ScaffoldMessenger.of(context),
+        switch (problem) {
+          PlaybackProblem.loadFailed => l10n.playbackLoadFailed,
+          PlaybackProblem.stalled => l10n.playbackStalled,
+          PlaybackProblem.brokenDownload => l10n.playbackBrokenDownload,
+          PlaybackProblem.episodeGone => l10n.playbackEpisodeGone,
+          PlaybackProblem.unsupportedFormat => l10n.playbackUnsupported,
+          PlaybackProblem.streamChanged => l10n.playbackStreamChanged,
+          PlaybackProblem.streamVaries => l10n.playbackStreamVaries,
+        },
+        action: switch (problem) {
+          PlaybackProblem.streamChanged ||
+          PlaybackProblem.streamVaries => download,
+          _ => null,
+        },
+      );
     });
     return Scaffold(
       body: navigationShell,

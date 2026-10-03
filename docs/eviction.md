@@ -94,7 +94,8 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
   Player-Bereich (`episodeNotesProvider`, autoDispose). Die Tipp-Erkenner der Links (`TapGestureRecognizer`) gehören
   dem State von `NotesText` und werden in `dispose()` bzw. bei neuem Text freigegeben. ✅
 - Keine unbegrenzt wachsenden Listen/Maps in Services. Beispiel: `ChapterSkips` merkt höchstens 20 Folgen,
-  sein Stream-Controller wird in `PodcastAudioHandler.dispose()` geschlossen. ✅
+  sein Stream-Controller wird in `PodcastAudioHandler.dispose()` geschlossen. Die Stream-Prüfung im
+  `PodcastAudioHandler` (`_streamDurations`, `_streamHints`) merkt höchstens 50 Folgen (älteste fliegt raus). ✅
 
 ## Tests
 - Unit-Tests für alle Regeln oben (mit fake `Clock` und temporärem Verzeichnis).

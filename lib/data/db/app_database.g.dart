@@ -260,6 +260,21 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _streamVariesMeta = const VerificationMeta(
+    'streamVaries',
+  );
+  @override
+  late final GeneratedColumn<bool> streamVaries = GeneratedColumn<bool>(
+    'stream_varies',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("stream_varies" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -284,6 +299,7 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     episodeCounter,
     episodeNumberOffset,
     episodeOwnCount,
+    streamVaries,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -462,6 +478,15 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         ),
       );
     }
+    if (data.containsKey('stream_varies')) {
+      context.handle(
+        _streamVariesMeta,
+        streamVaries.isAcceptableOrUnknown(
+          data['stream_varies']!,
+          _streamVariesMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -561,6 +586,10 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         DriftSqlType.bool,
         data['${effectivePrefix}episode_own_count'],
       )!,
+      streamVaries: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}stream_varies'],
+      )!,
     );
   }
 
@@ -615,6 +644,11 @@ class Podcast extends DataClass implements Insertable<Podcast> {
   /// Count by date even if the feed numbers its episodes (v12); only then the
   /// offset applies to such feeds.
   final bool episodeOwnCount;
+
+  /// The server delivered a streamed episode differently on a reload (e.g.
+  /// newly inserted ads), so resuming a stream can land elsewhere (v16).
+  /// Set by the player; the app then recommends downloading (playback.md).
+  final bool streamVaries;
   const Podcast({
     required this.id,
     required this.feedUrl,
@@ -638,6 +672,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     required this.episodeCounter,
     required this.episodeNumberOffset,
     required this.episodeOwnCount,
+    required this.streamVaries,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -692,6 +727,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     map['episode_counter'] = Variable<bool>(episodeCounter);
     map['episode_number_offset'] = Variable<int>(episodeNumberOffset);
     map['episode_own_count'] = Variable<bool>(episodeOwnCount);
+    map['stream_varies'] = Variable<bool>(streamVaries);
     return map;
   }
 
@@ -741,6 +777,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       episodeCounter: Value(episodeCounter),
       episodeNumberOffset: Value(episodeNumberOffset),
       episodeOwnCount: Value(episodeOwnCount),
+      streamVaries: Value(streamVaries),
     );
   }
 
@@ -780,6 +817,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
         json['episodeNumberOffset'],
       ),
       episodeOwnCount: serializer.fromJson<bool>(json['episodeOwnCount']),
+      streamVaries: serializer.fromJson<bool>(json['streamVaries']),
     );
   }
   @override
@@ -812,6 +850,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       'episodeCounter': serializer.toJson<bool>(episodeCounter),
       'episodeNumberOffset': serializer.toJson<int>(episodeNumberOffset),
       'episodeOwnCount': serializer.toJson<bool>(episodeOwnCount),
+      'streamVaries': serializer.toJson<bool>(streamVaries),
     };
   }
 
@@ -838,6 +877,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     bool? episodeCounter,
     int? episodeNumberOffset,
     bool? episodeOwnCount,
+    bool? streamVaries,
   }) => Podcast(
     id: id ?? this.id,
     feedUrl: feedUrl ?? this.feedUrl,
@@ -870,6 +910,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     episodeCounter: episodeCounter ?? this.episodeCounter,
     episodeNumberOffset: episodeNumberOffset ?? this.episodeNumberOffset,
     episodeOwnCount: episodeOwnCount ?? this.episodeOwnCount,
+    streamVaries: streamVaries ?? this.streamVaries,
   );
   Podcast copyWithCompanion(PodcastsCompanion data) {
     return Podcast(
@@ -923,6 +964,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       episodeOwnCount: data.episodeOwnCount.present
           ? data.episodeOwnCount.value
           : this.episodeOwnCount,
+      streamVaries: data.streamVaries.present
+          ? data.streamVaries.value
+          : this.streamVaries,
     );
   }
 
@@ -950,7 +994,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ..write('autoPlaylistName: $autoPlaylistName, ')
           ..write('episodeCounter: $episodeCounter, ')
           ..write('episodeNumberOffset: $episodeNumberOffset, ')
-          ..write('episodeOwnCount: $episodeOwnCount')
+          ..write('episodeOwnCount: $episodeOwnCount, ')
+          ..write('streamVaries: $streamVaries')
           ..write(')'))
         .toString();
   }
@@ -979,6 +1024,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     episodeCounter,
     episodeNumberOffset,
     episodeOwnCount,
+    streamVaries,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -1005,7 +1051,8 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           other.autoPlaylistName == this.autoPlaylistName &&
           other.episodeCounter == this.episodeCounter &&
           other.episodeNumberOffset == this.episodeNumberOffset &&
-          other.episodeOwnCount == this.episodeOwnCount);
+          other.episodeOwnCount == this.episodeOwnCount &&
+          other.streamVaries == this.streamVaries);
 }
 
 class PodcastsCompanion extends UpdateCompanion<Podcast> {
@@ -1031,6 +1078,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
   final Value<bool> episodeCounter;
   final Value<int> episodeNumberOffset;
   final Value<bool> episodeOwnCount;
+  final Value<bool> streamVaries;
   const PodcastsCompanion({
     this.id = const Value.absent(),
     this.feedUrl = const Value.absent(),
@@ -1054,6 +1102,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.episodeCounter = const Value.absent(),
     this.episodeNumberOffset = const Value.absent(),
     this.episodeOwnCount = const Value.absent(),
+    this.streamVaries = const Value.absent(),
   });
   PodcastsCompanion.insert({
     this.id = const Value.absent(),
@@ -1078,6 +1127,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.episodeCounter = const Value.absent(),
     this.episodeNumberOffset = const Value.absent(),
     this.episodeOwnCount = const Value.absent(),
+    this.streamVaries = const Value.absent(),
   }) : feedUrl = Value(feedUrl),
        title = Value(title),
        subscribedAt = Value(subscribedAt);
@@ -1104,6 +1154,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Expression<bool>? episodeCounter,
     Expression<int>? episodeNumberOffset,
     Expression<bool>? episodeOwnCount,
+    Expression<bool>? streamVaries,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1131,6 +1182,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       if (episodeNumberOffset != null)
         'episode_number_offset': episodeNumberOffset,
       if (episodeOwnCount != null) 'episode_own_count': episodeOwnCount,
+      if (streamVaries != null) 'stream_varies': streamVaries,
     });
   }
 
@@ -1157,6 +1209,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Value<bool>? episodeCounter,
     Value<int>? episodeNumberOffset,
     Value<bool>? episodeOwnCount,
+    Value<bool>? streamVaries,
   }) {
     return PodcastsCompanion(
       id: id ?? this.id,
@@ -1182,6 +1235,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       episodeCounter: episodeCounter ?? this.episodeCounter,
       episodeNumberOffset: episodeNumberOffset ?? this.episodeNumberOffset,
       episodeOwnCount: episodeOwnCount ?? this.episodeOwnCount,
+      streamVaries: streamVaries ?? this.streamVaries,
     );
   }
 
@@ -1258,6 +1312,9 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     if (episodeOwnCount.present) {
       map['episode_own_count'] = Variable<bool>(episodeOwnCount.value);
     }
+    if (streamVaries.present) {
+      map['stream_varies'] = Variable<bool>(streamVaries.value);
+    }
     return map;
   }
 
@@ -1285,7 +1342,8 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           ..write('autoPlaylistName: $autoPlaylistName, ')
           ..write('episodeCounter: $episodeCounter, ')
           ..write('episodeNumberOffset: $episodeNumberOffset, ')
-          ..write('episodeOwnCount: $episodeOwnCount')
+          ..write('episodeOwnCount: $episodeOwnCount, ')
+          ..write('streamVaries: $streamVaries')
           ..write(')'))
         .toString();
   }
@@ -4798,6 +4856,7 @@ typedef $$PodcastsTableCreateCompanionBuilder = PodcastsCompanion Function({
   Value<bool> episodeCounter,
   Value<int> episodeNumberOffset,
   Value<bool> episodeOwnCount,
+  Value<bool> streamVaries,
 });
 typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<int> id,
@@ -4822,6 +4881,7 @@ typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<bool> episodeCounter,
   Value<int> episodeNumberOffset,
   Value<bool> episodeOwnCount,
+  Value<bool> streamVaries,
 });
 
 final class $$PodcastsTableReferences
@@ -4965,6 +5025,11 @@ class $$PodcastsTableFilterComposer
 
   ColumnFilters<bool> get episodeOwnCount => $composableBuilder(
     column: $table.episodeOwnCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get streamVaries => $composableBuilder(
+    column: $table.streamVaries,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5112,6 +5177,11 @@ class $$PodcastsTableOrderingComposer
     column: $table.episodeOwnCount,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get streamVaries => $composableBuilder(
+    column: $table.streamVaries,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PodcastsTableAnnotationComposer
@@ -5218,6 +5288,11 @@ class $$PodcastsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get streamVaries => $composableBuilder(
+    column: $table.streamVaries,
+    builder: (column) => column,
+  );
+
   Expression<T> episodesRefs<T extends Object>(
     Expression<T> Function($$EpisodesTableAnnotationComposer a) f,
   ) {
@@ -5294,6 +5369,7 @@ class $$PodcastsTableTableManager
                 Value<bool> episodeCounter = const Value.absent(),
                 Value<int> episodeNumberOffset = const Value.absent(),
                 Value<bool> episodeOwnCount = const Value.absent(),
+                Value<bool> streamVaries = const Value.absent(),
               }) => PodcastsCompanion(
                 id: id,
                 feedUrl: feedUrl,
@@ -5317,6 +5393,7 @@ class $$PodcastsTableTableManager
                 episodeCounter: episodeCounter,
                 episodeNumberOffset: episodeNumberOffset,
                 episodeOwnCount: episodeOwnCount,
+                streamVaries: streamVaries,
               ),
           createCompanionCallback:
               ({
@@ -5342,6 +5419,7 @@ class $$PodcastsTableTableManager
                 Value<bool> episodeCounter = const Value.absent(),
                 Value<int> episodeNumberOffset = const Value.absent(),
                 Value<bool> episodeOwnCount = const Value.absent(),
+                Value<bool> streamVaries = const Value.absent(),
               }) => PodcastsCompanion.insert(
                 id: id,
                 feedUrl: feedUrl,
@@ -5365,6 +5443,7 @@ class $$PodcastsTableTableManager
                 episodeCounter: episodeCounter,
                 episodeNumberOffset: episodeNumberOffset,
                 episodeOwnCount: episodeOwnCount,
+                streamVaries: streamVaries,
               ),
           withReferenceMapper: (p0) => p0
               .map(
