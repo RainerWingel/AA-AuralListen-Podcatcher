@@ -129,7 +129,13 @@ class PodcastRepository {
     (e) => OrderingTerm.asc(e.id),
   ];
 
-  /// Seasons of a podcast, ascending (empty = no seasons in the feed).
+  /// A podcast counts as having seasons only with at least this many
+  /// different ones: some feeds tag a stray episode or two with season 1
+  /// ("Hi Freaks", bug 2026-10-03), and one season filters nothing anyway.
+  static const minSeasons = 2;
+
+  /// Seasons of a podcast, ascending; empty = no seasons in the feed or
+  /// fewer than [minSeasons].
   Stream<List<int>> watchSeasons(int podcastId) {
     final season = _db.episodes.season;
     return (_db.selectOnly(_db.episodes, distinct: true)
@@ -137,7 +143,8 @@ class PodcastRepository {
           ..where(_db.episodes.podcastId.equals(podcastId) & season.isNotNull())
           ..orderBy([OrderingTerm.asc(season)]))
         .map((r) => r.read(season)!)
-        .watch();
+        .watch()
+        .map((seasons) => seasons.length < minSeasons ? const [] : seasons);
   }
 
   /// How long an episode counts as "fresh" after it was first fetched.
@@ -275,8 +282,9 @@ class PodcastRepository {
   /// Cover labels of one podcast's episodes (episode id → "12", or "S2·5"
   /// with seasons), updated on refresh and when the counter settings change.
   /// Empty when the counter is switched off for this podcast. Podcasts with
-  /// seasons only use the feed's numbers – the app's own count (and its
-  /// offset) would mix the seasons up (user wish 2026-10-03).
+  /// seasons (at least [minSeasons]) only use the feed's numbers – the app's
+  /// own count (and its offset) would mix the seasons up (user wish
+  /// 2026-10-03). Fewer seasons are ignored, as if there were none.
   Stream<Map<int, String>> watchEpisodeNumbers(int podcastId) {
     final e = _db.episodes;
     final p = _db.podcasts;
@@ -296,7 +304,8 @@ class PodcastRepository {
       if (rows.isEmpty || rows.first.read(p.episodeCounter) != true) {
         return const <int, String>{};
       }
-      if (rows.any((r) => r.read(e.season) != null)) {
+      final seasons = {for (final r in rows) ?r.read(e.season)};
+      if (seasons.length >= minSeasons) {
         return {
           for (final r in rows)
             r.read(e.id)!: ?seasonLabel(

@@ -97,3 +97,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-03 · **Staffeln & Serien, eigene Zählung dort aus** (Benutzer) · `itunes:season` → „S2·5" am Cover, Staffel-
   Chips (Filter + Abspielmenü), `itunes:type` serial → Hörreihenfolge in Liste, „Alle spielen" und Auto-Download. Die
   eigene Zählung samt Versatz ist bei Staffel-Podcasts deaktiviert (nur Feed-Nummern), weil sie Staffeln vermischen würde.
+- 2026-10-03 · **Staffel-Podcast erst ab 2 Staffeln** (Benutzer) · Feeds mit vereinzelt gesetztem `itunes:season`
+  (z. B. „Hi Freaks") bekamen sonst nutzlose Chips und verloren ihre eigene Zählung; eine einzige Staffel filtert ohnehin nichts.

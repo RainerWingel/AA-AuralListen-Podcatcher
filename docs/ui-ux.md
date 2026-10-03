@@ -78,6 +78,9 @@ Eingabe mit „Fertig" oder beim Verlassen übernommen) gilt **nur für die eige
 ausgegraut mit Hinweis. „Eigene Zählung" nummeriert auch Folgen ohne Feed-Nummer. Themen-Feeds zählen über den ganzen Feed.
 
 **Staffeln und Serien** (Benutzerwunsch 2026-10-03, `itunes:season`, `itunes:type`):
+- Als Staffel-Podcast gilt er erst ab **zwei verschiedenen Staffeln** (`PodcastRepository.minSeasons`): manche Feeds
+  markieren nur vereinzelte Folgen mit Staffel 1 („Hi Freaks": 2 von 105 Folgen, Fehler des Podcasters, 2026-10-03) –
+  bei nur einer Staffel werden die Angaben ignoriert (keine Chips, kein „S1·", eigene Zählung möglich).
 - Hat ein Podcast Staffeln, zeigt der Cover-Streifen **„S2·5"** (Staffel·Feed-Nummer), „S2" für ungezählte Folgen
   einer Staffel (Trailer, Bonus), nur die Nummer für Folgen ohne Staffel. **Eigene Zählung und Versatz sind dann aus**
   (Podcast-Einstellungen: Hinweis statt Auswahl) – sie würden die Staffeln durcheinanderbringen.

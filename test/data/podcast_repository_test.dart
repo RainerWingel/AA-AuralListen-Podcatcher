@@ -489,6 +489,18 @@ void main() {
       expect(await repo.watchSeasons(podcastId).first, [1, 2]);
     });
 
+    test('a single season is ignored (stray tags, "Hi Freaks")', () async {
+      final tagged = await add('t', season: 1, number: 83, day: 2);
+      final plain = await add('p', day: 1);
+      await repo.setEpisodeCounter(podcastId, ownCount: true, offset: 100);
+      // Own count with offset still applies, no "S1·" labels, no chips.
+      expect(await repo.watchEpisodeNumbers(podcastId).first, {
+        plain: '101',
+        tagged: '102',
+      });
+      expect(await repo.watchSeasons(podcastId).first, isEmpty);
+    });
+
     test('serial: listening order in lists and "play all"', () async {
       // Published out of order on purpose.
       final s2e1 = await add('s2e1', season: 2, number: 1, day: 1);
