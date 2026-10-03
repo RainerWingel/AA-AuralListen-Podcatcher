@@ -923,6 +923,41 @@ class AppLocalizationsDe extends AppLocalizations {
   String get playUnplayedEpisodes => 'Alle ungespielten Episoden spielen';
 
   @override
+  String get addNewEpisodesToPlaylist => 'Alle neuen Episoden in Playlist';
+
+  @override
+  String get addUnplayedSinceToPlaylist =>
+      'Ungespielte Episoden seit … in Playlist';
+
+  @override
+  String get addUnplayedEpisodesToPlaylist =>
+      'Alle ungespielten Episoden in Playlist';
+
+  @override
+  String get podcastMenuPlayNew => 'Alle neuen Episoden abspielen';
+
+  @override
+  String get podcastMenuPlaySince => 'Ungespielte Episoden seit … abspielen';
+
+  @override
+  String get podcastMenuPlayUnplayed => 'Alle ungespielten Episoden abspielen';
+
+  @override
+  String get noUnplayedEpisodes => 'Keine ungespielten Folgen.';
+
+  @override
+  String episodesAddedNoPlay(int count, String playlist) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Folgen zu „$playlist“ hinzugefügt.',
+      one: '1 Folge zu „$playlist“ hinzugefügt.',
+      zero: 'Alle Folgen waren schon in „$playlist“.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String episodesAddedToPlaylist(int count, String playlist) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

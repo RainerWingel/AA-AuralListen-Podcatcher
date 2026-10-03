@@ -115,8 +115,10 @@ Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Co
 Auswahl) und Löschen / Abbrechen / Erneut. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
 
 ## Podcast-Menü (⋮ im Podcast-Detail)
-Podcast-Einstellungen · Als gespielt markieren bis … · Als ungespielt markieren seit … (je Kalender → Rückfrage mit Anzahl →
-Infobox) · Abo kündigen.
+Podcast-Einstellungen · Alle neuen Episoden abspielen · Ungespielte Episoden seit … abspielen · Alle ungespielten
+Episoden abspielen (Benutzerwunsch 2026-10-03, `playlists.md`) · Als gespielt markieren bis … · Als ungespielt markieren
+seit … (je Kalender → Rückfrage mit Anzahl → Infobox) · Abo kündigen. Langes Drücken auf einen Podcast im Abos-Tab packt
+dagegen nur in eine Playlist (ohne Abspielen).
 
 ## Podcast-Einstellungen
 Podcast-Detail → ⋮ → „Podcast-Einstellungen" (Bottom-Sheet): Automatisch herunterladen (Aus / Nur WLAN / Immer),

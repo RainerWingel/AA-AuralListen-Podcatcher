@@ -44,10 +44,17 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
   - Umbenennen, Farbe…, Playlist löschen.
 
 ## Ganze Podcasts in eine Playlist (Benutzerwunsch 2026-09-28)
-Abos-Tab → **langes Drücken** auf eine Kachel → Menü (`play_podcast_episodes.dart`); dasselbe Menü gibt es für ein einzelnes **Thema**
-(Netzwerk-Feeds wie WRINT): Podcast-Einstellungen → „Themen für automatische Downloads" → langes Drücken auf ein Thema
-(Benutzerwunsch 2026-09-30). Dann zählen nur Folgen dieses Themas (`unplayedEpisodes(theme: …)`), Titel „Podcast · Thema";
-schon enthaltene Folgen werden wie immer übersprungen:
+Ein Menü (`showPodcastPlayMenu` in `play_podcast_episodes.dart`) an drei Stellen:
+- **Abos-Tab → langes Drücken auf eine Kachel/Zeile:** die drei Folgen-Einträge **packen nur in eine Playlist**, ohne
+  abzuspielen (Benutzerwunsch 2026-10-03, `PodcastEpisodesAction.addToPlaylist`): „Alle neuen Episoden in Playlist",
+  „Ungespielte Episoden seit … in Playlist", „Alle ungespielten Episoden in Playlist"; Infobox „n Folgen zu „X"
+  hinzugefügt." bzw. „Alle Folgen waren schon in „X".".
+- **Thema** (Netzwerk-Feeds wie WRINT): Podcast-Einstellungen → „Themen für automatische Downloads" → langes Drücken
+  (Benutzerwunsch 2026-09-30) – nur Folgen dieses Themas (`unplayedEpisodes(theme: …)`), Titel „Podcast · Thema".
+- **Staffel**: langes Drücken auf einen Staffel-Chip im Podcast-Detail – nur diese Staffel.
+Thema und Staffel **spielen** wie unten beschrieben. Zusätzlich hat das ⋮-Menü im Podcast-Detail direkt (ohne Menü
+dazwischen) „Alle neuen Episoden abspielen", „Ungespielte Episoden seit … abspielen", „Alle ungespielten Episoden
+abspielen" (`playFromPodcastMenu`; nichts Passendes → Infobox). Schon enthaltene Folgen werden immer übersprungen:
 1. **„Alle neuen Episoden spielen"** – nur **frische** Folgen.
 2. **„Ungespielte Episoden seit … spielen"** – Kalender (öffnet auf heute, frühestes Datum = älteste ungespielte
    Folge): ungespielte Folgen mit Veröffentlichungsdatum **ab Beginn des gewählten Tags**; Folgen ohne Datum zählen

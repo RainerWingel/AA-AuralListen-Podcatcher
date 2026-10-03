@@ -1574,6 +1574,54 @@ abstract class AppLocalizations {
   /// **'Alle ungespielten Episoden spielen'**
   String get playUnplayedEpisodes;
 
+  /// No description provided for @addNewEpisodesToPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle neuen Episoden in Playlist'**
+  String get addNewEpisodesToPlaylist;
+
+  /// No description provided for @addUnplayedSinceToPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Ungespielte Episoden seit … in Playlist'**
+  String get addUnplayedSinceToPlaylist;
+
+  /// No description provided for @addUnplayedEpisodesToPlaylist.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle ungespielten Episoden in Playlist'**
+  String get addUnplayedEpisodesToPlaylist;
+
+  /// No description provided for @podcastMenuPlayNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle neuen Episoden abspielen'**
+  String get podcastMenuPlayNew;
+
+  /// No description provided for @podcastMenuPlaySince.
+  ///
+  /// In de, this message translates to:
+  /// **'Ungespielte Episoden seit … abspielen'**
+  String get podcastMenuPlaySince;
+
+  /// No description provided for @podcastMenuPlayUnplayed.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle ungespielten Episoden abspielen'**
+  String get podcastMenuPlayUnplayed;
+
+  /// No description provided for @noUnplayedEpisodes.
+  ///
+  /// In de, this message translates to:
+  /// **'Keine ungespielten Folgen.'**
+  String get noUnplayedEpisodes;
+
+  /// No description provided for @episodesAddedNoPlay.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =0{Alle Folgen waren schon in „{playlist}“.} =1{1 Folge zu „{playlist}“ hinzugefügt.} other{{count} Folgen zu „{playlist}“ hinzugefügt.}}'**
+  String episodesAddedNoPlay(int count, String playlist);
+
   /// No description provided for @episodesAddedToPlaylist.
   ///
   /// In de, this message translates to:

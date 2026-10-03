@@ -208,7 +208,13 @@ class _SubscriptionSearchResults extends ConsumerWidget {
               title: Text(podcast.title),
               subtitle: podcast.author == null ? null : Text(podcast.author!),
               onTap: () => context.go(Routes.podcast(podcast.id)),
-              onLongPress: () => showPodcastPlayMenu(context, ref, podcast),
+              onLongPress: () => showPodcastPlayMenu(
+                context,
+                ref,
+                podcast,
+                // In the Abos grid only into a playlist (user wish 2026-10-03).
+                action: PodcastEpisodesAction.addToPlaylist,
+              ),
             ),
         ],
         if (found.isNotEmpty) ...[
@@ -258,7 +264,13 @@ class _PodcastGrid extends ConsumerWidget {
             return InkWell(
               borderRadius: BorderRadius.circular(10),
               onTap: () => context.go(Routes.podcast(podcast.id)),
-              onLongPress: () => showPodcastPlayMenu(context, ref, podcast),
+              onLongPress: () => showPodcastPlayMenu(
+                context,
+                ref,
+                podcast,
+                // In the Abos grid only into a playlist (user wish 2026-10-03).
+                action: PodcastEpisodesAction.addToPlaylist,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

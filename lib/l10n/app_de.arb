@@ -561,6 +561,24 @@
     }
   },
   "playUnplayedEpisodes": "Alle ungespielten Episoden spielen",
+  "addNewEpisodesToPlaylist": "Alle neuen Episoden in Playlist",
+  "addUnplayedSinceToPlaylist": "Ungespielte Episoden seit … in Playlist",
+  "addUnplayedEpisodesToPlaylist": "Alle ungespielten Episoden in Playlist",
+  "podcastMenuPlayNew": "Alle neuen Episoden abspielen",
+  "podcastMenuPlaySince": "Ungespielte Episoden seit … abspielen",
+  "podcastMenuPlayUnplayed": "Alle ungespielten Episoden abspielen",
+  "noUnplayedEpisodes": "Keine ungespielten Folgen.",
+  "episodesAddedNoPlay": "{count, plural, =0{Alle Folgen waren schon in „{playlist}“.} =1{1 Folge zu „{playlist}“ hinzugefügt.} other{{count} Folgen zu „{playlist}“ hinzugefügt.}}",
+  "@episodesAddedNoPlay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "playlist": {
+        "type": "String"
+      }
+    }
+  },
   "episodesAddedToPlaylist": "{count, plural, =0{Alle Folgen waren schon in „{playlist}“ – Wiedergabe startet.} =1{1 Folge zu „{playlist}“ hinzugefügt.} other{{count} Folgen zu „{playlist}“ hinzugefügt.}}",
   "@episodesAddedToPlaylist": {
     "placeholders": {

@@ -13,6 +13,11 @@ import '../playlists/playlist_actions.dart';
 
 enum _PlayChoice { fresh, since, all, markAll }
 
+/// What the three episode entries of [showPodcastPlayMenu] do: add to a
+/// chosen playlist and start playing (podcast page, seasons, topics), or
+/// only add (long press in the Abos grid, user wish 2026-10-03).
+enum PodcastEpisodesAction { play, addToPlaylist }
+
 /// Long press on a subscription tile: "Alle neuen Episoden spielen",
 /// "Ungespielte Episoden seit … spielen", "Alle ungespielten Episoden
 /// spielen" (docs/playlists.md). With [theme] (long press on a topic in the
@@ -24,8 +29,10 @@ Future<void> showPodcastPlayMenu(
   Podcast podcast, {
   String? theme,
   int? season,
+  PodcastEpisodesAction action = PodcastEpisodesAction.play,
 }) async {
   final l10n = AppLocalizations.of(context);
+  final play = action == PodcastEpisodesAction.play;
   final repo = ref.read(podcastRepositoryProvider);
   final fresh = await repo.unplayedEpisodes(
     podcast.id,
@@ -71,21 +78,29 @@ Future<void> showPodcastPlayMenu(
             ),
             ListTile(
               leading: const Icon(Icons.fiber_new_outlined),
-              title: Text(l10n.playNewEpisodes),
+              title: Text(
+                play ? l10n.playNewEpisodes : l10n.addNewEpisodesToPlaylist,
+              ),
               subtitle: Text(l10n.playNewEpisodesHint(fresh.length)),
               enabled: fresh.isNotEmpty,
               onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.fresh),
             ),
             ListTile(
               leading: const Icon(Icons.event_outlined),
-              title: Text(l10n.playUnplayedSince),
+              title: Text(
+                play ? l10n.playUnplayedSince : l10n.addUnplayedSinceToPlaylist,
+              ),
               subtitle: Text(l10n.playUnplayedSinceHint),
               enabled: unplayed.isNotEmpty,
               onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.since),
             ),
             ListTile(
               leading: const Icon(Icons.playlist_play),
-              title: Text(l10n.playUnplayedEpisodes),
+              title: Text(
+                play
+                    ? l10n.playUnplayedEpisodes
+                    : l10n.addUnplayedEpisodesToPlaylist,
+              ),
               subtitle: Text(l10n.episodeCount(unplayed.length)),
               enabled: unplayed.isNotEmpty,
               onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.all),
@@ -112,14 +127,18 @@ Future<void> showPodcastPlayMenu(
         context,
         ref,
         fresh,
-        title: l10n.playNewEpisodes,
+        title: play ? l10n.playNewEpisodes : l10n.addNewEpisodesToPlaylist,
+        play: play,
       );
     case _PlayChoice.all:
       await playPodcastEpisodes(
         context,
         ref,
         unplayed,
-        title: l10n.playUnplayedEpisodes,
+        title: play
+            ? l10n.playUnplayedEpisodes
+            : l10n.addUnplayedEpisodesToPlaylist,
+        play: play,
       );
     case _PlayChoice.since:
       await _playUnplayedSince(
@@ -129,6 +148,7 @@ Future<void> showPodcastPlayMenu(
         unplayed,
         theme: theme,
         season: season,
+        play: play,
       );
     case _PlayChoice.markAll:
       await _markAll(
@@ -206,6 +226,7 @@ Future<void> _playUnplayedSince(
   List<Episode> unplayed, {
   String? theme,
   int? season,
+  bool play = true,
 }) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
@@ -254,17 +275,20 @@ Future<void> _playUnplayedSince(
     context,
     ref,
     episodes,
-    title: l10n.playUnplayedSince,
+    title: play ? l10n.playUnplayedSince : l10n.addUnplayedSinceToPlaylist,
+    play: play,
   );
 }
 
 /// Adds [episodes] (oldest first) to a chosen playlist – skipping those
-/// already in it – and starts playing the first of them in that playlist.
+/// already in it – and, with [play], starts playing the first of them in
+/// that playlist.
 Future<void> playPodcastEpisodes(
   BuildContext context,
   WidgetRef ref,
   List<Episode> episodes, {
   required String title,
+  bool play = true,
 }) async {
   if (episodes.isEmpty) return;
   final l10n = AppLocalizations.of(context);
@@ -275,6 +299,13 @@ Future<void> playPodcastEpisodes(
   final added = await ref.read(playlistRepositoryProvider).addAll(playlist.id, [
     for (final e in episodes) e.id,
   ]);
+  if (!play) {
+    showInfoSnackBar(
+      messenger,
+      l10n.episodesAddedNoPlay(added.length, playlist.name),
+    );
+    return;
+  }
   await ref
       .read(audioHandlerProvider)
       .playEpisode(episodes.first.id, playlistId: playlist.id);
@@ -282,4 +313,49 @@ Future<void> playPodcastEpisodes(
     messenger,
     l10n.episodesAddedToPlaylist(added.length, playlist.name),
   );
+}
+
+/// One of the three play entries of the podcast page's ⋮ menu (user wish
+/// 2026-10-03): like the play menu, but without the sheet in between.
+enum PodcastPlayEntry { fresh, since, all }
+
+Future<void> playFromPodcastMenu(
+  BuildContext context,
+  WidgetRef ref,
+  Podcast podcast,
+  PodcastPlayEntry entry,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final episodes = await ref
+      .read(podcastRepositoryProvider)
+      .unplayedEpisodes(podcast.id, freshOnly: entry == PodcastPlayEntry.fresh);
+  if (!context.mounted) return;
+  if (episodes.isEmpty) {
+    showInfoSnackBar(
+      messenger,
+      entry == PodcastPlayEntry.fresh
+          ? l10n.playNewEpisodesHint(0)
+          : l10n.noUnplayedEpisodes,
+    );
+    return;
+  }
+  switch (entry) {
+    case PodcastPlayEntry.fresh:
+      await playPodcastEpisodes(
+        context,
+        ref,
+        episodes,
+        title: l10n.podcastMenuPlayNew,
+      );
+    case PodcastPlayEntry.all:
+      await playPodcastEpisodes(
+        context,
+        ref,
+        episodes,
+        title: l10n.podcastMenuPlayUnplayed,
+      );
+    case PodcastPlayEntry.since:
+      await _playUnplayedSince(context, ref, podcast, episodes);
+  }
 }

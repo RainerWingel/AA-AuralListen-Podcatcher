@@ -2064,7 +2064,49 @@ void main() {
   );
 
   testWidgets(
-    'long press on a subscription plays its unplayed episodes',
+    'podcast page menu: play all unplayed episodes',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+      await tester.tap(find.byType(PopupMenuButton<void>));
+      await settle(tester);
+      expect(find.text('Alle neuen Episoden abspielen'), findsOneWidget);
+      expect(
+        find.text('Ungespielte Episoden seit … abspielen'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Alle ungespielten Episoden abspielen'));
+      await settle(tester);
+
+      // Only one playlist: no chooser, it plays right away.
+      final episode = await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      );
+      expect(handler.currentEpisodeId, episode!.id);
+      expect(handler.playbackState.value.playing, isTrue);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'long press on a subscription: unplayed episodes into a playlist',
     timeout: timeout,
     (tester) async {
       tester.view
@@ -2088,14 +2130,14 @@ void main() {
 
       await tester.longPress(find.text('Widget-Podcast'));
       await settle(tester);
-      expect(find.text('Alle neuen Episoden spielen'), findsOneWidget);
+      expect(find.text('Alle neuen Episoden in Playlist'), findsOneWidget);
       // Only the initial import so far: nothing is "new".
       expect(
         find.text('Keine neuen Folgen in den letzten 96 Stunden'),
         findsOneWidget,
       );
 
-      await tester.tap(find.text('Alle ungespielten Episoden spielen'));
+      await tester.tap(find.text('Alle ungespielten Episoden in Playlist'));
       await settle(tester);
       // Two playlists: the user chooses.
       await tester.tap(find.text('Unterwegs'));
@@ -2108,9 +2150,10 @@ void main() {
         () => db.select(db.episodes).get(),
       );
       expect(entries, hasLength(episodes!.length));
-      expect(handler.currentEpisodeId, entries!.first.episode.id);
-      expect(handler.activePlaylistId, second);
-      expect(handler.playbackState.value.playing, isTrue);
+      expect(entries!.first.item.playlistId, second);
+      // Only added: nothing starts playing (user wish 2026-10-03).
+      expect(handler.currentEpisodeId, isNull);
+      expect(handler.playbackState.value.playing, isFalse);
       expect(find.textContaining('zu „Unterwegs“ hinzugefügt'), findsOneWidget);
 
       await disposeApp(tester);
@@ -2160,7 +2203,7 @@ void main() {
 
       await tester.longPress(find.text('Widget-Podcast'));
       await settle(tester);
-      await tester.tap(find.text('Ungespielte Episoden seit … spielen'));
+      await tester.tap(find.text('Ungespielte Episoden seit … in Playlist'));
       await settle(tester);
 
       // The calendar opens on this month: pick its first day.
@@ -2177,7 +2220,7 @@ void main() {
         () => container.read(playlistRepositoryProvider).entries(playlist!.id),
       );
       expect(entries!.map((e) => e.episode.guid), ['neu']);
-      expect(handler.playbackState.value.playing, isTrue);
+      expect(handler.playbackState.value.playing, isFalse);
       expect(find.textContaining('1 Folge zu'), findsOneWidget);
 
       await disposeApp(tester);
@@ -2202,7 +2245,7 @@ void main() {
       await settle(tester);
       await tester.longPress(find.text('Widget-Podcast'));
       await settle(tester);
-      await tester.tap(find.text('Ungespielte Episoden seit … spielen'));
+      await tester.tap(find.text('Ungespielte Episoden seit … in Playlist'));
       await settle(tester);
       await tester.tap(find.byIcon(Icons.edit_outlined));
       await settle(tester);

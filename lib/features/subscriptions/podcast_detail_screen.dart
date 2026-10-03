@@ -105,6 +105,33 @@ class _PodcastDetailScreenState extends ConsumerState<PodcastDetailScreen> {
                     child: Text(l10n.podcastSettings),
                   ),
                   PopupMenuItem(
+                    onTap: () => playFromPodcastMenu(
+                      context,
+                      ref,
+                      podcast,
+                      PodcastPlayEntry.fresh,
+                    ),
+                    child: Text(l10n.podcastMenuPlayNew),
+                  ),
+                  PopupMenuItem(
+                    onTap: () => playFromPodcastMenu(
+                      context,
+                      ref,
+                      podcast,
+                      PodcastPlayEntry.since,
+                    ),
+                    child: Text(l10n.podcastMenuPlaySince),
+                  ),
+                  PopupMenuItem(
+                    onTap: () => playFromPodcastMenu(
+                      context,
+                      ref,
+                      podcast,
+                      PodcastPlayEntry.all,
+                    ),
+                    child: Text(l10n.podcastMenuPlayUnplayed),
+                  ),
+                  PopupMenuItem(
                     onTap: () =>
                         markPlayedUntilFlow(context, ref, podcast, all),
                     child: Text(l10n.markPlayedUntil),
