@@ -314,10 +314,15 @@ class _EpisodeCounterSettings extends ConsumerWidget {
     final repo = ref.read(podcastRepositoryProvider);
     final feedNumbers =
         ref.watch(hasFeedNumbersProvider(podcast.id)).value ?? false;
+    // Podcasts with seasons only show the feed's numbers per season ("S2·5");
+    // own count and offset are off for them (user wish 2026-10-03).
+    final seasonal =
+        ref.watch(podcastSeasonsProvider(podcast.id)).value?.isNotEmpty ??
+        false;
     final on = podcast.episodeCounter;
     // The offset belongs to the app's own count: always for feeds without
     // numbers, for numbered feeds only when chosen (user wish 2026-10-01).
-    final ownCount = !feedNumbers || podcast.episodeOwnCount;
+    final ownCount = !seasonal && (!feedNumbers || podcast.episodeOwnCount);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -328,7 +333,12 @@ class _EpisodeCounterSettings extends ConsumerWidget {
           value: on,
           onChanged: (v) => repo.setEpisodeCounter(podcast.id, enabled: v),
         ),
-        if (feedNumbers) ...[
+        if (seasonal) ...[
+          Text(l10n.episodeNumbering, style: theme.textTheme.titleSmall),
+          const SizedBox(height: 4),
+          Text(l10n.episodeNumberingSeasons, style: theme.textTheme.bodySmall),
+          const SizedBox(height: 8),
+        ] else if (feedNumbers) ...[
           Text(l10n.episodeNumbering, style: theme.textTheme.titleSmall),
           const SizedBox(height: 8),
           SegmentedButton<bool>(
@@ -369,6 +379,8 @@ class _EpisodeCounterSettings extends ConsumerWidget {
         Text(
           ownCount
               ? l10n.episodeNumberOffsetHint
+              : seasonal
+              ? l10n.episodeNumberOffsetSeasons
               : l10n.episodeNumberOffsetFeed,
           style: theme.textTheme.bodySmall,
         ),

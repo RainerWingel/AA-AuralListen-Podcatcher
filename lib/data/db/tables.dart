@@ -24,6 +24,10 @@ class Podcasts extends Table {
   TextColumn get imageUrl => text().nullable()();
   TextColumn get websiteUrl => text().nullable()();
 
+  /// `itunes:type` is `serial` (v18): told in order, so lists, "play all"
+  /// and auto-download go oldest first (by season and episode).
+  BoolColumn get serial => boolean().withDefault(const Constant(false))();
+
   /// "Support" link from `podcast:funding` and its text (v17).
   TextColumn get fundingUrl => text().nullable()();
   TextColumn get fundingLabel => text().nullable()();
@@ -106,6 +110,10 @@ class Episodes extends Table {
 
   /// The feed's own episode number (`itunes:episode`), v11.
   IntColumn get episodeNumber => integer().nullable()();
+
+  /// `itunes:season` (v18): seasons are shown ("S2·5"), filtered and – for
+  /// serial podcasts – ordered by (docs/ui-ux.md "Staffeln").
+  IntColumn get season => integer().nullable()();
 
   TextColumn get status => textEnum<EpisodeStatus>().withDefault(
     Constant(EpisodeStatus.newEpisode.name),

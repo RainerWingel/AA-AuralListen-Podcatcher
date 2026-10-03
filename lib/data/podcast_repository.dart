@@ -101,17 +101,44 @@ class PodcastRepository {
     _db.episodeNotes,
   )..where((n) => n.episodeId.equals(episodeId))).getSingleOrNull())?.notes;
 
-  Stream<List<Episode>> watchEpisodes(int podcastId) =>
+  /// Episodes of a podcast for its page: newest first, or for [serial]
+  /// podcasts in listening order (season, episode, date – see [serialOrder]).
+  Stream<List<Episode>> watchEpisodes(int podcastId, {bool serial = false}) =>
       (_db.select(_db.episodes)
             ..where((e) => e.podcastId.equals(podcastId))
-            ..orderBy([
-              (e) => OrderingTerm(
-                expression: e.pubDate,
-                mode: OrderingMode.desc,
-                nulls: NullsOrder.last,
-              ),
-            ]))
+            ..orderBy(
+              serial
+                  ? serialOrder
+                  : [
+                      (e) => OrderingTerm(
+                        expression: e.pubDate,
+                        mode: OrderingMode.desc,
+                        nulls: NullsOrder.last,
+                      ),
+                    ],
+            ))
           .watch();
+
+  /// Listening order of a serial podcast (`itunes:type` serial): season,
+  /// then episode number, then date; episodes without season or number
+  /// (trailers, bonus) after the numbered ones of their group.
+  static final serialOrder = <OrderingTerm Function($EpisodesTable)>[
+    (e) => OrderingTerm(expression: e.season, nulls: NullsOrder.last),
+    (e) => OrderingTerm(expression: e.episodeNumber, nulls: NullsOrder.last),
+    (e) => OrderingTerm(expression: e.pubDate, nulls: NullsOrder.last),
+    (e) => OrderingTerm.asc(e.id),
+  ];
+
+  /// Seasons of a podcast, ascending (empty = no seasons in the feed).
+  Stream<List<int>> watchSeasons(int podcastId) {
+    final season = _db.episodes.season;
+    return (_db.selectOnly(_db.episodes, distinct: true)
+          ..addColumns([season])
+          ..where(_db.episodes.podcastId.equals(podcastId) & season.isNotNull())
+          ..orderBy([OrderingTerm.asc(season)]))
+        .map((r) => r.read(season)!)
+        .watch();
+  }
 
   /// How long an episode counts as "fresh" after it was first fetched.
   static const freshFor = Duration(hours: 96);
@@ -123,12 +150,14 @@ class PodcastRepository {
   /// With [since] only those published at or after it ("Ungespielte Episoden
   /// seit … spielen"); episodes without a date are left out then.
   /// With [theme] only episodes of that sub-series (network feeds, long press
-  /// on a topic in the podcast settings).
+  /// on a topic in the podcast settings), with [season] only that season.
+  /// Serial podcasts come in listening order ([serialOrder]).
   Future<List<Episode>> unplayedEpisodes(
     int podcastId, {
     required bool freshOnly,
     DateTime? since,
     String? theme,
+    int? season,
   }) async {
     final podcast = await (_db.select(
       _db.podcasts,
@@ -140,10 +169,20 @@ class PodcastRepository {
             e.podcastId.equals(podcastId) &
             e.status.equalsValue(EpisodeStatus.played).not(),
       )
-      ..orderBy([
-        (e) => OrderingTerm(expression: e.pubDate, nulls: NullsOrder.first),
-        (e) => OrderingTerm.asc(e.id),
-      ]);
+      ..orderBy(
+        podcast.serial
+            ? serialOrder
+            : [
+                (e) => OrderingTerm(
+                  expression: e.pubDate,
+                  nulls: NullsOrder.first,
+                ),
+                (e) => OrderingTerm.asc(e.id),
+              ],
+      );
+    if (season != null) {
+      query.where((e) => e.season.equals(season));
+    }
     if (since != null) {
       query.where((e) => e.pubDate.isBiggerOrEqualValue(since));
     }
@@ -233,10 +272,12 @@ class PodcastRepository {
     ];
   }
 
-  /// Cover numbers of one podcast's episodes (episode id → number), updated
-  /// on refresh and when the counter settings change. Empty when the counter
-  /// is switched off for this podcast.
-  Stream<Map<int, int>> watchEpisodeNumbers(int podcastId) {
+  /// Cover labels of one podcast's episodes (episode id → "12", or "S2·5"
+  /// with seasons), updated on refresh and when the counter settings change.
+  /// Empty when the counter is switched off for this podcast. Podcasts with
+  /// seasons only use the feed's numbers – the app's own count (and its
+  /// offset) would mix the seasons up (user wish 2026-10-03).
+  Stream<Map<int, String>> watchEpisodeNumbers(int podcastId) {
     final e = _db.episodes;
     final p = _db.podcasts;
     final query =
@@ -245,6 +286,7 @@ class PodcastRepository {
             e.id,
             e.pubDate,
             e.episodeNumber,
+            e.season,
             p.episodeCounter,
             p.episodeNumberOffset,
             p.episodeOwnCount,
@@ -252,9 +294,18 @@ class PodcastRepository {
           ..where(e.podcastId.equals(podcastId));
     return query.watch().map((rows) {
       if (rows.isEmpty || rows.first.read(p.episodeCounter) != true) {
-        return const <int, int>{};
+        return const <int, String>{};
       }
-      return episodeNumbers(
+      if (rows.any((r) => r.read(e.season) != null)) {
+        return {
+          for (final r in rows)
+            r.read(e.id)!: ?seasonLabel(
+              r.read(e.season),
+              r.read(e.episodeNumber),
+            ),
+        };
+      }
+      final numbers = episodeNumbers(
         [
           for (final r in rows)
             (
@@ -266,6 +317,7 @@ class PodcastRepository {
         offset: rows.first.read(p.episodeNumberOffset) ?? 0,
         ownCount: rows.first.read(p.episodeOwnCount) ?? false,
       );
+      return {for (final n in numbers.entries) n.key: '${n.value}'};
     });
   }
 
@@ -371,6 +423,7 @@ class PodcastRepository {
               websiteUrl: Value(feed.websiteUrl),
               fundingUrl: Value(feed.fundingUrl),
               fundingLabel: Value(feed.fundingLabel),
+              serial: Value(feed.serial),
               etag: Value(result.etag),
               lastModified: Value(result.lastModified),
               lastRefreshAt: Value(now),
@@ -637,6 +690,7 @@ class PodcastRepository {
             websiteUrl: Value(feed.websiteUrl),
             fundingUrl: Value(feed.fundingUrl),
             fundingLabel: Value(feed.fundingLabel),
+            serial: Value(feed.serial),
             etag: Value(loaded.fetched.etag),
             lastModified: Value(loaded.fetched.lastModified),
             lastRefreshAt: Value(now),
@@ -796,6 +850,7 @@ class PodcastRepository {
           chaptersUrl: Value(e.chaptersUrl),
           theme: Value(e.theme),
           episodeNumber: Value(e.episodeNumber),
+          season: Value(e.season),
           addedAt: now,
         ),
         onConflict: DoUpdate(
@@ -810,6 +865,7 @@ class PodcastRepository {
             chaptersUrl: Value(e.chaptersUrl),
             theme: Value(e.theme),
             episodeNumber: Value(e.episodeNumber),
+            season: Value(e.season),
           ),
           target: [_db.episodes.podcastId, _db.episodes.guid],
         ),

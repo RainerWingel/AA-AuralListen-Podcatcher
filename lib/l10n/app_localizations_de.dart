@@ -319,6 +319,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get download => 'Herunterladen';
 
   @override
+  String get episodeNumberingSeasons =>
+      'Staffel-Podcast: Es gelten die Nummern aus dem Feed, je Staffel (z. B. „S2·5“). Eine eigene Zählung ist hier nicht möglich.';
+
+  @override
+  String get episodeNumberOffsetSeasons =>
+      'Bei Staffel-Podcasts nicht möglich.';
+
+  @override
+  String get seasonAll => 'Alle';
+
+  @override
+  String seasonLabel(int season) {
+    return 'Staffel $season';
+  }
+
+  @override
   String get podcastWebsite => 'Website';
 
   @override

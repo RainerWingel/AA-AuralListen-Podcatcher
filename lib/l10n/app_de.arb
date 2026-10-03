@@ -204,6 +204,17 @@
   "markUnplayed": "Als ungespielt markieren",
   "settingsTitle": "Einstellungen",
   "download": "Herunterladen",
+  "episodeNumberingSeasons": "Staffel-Podcast: Es gelten die Nummern aus dem Feed, je Staffel (z. B. „S2·5“). Eine eigene Zählung ist hier nicht möglich.",
+  "episodeNumberOffsetSeasons": "Bei Staffel-Podcasts nicht möglich.",
+  "seasonAll": "Alle",
+  "seasonLabel": "Staffel {season}",
+  "@seasonLabel": {
+    "placeholders": {
+      "season": {
+        "type": "int"
+      }
+    }
+  },
   "podcastWebsite": "Website",
   "podcastSupport": "Unterstützen",
   "playlistContinueOffer": "Antippen: am Ende mit der nächsten Folge dieser Playlist weitermachen",

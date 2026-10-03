@@ -16,12 +16,14 @@ enum _PlayChoice { fresh, since, all, markAll }
 /// Long press on a subscription tile: "Alle neuen Episoden spielen",
 /// "Ungespielte Episoden seit … spielen", "Alle ungespielten Episoden
 /// spielen" (docs/playlists.md). With [theme] (long press on a topic in the
-/// podcast settings) only that topic's episodes count.
+/// podcast settings) only that topic's episodes count, with [season] (long
+/// press on a season chip on the podcast page) only that season's.
 Future<void> showPodcastPlayMenu(
   BuildContext context,
   WidgetRef ref,
   Podcast podcast, {
   String? theme,
+  int? season,
 }) async {
   final l10n = AppLocalizations.of(context);
   final repo = ref.read(podcastRepositoryProvider);
@@ -29,15 +31,17 @@ Future<void> showPodcastPlayMenu(
     podcast.id,
     freshOnly: true,
     theme: theme,
+    season: season,
   );
   final unplayed = await repo.unplayedEpisodes(
     podcast.id,
     freshOnly: false,
     theme: theme,
+    season: season,
   );
   final total = await ref
       .read(playbackRepositoryProvider)
-      .countEpisodes(podcast.id, theme: theme);
+      .countEpisodes(podcast.id, theme: theme, season: season);
   // "Mark all as unplayed" only when every affected episode is played.
   final allPlayed = total > 0 && unplayed.isEmpty;
   if (!context.mounted) return;
@@ -55,9 +59,11 @@ Future<void> showPodcastPlayMenu(
           children: [
             ListTile(
               title: Text(
-                theme == null
-                    ? podcast.title
-                    : '${podcast.title} · ${themeDisplayName(theme)}',
+                [
+                  podcast.title,
+                  if (theme != null) themeDisplayName(theme),
+                  if (season != null) l10n.seasonLabel(season),
+                ].join(' · '),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(sheetContext).textTheme.titleMedium,
@@ -116,13 +122,21 @@ Future<void> showPodcastPlayMenu(
         title: l10n.playUnplayedEpisodes,
       );
     case _PlayChoice.since:
-      await _playUnplayedSince(context, ref, podcast, unplayed, theme: theme);
+      await _playUnplayedSince(
+        context,
+        ref,
+        podcast,
+        unplayed,
+        theme: theme,
+        season: season,
+      );
     case _PlayChoice.markAll:
       await _markAll(
         context,
         ref,
         podcast,
         theme: theme,
+        season: season,
         played: !allPlayed,
         count: allPlayed ? total : unplayed.length,
       );
@@ -136,6 +150,7 @@ Future<void> _markAll(
   WidgetRef ref,
   Podcast podcast, {
   required String? theme,
+  required int? season,
   required bool played,
   required int count,
 }) async {
@@ -167,10 +182,18 @@ Future<void> _markAll(
   if (confirmed != true) return;
   final playback = ref.read(playbackRepositoryProvider);
   if (played) {
-    final marked = await playback.markAllPlayed(podcast.id, theme: theme);
+    final marked = await playback.markAllPlayed(
+      podcast.id,
+      theme: theme,
+      season: season,
+    );
     showInfoSnackBar(messenger, l10n.markPlayedUntilDone(marked));
   } else {
-    final marked = await playback.markAllUnplayed(podcast.id, theme: theme);
+    final marked = await playback.markAllUnplayed(
+      podcast.id,
+      theme: theme,
+      season: season,
+    );
     showInfoSnackBar(messenger, l10n.markUnplayedSinceDone(marked));
   }
 }
@@ -182,6 +205,7 @@ Future<void> _playUnplayedSince(
   Podcast podcast,
   List<Episode> unplayed, {
   String? theme,
+  int? season,
 }) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
@@ -214,6 +238,7 @@ Future<void> _playUnplayedSince(
         freshOnly: false,
         since: since,
         theme: theme,
+        season: season,
       );
   if (!context.mounted) return;
   if (episodes.isEmpty) {

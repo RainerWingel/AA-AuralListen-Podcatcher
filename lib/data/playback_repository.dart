@@ -167,16 +167,22 @@ class PlaybackRepository {
         ),
       );
 
-  Expression<bool> _ofPodcast($EpisodesTable e, int podcastId, String? theme) =>
+  Expression<bool> _ofPodcast(
+    $EpisodesTable e,
+    int podcastId,
+    String? theme, [
+    int? season,
+  ]) =>
       e.podcastId.equals(podcastId) &
-      (theme == null ? const Constant(true) : e.theme.equals(theme));
+      (theme == null ? const Constant(true) : e.theme.equals(theme)) &
+      (season == null ? const Constant(true) : e.season.equals(season));
 
-  /// Number of all episodes of a podcast (or of one [theme]).
-  Future<int> countEpisodes(int podcastId, {String? theme}) async {
+  /// Number of all episodes of a podcast (or of one [theme] / [season]).
+  Future<int> countEpisodes(int podcastId, {String? theme, int? season}) async {
     final count = _db.episodes.id.count();
     return await (_db.selectOnly(_db.episodes)
               ..addColumns([count])
-              ..where(_ofPodcast(_db.episodes, podcastId, theme)))
+              ..where(_ofPodcast(_db.episodes, podcastId, theme, season)))
             .map((r) => r.read(count))
             .getSingle() ??
         0;
@@ -185,13 +191,13 @@ class PlaybackRepository {
   /// "Alle als gespielt markieren" (whole podcast or one [theme]): like
   /// [markPlayedUntil], but for every not yet played episode, undated ones
   /// too. Returns the number of episodes marked.
-  Future<int> markAllPlayed(int podcastId, {String? theme}) =>
+  Future<int> markAllPlayed(int podcastId, {String? theme, int? season}) =>
       _db.transaction(() async {
         final ids =
             await (_db.selectOnly(_db.episodes)
                   ..addColumns([_db.episodes.id])
                   ..where(
-                    _ofPodcast(_db.episodes, podcastId, theme) &
+                    _ofPodcast(_db.episodes, podcastId, theme, season) &
                         _db.episodes.status
                             .equalsValue(EpisodeStatus.played)
                             .not(),
@@ -214,10 +220,10 @@ class PlaybackRepository {
 
   /// "Alle als ungespielt markieren": all played episodes of the podcast (or
   /// [theme]) become new again, like [markUnplayedSince]. Returns the count.
-  Future<int> markAllUnplayed(int podcastId, {String? theme}) =>
+  Future<int> markAllUnplayed(int podcastId, {String? theme, int? season}) =>
       (_db.update(_db.episodes)..where(
             (e) =>
-                _ofPodcast(e, podcastId, theme) &
+                _ofPodcast(e, podcastId, theme, season) &
                 e.status.equalsValue(EpisodeStatus.played),
           ))
           .write(

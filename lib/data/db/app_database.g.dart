@@ -84,6 +84,19 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _serialMeta = const VerificationMeta('serial');
+  @override
+  late final GeneratedColumn<bool> serial = GeneratedColumn<bool>(
+    'serial',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("serial" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _fundingUrlMeta = const VerificationMeta(
     'fundingUrl',
   );
@@ -306,6 +319,7 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     description,
     imageUrl,
     websiteUrl,
+    serial,
     fundingUrl,
     fundingLabel,
     etag,
@@ -381,6 +395,12 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
       context.handle(
         _websiteUrlMeta,
         websiteUrl.isAcceptableOrUnknown(data['website_url']!, _websiteUrlMeta),
+      );
+    }
+    if (data.containsKey('serial')) {
+      context.handle(
+        _serialMeta,
+        serial.isAcceptableOrUnknown(data['serial']!, _serialMeta),
       );
     }
     if (data.containsKey('funding_url')) {
@@ -563,6 +583,10 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         DriftSqlType.string,
         data['${effectivePrefix}website_url'],
       ),
+      serial: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}serial'],
+      )!,
       fundingUrl: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}funding_url'],
@@ -660,6 +684,10 @@ class Podcast extends DataClass implements Insertable<Podcast> {
   final String? imageUrl;
   final String? websiteUrl;
 
+  /// `itunes:type` is `serial` (v18): told in order, so lists, "play all"
+  /// and auto-download go oldest first (by season and episode).
+  final bool serial;
+
   /// "Support" link from `podcast:funding` and its text (v17).
   final String? fundingUrl;
   final String? fundingLabel;
@@ -708,6 +736,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     this.description,
     this.imageUrl,
     this.websiteUrl,
+    required this.serial,
     this.fundingUrl,
     this.fundingLabel,
     this.etag,
@@ -745,6 +774,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     if (!nullToAbsent || websiteUrl != null) {
       map['website_url'] = Variable<String>(websiteUrl);
     }
+    map['serial'] = Variable<bool>(serial);
     if (!nullToAbsent || fundingUrl != null) {
       map['funding_url'] = Variable<String>(fundingUrl);
     }
@@ -807,6 +837,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       websiteUrl: websiteUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(websiteUrl),
+      serial: Value(serial),
       fundingUrl: fundingUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(fundingUrl),
@@ -859,6 +890,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       description: serializer.fromJson<String?>(json['description']),
       imageUrl: serializer.fromJson<String?>(json['imageUrl']),
       websiteUrl: serializer.fromJson<String?>(json['websiteUrl']),
+      serial: serializer.fromJson<bool>(json['serial']),
       fundingUrl: serializer.fromJson<String?>(json['fundingUrl']),
       fundingLabel: serializer.fromJson<String?>(json['fundingLabel']),
       etag: serializer.fromJson<String?>(json['etag']),
@@ -898,6 +930,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       'description': serializer.toJson<String?>(description),
       'imageUrl': serializer.toJson<String?>(imageUrl),
       'websiteUrl': serializer.toJson<String?>(websiteUrl),
+      'serial': serializer.toJson<bool>(serial),
       'fundingUrl': serializer.toJson<String?>(fundingUrl),
       'fundingLabel': serializer.toJson<String?>(fundingLabel),
       'etag': serializer.toJson<String?>(etag),
@@ -931,6 +964,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     Value<String?> description = const Value.absent(),
     Value<String?> imageUrl = const Value.absent(),
     Value<String?> websiteUrl = const Value.absent(),
+    bool? serial,
     Value<String?> fundingUrl = const Value.absent(),
     Value<String?> fundingLabel = const Value.absent(),
     Value<String?> etag = const Value.absent(),
@@ -957,6 +991,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     description: description.present ? description.value : this.description,
     imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
     websiteUrl: websiteUrl.present ? websiteUrl.value : this.websiteUrl,
+    serial: serial ?? this.serial,
     fundingUrl: fundingUrl.present ? fundingUrl.value : this.fundingUrl,
     fundingLabel: fundingLabel.present ? fundingLabel.value : this.fundingLabel,
     etag: etag.present ? etag.value : this.etag,
@@ -998,6 +1033,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       websiteUrl: data.websiteUrl.present
           ? data.websiteUrl.value
           : this.websiteUrl,
+      serial: data.serial.present ? data.serial.value : this.serial,
       fundingUrl: data.fundingUrl.present
           ? data.fundingUrl.value
           : this.fundingUrl,
@@ -1059,6 +1095,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ..write('description: $description, ')
           ..write('imageUrl: $imageUrl, ')
           ..write('websiteUrl: $websiteUrl, ')
+          ..write('serial: $serial, ')
           ..write('fundingUrl: $fundingUrl, ')
           ..write('fundingLabel: $fundingLabel, ')
           ..write('etag: $etag, ')
@@ -1090,6 +1127,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     description,
     imageUrl,
     websiteUrl,
+    serial,
     fundingUrl,
     fundingLabel,
     etag,
@@ -1120,6 +1158,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           other.description == this.description &&
           other.imageUrl == this.imageUrl &&
           other.websiteUrl == this.websiteUrl &&
+          other.serial == this.serial &&
           other.fundingUrl == this.fundingUrl &&
           other.fundingLabel == this.fundingLabel &&
           other.etag == this.etag &&
@@ -1148,6 +1187,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
   final Value<String?> description;
   final Value<String?> imageUrl;
   final Value<String?> websiteUrl;
+  final Value<bool> serial;
   final Value<String?> fundingUrl;
   final Value<String?> fundingLabel;
   final Value<String?> etag;
@@ -1174,6 +1214,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.description = const Value.absent(),
     this.imageUrl = const Value.absent(),
     this.websiteUrl = const Value.absent(),
+    this.serial = const Value.absent(),
     this.fundingUrl = const Value.absent(),
     this.fundingLabel = const Value.absent(),
     this.etag = const Value.absent(),
@@ -1201,6 +1242,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.description = const Value.absent(),
     this.imageUrl = const Value.absent(),
     this.websiteUrl = const Value.absent(),
+    this.serial = const Value.absent(),
     this.fundingUrl = const Value.absent(),
     this.fundingLabel = const Value.absent(),
     this.etag = const Value.absent(),
@@ -1230,6 +1272,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Expression<String>? description,
     Expression<String>? imageUrl,
     Expression<String>? websiteUrl,
+    Expression<bool>? serial,
     Expression<String>? fundingUrl,
     Expression<String>? fundingLabel,
     Expression<String>? etag,
@@ -1257,6 +1300,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       if (description != null) 'description': description,
       if (imageUrl != null) 'image_url': imageUrl,
       if (websiteUrl != null) 'website_url': websiteUrl,
+      if (serial != null) 'serial': serial,
       if (fundingUrl != null) 'funding_url': fundingUrl,
       if (fundingLabel != null) 'funding_label': fundingLabel,
       if (etag != null) 'etag': etag,
@@ -1289,6 +1333,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Value<String?>? description,
     Value<String?>? imageUrl,
     Value<String?>? websiteUrl,
+    Value<bool>? serial,
     Value<String?>? fundingUrl,
     Value<String?>? fundingLabel,
     Value<String?>? etag,
@@ -1316,6 +1361,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
       websiteUrl: websiteUrl ?? this.websiteUrl,
+      serial: serial ?? this.serial,
       fundingUrl: fundingUrl ?? this.fundingUrl,
       fundingLabel: fundingLabel ?? this.fundingLabel,
       etag: etag ?? this.etag,
@@ -1361,6 +1407,9 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     }
     if (websiteUrl.present) {
       map['website_url'] = Variable<String>(websiteUrl.value);
+    }
+    if (serial.present) {
+      map['serial'] = Variable<bool>(serial.value);
     }
     if (fundingUrl.present) {
       map['funding_url'] = Variable<String>(fundingUrl.value);
@@ -1433,6 +1482,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           ..write('description: $description, ')
           ..write('imageUrl: $imageUrl, ')
           ..write('websiteUrl: $websiteUrl, ')
+          ..write('serial: $serial, ')
           ..write('fundingUrl: $fundingUrl, ')
           ..write('fundingLabel: $fundingLabel, ')
           ..write('etag: $etag, ')
@@ -1614,6 +1664,15 @@ class $EpisodesTable extends Episodes with TableInfo<$EpisodesTable, Episode> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _seasonMeta = const VerificationMeta('season');
+  @override
+  late final GeneratedColumn<int> season = GeneratedColumn<int>(
+    'season',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   late final GeneratedColumnWithTypeConverter<EpisodeStatus, String> status =
       GeneratedColumn<String>(
@@ -1674,6 +1733,7 @@ class $EpisodesTable extends Episodes with TableInfo<$EpisodesTable, Episode> {
     chaptersUrl,
     theme,
     episodeNumber,
+    season,
     status,
     positionMs,
     playedAt,
@@ -1795,6 +1855,12 @@ class $EpisodesTable extends Episodes with TableInfo<$EpisodesTable, Episode> {
         ),
       );
     }
+    if (data.containsKey('season')) {
+      context.handle(
+        _seasonMeta,
+        season.isAcceptableOrUnknown(data['season']!, _seasonMeta),
+      );
+    }
     if (data.containsKey('position_ms')) {
       context.handle(
         _positionMsMeta,
@@ -1884,6 +1950,10 @@ class $EpisodesTable extends Episodes with TableInfo<$EpisodesTable, Episode> {
         DriftSqlType.int,
         data['${effectivePrefix}episode_number'],
       ),
+      season: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}season'],
+      ),
       status: $EpisodesTable.$converterstatus.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -1939,6 +2009,10 @@ class Episode extends DataClass implements Insertable<Episode> {
 
   /// The feed's own episode number (`itunes:episode`), v11.
   final int? episodeNumber;
+
+  /// `itunes:season` (v18): seasons are shown ("S2·5"), filtered and – for
+  /// serial podcasts – ordered by (docs/ui-ux.md "Staffeln").
+  final int? season;
   final EpisodeStatus status;
   final int positionMs;
   final DateTime? playedAt;
@@ -1958,6 +2032,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     this.chaptersUrl,
     this.theme,
     this.episodeNumber,
+    this.season,
     required this.status,
     required this.positionMs,
     this.playedAt,
@@ -1997,6 +2072,9 @@ class Episode extends DataClass implements Insertable<Episode> {
     }
     if (!nullToAbsent || episodeNumber != null) {
       map['episode_number'] = Variable<int>(episodeNumber);
+    }
+    if (!nullToAbsent || season != null) {
+      map['season'] = Variable<int>(season);
     }
     {
       map['status'] = Variable<String>(
@@ -2045,6 +2123,9 @@ class Episode extends DataClass implements Insertable<Episode> {
       episodeNumber: episodeNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(episodeNumber),
+      season: season == null && nullToAbsent
+          ? const Value.absent()
+          : Value(season),
       status: Value(status),
       positionMs: Value(positionMs),
       playedAt: playedAt == null && nullToAbsent
@@ -2074,6 +2155,7 @@ class Episode extends DataClass implements Insertable<Episode> {
       chaptersUrl: serializer.fromJson<String?>(json['chaptersUrl']),
       theme: serializer.fromJson<String?>(json['theme']),
       episodeNumber: serializer.fromJson<int?>(json['episodeNumber']),
+      season: serializer.fromJson<int?>(json['season']),
       status: $EpisodesTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
       ),
@@ -2100,6 +2182,7 @@ class Episode extends DataClass implements Insertable<Episode> {
       'chaptersUrl': serializer.toJson<String?>(chaptersUrl),
       'theme': serializer.toJson<String?>(theme),
       'episodeNumber': serializer.toJson<int?>(episodeNumber),
+      'season': serializer.toJson<int?>(season),
       'status': serializer.toJson<String>(
         $EpisodesTable.$converterstatus.toJson(status),
       ),
@@ -2124,6 +2207,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     Value<String?> chaptersUrl = const Value.absent(),
     Value<String?> theme = const Value.absent(),
     Value<int?> episodeNumber = const Value.absent(),
+    Value<int?> season = const Value.absent(),
     EpisodeStatus? status,
     int? positionMs,
     Value<DateTime?> playedAt = const Value.absent(),
@@ -2149,6 +2233,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     episodeNumber: episodeNumber.present
         ? episodeNumber.value
         : this.episodeNumber,
+    season: season.present ? season.value : this.season,
     status: status ?? this.status,
     positionMs: positionMs ?? this.positionMs,
     playedAt: playedAt.present ? playedAt.value : this.playedAt,
@@ -2182,6 +2267,7 @@ class Episode extends DataClass implements Insertable<Episode> {
       episodeNumber: data.episodeNumber.present
           ? data.episodeNumber.value
           : this.episodeNumber,
+      season: data.season.present ? data.season.value : this.season,
       status: data.status.present ? data.status.value : this.status,
       positionMs: data.positionMs.present
           ? data.positionMs.value
@@ -2208,6 +2294,7 @@ class Episode extends DataClass implements Insertable<Episode> {
           ..write('chaptersUrl: $chaptersUrl, ')
           ..write('theme: $theme, ')
           ..write('episodeNumber: $episodeNumber, ')
+          ..write('season: $season, ')
           ..write('status: $status, ')
           ..write('positionMs: $positionMs, ')
           ..write('playedAt: $playedAt, ')
@@ -2232,6 +2319,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     chaptersUrl,
     theme,
     episodeNumber,
+    season,
     status,
     positionMs,
     playedAt,
@@ -2255,6 +2343,7 @@ class Episode extends DataClass implements Insertable<Episode> {
           other.chaptersUrl == this.chaptersUrl &&
           other.theme == this.theme &&
           other.episodeNumber == this.episodeNumber &&
+          other.season == this.season &&
           other.status == this.status &&
           other.positionMs == this.positionMs &&
           other.playedAt == this.playedAt &&
@@ -2276,6 +2365,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
   final Value<String?> chaptersUrl;
   final Value<String?> theme;
   final Value<int?> episodeNumber;
+  final Value<int?> season;
   final Value<EpisodeStatus> status;
   final Value<int> positionMs;
   final Value<DateTime?> playedAt;
@@ -2295,6 +2385,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     this.chaptersUrl = const Value.absent(),
     this.theme = const Value.absent(),
     this.episodeNumber = const Value.absent(),
+    this.season = const Value.absent(),
     this.status = const Value.absent(),
     this.positionMs = const Value.absent(),
     this.playedAt = const Value.absent(),
@@ -2315,6 +2406,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     this.chaptersUrl = const Value.absent(),
     this.theme = const Value.absent(),
     this.episodeNumber = const Value.absent(),
+    this.season = const Value.absent(),
     this.status = const Value.absent(),
     this.positionMs = const Value.absent(),
     this.playedAt = const Value.absent(),
@@ -2339,6 +2431,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     Expression<String>? chaptersUrl,
     Expression<String>? theme,
     Expression<int>? episodeNumber,
+    Expression<int>? season,
     Expression<String>? status,
     Expression<int>? positionMs,
     Expression<DateTime>? playedAt,
@@ -2359,6 +2452,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
       if (chaptersUrl != null) 'chapters_url': chaptersUrl,
       if (theme != null) 'theme': theme,
       if (episodeNumber != null) 'episode_number': episodeNumber,
+      if (season != null) 'season': season,
       if (status != null) 'status': status,
       if (positionMs != null) 'position_ms': positionMs,
       if (playedAt != null) 'played_at': playedAt,
@@ -2381,6 +2475,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     Value<String?>? chaptersUrl,
     Value<String?>? theme,
     Value<int?>? episodeNumber,
+    Value<int?>? season,
     Value<EpisodeStatus>? status,
     Value<int>? positionMs,
     Value<DateTime?>? playedAt,
@@ -2401,6 +2496,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
       chaptersUrl: chaptersUrl ?? this.chaptersUrl,
       theme: theme ?? this.theme,
       episodeNumber: episodeNumber ?? this.episodeNumber,
+      season: season ?? this.season,
       status: status ?? this.status,
       positionMs: positionMs ?? this.positionMs,
       playedAt: playedAt ?? this.playedAt,
@@ -2453,6 +2549,9 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     if (episodeNumber.present) {
       map['episode_number'] = Variable<int>(episodeNumber.value);
     }
+    if (season.present) {
+      map['season'] = Variable<int>(season.value);
+    }
     if (status.present) {
       map['status'] = Variable<String>(
         $EpisodesTable.$converterstatus.toSql(status.value),
@@ -2487,6 +2586,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
           ..write('chaptersUrl: $chaptersUrl, ')
           ..write('theme: $theme, ')
           ..write('episodeNumber: $episodeNumber, ')
+          ..write('season: $season, ')
           ..write('status: $status, ')
           ..write('positionMs: $positionMs, ')
           ..write('playedAt: $playedAt, ')
@@ -4948,6 +5048,7 @@ typedef $$PodcastsTableCreateCompanionBuilder = PodcastsCompanion Function({
   Value<String?> description,
   Value<String?> imageUrl,
   Value<String?> websiteUrl,
+  Value<bool> serial,
   Value<String?> fundingUrl,
   Value<String?> fundingLabel,
   Value<String?> etag,
@@ -4975,6 +5076,7 @@ typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<String?> description,
   Value<String?> imageUrl,
   Value<String?> websiteUrl,
+  Value<bool> serial,
   Value<String?> fundingUrl,
   Value<String?> fundingLabel,
   Value<String?> etag,
@@ -5060,6 +5162,11 @@ class $$PodcastsTableFilterComposer
 
   ColumnFilters<String> get websiteUrl => $composableBuilder(
     column: $table.websiteUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get serial => $composableBuilder(
+    column: $table.serial,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5224,6 +5331,11 @@ class $$PodcastsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get serial => $composableBuilder(
+    column: $table.serial,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get fundingUrl => $composableBuilder(
     column: $table.fundingUrl,
     builder: (column) => ColumnOrderings(column),
@@ -5348,6 +5460,9 @@ class $$PodcastsTableAnnotationComposer
     column: $table.websiteUrl,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get serial =>
+      $composableBuilder(column: $table.serial, builder: (column) => column);
 
   GeneratedColumn<String> get fundingUrl => $composableBuilder(
     column: $table.fundingUrl,
@@ -5495,6 +5610,7 @@ class $$PodcastsTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<String?> imageUrl = const Value.absent(),
                 Value<String?> websiteUrl = const Value.absent(),
+                Value<bool> serial = const Value.absent(),
                 Value<String?> fundingUrl = const Value.absent(),
                 Value<String?> fundingLabel = const Value.absent(),
                 Value<String?> etag = const Value.absent(),
@@ -5521,6 +5637,7 @@ class $$PodcastsTableTableManager
                 description: description,
                 imageUrl: imageUrl,
                 websiteUrl: websiteUrl,
+                serial: serial,
                 fundingUrl: fundingUrl,
                 fundingLabel: fundingLabel,
                 etag: etag,
@@ -5549,6 +5666,7 @@ class $$PodcastsTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<String?> imageUrl = const Value.absent(),
                 Value<String?> websiteUrl = const Value.absent(),
+                Value<bool> serial = const Value.absent(),
                 Value<String?> fundingUrl = const Value.absent(),
                 Value<String?> fundingLabel = const Value.absent(),
                 Value<String?> etag = const Value.absent(),
@@ -5575,6 +5693,7 @@ class $$PodcastsTableTableManager
                 description: description,
                 imageUrl: imageUrl,
                 websiteUrl: websiteUrl,
+                serial: serial,
                 fundingUrl: fundingUrl,
                 fundingLabel: fundingLabel,
                 etag: etag,
@@ -5657,6 +5776,7 @@ typedef $$EpisodesTableCreateCompanionBuilder = EpisodesCompanion Function({
   Value<String?> chaptersUrl,
   Value<String?> theme,
   Value<int?> episodeNumber,
+  Value<int?> season,
   Value<EpisodeStatus> status,
   Value<int> positionMs,
   Value<DateTime?> playedAt,
@@ -5677,6 +5797,7 @@ typedef $$EpisodesTableUpdateCompanionBuilder = EpisodesCompanion Function({
   Value<String?> chaptersUrl,
   Value<String?> theme,
   Value<int?> episodeNumber,
+  Value<int?> season,
   Value<EpisodeStatus> status,
   Value<int> positionMs,
   Value<DateTime?> playedAt,
@@ -5867,6 +5988,11 @@ class $$EpisodesTableFilterComposer
 
   ColumnFilters<int> get episodeNumber => $composableBuilder(
     column: $table.episodeNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get season => $composableBuilder(
+    column: $table.season,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6114,6 +6240,11 @@ class $$EpisodesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get season => $composableBuilder(
+    column: $table.season,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnOrderings(column),
@@ -6217,6 +6348,9 @@ class $$EpisodesTableAnnotationComposer
     column: $table.episodeNumber,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get season =>
+      $composableBuilder(column: $table.season, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<EpisodeStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
@@ -6430,6 +6564,7 @@ class $$EpisodesTableTableManager
                 Value<String?> chaptersUrl = const Value.absent(),
                 Value<String?> theme = const Value.absent(),
                 Value<int?> episodeNumber = const Value.absent(),
+                Value<int?> season = const Value.absent(),
                 Value<EpisodeStatus> status = const Value.absent(),
                 Value<int> positionMs = const Value.absent(),
                 Value<DateTime?> playedAt = const Value.absent(),
@@ -6449,6 +6584,7 @@ class $$EpisodesTableTableManager
                 chaptersUrl: chaptersUrl,
                 theme: theme,
                 episodeNumber: episodeNumber,
+                season: season,
                 status: status,
                 positionMs: positionMs,
                 playedAt: playedAt,
@@ -6470,6 +6606,7 @@ class $$EpisodesTableTableManager
                 Value<String?> chaptersUrl = const Value.absent(),
                 Value<String?> theme = const Value.absent(),
                 Value<int?> episodeNumber = const Value.absent(),
+                Value<int?> season = const Value.absent(),
                 Value<EpisodeStatus> status = const Value.absent(),
                 Value<int> positionMs = const Value.absent(),
                 Value<DateTime?> playedAt = const Value.absent(),
@@ -6489,6 +6626,7 @@ class $$EpisodesTableTableManager
                 chaptersUrl: chaptersUrl,
                 theme: theme,
                 episodeNumber: episodeNumber,
+                season: season,
                 status: status,
                 positionMs: positionMs,
                 playedAt: playedAt,

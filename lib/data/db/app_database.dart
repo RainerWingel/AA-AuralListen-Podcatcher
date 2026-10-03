@@ -40,7 +40,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 17;
+  int get schemaVersion => 18;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -142,6 +142,14 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(podcasts, podcasts.fundingUrl);
         await m.addColumn(podcasts, podcasts.fundingLabel);
         // Re-read every feed once so subscriptions get their support link.
+        await customStatement(
+          'UPDATE podcasts SET etag = NULL, last_modified = NULL',
+        );
+      }
+      if (from < 18) {
+        await m.addColumn(episodes, episodes.season);
+        await m.addColumn(podcasts, podcasts.serial);
+        // Re-read every feed once so seasons and the serial flag arrive.
         await customStatement(
           'UPDATE podcasts SET etag = NULL, last_modified = NULL',
         );

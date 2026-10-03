@@ -7,7 +7,7 @@ import '../../core/clock.dart';
 import '../db/app_database.dart';
 import '../playlist_repository.dart';
 import '../podcast_repository.dart'
-    show PodcastFilesCleaner, autoDownloadThemesOf;
+    show PodcastFilesCleaner, PodcastRepository, autoDownloadThemesOf;
 import '../settings_keys.dart';
 import 'download_engine.dart';
 
@@ -341,13 +341,19 @@ class DownloadService implements PodcastFilesCleaner {
                           ..addColumns([_db.downloads.episodeId]),
                       ),
                 )
-                ..orderBy([
-                  (e) => OrderingTerm(
-                    expression: e.pubDate,
-                    mode: OrderingMode.desc,
-                    nulls: NullsOrder.last,
-                  ),
-                ])
+                // Serial podcasts: the next ones to hear (oldest in listening
+                // order); otherwise the newest.
+                ..orderBy(
+                  podcast.serial
+                      ? PodcastRepository.serialOrder
+                      : [
+                          (e) => OrderingTerm(
+                            expression: e.pubDate,
+                            mode: OrderingMode.desc,
+                            nulls: NullsOrder.last,
+                          ),
+                        ],
+                )
                 ..limit(missing))
               .get();
 

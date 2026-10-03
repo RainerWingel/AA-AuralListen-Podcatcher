@@ -241,4 +241,45 @@ void main() {
       );
     });
   });
+
+  group('seasons and serial podcasts', () {
+    ParsedFeed parse(String type, String items) => parser.parse('''
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>P</title>
+    $type
+    $items
+  </channel>
+</rss>''');
+    String item(String guid, String extra) =>
+        '<item><guid>$guid</guid><enclosure url="https://e.x/$guid.mp3" '
+        'type="audio/mpeg"/>$extra</item>';
+
+    test('reads itunes:type serial and itunes:season', () {
+      final feed = parse(
+        '<itunes:type> Serial </itunes:type>',
+        item(
+              'a',
+              '<itunes:season>2</itunes:season>'
+                  '<itunes:episode>5</itunes:episode>',
+            ) +
+            item('b', '<itunes:season>0</itunes:season>') +
+            item('c', ''),
+      );
+      expect(feed.serial, isTrue);
+      expect(feed.episodes.map((e) => (e.season, e.episodeNumber)), [
+        (2, 5),
+        (null, null), // season 0 is not a season
+        (null, null),
+      ]);
+    });
+
+    test('episodic is the default', () {
+      expect(parse('', item('a', '')).serial, isFalse);
+      expect(
+        parse('<itunes:type>episodic</itunes:type>', item('a', '')).serial,
+        isFalse,
+      );
+    });
+  });
 }

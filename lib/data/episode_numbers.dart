@@ -26,3 +26,12 @@ Map<int, int> episodeNumbers(
     });
   return {for (final (i, e) in dated.indexed) e.id: i + 1 + offset};
 }
+
+/// Cover label of an episode of a podcast with seasons: "S2·5", "S2" for an
+/// unnumbered episode of a season, "5" for a numbered one without season.
+String? seasonLabel(int? season, int? number) => switch ((season, number)) {
+  (final s?, final n?) => 'S$s·$n',
+  (final s?, null) => 'S$s',
+  (null, final n?) => '$n',
+  (null, null) => null,
+};

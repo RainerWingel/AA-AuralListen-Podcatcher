@@ -52,7 +52,8 @@ schon enthaltene Folgen werden wie immer übersprungen:
 2. **„Ungespielte Episoden seit … spielen"** – Kalender (öffnet auf heute, frühestes Datum = älteste ungespielte
    Folge): ungespielte Folgen mit Veröffentlichungsdatum **ab Beginn des gewählten Tags**; Folgen ohne Datum zählen
    nicht. Keine passenden → Infobox „Keine ungespielten Folgen seit dem …".
-3. **„Alle ungespielten Episoden spielen"** – alle Folgen mit Status neu oder angefangen.
+3. **„Alle ungespielten Episoden spielen"** – alle Folgen mit Status neu oder angefangen (älteste zuerst, bei
+   Serien-Podcasts in Hörreihenfolge nach Staffel und Folge; mit Staffel-Chip nur diese Staffel).
 4. **„Alle als gespielt markieren"** (unter einem Trennstrich; Benutzerwunsch 2026-09-30): alle Folgen des Podcasts bzw.
    des Themas, auch ohne Datum – Regeln wie „Als gespielt markieren bis …" (verlassen alle Playlists, Downloads nach
    96 h weg). Sind **alle** betroffenen Folgen schon gespielt, heißt der Eintrag **„Alle als ungespielt markieren"**

@@ -11,13 +11,26 @@ import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../episodes/episode_tile.dart';
 import 'mark_played_until.dart';
+import 'play_podcast_episodes.dart';
 import 'podcast_settings_sheet.dart';
 
-/// Podcast header plus its episode list.
-class PodcastDetailScreen extends ConsumerWidget {
+/// Podcast header plus its episode list; podcasts with seasons get season
+/// chips to filter the list (docs/ui-ux.md "Staffeln").
+class PodcastDetailScreen extends ConsumerStatefulWidget {
   const PodcastDetailScreen({required this.podcastId, super.key});
 
   final int podcastId;
+
+  @override
+  ConsumerState<PodcastDetailScreen> createState() =>
+      _PodcastDetailScreenState();
+}
+
+class _PodcastDetailScreenState extends ConsumerState<PodcastDetailScreen> {
+  /// Selected season chip; null = all episodes.
+  int? _season;
+
+  int get podcastId => widget.podcastId;
 
   Future<void> _unsubscribe(
     BuildContext context,
@@ -52,10 +65,14 @@ class PodcastDetailScreen extends ConsumerWidget {
       ref.read(podcastRepositoryProvider).refreshPodcast(podcast);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final podcast = ref.watch(podcastProvider(podcastId));
     final episodes = ref.watch(podcastEpisodesProvider(podcastId));
+    final seasons =
+        ref.watch(podcastSeasonsProvider(podcastId)).value ?? const <int>[];
+    // A season that vanished (feed changed) falls back to "all".
+    final season = seasons.contains(_season) ? _season : null;
 
     return podcast.when(
       loading: () =>
@@ -71,7 +88,11 @@ class PodcastDetailScreen extends ConsumerWidget {
             body: Center(child: Text(l10n.podcastNotFound)),
           );
         }
-        final items = episodes.value ?? const <Episode>[];
+        final all = episodes.value ?? const <Episode>[];
+        final items = season == null
+            ? all
+            : all.where((e) => e.season == season).toList();
+        final extra = seasons.isEmpty ? 1 : 2; // header (+ season chips)
         return Scaffold(
           appBar: AppBar(
             title: Text(podcast.title),
@@ -85,12 +106,12 @@ class PodcastDetailScreen extends ConsumerWidget {
                   ),
                   PopupMenuItem(
                     onTap: () =>
-                        markPlayedUntilFlow(context, ref, podcast, items),
+                        markPlayedUntilFlow(context, ref, podcast, all),
                     child: Text(l10n.markPlayedUntil),
                   ),
                   PopupMenuItem(
                     onTap: () =>
-                        markUnplayedSinceFlow(context, ref, podcast, items),
+                        markUnplayedSinceFlow(context, ref, podcast, all),
                     child: Text(l10n.markUnplayedSince),
                   ),
                   PopupMenuItem(
@@ -105,14 +126,72 @@ class PodcastDetailScreen extends ConsumerWidget {
             onRefresh: () => _refresh(ref, podcast),
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: items.length + 1,
-              itemBuilder: (context, index) => index == 0
-                  ? _Header(podcast: podcast, episodeCount: items.length)
-                  : EpisodeTile(episode: items[index - 1], podcast: podcast),
+              itemCount: items.length + extra,
+              itemBuilder: (context, index) => switch (index) {
+                0 => _Header(podcast: podcast, episodeCount: all.length),
+                1 when extra == 2 => _SeasonChips(
+                  podcast: podcast,
+                  seasons: seasons,
+                  selected: season,
+                  onSelected: (s) => setState(() => _season = s),
+                ),
+                _ => EpisodeTile(
+                  episode: items[index - extra],
+                  podcast: podcast,
+                ),
+              },
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// "Alle · Staffel 1 · Staffel 2 …": tap filters the list, long press opens
+/// the play menu for that season (like topics in the podcast settings).
+class _SeasonChips extends ConsumerWidget {
+  const _SeasonChips({
+    required this.podcast,
+    required this.seasons,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final Podcast podcast;
+  final List<int> seasons;
+  final int? selected;
+  final ValueChanged<int?> onSelected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            ChoiceChip(
+              label: Text(l10n.seasonAll),
+              selected: selected == null,
+              onSelected: (_) => onSelected(null),
+            ),
+            for (final s in seasons) ...[
+              const SizedBox(width: 8),
+              GestureDetector(
+                onLongPress: () =>
+                    showPodcastPlayMenu(context, ref, podcast, season: s),
+                child: ChoiceChip(
+                  label: Text(l10n.seasonLabel(s)),
+                  selected: selected == s,
+                  onSelected: (_) => onSelected(s),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

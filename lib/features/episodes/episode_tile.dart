@@ -366,10 +366,11 @@ class _NumberedCover extends ConsumerWidget {
                 child: RotatedBox(
                   quarterTurns: 3,
                   child: FittedBox(
-                    // Long numbers (e.g. "-1234") shrink to the cover height.
+                    // Long labels ("-1234", "S12·105") shrink to the cover
+                    // height.
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      '$number',
+                      number,
                       maxLines: 1,
                       style: const TextStyle(
                         color: Colors.white,

@@ -608,6 +608,30 @@ abstract class AppLocalizations {
   /// **'Herunterladen'**
   String get download;
 
+  /// No description provided for @episodeNumberingSeasons.
+  ///
+  /// In de, this message translates to:
+  /// **'Staffel-Podcast: Es gelten die Nummern aus dem Feed, je Staffel (z. B. „S2·5“). Eine eigene Zählung ist hier nicht möglich.'**
+  String get episodeNumberingSeasons;
+
+  /// No description provided for @episodeNumberOffsetSeasons.
+  ///
+  /// In de, this message translates to:
+  /// **'Bei Staffel-Podcasts nicht möglich.'**
+  String get episodeNumberOffsetSeasons;
+
+  /// No description provided for @seasonAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle'**
+  String get seasonAll;
+
+  /// No description provided for @seasonLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Staffel {season}'**
+  String seasonLabel(int season);
+
   /// No description provided for @podcastWebsite.
   ///
   /// In de, this message translates to:

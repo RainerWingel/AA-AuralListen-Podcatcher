@@ -29,6 +29,8 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
 - `itunes:duration`: Sekunden, `MM:SS`, `HH:MM:SS`.
 - Show-Notes werden zu Klartext (max. 4000 Zeichen).
 - `itunes:episode` (ganze Zahl ≥ 0) → `episodes.episodeNumber` für die Folgennummer am Cover (`ui-ux.md`).
+- `itunes:season` (ganze Zahl ≥ 1) → `episodes.season`; Kanal-`itunes:type` = `serial` → `podcasts.serial`
+  (Staffel-Chips, Hörreihenfolge – `ui-ux.md` „Staffeln und Serien").
 - Kanal-`<link>` → `podcasts.websiteUrl`, erstes `podcast:funding` (`url` + Text) → `podcasts.fundingUrl`/`fundingLabel`
   (v17). Nur http/https-Adressen werden übernommen (`isWebUrl`); angezeigt als Links im Podcast-Detail (`ui-ux.md`).
 - Titel (Podcast, Folge): HTML-Entities wie `&nbsp;`, `&#8211;` werden dekodiert, Leerraum zusammengefasst (`cleanTitle`),

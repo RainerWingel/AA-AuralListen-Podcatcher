@@ -94,3 +94,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-03 · **Zu Ende gehört → nur aus der aktiven Playlist** (Benutzer) · Ersetzt für das Wiedergabe-Ende die Regel
   „Gespielt → aus allen Playlists" (2026-09-27); manuelles Markieren entfernt weiter aus allen. Ohne aktive Playlist
   (auch nur angeboten) bleibt die Folge überall. Folge: gespielte Folgen in Playlists sind vor dem Auto-Löschen geschützt.
+- 2026-10-03 · **Staffeln & Serien, eigene Zählung dort aus** (Benutzer) · `itunes:season` → „S2·5" am Cover, Staffel-
+  Chips (Filter + Abspielmenü), `itunes:type` serial → Hörreihenfolge in Liste, „Alle spielen" und Auto-Download. Die
+  eigene Zählung samt Versatz ist bei Staffel-Podcasts deaktiviert (nur Feed-Nummern), weil sie Staffeln vermischen würde.

@@ -15,6 +15,7 @@ class ParsedFeed {
     this.websiteUrl,
     this.fundingUrl,
     this.fundingLabel,
+    this.serial = false,
     this.newFeedUrl,
   });
 
@@ -28,6 +29,9 @@ class ParsedFeed {
   /// "Unterstütze uns auf Steady".
   final String? fundingUrl;
   final String? fundingLabel;
+
+  /// `itunes:type` = `serial`: episodes are meant to be heard in order.
+  final bool serial;
 
   /// Announced new address of the feed (`<itunes:new-feed-url>`), set by the
   /// publisher when the podcast moves to another host.
@@ -49,6 +53,7 @@ class ParsedEpisode {
     this.chaptersUrl,
     this.theme,
     this.episodeNumber,
+    this.season,
     this.chapters = const [],
   });
 
@@ -70,6 +75,9 @@ class ParsedEpisode {
 
   /// The feed's episode number (`itunes:episode`), if it has one.
   final int? episodeNumber;
+
+  /// `itunes:season` (≥ 1).
+  final int? season;
 
   /// Podlove Simple Chapters embedded in the feed (`<psc:chapters>`).
   final List<ParsedChapter> chapters;
@@ -160,6 +168,8 @@ class RssParser {
               null => null,
             }
           : null,
+      serial:
+          _text(_ns(channel, _Ns.itunes, 'type'))?.toLowerCase() == 'serial',
       newFeedUrl: _text(_ns(channel, _Ns.itunes, 'new-feed-url')),
       episodes: episodes,
     );
@@ -202,6 +212,12 @@ class RssParser {
         _text(_ns(item, _Ns.itunes, 'episode')) ?? '',
       )) {
         final n? when n >= 0 => n,
+        _ => null,
+      },
+      season: switch (int.tryParse(
+        _text(_ns(item, _Ns.itunes, 'season')) ?? '',
+      )) {
+        final n? when n >= 1 => n,
         _ => null,
       },
       chapters: _pscChapters(item),

@@ -162,9 +162,16 @@ final episodeNotesProvider = FutureProvider.autoDispose.family<String?, int>(
 );
 
 final episodeNumbersProvider = StreamProvider.autoDispose
-    .family<Map<int, int>, int>(
+    .family<Map<int, String>, int>(
       (ref, podcastId) =>
           ref.watch(podcastRepositoryProvider).watchEpisodeNumbers(podcastId),
+    );
+
+/// Seasons of a podcast, ascending; empty = no seasons (docs/ui-ux.md).
+final podcastSeasonsProvider = StreamProvider.autoDispose
+    .family<List<int>, int>(
+      (ref, podcastId) =>
+          ref.watch(podcastRepositoryProvider).watchSeasons(podcastId),
     );
 
 final hasFeedNumbersProvider = StreamProvider.autoDispose.family<bool, int>(
@@ -182,10 +189,15 @@ final podcastProvider = StreamProvider.autoDispose.family<Podcast?, int>(
 );
 
 final podcastEpisodesProvider = StreamProvider.autoDispose
-    .family<List<Episode>, int>(
-      (ref, podcastId) =>
-          ref.watch(podcastRepositoryProvider).watchEpisodes(podcastId),
-    );
+    .family<List<Episode>, int>((ref, podcastId) {
+      // Serial podcasts list in listening order (docs/ui-ux.md "Staffeln").
+      final serial = ref.watch(
+        podcastProvider(podcastId).select((p) => p.value?.serial ?? false),
+      );
+      return ref
+          .watch(podcastRepositoryProvider)
+          .watchEpisodes(podcastId, serial: serial);
+    });
 
 final latestEpisodesProvider =
     StreamProvider.autoDispose<List<EpisodeWithPodcast>>(

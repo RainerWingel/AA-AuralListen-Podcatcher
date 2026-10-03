@@ -49,4 +49,11 @@ void main() {
       {1: 0, 2: 1, 3: 2},
     );
   });
+
+  test('season labels', () {
+    expect(seasonLabel(2, 5), 'S2·5');
+    expect(seasonLabel(2, null), 'S2');
+    expect(seasonLabel(null, 7), '7');
+    expect(seasonLabel(null, null), isNull);
+  });
 }

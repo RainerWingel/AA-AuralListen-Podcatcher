@@ -432,17 +432,88 @@ void main() {
         );
     final first = await add('a', 1);
     final second = await add('b', 2);
-    Future<Map<int, int>> numbers() =>
+    Future<Map<int, String>> numbers() =>
         repo.watchEpisodeNumbers(podcastId).first;
 
-    expect(await numbers(), {first: 1, second: 2});
+    expect(await numbers(), {first: '1', second: '2'});
     await repo.setEpisodeCounter(podcastId, offset: -1);
-    expect(await numbers(), {first: 0, second: 1});
+    expect(await numbers(), {first: '0', second: '1'});
     await repo.setEpisodeCounter(podcastId, offset: 20000); // clamped
-    expect(await numbers(), {first: 10000, second: 10001});
+    expect(await numbers(), {first: '10000', second: '10001'});
     await repo.setEpisodeCounter(podcastId, enabled: false);
     expect(await numbers(), isEmpty);
     expect(await repo.watchHasFeedNumbers(podcastId).first, isFalse);
+  });
+
+  group('seasons and serial podcasts', () {
+    late int podcastId;
+    Future<int> add(String guid, {int? season, int? number, int day = 1}) => db
+        .into(db.episodes)
+        .insert(
+          EpisodesCompanion.insert(
+            podcastId: podcastId,
+            guid: guid,
+            title: guid,
+            audioUrl: 'https://example.com/$guid.mp3',
+            season: Value(season),
+            episodeNumber: Value(number),
+            pubDate: Value(DateTime.utc(2026, 1, day)),
+            addedAt: clockNow,
+          ),
+        );
+
+    setUp(() async {
+      podcastId = await db
+          .into(db.podcasts)
+          .insert(
+            PodcastsCompanion.insert(
+              feedUrl: 'https://example.com/s',
+              title: 'S',
+              subscribedAt: clockNow,
+            ),
+          );
+    });
+
+    test('cover labels per season; own count is ignored', () async {
+      final a = await add('a', season: 1, number: 1, day: 1);
+      final b = await add('b', season: 2, number: 1, day: 5);
+      final trailer = await add('t', season: 2, day: 4);
+      final loose = await add('x', day: 6);
+      await repo.setEpisodeCounter(podcastId, ownCount: true, offset: 10);
+      expect(await repo.watchEpisodeNumbers(podcastId).first, {
+        a: 'S1·1',
+        b: 'S2·1',
+        trailer: 'S2',
+      });
+      expect(loose, isPositive); // no season, no number → no label
+      expect(await repo.watchSeasons(podcastId).first, [1, 2]);
+    });
+
+    test('serial: listening order in lists and "play all"', () async {
+      // Published out of order on purpose.
+      final s2e1 = await add('s2e1', season: 2, number: 1, day: 1);
+      final s1e2 = await add('s1e2', season: 1, number: 2, day: 2);
+      final s1e1 = await add('s1e1', season: 1, number: 1, day: 3);
+      Future<List<int>> listed({bool serial = false}) async => [
+        for (final e
+            in await repo.watchEpisodes(podcastId, serial: serial).first)
+          e.id,
+      ];
+      // Episodic: newest first.
+      expect(await listed(), [s1e1, s1e2, s2e1]);
+      expect(await listed(serial: true), [s1e1, s1e2, s2e1]);
+
+      await (db.update(db.podcasts)..where((p) => p.id.equals(podcastId)))
+          .write(const PodcastsCompanion(serial: Value(true)));
+      final unplayed = await repo.unplayedEpisodes(podcastId, freshOnly: false);
+      expect(unplayed.map((e) => e.id), [s1e1, s1e2, s2e1]);
+      final season2 = await repo.unplayedEpisodes(
+        podcastId,
+        freshOnly: false,
+        season: 2,
+      );
+      expect(season2.map((e) => e.id), [s2e1]);
+    });
   });
 
   test('unsubscribe deletes episodes and evicts cover images', () async {
@@ -562,6 +633,7 @@ void main() {
       episodeNumberOffset: 0,
       episodeOwnCount: false,
       streamVaries: false,
+      serial: false,
     );
     Episode added(DateTime at) => Episode(
       id: 1,

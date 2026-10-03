@@ -56,6 +56,33 @@ const _feed = '''
   </channel>
 </rss>''';
 
+// Serial podcast with two seasons, without images.
+const _seasonFeed = '''
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>Staffel-Podcast</title>
+    <itunes:type>serial</itunes:type>
+    <item>
+      <title>Neue Staffel Teil 1</title><guid>s2e1</guid>
+      <pubDate>Tue, 10 Jun 2025 04:00:00 +0000</pubDate>
+      <enclosure url="https://seasons.example.com/s2e1.mp3" type="audio/mpeg"/>
+      <itunes:season>2</itunes:season><itunes:episode>1</itunes:episode>
+    </item>
+    <item>
+      <title>Erste Staffel Teil 2</title><guid>s1e2</guid>
+      <pubDate>Mon, 09 Jun 2025 04:00:00 +0000</pubDate>
+      <enclosure url="https://seasons.example.com/s1e2.mp3" type="audio/mpeg"/>
+      <itunes:season>1</itunes:season><itunes:episode>2</itunes:episode>
+    </item>
+    <item>
+      <title>Erste Staffel Teil 1</title><guid>s1e1</guid>
+      <pubDate>Sun, 08 Jun 2025 04:00:00 +0000</pubDate>
+      <enclosure url="https://seasons.example.com/s1e1.mp3" type="audio/mpeg"/>
+      <itunes:season>1</itunes:season><itunes:episode>1</itunes:episode>
+    </item>
+  </channel>
+</rss>''';
+
 // Network feed with two themes (like WRINT), without images.
 const _themedFeed = '''
 <rss><channel><title>WRINT</title>
@@ -148,6 +175,10 @@ void main() {
                 // UTF-8 bytes like a real server (the String constructor
                 // would send Latin-1 and break umlauts).
                 'example.com' => http.Response.bytes(utf8.encode(_feed), 200),
+                'seasons.example.com' => http.Response.bytes(
+                  utf8.encode(_seasonFeed),
+                  200,
+                ),
                 'wrint.example.com' => http.Response.bytes(
                   utf8.encode(_themedFeed),
                   200,
@@ -1977,6 +2008,56 @@ void main() {
         'https://www.example.com/podcast',
         'https://steadyhq.com/de/p',
       ]);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'seasons: chips filter, listening order, labels on the cover',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://seasons.example.com/feed'),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Staffel-Podcast'));
+      await settle(tester);
+
+      // Serial: listening order, not newest first.
+      double top(String title) => tester.getTopLeft(find.text(title)).dy;
+      expect(
+        top('Erste Staffel Teil 1'),
+        lessThan(top('Erste Staffel Teil 2')),
+      );
+      expect(top('Erste Staffel Teil 2'), lessThan(top('Neue Staffel Teil 1')));
+      expect(find.text('S1·1'), findsOneWidget);
+      expect(find.text('S2·1'), findsOneWidget);
+
+      // The chip row scrolls sideways (wide test font).
+      final season2 = find.widgetWithText(ChoiceChip, 'Staffel 2');
+      await tester.ensureVisible(season2);
+      await tester.tap(season2);
+      await settle(tester);
+      expect(find.text('Neue Staffel Teil 1'), findsOneWidget);
+      expect(find.text('Erste Staffel Teil 1'), findsNothing);
+
+      final all = find.widgetWithText(ChoiceChip, 'Alle');
+      await tester.ensureVisible(all);
+      await tester.tap(all);
+      await settle(tester);
+      expect(find.text('Erste Staffel Teil 1'), findsOneWidget);
 
       await disposeApp(tester);
     },

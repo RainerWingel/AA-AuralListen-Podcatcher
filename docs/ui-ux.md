@@ -76,6 +76,19 @@ mit eigenen Nummern Auswahl **„Nummerierung: Feed-Nummern | Eigene Zählung"**
 Podcasts liefern `itunes:episode`, Benutzerwunsch 2026-10-01); „Versatz der Zählung" als − [Feld] + (−9999…9999,
 Eingabe mit „Fertig" oder beim Verlassen übernommen) gilt **nur für die eigene Zählung** – bei Feed-Nummern
 ausgegraut mit Hinweis. „Eigene Zählung" nummeriert auch Folgen ohne Feed-Nummer. Themen-Feeds zählen über den ganzen Feed.
+
+**Staffeln und Serien** (Benutzerwunsch 2026-10-03, `itunes:season`, `itunes:type`):
+- Hat ein Podcast Staffeln, zeigt der Cover-Streifen **„S2·5"** (Staffel·Feed-Nummer), „S2" für ungezählte Folgen
+  einer Staffel (Trailer, Bonus), nur die Nummer für Folgen ohne Staffel. **Eigene Zählung und Versatz sind dann aus**
+  (Podcast-Einstellungen: Hinweis statt Auswahl) – sie würden die Staffeln durcheinanderbringen.
+- Podcast-Detail: unter dem Kopf Chips **„Alle · Staffel 1 · Staffel 2 …"** (seitlich scrollbar); Tippen filtert die
+  Liste, **langes Drücken** öffnet das Abspielmenü nur für diese Staffel (neue / seit … / alle ungespielten spielen,
+  alle als (un)gespielt markieren) – wie die Themen in den Podcast-Einstellungen. Die Auswahl gilt nur, solange die
+  Seite offen ist.
+- **Serien-Podcasts** (`itunes:type` = `serial`, z. B. Hörspiele, Doku-Reihen) erscheinen in **Hörreihenfolge**:
+  Staffel, dann Folgennummer, dann Datum (ohne Staffel/Nummer jeweils dahinter) – in der Podcast-Liste, bei „Alle
+  ungespielten spielen" und beim Auto-Download (die nächsten statt der neuesten, `eviction.md`). Normale Podcasts
+  (`episodic`, Standard) bleiben neueste zuerst. Code: `PodcastRepository.serialOrder`.
 Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Daneben
 Playlist-Symbol (`playlist_add_check`, Tooltip „In einer Playlist"), solange die Folge in mindestens einer Playlist
 steht – live aus der DB (`episodesInPlaylistsProvider`), verschwindet beim Entfernen aus der letzten Playlist; in der

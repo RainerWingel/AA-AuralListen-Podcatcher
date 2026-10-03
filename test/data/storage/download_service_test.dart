@@ -335,6 +335,20 @@ void main() {
       expect(await service.autoDownload(), 0);
     });
 
+    test('serial podcast: the next episodes in listening order', () async {
+      await setPodcast(
+        const PodcastsCompanion(
+          autoDownloadMode: Value(AutoDownloadMode.always),
+          autoDownloadMaxEpisodes: Value(1),
+          serial: Value(true),
+        ),
+      );
+      await addEpisode('newest', pubDate: DateTime(2026, 9, 3));
+      final first = await addEpisode('first', pubDate: DateTime(2026, 9, 1));
+      expect(await service.autoDownload(), 1);
+      expect(engine.active.keys, [first]);
+    });
+
     test(
       'auto-downloads go into the podcast\'s playlist, even a deleted one',
       () async {

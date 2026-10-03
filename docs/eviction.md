@@ -40,7 +40,8 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 ### Auto-Download
 - Pro Podcast (Podcast → ⋮ → Podcast-Einstellungen): Aus / Nur WLAN / Immer, „Anzahl ungespielter Folgen auf dem Gerät" (bis 2026-09-30:
   „Neueste ungespielte Folgen behalten" – umbenannt, weil es nichts löscht): 1/2/3/5/10, mit Hinweiszeile darunter.
-- Geladen werden die **neuesten** Folgen mit Status `neu` ohne Download, bis N ungespielte Downloads existieren.
+- Geladen werden die **neuesten** Folgen mit Status `neu` ohne Download, bis N ungespielte Downloads existieren –
+  bei **Serien-Podcasts** (`podcasts.serial`) stattdessen die **nächsten in Hörreihenfolge** (`ui-ux.md` „Staffeln").
   Fehlgeschlagene zählen nicht mit und werden nicht automatisch erneut versucht (Knopf „Erneut herunterladen").
 - **Themen-Filter** (Netzwerk-Feeds): Ist `autoDownloadThemes` gesetzt, zählen und laden nur Folgen dieser Themen
   (leere Liste = nichts). Folgen ohne Thema fallen bei gesetztem Filter heraus. Neue Themen sind nicht automatisch dabei.
