@@ -12,9 +12,14 @@
 ## Branches (seit 2026-09-28: nur `main`)
 - **Alles wird direkt auf `main` committet** – keine Feature-Branches, keine Pull Requests (Wunsch des Benutzers).
   Gilt für beide Agenten.
-- **Committen jederzeit, pushen nur auf Ansage des Benutzers** (seit 2026-09-28). Die CI läuft daher erst beim Push.
+- **Committen jederzeit, pushen nur auf ausdrückliche Ansage des Benutzers** (seit 2026-09-28, bekräftigt 2026-10-03).
+  **Nie automatisch pushen** – auch nicht nach Fehlerbehebungen, CI-Reparaturen, Release-Vorbereitung oder vor einem
+  Agentenwechsel. Ein „bitte pushen" gilt nur für diesen einen Push. Die CI läuft daher erst beim Push.
+- **Keine Pull Requests** – weder per `gh pr create` noch über die GitHub-Oberfläche oder Werkzeuge, die PRs von sich
+  aus anlegen. Auch keine Branches dafür.
 - **Vor jedem Commit** lokal: `dart format .` · `flutter analyze` (0 Probleme) · `flutter test` (alle grün).
-  Nach einem Push prüft die CI auf `main` noch einmal; ist sie rot, sofort auf `main` reparieren.
+  Nach einem Push prüft die CI auf `main` noch einmal; ist sie rot, auf `main` reparieren und **committen** – gepusht
+  wird die Reparatur erst, wenn der Benutzer es sagt (ihm sagen, dass die CI rot war).
 - Vor dem Arbeiten `git pull --ff-only`, damit man auf dem Stand des anderen Agenten aufsetzt.
 - Früher (bis PR #31): Branches + PRs mit geprüftem Merge; die Historie bleibt so stehen.
 
@@ -23,8 +28,9 @@
 - Klein und in sich abgeschlossen; Doku-Änderungen im selben Commit wie der zugehörige Code.
 
 ## Übergabe zwischen Agenten (Claude ⇄ ChatGPT)
-1. Arbeit auf `main` committen – nie mit uncommitteten Änderungen aufhören. Gepusht wird, wenn der Benutzer es sagt
-   (spätestens vor einem Agentenwechsel, sonst sieht der andere Agent den Stand nicht).
+1. Arbeit auf `main` committen – nie mit uncommitteten Änderungen aufhören. Gepusht wird nur, wenn der Benutzer es
+   sagt. Vor einem Agentenwechsel den Benutzer darauf **hinweisen**, dass ungepushte Commits existieren (der andere
+   Agent sieht nur Gepushtes) – aber nicht selbst pushen.
 2. In `docs/roadmap.md` abhaken, was erledigt ist; Offenes als Checkbox eintragen.
 3. Neue Entscheidungen in `docs/decisions.md`.
 4. Der nächste Agent startet mit `git pull`, liest `AGENTS.md` → `docs/roadmap.md` → betroffene Themen.

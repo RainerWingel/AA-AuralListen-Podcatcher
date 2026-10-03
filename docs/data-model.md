@@ -1,9 +1,10 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 13** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
+Aktuell **schemaVersion 14** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
 v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`; v8: nur Daten – `angefangen` unter 15 s → `neu`, Position 0; v9: `playlists.color`; v10: `podcasts.autoPlaylistId`, `autoPlaylistName`; v11: `episodes.episodeNumber`, `podcasts.episodeCounter`, `episodeNumberOffset`, einmaliges Neulesen aller Feeds; v12: `podcasts.episodeOwnCount`; v13: `episode_notes`, Shownotes aus `episodes.description` dorthin verschoben,
-einmaliges Neulesen aller Feeds für die Links). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+einmaliges Neulesen aller Feeds für die Links; v14: nur Daten – Shownotes-Grenze 6000 → 18000 Zeichen, einmaliges
+Neulesen aller Feeds). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 0. Neue Tabelle? → auch in `BackupService._restoredTables` eintragen (`backup.md`).
@@ -24,7 +25,7 @@ Fremdschlüsseln neu aufbauen würde), audioUrl, audioMimeType, audioSizeBytes, 
 | `playlists` ✅ (v4) | id, name, sortOrder, createdAt, lastEpisodeId (v7, zuletzt aus der Playlist gespielte Folge für „Fortsetzen", ohne FK), color (v9, `PlaylistColor` als Name, null = keine). Standard-Playlist „Wiedergabeliste" (`AppDatabase.defaultPlaylistName`) |
 | `playlist_items` ✅ (v4) | PK (playlistId, episodeId), beide FK mit CASCADE, position (aufsteigend, neu = max + 1), addedAt |
 | `chapters` ✅ (v6) | PK (episodeId, startMs), FK CASCADE, title, url, imageUrl. Quellen: `playback.md` |
-| `episode_notes` ✅ (v13) | episodeId (PK, FK → episodes, CASCADE), notes. Shownotes **getrennt von `episodes`**, damit Folgenlisten sie nicht in den Arbeitsspeicher laden; gelesen nur beim Anzeigen (`episodeNotesProvider`, autoDispose). Format: Text mit Zeilenumbrüchen und „• " für Aufzählungen, Links als `\uE000Text\uE001URL\uE002` (nur http/https), max. 6000 Zeichen inkl. URLs, Links werden beim Kürzen nie zerteilt (`htmlToNotes`/`parseNotes` in `lib/core/text_utils.dart`). Beim Feed-Refresh neu geschrieben; Folge ohne Shownotes → Zeile gelöscht. Die Abos-Suche sucht auch hier. |
+| `episode_notes` ✅ (v13) | episodeId (PK, FK → episodes, CASCADE), notes. Shownotes **getrennt von `episodes`**, damit Folgenlisten sie nicht in den Arbeitsspeicher laden; gelesen nur beim Anzeigen (`episodeNotesProvider`, autoDispose). Format: Text mit Zeilenumbrüchen und „• " für Aufzählungen, Links als `\uE000Text\uE001URL\uE002` (nur http/https), max. **18000** Zeichen inkl. URLs (Benutzerwunsch 2026-10-03, vorher 6000; nur beim Anzeigen im Speicher), Links werden beim Kürzen nie zerteilt (`htmlToNotes`/`parseNotes` in `lib/core/text_utils.dart`). Beim Feed-Refresh neu geschrieben; Folge ohne Shownotes → Zeile gelöscht. Die Abos-Suche sucht auch hier. |
 | `bookmarks` ✅ (v6) | id, episodeId (FK CASCADE), positionMs, note (null = keine), createdAt |
 | `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb`, `player.activePlaylistId`, `downloads.limitBytes`, `ui.themeMode`, `ui.language` (`de`/`en`, fehlt = noch nicht gewählt), `ui.appColor` (`AppColor`-Name, fehlt = wallpaper, ohne Wallpaper-Farben orange) |
 | ~~`player_state`~~ | entfällt – letzte Folge und aktive Playlist stehen in `settings` |

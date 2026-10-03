@@ -222,4 +222,23 @@ void main() {
     expect((await db.select(db.podcasts).getSingle()).etag, isNull);
     await db.close();
   });
+
+  test('upgrade v13 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(13);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v14 re-reads every feed once', () async {
+    final schema = await verifier.schemaAt(13);
+    schema.rawDatabase.execute(
+      'INSERT INTO podcasts (feed_url, title, subscribed_at, etag, last_modified) '
+      "VALUES ('https://example.com/feed', 'P', 1767225600, 'e1', 'm1')",
+    );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    final podcast = await db.select(db.podcasts).getSingle();
+    expect((podcast.etag, podcast.lastModified), (null, null));
+    await db.close();
+  });
 }

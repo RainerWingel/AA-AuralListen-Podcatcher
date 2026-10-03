@@ -83,7 +83,7 @@ String htmlToPlainText(String html, {int maxLength = maxDescriptionLength}) {
 // see docs/decisions.md.
 
 /// Maximum stored length of show notes including link addresses.
-const int maxNotesLength = 6000;
+const int maxNotesLength = 18000;
 
 const String _linkStart = '\uE000';
 const String _linkUrl = '\uE001';
