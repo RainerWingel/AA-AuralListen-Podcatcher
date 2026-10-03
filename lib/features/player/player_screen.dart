@@ -8,6 +8,7 @@ import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../data/db/app_database.dart' show DownloadState;
 import '../../data/providers.dart';
+import '../../data/settings_keys.dart';
 import '../../l10n/app_localizations.dart';
 import '../episodes/episode_description.dart';
 import 'boost_sheet.dart';
@@ -185,16 +186,45 @@ class _SeekBarState extends ConsumerState<_SeekBar> {
           },
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          // Right side 8 less: the tappable time brings its own padding.
+          padding: const EdgeInsets.only(left: 24, right: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(formatClock(shown)),
-              Text('-${formatClock(total - shown)}'),
+              _TotalOrRemaining(total: total, shown: shown),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Right time under the slider: remaining time ("-12:34", default) or the
+/// total length. A tap switches; the choice is stored (settings).
+class _TotalOrRemaining extends ConsumerWidget {
+  const _TotalOrRemaining({required this.total, required this.shown});
+
+  final Duration total;
+  final Duration shown;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final showTotal = ref.watch(showTotalTimeProvider).value ?? false;
+    final settings = ref.read(settingsRepositoryProvider);
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: () => showTotal
+          ? settings.remove(SettingsKeys.showTotalTime)
+          : settings.set(SettingsKeys.showTotalTime, 'true'),
+      child: Padding(
+        // A comfortable tap target around the short text.
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Text(
+          showTotal ? formatClock(total) : '-${formatClock(total - shown)}',
+        ),
+      ),
     );
   }
 }

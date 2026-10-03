@@ -315,6 +315,14 @@ final seedColorProvider = Provider<Color>(
       AppColor.fallback.seed!,
 );
 
+/// Player: total length instead of the remaining time (tap toggles it).
+final showTotalTimeProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.showTotalTime)
+      .map((v) => v == 'true'),
+);
+
 /// Light/dark mode chosen in Optionen (default: follow the system).
 final themeModeProvider = StreamProvider<ThemeMode>(
   (ref) => ref

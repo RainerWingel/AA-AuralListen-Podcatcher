@@ -1855,6 +1855,49 @@ void main() {
   );
 
   testWidgets(
+    'tapping the remaining time shows the total length, remembered',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+
+      Future<String?> stored() async => tester.runAsync<String?>(
+        () => SettingsRepository(db).get(SettingsKeys.showTotalTime),
+      );
+      final remaining = find.textContaining(RegExp(r'^-\d'));
+      expect(remaining, findsOneWidget);
+      expect(await stored(), isNull);
+
+      await tester.tap(remaining);
+      await settle(tester);
+      // Feed length (the fake player's 10 min count as a wrong estimate).
+      expect(remaining, findsNothing);
+      expect(find.text('1:05:00'), findsOneWidget);
+      expect(await stored(), 'true');
+
+      await tester.tap(find.text('1:05:00'));
+      await settle(tester);
+      expect(remaining, findsOneWidget);
+      expect(await stored(), isNull);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'long press on a subscription plays its unplayed episodes',
     timeout: timeout,
     (tester) async {

@@ -19,6 +19,10 @@ abstract final class SettingsKeys {
   /// Upper limit for all downloaded audio files in bytes (default 5 GB).
   static const downloadLimitBytes = 'downloads.limitBytes';
 
+  /// Player shows the total length instead of the remaining time: `true`;
+  /// missing = remaining time (default). Toggled by tapping the time.
+  static const showTotalTime = 'player.showTotalTime';
+
   /// Playlist the current episode was started from (null = none).
   static const activePlaylistId = 'player.activePlaylistId';
 }
