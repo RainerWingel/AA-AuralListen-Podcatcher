@@ -60,7 +60,15 @@ abstract interface class PlayerEngine {
 
   /// Prepares [uri] (http(s) or file) and returns its duration if known.
   /// Throws [EngineException] if it cannot be loaded.
-  Future<Duration?> load(Uri uri, {Duration initialPosition = Duration.zero});
+  ///
+  /// [exactMp3Seeking]: MP3 seeks use an index built while reading instead of
+  /// an estimate – exact, but a seek ahead reads (downloads) everything up to
+  /// the target. Only for files the estimate gets wrong (docs/playback.md).
+  Future<Duration?> load(
+    Uri uri, {
+    Duration initialPosition = Duration.zero,
+    bool exactMp3Seeking = false,
+  });
 
   /// Starts playback. Returns immediately (does not wait until playback ends).
   Future<void> play();
@@ -148,10 +156,20 @@ class JustAudioEngine implements PlayerEngine {
   Future<Duration?> load(
     Uri uri, {
     Duration initialPosition = Duration.zero,
+    bool exactMp3Seeking = false,
   }) async {
     try {
       return await _player.setAudioSource(
-        AudioSource.uri(uri),
+        exactMp3Seeking
+            ? ProgressiveAudioSource(
+                uri,
+                options: const ProgressiveAudioSourceOptions(
+                  androidExtractorOptions: AndroidExtractorOptions(
+                    mp3Flags: AndroidExtractorOptions.flagMp3EnableIndexSeeking,
+                  ),
+                ),
+              )
+            : AudioSource.uri(uri),
         initialPosition: initialPosition,
       );
     } on PlayerException catch (e) {

@@ -19,6 +19,13 @@ class FakePlayerEngine implements PlayerEngine {
   double boostDb = 0;
   Duration fakeDuration = const Duration(minutes: 10);
 
+  /// Duration reported by loads without exact MP3 seeking (null = same as
+  /// [fakeDuration]) – simulates ExoPlayer's estimate for VBR files.
+  Duration? estimatedDuration;
+
+  /// [load]'s exactMp3Seeking flag of every load, in order.
+  final exactLoads = <bool>[];
+
   /// While true, [load] fails like just_audio without network.
   bool failLoads = false;
 
@@ -92,8 +99,10 @@ class FakePlayerEngine implements PlayerEngine {
   Future<Duration?> load(
     Uri uri, {
     Duration initialPosition = Duration.zero,
+    bool exactMp3Seeking = false,
   }) async {
     calls.add('load');
+    exactLoads.add(exactMp3Seeking);
     if (loadDelay > Duration.zero) await Future<void>.delayed(loadDelay);
     final failOnce = failNextLoads > 0;
     if (failOnce) failNextLoads--;
@@ -103,10 +112,13 @@ class FakePlayerEngine implements PlayerEngine {
     loadedUri = uri;
     loadedAt = initialPosition;
     _pos = initialPosition;
-    _dur = fakeDuration;
+    final duration = exactMp3Seeking
+        ? fakeDuration
+        : estimatedDuration ?? fakeDuration;
+    _dur = duration;
     _setState(_current.playing, EngineProcessing.ready);
-    _duration.add(fakeDuration);
-    return fakeDuration;
+    _duration.add(duration);
+    return duration;
   }
 
   @override

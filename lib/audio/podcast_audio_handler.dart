@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
@@ -88,6 +89,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// A long pause releases the player and ends the foreground service.
   final Duration stopAfterPause;
 
+  /// Minimum difference between feed and player duration that counts as a
+  /// wrong estimate (besides 10 % of the length; ads inserted by the
+  /// server make files a bit longer than the feed says).
+  static const estimatedDurationTolerance = Duration(minutes: 1);
+
   /// Hang detection (docs/playback.md): while playing, the position is
   /// checked this often; [stallChecks] checks without progress = hanging.
   final Duration stallCheckInterval;
@@ -170,6 +176,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// in the background that can be minutes (or the whole episode) earlier
   /// (bug 2026-09-28: recovery restarted from the beginning).
   Duration _knownPosition = Duration.zero;
+
+  /// Episode row as it was before the current load (feed duration).
+  Episode? _loadingEpisode;
 
   /// Position shown while no audio is loaded (after app start, after stop).
   Duration _idlePosition = Duration.zero;
@@ -594,7 +603,16 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         : Uri.parse(episode.audioUrl);
     _source = source;
     _sourceIsLocal = local != null;
-    await _engine.load(source, initialPosition: start);
+    // Feed length of this episode, read before the player can report its
+    // own (an estimate must neither be stored nor compared with itself).
+    _loadingEpisode = episode;
+    final reported = await _engine.load(source, initialPosition: start);
+    if (_durationLooksEstimated(reported, episode)) {
+      // ExoPlayer guessed the length of a VBR MP3 from its first frame:
+      // every seek (resume, reload after a pause) lands elsewhere. Load
+      // again with exact seeking (docs/playback.md "VBR-MP3").
+      await _engine.load(source, initialPosition: start, exactMp3Seeking: true);
+    }
     _knownPosition = start;
     _retriedReachable = false;
     await _engine.setBoostDb(await _boostFor(row.podcast));
@@ -603,6 +621,22 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _broadcastState();
     _markedPlayed = false;
     _lastSaved = start;
+  }
+
+  /// True if the player's duration is far off the feed's for an MP3 – the
+  /// sign of ExoPlayer's constant-bitrate estimate for a VBR file without
+  /// a seek table (it takes the first frame's bitrate, often silence).
+  static bool _durationLooksEstimated(Duration? reported, Episode episode) {
+    final expectedMs = episode.durationMs;
+    if (reported == null || expectedMs == null || expectedMs <= 0) {
+      return false;
+    }
+    final mime = episode.audioMimeType?.toLowerCase();
+    final isMp3 = mime == null || mime.contains('mpeg') || mime.contains('mp3');
+    if (!isMp3) return false;
+    final diffMs = (reported.inMilliseconds - expectedMs).abs();
+    return diffMs >
+        max(estimatedDurationTolerance.inMilliseconds, expectedMs ~/ 10);
   }
 
   /// Position shown before loading: played episodes and positions under
@@ -685,6 +719,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final id = _episodeId;
     final item = mediaItem.value;
     if (id == null || duration == null || duration <= Duration.zero) return;
+    // A wrong estimate (VBR MP3) is replaced by the exact load right after;
+    // storing it would also hide the mismatch next time.
+    if (_loadingEpisode case final episode? when episode.id == id) {
+      if (_durationLooksEstimated(duration, episode)) return;
+    }
     if (item != null && item.duration != duration) {
       mediaItem.add(item.copyWith(duration: duration));
     }

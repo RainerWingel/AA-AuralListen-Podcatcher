@@ -140,13 +140,30 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 - Ende der Datei → `gespielt` (falls noch nicht), Player wird gestoppt. (Ab M5: nächste Playlist-Folge.)
 - Eine gespielte Folge erneut abspielen → startet bei 0; ab 15 s ist sie wieder `angefangen` (`playedAt` gelöscht → keine
   Löschung nach 96 h), darunter bleibt sie `gespielt`.
-- Die vom Player gemeldete Dauer wird in `episodes.durationMs` übernommen (genauer als die Feed-Angabe).
+- Die vom Player gemeldete Dauer wird in `episodes.durationMs` übernommen (genauer als die Feed-Angabe) – **außer** sie
+  sieht nach einer VBR-Schätzung aus (siehe unten), dann bleibt die Feed-Dauer.
 - Letzte Folge: `settings['player.lastEpisodeId']`; nach App-Start zeigt der Mini-Player sie an, **ohne** Audio zu laden
   (kein Netzverkehr, bis Play gedrückt wird).
 - **Ruheposition:** Solange kein Audio geladen ist (nach App-Start, nach Stopp/Pause-Timeout), zeigen Mini-/Vollbild-Player
   die gespeicherte Position (`handler.position` / `positionStream` liefern sie). Slider und −15/+30 s verschieben dann nur die
   gespeicherte Position (sofort in der DB); Play startet danach **exakt** dort (ohne 3-s-Rückblick).
   Regressionstests: Gruppe „before audio is loaded" in `test/audio/podcast_audio_handler_test.dart`.
+
+### VBR-MP3 ohne Sprungtabelle (Bug 2026-10-03, Benutzermeldung „Sternenkraft")
+- Symptom: Nach Pause/Play (Kopfhörer) ging es an einer anderen Stelle weiter, die Zeitanzeige stimmte aber.
+  Ursache: MP3 mit variabler Bitrate, deren Xing-Kopf **keine TOC** hat. Media3 1.4.1 (in just_audio 0.10.6) hält die Datei
+  dann für nicht springbar und fällt (just_audio-Standard `constantBitrateSeekingEnabled`) auf eine **feste Bitrate des
+  ersten Frames** zurück – dort oft Stille mit 32 kbit/s. Folge: 13:17 lange Datei wurde als ~46 min gemeldet, jeder
+  Sprung (Fortsetzen, Neuladen nach Pause > 10 min oder Netzfehler, Slider) landete z. B. bei 2:50 statt 10:00.
+  Neuere Media3-Versionen mitteln über die Xing-Angaben; just_audio liefert sie noch nicht.
+- Lösung (`PodcastAudioHandler._durationLooksEstimated`): Nach dem Laden die gemeldete Dauer mit der **Feed-Dauer**
+  vergleichen (nur MP3 bzw. MIME unbekannt). Abweichung > max(1 min, 10 %) → sofort erneut laden mit
+  `exactMp3Seeking` (`AndroidExtractorOptions.flagMp3EnableIndexSeeking`): Dauer aus dem Xing-Kopf, Sprünge exakt.
+  Kosten: Ein Sprung nach vorn liest (streamt) die Datei bis zum Ziel – deshalb nur für solche Dateien.
+- Die geschätzte Dauer wird weder gespeichert noch angezeigt (sonst fehlt beim nächsten Mal der Vergleichswert).
+  Migration v15 liest alle Feeds einmal neu und repariert so schon überschriebene Dauern.
+- Grenzen: Ohne Feed-Dauer keine Erkennung. Kleine Abweichungen (eingefügte Werbung) bleiben beim normalen Laden.
+- Regressionstests: Gruppe „VBR MP3 whose length the player only estimates" in `test/audio/podcast_audio_handler_test.dart`.
 
 ## Lautstärke-Boost
 - Android `LoudnessEnhancer` über `just_audio` (`AndroidLoudnessEnhancer`), Zielverstärkung in dB; 0 = aus.

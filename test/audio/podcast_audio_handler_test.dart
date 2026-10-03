@@ -116,6 +116,67 @@ void main() {
     );
   });
 
+  group('VBR MP3 whose length the player only estimates', () {
+    Future<void> setFeed(Duration duration, {String? mime}) =>
+        (db.update(db.episodes)..where((e) => e.id.equals(episodeId))).write(
+          EpisodesCompanion(
+            durationMs: Value(duration.inMilliseconds),
+            audioMimeType: Value(mime),
+          ),
+        );
+
+    test('loads again with exact seeking, also after a pause', () async {
+      // Real case: 13:17 file, ExoPlayer guesses 46 min from 32 kbit/s
+      // silence at the start, so a resume at 10:00 played from ~2:50.
+      await setFeed(const Duration(minutes: 13, seconds: 17));
+      engine
+        ..fakeDuration = const Duration(minutes: 13, seconds: 17)
+        ..estimatedDuration = const Duration(minutes: 46, seconds: 19);
+
+      final durations = <Duration?>[];
+      final sub = handler.mediaItem.listen((i) => durations.add(i?.duration));
+      addTearDown(sub.cancel);
+      await handler.playEpisode(episodeId);
+      expect(engine.exactLoads, [false, true]);
+      expect(engine.loadedAt, const Duration(seconds: 57));
+      // The estimate is neither stored nor shown.
+      expect(
+        (await episode()).durationMs,
+        const Duration(minutes: 13, seconds: 17).inMilliseconds,
+      );
+      expect(
+        durations,
+        isNot(contains(const Duration(minutes: 46, seconds: 19))),
+      );
+
+      // A long pause releases the player; Play loads exactly again.
+      engine.emitPosition(const Duration(minutes: 10));
+      await handler.pause();
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      await handler.play();
+      expect(engine.exactLoads, [false, true, false, true]);
+      // Resume after a stop: 3 s before the saved place, as always.
+      expect(engine.loadedAt, const Duration(minutes: 9, seconds: 57));
+    });
+
+    test(
+      'small differences (e.g. inserted ads) keep the normal load',
+      () async {
+        await setFeed(const Duration(minutes: 10));
+        engine.estimatedDuration = const Duration(minutes: 10, seconds: 50);
+        await handler.playEpisode(episodeId);
+        expect(engine.exactLoads, [false]);
+      },
+    );
+
+    test('only MP3 files are loaded again', () async {
+      await setFeed(const Duration(minutes: 13), mime: 'audio/mp4');
+      engine.estimatedDuration = const Duration(minutes: 46);
+      await handler.playEpisode(episodeId);
+      expect(engine.exactLoads, [false]);
+    });
+  });
+
   test('saves the position at most every 5 s and on pause', () async {
     final fresh = await addEpisode('2');
     await handler.playEpisode(fresh);
