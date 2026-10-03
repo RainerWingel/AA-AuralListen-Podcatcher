@@ -27,6 +27,8 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 - Heruntergeladene, **gespielte** Folgen werden **96 Stunden nach `playedAt`** automatisch gelöscht
   (sofern „Gespielte Folgen löschen" für den Podcast an ist – Standard: an).
 - **Nicht gespielte** Folgen werden **nie** automatisch gelöscht.
+- Gespielte Folgen, die **noch in einer Playlist** stehen (zu Ende gehört aus einer anderen Playlist, `playlists.md`),
+  werden ebenfalls nicht gelöscht – weder nach 96 h noch bei vollem Speicher (`DownloadService._notInAnyPlaylist`).
 - Die Folge im Player wird nie automatisch gelöscht.
 - Wird eine Folge wieder „ungespielt" markiert oder erneut abgespielt, entfällt die Löschung (`playedAt` = null).
 

@@ -805,8 +805,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// End of the file – only then an episode counts as played (user rule
   /// 2026-10-03, before: from 98 %). Order matters: read the next playlist
-  /// episode first, because marking played removes this one from all
-  /// playlists; then mark, unload, continue.
+  /// episode first, because marking played removes this one from the
+  /// active playlist (only that one); then mark, unload, continue.
   Future<void> _complete() async {
     if (_completing) return;
     _completing = true;
@@ -815,12 +815,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       // Sleep timer "Bis Ende der Folge": stay stopped, then it is off.
       final sleepAtEnd = _sleepTimer is SleepTimerAtEpisodeEnd;
       final next = sleepAtEnd ? null : await _nextInPlaylist();
-      // Leaving the playlists now is intended, not a membership change.
+      // Leaving the playlist now is intended, not a membership change.
       await _membership?.cancel();
       _membership = null;
       if (id != null && !_markedPlayed) {
         _markedPlayed = true;
-        await _playback.markPlayed(id);
+        await _playback.markFinished(id, playlistId: _activePlaylistId);
       }
       await stop();
       if (sleepAtEnd) {

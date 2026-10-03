@@ -263,26 +263,31 @@ class DownloadService implements PodcastFilesCleaner {
     return freed;
   }
 
-  /// Deletes played downloads 96 h after they were played (per-podcast switch).
+  /// Deletes played downloads 96 h after they were played (per-podcast
+  /// switch) – except episodes still in a playlist (played to the end from
+  /// another one, docs/eviction.md).
   Future<int> evictPlayed() async {
     final cutoff = _clock().subtract(deletePlayedAfter);
     final rows = await _rowsWhere(
       _db.downloads.state.equalsValue(DownloadState.done) &
           _db.episodes.status.equalsValue(EpisodeStatus.played) &
           _db.episodes.playedAt.isSmallerOrEqualValue(cutoff) &
-          _db.podcasts.autoDeletePlayed.equals(true),
+          _db.podcasts.autoDeletePlayed.equals(true) &
+          _notInAnyPlaylist(),
     );
     return _deleteAll(rows);
   }
 
   /// Over the limit: delete played downloads, oldest first. Unplayed
-  /// downloads are never deleted automatically.
+  /// downloads and episodes still in a playlist are never deleted
+  /// automatically.
   Future<int> enforceLimit() async {
     var excess = await totalBytes() - await limitBytes();
     if (excess <= 0) return 0;
     final rows = await _rowsWhere(
       _db.downloads.state.equalsValue(DownloadState.done) &
-          _db.episodes.status.equalsValue(EpisodeStatus.played),
+          _db.episodes.status.equalsValue(EpisodeStatus.played) &
+          _notInAnyPlaylist(),
       orderBy: OrderingTerm.asc(_db.episodes.playedAt),
     );
     final toDelete = <Download>[];
@@ -442,6 +447,13 @@ class DownloadService implements PodcastFilesCleaner {
   Future<Download?> _row(int episodeId) => (_db.select(
     _db.downloads,
   )..where((d) => d.episodeId.equals(episodeId))).getSingleOrNull();
+
+  /// The joined episode is in no playlist.
+  Expression<bool> _notInAnyPlaylist() => notExistsQuery(
+    _db.selectOnly(_db.playlistItems)
+      ..addColumns([_db.playlistItems.episodeId])
+      ..where(_db.playlistItems.episodeId.equalsExp(_db.episodes.id)),
+  );
 
   Future<List<Download>> _rowsWhere(
     Expression<bool> where, {

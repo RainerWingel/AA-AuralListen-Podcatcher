@@ -53,21 +53,38 @@ class PlaybackRepository {
             ),
           );
 
-  /// Marks as played (end of the file or manually) and removes it from ALL
-  /// playlists (docs/playlists.md). `playedAt` starts the 96 h eviction timer.
+  /// Marked as played by the user: removes the episode from ALL playlists
+  /// (docs/playlists.md). `playedAt` starts the 96 h eviction timer.
   Future<void> markPlayed(int episodeId) => _db.transaction(() async {
-    await _update(
-      episodeId,
-      EpisodesCompanion(
-        status: const Value(EpisodeStatus.played),
-        playedAt: Value(_clock()),
-        positionMs: const Value(0),
-      ),
-    );
+    await _setPlayed(episodeId);
     await (_db.delete(
       _db.playlistItems,
     )..where((i) => i.episodeId.equals(episodeId))).go();
   });
+
+  /// Played to the end: leaves only [playlistId] – the playlist it was
+  /// played from – and stays in all others (user wish 2026-10-03). Without
+  /// an active playlist it stays everywhere.
+  Future<void> markFinished(int episodeId, {int? playlistId}) =>
+      _db.transaction(() async {
+        await _setPlayed(episodeId);
+        if (playlistId == null) return;
+        await (_db.delete(_db.playlistItems)..where(
+              (i) =>
+                  i.episodeId.equals(episodeId) &
+                  i.playlistId.equals(playlistId),
+            ))
+            .go();
+      });
+
+  Future<void> _setPlayed(int episodeId) => _update(
+    episodeId,
+    EpisodesCompanion(
+      status: const Value(EpisodeStatus.played),
+      playedAt: Value(_clock()),
+      positionMs: const Value(0),
+    ),
+  );
 
   Expression<bool> _unplayedUntil(
     $EpisodesTable e,

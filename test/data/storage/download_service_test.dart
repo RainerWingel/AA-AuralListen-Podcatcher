@@ -221,6 +221,19 @@ void main() {
       expect(fileOf(id).existsSync(), isTrue);
     });
 
+    test('keeps played episodes that are still in a playlist', () async {
+      final id = await addEpisode(
+        'old',
+        status: EpisodeStatus.played,
+        playedAt: now.subtract(const Duration(days: 30)),
+      );
+      await downloaded(id);
+      final list = (await db.select(db.playlists).get()).first.id;
+      await PlaylistRepository(db, () => now).add(list, id);
+      await service.evictPlayed();
+      expect(fileOf(id).existsSync(), isTrue);
+    });
+
     test('never deletes the episode in the player', () async {
       final id = await addEpisode(
         'old',
@@ -266,6 +279,27 @@ void main() {
       expect(fileOf(newer).existsSync(), isFalse);
       expect(fileOf(unplayed1).existsSync(), isTrue);
       expect(fileOf(unplayed2).existsSync(), isTrue);
+    });
+
+    test('keeps played episodes that are still in a playlist', () async {
+      await db
+          .into(db.settings)
+          .insert(
+            SettingsCompanion.insert(
+              key: SettingsKeys.downloadLimitBytes,
+              value: '500',
+            ),
+          );
+      final id = await addEpisode(
+        'a',
+        status: EpisodeStatus.played,
+        playedAt: now.subtract(const Duration(hours: 2)),
+      );
+      await downloaded(id);
+      final list = (await db.select(db.playlists).get()).first.id;
+      await PlaylistRepository(db, () => now).add(list, id);
+      await service.enforceLimit();
+      expect(fileOf(id).existsSync(), isTrue);
     });
   });
 

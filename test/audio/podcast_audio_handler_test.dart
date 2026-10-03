@@ -1283,12 +1283,32 @@ void main() {
       expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
     });
 
-    test('played episode leaves ALL playlists', () async {
+    test('played to the end: leaves only the active playlist', () async {
       final other = await playlists.create('Unterwegs');
       await playlists.add(other, episodeId);
       await handler.playEpisode(episodeId, playlistId: playlistId);
       engine.complete();
       await pumpEventQueue();
+      expect(await itemsOf(playlistId), [ep2, ep3]);
+      expect(await itemsOf(other), [episodeId]);
+      expect((await episode()).status, EpisodeStatus.played);
+    });
+
+    test('played to the end without active playlist: stays in all', () async {
+      // Only offered (started elsewhere, not tapped).
+      await handler.playEpisode(episodeId);
+      expect(handler.suggestedPlaylistId, playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+      expect((await episode()).status, EpisodeStatus.played);
+    });
+
+    test('marked played by hand: leaves ALL playlists', () async {
+      final other = await playlists.create('Unterwegs');
+      await playlists.add(other, episodeId);
+      await PlaybackRepository(db, () => now).markPlayed(episodeId);
+      expect(await itemsOf(playlistId), [ep2, ep3]);
       expect(await itemsOf(other), isEmpty);
     });
 

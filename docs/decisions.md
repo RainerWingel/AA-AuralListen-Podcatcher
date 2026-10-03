@@ -91,3 +91,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   (2026-09-27). Die Sonderfälle der 98-%-Regel (Folge verließ die Playlists vor dem Ende, Beobachter-Ausnahme,
   Positions-Nachlesen) entfallen; am Ende: nächste lesen → markieren → stoppen → weiter. Auto-Löschen bleibt 96 h nach
   „gespielt"; nicht gespielte Folgen werden nie automatisch gelöscht.
+- 2026-10-03 · **Zu Ende gehört → nur aus der aktiven Playlist** (Benutzer) · Ersetzt für das Wiedergabe-Ende die Regel
+  „Gespielt → aus allen Playlists" (2026-09-27); manuelles Markieren entfernt weiter aus allen. Ohne aktive Playlist
+  (auch nur angeboten) bleibt die Folge überall. Folge: gespielte Folgen in Playlists sind vor dem Auto-Löschen geschützt.

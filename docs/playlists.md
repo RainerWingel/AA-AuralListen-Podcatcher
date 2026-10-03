@@ -72,7 +72,8 @@ schon enthaltene Folgen werden wie immer übersprungen:
 - Startet der Benutzer eine Folge **aus einer Playlist**, wird diese Playlist zur **aktiven Playlist**.
 - Erreicht die Folge ihr **Ende** (Dateiende; keine 98-%-Regel mehr, Benutzerwunsch 2026-10-03):
   1. Folge wird als **gespielt** markiert (`playedAt` gesetzt).
-  2. Folge wird **automatisch aus allen Playlists entfernt**, in denen sie steht (nicht nur aus der aktiven).
+  2. Folge wird **nur aus der aktiven Playlist entfernt** (der mit ⏭; Benutzerwunsch 2026-10-03, vorher aus allen) und
+     bleibt in allen anderen. Ohne aktive Playlist (auch wenn eine nur angeboten war) bleibt sie überall.
   3. Die **nächste Folge derselben Playlist startet automatisch**.
 - Die „nächste Folge" wird **erst in diesem Moment aus der DB gelesen** – kein Schnappschuss beim Start.
   Dadurch wird eine Folge, die während der Wiedergabe hinzugefügt wurde, automatisch mitgespielt.
@@ -91,12 +92,13 @@ schon enthaltene Folgen werden wie immer übersprungen:
   Gespielt-Markieren, das sie absichtlich aus allen Playlists nimmt) sofort beendet und in `dispose` freigegeben.
 - Überspringt der Benutzer eine Folge manuell („Weiter" ⏭ im Vollbild-Player bzw. in der Benachrichtigung), wird sie
   **nicht** als gespielt markiert und **bleibt** in der Playlist.
-- Auch manuelles „Als gespielt markieren" entfernt die Folge aus allen Playlists (Regel sitzt zentral in `markPlayed`).
+- Manuelles „Als gespielt markieren" (auch „bis …") entfernt die Folge dagegen aus **allen** Playlists
+  (`PlaybackRepository.markPlayed`); das Ende der Wiedergabe nutzt `markFinished(id, playlistId: aktive)`.
 
 ### Umsetzungsdetails
 - Am Ende (`PodcastAudioHandler._complete`) in dieser Reihenfolge: nächste Folge lesen (die laufende steht noch in der
   Playlist, ihre Position wird frisch gelesen – Umsortieren während der Wiedergabe zählt), Playlist-Beobachter beenden,
-  als gespielt markieren (entfernt sie aus allen Playlists), stoppen, nächste starten.
+  als gespielt markieren (entfernt sie nur aus der aktiven Playlist), stoppen, nächste starten.
 - Der Handler merkt sich die **Position** der laufenden Folge in der aktiven Playlist. Die nächste Folge ist der Eintrag
   mit der kleinsten Position **größer** als diese – gelesen im Moment des Wechsels.
 - Aktive Playlist + Position stehen in `settings['player.activePlaylistId']` (`"<id>:<position>"`) und überleben einen
