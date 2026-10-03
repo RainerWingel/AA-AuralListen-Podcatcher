@@ -1409,7 +1409,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupCreateSubtitle.
   ///
   /// In de, this message translates to:
-  /// **'Abos, Hörstand, Playlists, Lesezeichen, Einstellungen – ohne Audiodateien'**
+  /// **'Abos, Hörstand, Playlists, Lesezeichen, Verlauf, Einstellungen – ohne Audiodateien'**
   String get backupCreateSubtitle;
 
   /// No description provided for @backupCreated.

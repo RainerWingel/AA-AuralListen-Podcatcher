@@ -802,7 +802,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupCreateSubtitle =>
-      'Subscriptions, progress, playlists, bookmarks, settings – without audio files';
+      'Subscriptions, progress, playlists, bookmarks, history, settings – without audio files';
 
   @override
   String get backupCreated => 'Backup saved';

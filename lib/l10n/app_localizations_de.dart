@@ -803,7 +803,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get backupCreateSubtitle =>
-      'Abos, Hörstand, Playlists, Lesezeichen, Einstellungen – ohne Audiodateien';
+      'Abos, Hörstand, Playlists, Lesezeichen, Verlauf, Einstellungen – ohne Audiodateien';
 
   @override
   String get backupCreated => 'Backup gespeichert';

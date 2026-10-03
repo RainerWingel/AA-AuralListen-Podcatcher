@@ -508,7 +508,7 @@
   "opmlExportSubtitle": "Für andere Podcast-Apps",
   "opmlExported": "Abos exportiert",
   "backupCreate": "Backup erstellen",
-  "backupCreateSubtitle": "Abos, Hörstand, Playlists, Lesezeichen, Einstellungen – ohne Audiodateien",
+  "backupCreateSubtitle": "Abos, Hörstand, Playlists, Lesezeichen, Verlauf, Einstellungen – ohne Audiodateien",
   "backupCreated": "Backup gespeichert",
   "backupRestore": "Backup wiederherstellen",
   "backupRestoreSubtitle": "Ersetzt alle aktuellen Daten",

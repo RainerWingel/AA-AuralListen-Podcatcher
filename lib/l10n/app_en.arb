@@ -218,7 +218,7 @@
   "opmlExportSubtitle": "For other podcast apps",
   "opmlExported": "Subscriptions exported",
   "backupCreate": "Create backup",
-  "backupCreateSubtitle": "Subscriptions, progress, playlists, bookmarks, settings – without audio files",
+  "backupCreateSubtitle": "Subscriptions, progress, playlists, bookmarks, history, settings – without audio files",
   "backupCreated": "Backup saved",
   "backupRestore": "Restore backup",
   "backupRestoreSubtitle": "Replaces all current data",
