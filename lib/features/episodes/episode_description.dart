@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/app_platform.dart';
 import '../../core/text_utils.dart';
@@ -56,17 +57,39 @@ Future<void> showEpisodeDescriptionSheet(
   ),
 );
 
-/// Collapsible "Description" section at the bottom of the full-screen player.
-/// Hidden when the episode has no show notes.
+/// Collapsible "Description" section at the bottom of the full-screen player:
+/// episode number (as on the cover) and publication date on top (user wish
+/// 2026-10-04), then the show notes. Hidden when there is none of them.
 class EpisodeDescriptionSection extends ConsumerWidget {
-  const EpisodeDescriptionSection({required this.episodeId, super.key});
+  const EpisodeDescriptionSection({
+    required this.episodeId,
+    this.podcastId,
+    this.pubDate,
+    super.key,
+  });
 
   final int episodeId;
+  final int? podcastId;
+  final DateTime? pubDate;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final notes = ref.watch(episodeNotesProvider(episodeId)).value;
-    if (notes == null || notes.isEmpty) return const SizedBox.shrink();
+    final number = switch (podcastId) {
+      final id? => ref.watch(
+        episodeNumbersProvider(id).select((n) => n.value?[episodeId]),
+      ),
+      null => null,
+    };
+    final facts = [
+      if (number != null) l10n.episodeNumberLabel(number),
+      if (pubDate case final date?)
+        DateFormat.yMMMMd(l10n.localeName).format(date.toLocal()),
+    ].join(' · ');
+    final hasNotes = notes != null && notes.isNotEmpty;
+    if (!hasNotes && facts.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
     return ExpansionTile(
       // A new episode starts collapsed again.
       key: ValueKey(episodeId),
@@ -76,7 +99,19 @@ class EpisodeDescriptionSection extends ConsumerWidget {
       expandedAlignment: Alignment.topLeft,
       shape: const Border(),
       collapsedShape: const Border(),
-      children: [NotesText(notes)],
+      children: [
+        if (facts.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(bottom: hasNotes ? 12 : 0),
+            child: Text(
+              facts,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        if (hasNotes) NotesText(notes),
+      ],
     );
   }
 }

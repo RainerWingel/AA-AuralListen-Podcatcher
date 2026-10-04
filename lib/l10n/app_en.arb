@@ -165,6 +165,7 @@
   "appendToPlaylist": "Add to the end of “{playlist}”",
   "appendToPlaylistDone": "Added to the end of “{playlist}”.",
   "episodeDescription": "Description",
+  "episodeNumberLabel": "Episode {number}",
   "episodeNoDescription": "This episode has no description.",
   "addedToPlaylist": "Added to “{name}”",
   "alreadyInPlaylist": "Already in “{name}”",

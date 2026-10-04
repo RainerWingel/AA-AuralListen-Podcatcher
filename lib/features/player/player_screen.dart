@@ -142,7 +142,15 @@ class PlayerScreen extends ConsumerWidget {
                           ],
                         ),
                         if (item.extras?['episodeId'] case final int id)
-                          EpisodeDescriptionSection(episodeId: id),
+                          EpisodeDescriptionSection(
+                            episodeId: id,
+                            podcastId: podcastId,
+                            pubDate: switch (item.extras?['pubDateMs']) {
+                              final int ms =>
+                                DateTime.fromMillisecondsSinceEpoch(ms),
+                              _ => null,
+                            },
+                          ),
                         const SizedBox(height: 16),
                       ],
                     ),

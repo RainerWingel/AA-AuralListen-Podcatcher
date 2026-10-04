@@ -53,7 +53,10 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
   −15 s / Play / +30 s, „Boost: …" und daneben „Tempo: …" (öffnen je eine Auswahl, `playback.md`). Pfeil nach unten schließt.
   Darunter „Kapitel x/n: Titel" (falls vorhanden; tippen → Kapitel-Liste) und Knöpfe „Lesezeichen setzen", Sleep-Timer (Stoppuhr;
   aktiv: „noch mm:ss" bzw. „Bis Folgenende"), „Lesezeichen (n)". Ganz unten aufklappbarer Bereich „Beschreibung"
-  (Shownotes mit Links, zugeklappt, nur wenn vorhanden; Benutzerwunsch 2026-10-01).
+  (Shownotes mit Links, zugeklappt; Benutzerwunsch 2026-10-01). Aufgeklappt steht oben „Folge 105 · 26. September
+  2025" – Nummer wie am Cover (eigene Zählung/Versatz/Staffel „S2·5" beachtet), Erscheinungsdatum aus
+  `mediaItem.extras['pubDateMs']` (Benutzerwunsch 2026-10-04); der Bereich erscheint auch ohne Shownotes, wenn es
+  Nummer oder Datum gibt.
   Kapitel-Liste: Titel, darunter Startzeit, rechts Chip „Skip" (übersprungen = durchgestrichen) → `playback.md`.
 - **Boost-Auswahl** (Bottom-Sheet): Aus / +3 / +6 / +9 / +12 dB, Schalter „Nur für diesen Podcast".
 

@@ -596,6 +596,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get episodeDescription => 'Beschreibung';
 
   @override
+  String episodeNumberLabel(String number) {
+    return 'Folge $number';
+  }
+
+  @override
   String get episodeNoDescription =>
       'Für diese Folge gibt es keine Beschreibung.';
 

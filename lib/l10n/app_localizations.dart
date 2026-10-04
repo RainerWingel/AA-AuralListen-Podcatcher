@@ -1088,6 +1088,12 @@ abstract class AppLocalizations {
   /// **'Beschreibung'**
   String get episodeDescription;
 
+  /// No description provided for @episodeNumberLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Folge {number}'**
+  String episodeNumberLabel(String number);
+
   /// No description provided for @episodeNoDescription.
   ///
   /// In de, this message translates to:

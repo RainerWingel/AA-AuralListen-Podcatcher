@@ -359,6 +359,14 @@
     }
   },
   "episodeDescription": "Beschreibung",
+  "episodeNumberLabel": "Folge {number}",
+  "@episodeNumberLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "episodeNoDescription": "Für diese Folge gibt es keine Beschreibung.",
   "addedToPlaylist": "Zu „{name}“ hinzugefügt",
   "@addedToPlaylist": {

@@ -1828,6 +1828,8 @@ void main() {
       await tester.tap(find.text('Beschreibung'));
       await settle(tester);
       expect(notes, findsOneWidget);
+      // On top: number as on the cover (own count: 1) and the date.
+      expect(find.text('Folge 1 · 10. Juni 2025'), findsOneWidget);
 
       await disposeApp(tester);
     },

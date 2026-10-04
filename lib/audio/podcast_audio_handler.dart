@@ -1180,7 +1180,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       duration: e.durationMs == null
           ? null
           : Duration(milliseconds: e.durationMs!),
-      extras: {'episodeId': e.id, 'podcastId': p.id},
+      extras: {
+        'episodeId': e.id,
+        'podcastId': p.id,
+        // Shown above the show notes in the player.
+        'pubDateMs': e.pubDate?.millisecondsSinceEpoch,
+      },
     );
   }
 }
