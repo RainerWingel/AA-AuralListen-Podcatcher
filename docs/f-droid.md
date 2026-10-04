@@ -1,7 +1,7 @@
 # F-Droid
 
 F-Droid baut die App **selbst aus dem Quellcode** (Git-Tag) und signiert sie mit eigenem Schlüssel. Die Store-Texte
-kommen aus diesem Repo. Stand 2026-10-04: vorbereitet (Version 1.3.1), noch nicht eingereicht.
+kommen aus diesem Repo. Stand 2026-10-04: v1.3.1 veröffentlicht, noch nicht bei F-Droid eingereicht.
 
 ## Was im Repo dafür vorbereitet ist
 | Was | Wo |
@@ -27,8 +27,9 @@ aus `third_party/sqlite` (3.53.4).
 - Flutter-Version im Rezept (`flutter@…`) = Version in `.github/workflows/ci.yml`.
 
 ## Schritte für den Benutzer
-Stand 2026-10-04: Version **1.3.1** (+6, Codes 1006/2006/4006) vorbereitet, Changelogs und Store-Texte fertig; Tag und
-GitHub-Release fehlen noch. 1.3.0 wurde nie eingereicht – eingereicht wird direkt 1.3.1.
+Stand 2026-10-04: **v1.3.1 veröffentlicht** (+6, Codes 1006/2006/4006; Tag auf
+`7906fd482c82f34068059258548309675b580b95`), Rezept, Changelogs, Store-Texte und Screenshots fertig. 1.3.0 wurde nie
+eingereicht – eingereicht wird direkt 1.3.1. **Offen: Schritte 3–7.**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
    getaggten Stand.
