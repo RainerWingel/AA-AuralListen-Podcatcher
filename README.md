@@ -20,27 +20,40 @@ Gerät. Geschrieben in Flutter.
 - Suche über Apple Podcasts und fyyd.de, Abo per RSS-Adresse, OPML-Import und -Export (z. B. aus anderen Apps)
 - Aktualisierung beim Start und per Herunterziehen; Umzüge von Podcasts (neue Feed-Adresse) werden übernommen
 - Rote Zahl mit ungespielten Folgen an jedem Abo; Punkt bei frischen Folgen (letzte 96 Stunden)
+- Podcast-Seite mit Beschreibung, Links zur Website und zum Unterstützen (falls im Feed), Suche in den Abos
+- Folgennummer am Cover (aus dem Feed oder eigene Zählung mit Versatz)
+- Staffeln: „S2·5" am Cover, Filter nach Staffel; Serien-Podcasts (Hörspiele, Doku-Reihen) in Hörreihenfolge
 
 **Hören**
 - Wiedergabe im Hintergrund mit Benachrichtigung, Sperrbildschirm- und Bluetooth-Tasten
-- Sprünge −15 s / +30 s, Lautstärke-Boost (global oder pro Podcast)
+- Sprünge −15 s / +30 s, Abspielgeschwindigkeit 1,0× / 1,2× / 1,5× / 2,0×, Lautstärke-Boost (global oder pro Podcast)
+- Restzeit (bei höherem Tempo zusätzlich die tatsächliche Restzeit) oder Gesamtlänge – per Antippen umschaltbar
+- Shownotes mit antippbaren Links, Folgennummer und Erscheinungsdatum
 - Kapitel (Podlove, JSON, ID3) mit „Skip" je Kapitel, Lesezeichen mit Notiz
 - Sleep-Timer: 5 / 15 / 30 / 60 Minuten, eigene Zeit oder bis Ende der Folge – mit sanftem Ausblenden
-- Hörposition wird gemerkt; bis zum Ende gehört gilt eine Folge als gespielt
-- Robust bei Netzproblemen: Hänger-Erkennung, Fortsetzen an der richtigen Stelle, klare Meldungen
+- Hörposition wird gemerkt; erst bis zum Ende gehört gilt eine Folge als gespielt
+- Abspielverlauf der letzten 100 zu Ende gehörten Folgen (bleibt auch nach dem Kündigen eines Abos)
+- Robust bei Netzproblemen: Hänger-Erkennung, Fortsetzen an der richtigen Stelle (auch bei MP3s mit wechselnder
+  Bitrate), Hinweis bei Podcasts mit wechselnder Werbung, klare Meldungen
 
 **Playlists**
-- Mehrere Playlists mit automatischem Weiterspielen; gespielte Folgen verlassen alle Playlists
+- Mehrere Playlists mit automatischem Weiterspielen; eine zu Ende gehörte Folge verlässt die Playlist, aus der sie
+  lief (manuell als gespielt markiert: alle Playlists)
+- Folge woanders gestartet: ihre Playlist wird nur angeboten und erst nach Antippen fortgesetzt
+- „Als Nächstes spielen" und „Ans Ende der Playlist anfügen" für die laufende Playlist
 - „Fortsetzen" mit der zuletzt gespielten Folge jeder Playlist, Sortieren nach Datum oder Namen, „Alles downloaden"
-- Aus dem Abo-Menü: alle neuen, alle ungespielten oder alle ungespielten seit einem Datum in eine Playlist
+- Aus dem Abo-Menü: alle neuen, alle ungespielten oder alle ungespielten seit einem Datum in eine Playlist; über die
+  Podcast-Seite gleich abspielen
+- Symbol an jeder Folge, die in einer Playlist steht
 
 **Downloads und Speicher**
 - Downloads manuell oder automatisch pro Podcast (auch nur bestimmte Themen, z. B. bei Netzwerk-Feeds wie WRINT)
-- Automatisches Löschen gespielter Folgen nach 96 Stunden, einstellbares Speicherlimit
+- Automatisches Löschen gespielter Folgen nach 96 Stunden (nicht, solange sie noch in einer Playlist stehen),
+  einstellbares Speicherlimit
 
 **Sonstiges**
 - „Als gespielt markieren bis …" / „Als ungespielt markieren seit …"
-- Backup und Wiederherstellung (ZIP), Dark Mode, Deutsch oder Englisch
+- Backup und Wiederherstellung (ZIP), Dark Mode, wählbare App-Farbe, Deutsch oder Englisch
 
 ## Installation
 
