@@ -56,3 +56,6 @@ config/secrets.json
 android/key.properties
 *.jks
 *.keystore
+
+# Store screenshots only as small JPGs (docs/f-droid.md), never the PNG originals.
+fastlane/metadata/android/*/images/phoneScreenshots/*.png
