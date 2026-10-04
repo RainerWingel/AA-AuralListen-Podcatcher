@@ -62,7 +62,7 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 
 ## Folgen-Elemente
 Cover, Titel (max. 2 Zeilen), auf der Startseite der Podcast-Name in eigener Zeile, darunter **Datum · Dauer**
-(eigene Zeile, damit lange Podcast-Namen sie nie verdrängen), Fortschritt (Balken, nur bei `angefangen` und ab 15 s Position), Status-Icon (Punkt = **frisch** – ungespielt und von einem Refresh vor < 96 h geholt, gleiche Regel wie
+(eigene Zeile, damit lange Podcast-Namen sie nie verdrängen), Fortschritt (Balken, nur bei `angefangen` und ab 15 s Position; immer gleich breit – rechts steht stets ein 24 pt breiter Platz, auch ohne Symbol, Benutzerwunsch 2026-10-04), Status-Icon (Punkt = **frisch** – ungespielt und von einem Refresh vor < 96 h geholt, gleiche Regel wie
 „Alle neuen Episoden spielen" (`isFreshEpisode`); ältere ungespielte Folgen ohne Punkt · Haken = gespielt · Equalizer = läuft gerade;
 laufende Folge hervorgehoben; eine **gespielte** Folge gilt nur als laufend, solange sie wirklich noch spielt –
 nach dem Ende zeigt sie den Haken, auch wenn der Mini-Player sie noch anzeigt). Gespielte Folgen: Bild, Titel und Untertitel mit 50 % Deckkraft wie bei Castbox

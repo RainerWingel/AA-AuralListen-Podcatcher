@@ -2204,6 +2204,48 @@ void main() {
   );
 
   testWidgets(
+    'the progress bar keeps its width with or without a status symbol',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      // In progress (bar visible), no symbol on the right.
+      await tester.runAsync(
+        () => db
+            .update(db.episodes)
+            .write(
+              const EpisodesCompanion(
+                status: Value(EpisodeStatus.inProgress),
+                positionMs: Value(600000),
+              ),
+            ),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+      final bar = find.byType(LinearProgressIndicator);
+      final without = tester.getSize(bar).width;
+
+      // Now playing: the "now playing" symbol appears on the right.
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      expect(find.byIcon(Icons.graphic_eq), findsOneWidget);
+      expect(tester.getSize(bar.first).width, without);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'podcast page menu: play all unplayed episodes',
     timeout: timeout,
     (tester) async {

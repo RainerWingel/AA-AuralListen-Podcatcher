@@ -298,31 +298,41 @@ class EpisodeTile extends ConsumerWidget {
           ],
         ),
       ),
-      trailing: isCurrent
-          ? Tooltip(
-              message: l10n.nowPlaying,
-              child: Icon(Icons.graphic_eq, color: theme.colorScheme.primary),
-            )
-          : switch (episode.status) {
-              // The dot marks only fresh episodes (like "Alle neuen
-              // Episoden spielen"), not everything never played.
-              EpisodeStatus.newEpisode
-                  when !isFreshEpisode(episode, podcast, now) =>
-                null,
-              EpisodeStatus.newEpisode => Tooltip(
-                message: l10n.episodeNew,
-                child: Icon(
-                  Icons.circle,
-                  size: 10,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              EpisodeStatus.played => Tooltip(
-                message: l10n.episodePlayed,
-                child: Icon(Icons.check, color: theme.colorScheme.outline),
-              ),
-              EpisodeStatus.inProgress => null,
-            },
+      // Always the same width, with or without a symbol: the progress bar
+      // under the title must not change its length (user wish 2026-10-04).
+      trailing: SizedBox(
+        width: _trailingWidth,
+        child: Center(
+          child: isCurrent
+              ? Tooltip(
+                  message: l10n.nowPlaying,
+                  child: Icon(
+                    Icons.graphic_eq,
+                    color: theme.colorScheme.primary,
+                  ),
+                )
+              : switch (episode.status) {
+                  // The dot marks only fresh episodes (like "Alle neuen
+                  // Episoden spielen"), not everything never played.
+                  EpisodeStatus.newEpisode
+                      when !isFreshEpisode(episode, podcast, now) =>
+                    null,
+                  EpisodeStatus.newEpisode => Tooltip(
+                    message: l10n.episodeNew,
+                    child: Icon(
+                      Icons.circle,
+                      size: 10,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  EpisodeStatus.played => Tooltip(
+                    message: l10n.episodePlayed,
+                    child: Icon(Icons.check, color: theme.colorScheme.outline),
+                  ),
+                  EpisodeStatus.inProgress => null,
+                },
+        ),
+      ),
     );
   }
 }
@@ -394,6 +404,9 @@ class _PlaylistIndicator extends ConsumerWidget {
 }
 
 const double _coverSize = 56;
+
+/// Width of the status symbol on the right (an icon's size).
+const double _trailingWidth = 24;
 
 /// The cover with the episode number (if any) in a narrow dark strip on its
 /// left edge, reading bottom to top (docs/ui-ux.md "Folgennummer").
