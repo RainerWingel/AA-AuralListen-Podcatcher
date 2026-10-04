@@ -50,9 +50,10 @@ Ein Menü (`showPodcastPlayMenu` in `play_podcast_episodes.dart`) an drei Stelle
   „Ungespielte Episoden seit … in Playlist", „Alle ungespielten Episoden in Playlist"; Infobox „n Folgen zu „X"
   hinzugefügt." bzw. „Alle Folgen waren schon in „X".".
 - **Thema** (Netzwerk-Feeds wie WRINT): Podcast-Einstellungen → „Themen für automatische Downloads" → langes Drücken
-  (Benutzerwunsch 2026-09-30) – nur Folgen dieses Themas (`unplayedEpisodes(theme: …)`), Titel „Podcast · Thema".
+  (Benutzerwunsch 2026-09-30) – nur Folgen dieses Themas (`unplayedEpisodes(theme: …)`), Titel „Podcast · Thema";
+  packt wie die Abos-Übersicht **nur in eine Playlist** (Benutzerwunsch 2026-10-04).
 - **Staffel**: langes Drücken auf einen Staffel-Chip im Podcast-Detail – nur diese Staffel.
-Thema und Staffel **spielen** wie unten beschrieben. Zusätzlich hat das ⋮-Menü im Podcast-Detail direkt (ohne Menü
+Nur die Staffel **spielt** wie unten beschrieben. Zusätzlich hat das ⋮-Menü im Podcast-Detail direkt (ohne Menü
 dazwischen) „Alle neuen Episoden abspielen", „Ungespielte Episoden seit … abspielen", „Alle ungespielten Episoden
 abspielen" (`playFromPodcastMenu`; nichts Passendes → Infobox). Schon enthaltene Folgen werden immer übersprungen:
 1. **„Alle neuen Episoden spielen"** – nur **frische** Folgen.

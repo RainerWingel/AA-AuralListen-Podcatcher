@@ -263,11 +263,18 @@ class _ThemeFilter extends ConsumerWidget {
         ),
         Text(l10n.autoDownloadThemesHint, style: theme.textTheme.bodySmall),
         for (final t in themes)
-          // Long press: play this topic's episodes (same menu as on a
-          // subscription, limited to the topic).
+          // Long press: this topic's episodes into a playlist (same menu as
+          // on a subscription in the Abos grid, limited to the topic).
           GestureDetector(
-            onLongPress: () =>
-                showPodcastPlayMenu(context, ref, podcast, theme: t.theme),
+            onLongPress: () => showPodcastPlayMenu(
+              context,
+              ref,
+              podcast,
+              theme: t.theme,
+              // Like the Abos grid: only into a playlist (user wish
+              // 2026-10-04).
+              action: PodcastEpisodesAction.addToPlaylist,
+            ),
             child: CheckboxListTile(
               contentPadding: EdgeInsets.zero,
               value: selected.contains(t.theme),
