@@ -136,7 +136,8 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
   (Netzfehler, Hänger) oder einem Sprung ohne geladenes Audio geht es exakt an der Stelle weiter.
 - Erst ab **15 s** gilt eine Folge als `angefangen` – neu wie erneut abgespielt (`data-model.md` → Episoden-Status).
 - **Erst das Ende der Datei** macht eine Folge `gespielt` (`playedAt` = jetzt, Position = 0), Player wird gestoppt, ggf.
-  nächste Playlist-Folge (`playlists.md`). Die frühere **98-%-Regel ist abgeschafft** (Benutzerwunsch 2026-10-03): bis
+  nächste Playlist-Folge (`playlists.md`). Die Anzeige bleibt danach **am Ende** stehen (Gesamtlänge statt 0:00, auch
+  nach App-Neustart für die letzte Folge; Benutzerwunsch 2026-10-04); Play startet die Folge trotzdem von vorn. Die frühere **98-%-Regel ist abgeschafft** (Benutzerwunsch 2026-10-03): bis
   zur letzten Sekunde wird die Position normal gespeichert, die Folge bleibt in ihren Playlists.
 - Eine gespielte Folge erneut abspielen → startet bei 0; ab 15 s ist sie wieder `angefangen` (`playedAt` gelöscht → keine
   Löschung nach 96 h), darunter bleibt sie `gespielt`.

@@ -290,7 +290,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _playlistPosition = int.tryParse(saved[1]) ?? -1;
     }
     mediaItem.add(_withPlaylist(_toMediaItem(row)));
-    _setIdlePosition(_savedPosition(row.episode));
+    // A finished episode shows its end, not 0:00 (user wish 2026-10-04);
+    // Play still starts it over.
+    final played = row.episode.status == EpisodeStatus.played;
+    _setIdlePosition(
+      played && row.episode.durationMs != null
+          ? Duration(milliseconds: row.episode.durationMs!)
+          : _savedPosition(row.episode),
+    );
     _broadcastState();
   }
 
@@ -507,8 +514,13 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _pauseTimer?.cancel();
     _resetRecovery();
     await _saveCurrentPosition();
-    // Keep showing where playback stopped (0 if the episode was finished).
-    _setIdlePosition(_markedPlayed ? Duration.zero : _engine.position);
+    // Keep showing where playback stopped – the end if the episode was
+    // finished (user wish 2026-10-04; before: 0:00). Play starts it over.
+    _setIdlePosition(
+      _markedPlayed
+          ? _engine.duration ?? mediaItem.value?.duration ?? _engine.position
+          : _engine.position,
+    );
     await _engine.stop();
     _loaded = false;
     _broadcastState();

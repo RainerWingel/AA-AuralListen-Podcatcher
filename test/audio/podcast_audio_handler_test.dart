@@ -347,6 +347,8 @@ void main() {
       handler.playbackState.value.processingState,
       AudioProcessingState.idle,
     );
+    // The player keeps showing the end (10 min), not 0:00.
+    expect(handler.position, const Duration(minutes: 10));
 
     await handler.play();
     expect(engine.loadedAt, Duration.zero);
@@ -465,6 +467,23 @@ void main() {
     expect(handler.mediaItem.value!.title, 'Folge 1');
     expect(engine.calls, isEmpty);
     expect(handler.playbackState.value.playing, isFalse);
+  });
+
+  test('a finished last episode shows its end after an app start', () async {
+    await (db.update(db.episodes)..where((e) => e.id.equals(episodeId))).write(
+      const EpisodesCompanion(
+        status: Value(EpisodeStatus.played),
+        positionMs: Value(0),
+        durationMs: Value(600000),
+      ),
+    );
+    await settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
+    await handler.restoreLastEpisode();
+    expect(handler.position, const Duration(minutes: 10));
+
+    // Play starts it over.
+    await handler.play();
+    expect(engine.loadedAt, Duration.zero);
   });
 
   // Regression: after a phone restart the player showed 0:00 instead of the
