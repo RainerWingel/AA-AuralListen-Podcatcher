@@ -1,7 +1,7 @@
 # F-Droid
 
 F-Droid baut die App **selbst aus dem Quellcode** (Git-Tag) und signiert sie mit eigenem Schlüssel. Die Store-Texte
-kommen aus diesem Repo. Stand 2026-10-04: v1.3.1 veröffentlicht, noch nicht bei F-Droid eingereicht.
+kommen aus diesem Repo. Stand 2026-10-04: v1.3.1 bei F-Droid eingereicht (MR !51179), Prüfung läuft.
 
 ## Was im Repo dafür vorbereitet ist
 | Was | Wo |
@@ -29,7 +29,10 @@ aus `third_party/sqlite` (3.53.4).
 ## Schritte für den Benutzer
 Stand 2026-10-04: **v1.3.1 veröffentlicht** (+6, Codes 1006/2006/4006; Tag auf
 `7906fd482c82f34068059258548309675b580b95`), Rezept, Changelogs, Store-Texte und Screenshots fertig. 1.3.0 wurde nie
-eingereicht – eingereicht wird direkt 1.3.1. **Offen: Schritte 3–7.**
+eingereicht – eingereicht wird direkt 1.3.1.
+**Eingereicht 2026-10-04:** Merge Request https://gitlab.com/fdroid/fdroiddata/-/merge_requests/51179 – F-Droid-Pipeline
+grün. Im MR erklärt bzw. nicht angehakt: Flutter als srclib, keine Reproducible Builds (F-Droid signiert selbst).
+**Offen: Prüfung durch F-Droid (Schritt 7).**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
    getaggten Stand.
