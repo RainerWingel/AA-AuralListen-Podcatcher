@@ -41,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 19;
+  int get schemaVersion => 20;
 
   /// Name of the playlist that exists from the first start on (German-only app).
   static const defaultPlaylistName = 'Wiedergabeliste';
@@ -157,6 +157,13 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 19) {
         await m.createTable(playHistory);
+      }
+      if (from < 20) {
+        // Data only: re-read every feed once so titles and show notes are
+        // decoded with the full entity table ("&amp;Uuml;" → "Ü").
+        await customStatement(
+          'UPDATE podcasts SET etag = NULL, last_modified = NULL',
+        );
       }
       if (from >= 13 && from < 15) {
         // Data only, re-read every feed once. v14: notes may now be three

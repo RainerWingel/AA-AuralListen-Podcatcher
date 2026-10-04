@@ -18,40 +18,186 @@ final RegExp _anyTag = RegExp(r'<[^>]*>');
 final RegExp _spaces = RegExp(r'[ \t ]+');
 final RegExp _blankLines = RegExp(r'\n\s*\n\s*(\n\s*)+');
 
-// `&amp;` last, so "&amp;nbsp;" stays the literal text "&nbsp;".
-const Map<String, String> _entities = {
-  '&nbsp;': ' ',
-  '&lt;': '<',
-  '&gt;': '>',
-  '&quot;': '"',
-  '&#39;': "'",
-  '&apos;': "'",
-  '&auml;': 'ä',
-  '&ouml;': 'ö',
-  '&uuml;': 'ü',
-  '&Auml;': 'Ä',
-  '&Ouml;': 'Ö',
-  '&Uuml;': 'Ü',
-  '&szlig;': 'ß',
-  '&ndash;': '–',
-  '&mdash;': '—',
-  '&hellip;': '…',
-  '&amp;': '&',
+/// Named HTML entities feeds use: all of Latin-1 plus typographic ones
+/// (generated from Python's `html.entities`; no-break and thin spaces become
+/// plain spaces, invisible marks are dropped). Unknown names stay as text.
+const Map<String, String> _namedEntities = {
+  'AElig': 'Æ',
+  'Aacute': 'Á',
+  'Acirc': 'Â',
+  'Agrave': 'À',
+  'Aring': 'Å',
+  'Atilde': 'Ã',
+  'Auml': 'Ä',
+  'Ccedil': 'Ç',
+  'Dagger': '‡',
+  'ETH': 'Ð',
+  'Eacute': 'É',
+  'Ecirc': 'Ê',
+  'Egrave': 'È',
+  'Euml': 'Ë',
+  'Iacute': 'Í',
+  'Icirc': 'Î',
+  'Igrave': 'Ì',
+  'Iuml': 'Ï',
+  'Ntilde': 'Ñ',
+  'OElig': 'Œ',
+  'Oacute': 'Ó',
+  'Ocirc': 'Ô',
+  'Ograve': 'Ò',
+  'Oslash': 'Ø',
+  'Otilde': 'Õ',
+  'Ouml': 'Ö',
+  'Prime': '″',
+  'Scaron': 'Š',
+  'THORN': 'Þ',
+  'Uacute': 'Ú',
+  'Ucirc': 'Û',
+  'Ugrave': 'Ù',
+  'Uuml': 'Ü',
+  'Yacute': 'Ý',
+  'Yuml': 'Ÿ',
+  'aacute': 'á',
+  'acirc': 'â',
+  'acute': '´',
+  'aelig': 'æ',
+  'agrave': 'à',
+  'amp': '&',
+  'apos': "'",
+  'aring': 'å',
+  'atilde': 'ã',
+  'auml': 'ä',
+  'bdquo': '„',
+  'brvbar': '¦',
+  'bull': '•',
+  'ccedil': 'ç',
+  'cedil': '¸',
+  'cent': '¢',
+  'circ': 'ˆ',
+  'clubs': '♣',
+  'copy': '©',
+  'curren': '¤',
+  'dagger': '†',
+  'darr': '↓',
+  'deg': '°',
+  'diams': '♦',
+  'divide': '÷',
+  'eacute': 'é',
+  'ecirc': 'ê',
+  'egrave': 'è',
+  'emsp': ' ',
+  'ensp': ' ',
+  'eth': 'ð',
+  'euml': 'ë',
+  'euro': '€',
+  'fnof': 'ƒ',
+  'frac12': '½',
+  'frac14': '¼',
+  'frac34': '¾',
+  'gt': '>',
+  'harr': '↔',
+  'hearts': '♥',
+  'hellip': '…',
+  'iacute': 'í',
+  'icirc': 'î',
+  'iexcl': '¡',
+  'igrave': 'ì',
+  'iquest': '¿',
+  'iuml': 'ï',
+  'laquo': '«',
+  'larr': '←',
+  'ldquo': '“',
+  'lrm': '',
+  'lsaquo': '‹',
+  'lsquo': '‘',
+  'lt': '<',
+  'macr': '¯',
+  'mdash': '—',
+  'micro': 'µ',
+  'middot': '·',
+  'minus': '−',
+  'nbsp': ' ',
+  'ndash': '–',
+  'not': '¬',
+  'ntilde': 'ñ',
+  'oacute': 'ó',
+  'ocirc': 'ô',
+  'oelig': 'œ',
+  'ograve': 'ò',
+  'ordf': 'ª',
+  'ordm': 'º',
+  'oslash': 'ø',
+  'otilde': 'õ',
+  'ouml': 'ö',
+  'para': '¶',
+  'permil': '‰',
+  'plusmn': '±',
+  'pound': '£',
+  'prime': '′',
+  'quot': '"',
+  'raquo': '»',
+  'rarr': '→',
+  'rdquo': '”',
+  'reg': '®',
+  'rlm': '',
+  'rsaquo': '›',
+  'rsquo': '’',
+  'sbquo': '‚',
+  'scaron': 'š',
+  'sect': '§',
+  'shy': '',
+  'spades': '♠',
+  'sup1': '¹',
+  'sup2': '²',
+  'sup3': '³',
+  'szlig': 'ß',
+  'thinsp': ' ',
+  'thorn': 'þ',
+  'tilde': '˜',
+  'times': '×',
+  'trade': '™',
+  'uacute': 'ú',
+  'uarr': '↑',
+  'ucirc': 'û',
+  'ugrave': 'ù',
+  'uml': '¨',
+  'uuml': 'ü',
+  'yacute': 'ý',
+  'yen': '¥',
+  'yuml': 'ÿ',
+  'zwj': '',
+  'zwnj': '',
 };
 
+final RegExp _namedEntity = RegExp('&([A-Za-z][A-Za-z0-9]*);');
 final RegExp _numericEntity = RegExp(r'&#(x?)([0-9a-fA-F]+);');
 
+/// "&amp;Uuml;": an entity escaped twice (Podlove feeds like Freak Show do
+/// that in link titles) – collapsed to "&Uuml;" when the inner one is known.
+final RegExp _doubleEncoded = RegExp(
+  '&amp;(#x[0-9a-fA-F]+|#[0-9]+|[A-Za-z][A-Za-z0-9]*);',
+);
+
 /// Replaces HTML entities that feeds leave in their text ("&nbsp;",
-/// "&#8211;" …) by the characters. Unknown entities stay as they are.
+/// "&#8211;", "&rsquo;" …) by the characters, also when the feed escaped
+/// them twice ("&amp;Uuml;" → "Ü", bug 2026-10-04). Unknown entities stay.
 String decodeHtmlEntities(String text) {
-  var result = text;
-  _entities.forEach(
-    (entity, value) => result = result.replaceAll(entity, value),
-  );
-  return result.replaceAllMapped(_numericEntity, (m) {
-    final code = int.tryParse(m[2]!, radix: m[1]!.isEmpty ? 10 : 16);
-    return code == null || code > 0x10FFFF ? m[0]! : String.fromCharCode(code);
+  final collapsed = text.replaceAllMapped(_doubleEncoded, (m) {
+    final inner = m[1]!;
+    final known = inner.startsWith('#') || _namedEntities.containsKey(inner);
+    return known ? '&$inner;' : m[0]!;
   });
+  // One pass over the text: a decoded "&" can never start a new entity.
+  return collapsed.replaceAllMapped(
+    RegExp('${_namedEntity.pattern}|${_numericEntity.pattern}'),
+    (m) {
+      if (m[1] case final name?) return _namedEntities[name] ?? m[0]!;
+      final code = int.tryParse(m[3]!, radix: m[2]!.isEmpty ? 10 : 16);
+      return code == null || code > 0x10FFFF
+          ? m[0]!
+          : String.fromCharCode(code);
+    },
+  );
 }
 
 /// Titles: entities decoded, whitespace collapsed – but no tag stripping,

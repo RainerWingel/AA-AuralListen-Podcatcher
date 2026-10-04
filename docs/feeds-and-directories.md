@@ -33,6 +33,9 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
   (Staffel-Chips, Hörreihenfolge – `ui-ux.md` „Staffeln und Serien").
 - Kanal-`<link>` → `podcasts.websiteUrl`, erstes `podcast:funding` (`url` + Text) → `podcasts.fundingUrl`/`fundingLabel`
   (v17). Nur http/https-Adressen werden übernommen (`isWebUrl`); angezeigt als Links im Podcast-Detail (`ui-ux.md`).
+- HTML-Entities (`decodeHtmlEntities`): alle Latin-1-Namen plus typografische (`&rsquo;`, `&ldquo;`, `&laquo;`,
+  `&euro;` …) und numerische. **Doppelt kodierte** wie `&amp;Uuml;` (Podlove/Freak Show in Linktiteln, Bug 2026-10-04)
+  werden um eine Ebene zusammengefasst, wenn der innere Name bekannt ist; Unbekanntes bleibt Text.
 - Titel (Podcast, Folge): HTML-Entities wie `&nbsp;`, `&#8211;` werden dekodiert, Leerraum zusammengefasst (`cleanTitle`),
   Tags bleiben stehen. Bleibt nichts übrig, gilt die Audio-Adresse als Titel. Bestehende Folgen: beim nächsten Refresh.
 - Folgen-Identität: `guid`, Fallback `enclosure url`.
