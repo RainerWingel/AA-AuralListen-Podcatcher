@@ -5,31 +5,40 @@
 <li>Suche über Apple Podcasts und fyyd.de, Abo per RSS-Adresse, OPML-Import und -Export</li>
 <li>Aktualisieren per Herunterziehen; umgezogene Podcasts (neue Feed-Adresse) werden übernommen</li>
 <li>Rote Zahl ungespielter Folgen an jedem Abo; Suche innerhalb deiner Abos</li>
+<li>Podcast-Seite mit Beschreibung sowie Links zur Website und zum Unterstützen</li>
+<li>Staffeln: „S2·5“ am Cover und Filter nach Staffel; Serien-Podcasts in Hörreihenfolge</li>
 </ul>
 
 <p><b>Hören</b></p>
 <ul>
 <li>Wiedergabe im Hintergrund mit Benachrichtigung, Sperrbildschirm- und Bluetooth-Tasten</li>
-<li>Sprünge −15 s / +30 s, Lautstärke-Boost (global oder pro Podcast), Sleep-Timer mit sanftem Ausblenden</li>
+<li>Sprünge −15 s / +30 s, Tempo 1,0× bis 2,0×, Lautstärke-Boost (global oder pro Podcast)</li>
+<li>Restzeit oder Gesamtlänge per Antippen; bei höherem Tempo zusätzlich die tatsächliche Restzeit</li>
+<li>Shownotes mit antippbaren Links, Folgennummer und Erscheinungsdatum</li>
 <li>Kapitel (Podlove, JSON, ID3) mit „Skip“ je Kapitel, Lesezeichen mit Notiz</li>
-<li>Merkt sich die Position jeder Folge; robust bei Netzproblemen</li>
+<li>Sleep-Timer mit sanftem Ausblenden, auch „bis Ende der Folge“</li>
+<li>Merkt sich die Position jeder Folge; gespielt ist eine Folge erst am Ende</li>
+<li>Abspielverlauf der letzten 100 zu Ende gehörten Folgen</li>
+<li>Robust bei Netzproblemen und bei MP3s mit wechselnder Bitrate</li>
 </ul>
 
 <p><b>Playlists</b></p>
 <ul>
 <li>Mehrere Playlists mit automatischem Weiterspielen, Farben, Sortieren und „Fortsetzen“</li>
-<li>Alle neuen oder ungespielten Folgen eines Podcasts oder eines einzelnen Themas abspielen</li>
+<li>„Als Nächstes spielen“ und „Ans Ende anfügen“ für die laufende Playlist</li>
+<li>Alle neuen oder ungespielten Folgen eines Podcasts, Themas oder einer Staffel in eine Playlist</li>
+<li>Symbol an jeder Folge, die in einer Playlist steht</li>
 </ul>
 
 <p><b>Downloads</b></p>
 <ul>
 <li>Manuelle oder automatische Downloads pro Podcast, wahlweise direkt in eine Playlist</li>
-<li>Gespielte Downloads werden nach 96 Stunden gelöscht; einstellbares Speicherlimit</li>
+<li>Gespielte Downloads werden nach 96 Stunden gelöscht (nicht, solange sie in einer Playlist stehen); einstellbares Speicherlimit</li>
 </ul>
 
 <p><b>Außerdem</b></p>
 <ul>
-<li>Deutsch und Englisch, hell und dunkel, App-Farbe aus dem Hintergrundbild (Android 12+)</li>
+<li>Deutsch und Englisch, hell und dunkel, wählbare App-Farbe oder Farbe aus dem Hintergrundbild (Android 12+)</li>
 <li>Folgennummern auf den Covern, Backup und Wiederherstellung</li>
 </ul>
 

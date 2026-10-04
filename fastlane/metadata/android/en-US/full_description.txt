@@ -5,31 +5,40 @@
 <li>Search Apple Podcasts and fyyd.de, subscribe by RSS address, import and export OPML</li>
 <li>Pull to refresh; moved podcasts (new feed address) are followed automatically</li>
 <li>Red counter of unplayed episodes on each subscription; search within your subscriptions</li>
+<li>Podcast page with description and links to the website and to support the podcast</li>
+<li>Seasons: "S2·5" on the cover and a season filter; serial podcasts in listening order</li>
 </ul>
 
 <p><b>Listening</b></p>
 <ul>
 <li>Background playback with notification, lock screen and Bluetooth controls</li>
-<li>Skip −15 s / +30 s, volume boost (global or per podcast), sleep timer with gentle fade-out</li>
+<li>Skip −15 s / +30 s, speed 1.0× to 2.0×, volume boost (global or per podcast)</li>
+<li>Remaining time or total length at a tap; at higher speed also the real remaining time</li>
+<li>Show notes with tappable links, episode number and release date</li>
 <li>Chapters (Podlove, JSON, ID3) with per-chapter skip, bookmarks with notes</li>
-<li>Remembers the position of every episode; robust against network problems</li>
+<li>Sleep timer with gentle fade-out, also "until the end of the episode"</li>
+<li>Remembers the position of every episode; an episode counts as played only at its end</li>
+<li>Playback history of the last 100 episodes played to the end</li>
+<li>Robust against network problems and MP3s with variable bitrate</li>
 </ul>
 
 <p><b>Playlists</b></p>
 <ul>
 <li>Several playlists that continue automatically, with colors, sorting and "Resume"</li>
-<li>Play all new or unplayed episodes of a podcast or of a single topic</li>
+<li>"Play next" and "Add to the end" for the playlist that is playing</li>
+<li>All new or unplayed episodes of a podcast, topic or season into a playlist</li>
+<li>A symbol on every episode that is in a playlist</li>
 </ul>
 
 <p><b>Downloads</b></p>
 <ul>
 <li>Manual or automatic downloads per podcast, optionally into a playlist</li>
-<li>Played downloads are deleted after 96 hours; adjustable storage limit</li>
+<li>Played downloads are deleted after 96 hours (not while they are in a playlist); adjustable storage limit</li>
 </ul>
 
 <p><b>More</b></p>
 <ul>
-<li>German and English, light and dark mode, app color from your wallpaper (Android 12+)</li>
+<li>German and English, light and dark mode, selectable app color or the color of your wallpaper (Android 12+)</li>
 <li>Episode numbers on the covers, backup and restore</li>
 </ul>
 
