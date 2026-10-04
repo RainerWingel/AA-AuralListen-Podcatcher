@@ -97,6 +97,8 @@ class EpisodeDescriptionSection extends ConsumerWidget {
       tilePadding: EdgeInsets.zero,
       childrenPadding: const EdgeInsets.only(bottom: 16),
       expandedAlignment: Alignment.topLeft,
+      // Number/date line left-aligned like the notes below it.
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
       shape: const Border(),
       collapsedShape: const Border(),
       children: [
