@@ -1,0 +1,8 @@
+• Show notes with links, episode number and date
+• Speed 1.0× to 2.0×, remaining time or total length
+• Seasons and serial podcasts in listening order
+• Playback history of the last 100 episodes
+• "Play next", playlist symbol on episodes
+• Played only at the end, leaves only the current playlist
+• Website and support links of podcasts
+• Fixed: resuming MP3s with variable bitrate, special characters in show notes

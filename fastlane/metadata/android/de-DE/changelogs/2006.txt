@@ -1,0 +1,8 @@
+• Shownotes mit Links, Folgennummer und Datum
+• Tempo 1,0× bis 2,0×, Restzeit oder Gesamtlänge
+• Staffeln und Serien-Podcasts in Hörreihenfolge
+• Abspielverlauf der letzten 100 Folgen
+• „Als Nächstes spielen“, Playlist-Symbol an Folgen
+• Gespielt erst am Ende, nur aus der laufenden Playlist
+• Website- und Unterstützen-Link der Podcasts
+• Behoben: Fortsetzen bei MP3s mit wechselnder Bitrate, Sonderzeichen in Shownotes

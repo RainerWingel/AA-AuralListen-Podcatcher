@@ -1,7 +1,7 @@
 # F-Droid
 
 F-Droid baut die App **selbst aus dem Quellcode** (Git-Tag) und signiert sie mit eigenem Schlüssel. Die Store-Texte
-kommen aus diesem Repo. Stand 2026-10-01: vorbereitet, noch nicht eingereicht.
+kommen aus diesem Repo. Stand 2026-10-04: vorbereitet (Version 1.3.1), noch nicht eingereicht.
 
 ## Was im Repo dafür vorbereitet ist
 | Was | Wo |
@@ -27,9 +27,13 @@ aus `third_party/sqlite` (3.53.4).
 - Flutter-Version im Rezept (`flutter@…`) = Version in `.github/workflows/ci.yml`.
 
 ## Schritte für den Benutzer
-1. **Screenshots** machen (siehe unten) und in die beiden `phoneScreenshots`-Ordner legen.
-2. **Release v1.3.0** freigeben – Claude erhöht nichts mehr, setzt nur den Tag und baut den GitHub-Release.
-   Erst danach kann F-Droid bauen (das Rezept zeigt auf `commit: v1.3.0`).
+Stand 2026-10-04: Version **1.3.1** (+6, Codes 1006/2006/4006) vorbereitet, Changelogs und Store-Texte fertig; Tag und
+GitHub-Release fehlen noch. 1.3.0 wurde nie eingereicht – eingereicht wird direkt 1.3.1.
+1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
+   gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
+   getaggten Stand.
+2. **Release v1.3.1 freigeben** – Claude setzt den Tag `v1.3.1`, baut den GitHub-Release (`build-and-release.md`) und
+   trägt danach im Rezept statt `commit: v1.3.1` den **vollen Commit-Hash** des Tags ein (fdroiddata-Checkliste).
 3. **Konto auf gitlab.com** anlegen (Pseudonym möglich – der Name ist öffentlich). Claude legt keine Konten an.
 4. Auf gitlab.com das Projekt **fdroid/fdroiddata forken** („Fork"-Knopf).
 5. Im eigenen Fork eine Datei `metadata/io.github.rainerwingel.aurallisten.yml` anlegen (Weboberfläche: „+" → „New
@@ -37,6 +41,8 @@ aus `third_party/sqlite` (3.53.4).
 6. **Merge Request** an fdroid/fdroiddata stellen, Titel z. B. „New app: AA-AuralListen Podcatcher". Die Vorlage fragt
    Punkte ab (Lizenz, keine proprietären Teile, Tracker …) – alles erfüllt. F-Droid-CI baut die App testweise.
 7. Rückfragen der Prüfer beantworten (Claude hilft). Nach dem Merge erscheint die App meist nach wenigen Tagen.
+   Spätere Versionen erkennt F-Droid selbst am Tag (`UpdateCheckMode: Tags`) – dann nur noch Version erhöhen,
+   Changelogs schreiben, taggen.
 
 ## Screenshots
 - Format PNG oder JPG, Hochformat, Dateinamen sortieren die Reihenfolge (`1.png`, `2.png` …), 2–8 Stück je Sprache.
