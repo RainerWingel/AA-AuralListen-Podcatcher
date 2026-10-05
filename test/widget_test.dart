@@ -552,12 +552,14 @@ void main() {
       await tester.tap(find.byTooltip('3 Sterne'));
       await settle(tester);
       expect(await rating(), 3);
-      expect(find.byIcon(Icons.star_rounded), findsNWidgets(3));
+      // Three in the menu plus the "★3" badge on the cover behind it.
+      expect(find.byIcon(Icons.star_rounded), findsNWidgets(4));
       // The menu stays open; the same star again removes the rating.
       await tester.tap(find.byTooltip('Bewertung entfernen'));
       await settle(tester);
       expect(await rating(), 0);
       expect(find.byIcon(Icons.star_outline_rounded), findsNWidgets(5));
+      expect(find.byIcon(Icons.star_rounded), findsNothing);
 
       await disposeApp(tester);
     },

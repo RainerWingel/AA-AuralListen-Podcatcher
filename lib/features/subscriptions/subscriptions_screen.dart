@@ -312,6 +312,14 @@ class _PodcastGrid extends ConsumerWidget {
                             ),
                           ),
                         ),
+                      // Rating "★4" bottom left on the cover (user wish
+                      // 2026-10-05); unrated podcasts show nothing.
+                      if (podcast.rating > 0)
+                        Positioned(
+                          left: 4,
+                          bottom: 4,
+                          child: _RatingBadge(stars: podcast.rating),
+                        ),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -329,4 +337,42 @@ class _PodcastGrid extends ConsumerWidget {
       },
     );
   }
+}
+
+/// Small "★4" on a dark pill, legible on any cover.
+class _RatingBadge extends StatelessWidget {
+  const _RatingBadge({required this.stars});
+
+  final int stars;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: AppLocalizations.of(context).ratingStars(stars),
+    excludeSemantics: true,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(11),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(5, 2, 7, 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.star_rounded, size: 15, color: Colors.amber.shade500),
+            const SizedBox(width: 1),
+            Text(
+              '$stars',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }

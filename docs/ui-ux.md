@@ -29,7 +29,8 @@ Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-3
    **Bewertung & Reihenfolge** (Benutzerwunsch 2026-10-05): Im Menü beim langen Drücken auf eine Kachel stehen unter dem
    Titel fünf antippbare Sterne (`_RatingStars`, gespeichert in `podcasts.rating`, sofort; denselben Stern nochmal
    tippen = Bewertung entfernen). Die Abos sind **nach Sternen absteigend, dann nach Name** sortiert
-   (`PodcastRepository.watchPodcasts`; unbewertet = 0 Sterne, also am Ende). Das Menü ist dafür kompakter (dichte
+   (`PodcastRepository.watchPodcasts`; unbewertet = 0 Sterne, also am Ende). Auf dem Cover unten links ein kleines
+   „★4" auf dunkler Pille (`_RatingBadge`), bei unbewerteten nichts. Das Menü ist dafür kompakter (dichte
    Einträge, `ListTileTheme.merge`) – gilt auch für die gleichen Menüs auf Podcast-Seite, Staffeln und Themen; Sterne
    gibt es nur im Abos-Tab.
 3. **Playlists** – Liste der Playlists → Inhalt mit Drag & Drop
