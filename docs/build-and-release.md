@@ -73,6 +73,8 @@ Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für 
 - v1.3.1 (2026-10-04): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.3.1 – Shownotes,
   Tempo, Staffeln/Serien, Abspielverlauf, „Als Nächstes spielen", „gespielt" erst am Ende, VBR-MP3-Fix, Sonderzeichen;
   Version für die F-Droid-Einreichung (Tag auf `7906fd48…`, neue Screenshots)
+- v1.3.2 (2026-10-05): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.3.2 – nur neues
+  Versionscode-Schema für F-Droid (+500, Codes 5001/5002/5003; Tag auf `05f780f6…`)
 - v1.2.1 (2026-09-30): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.1 – Englisch,
   Playlist-Fortsetzen und -Farben, Abos-Suche, 15-s-Regel, Download-Fix (http → https)
 

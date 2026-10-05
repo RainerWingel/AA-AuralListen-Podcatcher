@@ -43,7 +43,8 @@ grün. Im MR erklärt bzw. nicht angehakt: Flutter als srclib, keine Reproducibl
 **2026-10-05, Rückmeldung der Prüfer:** erst Frage nach Alleinstellungsmerkmalen (beantwortet: Kapitel-Skip, Hinweis
 bei wechselnder Werbung, VBR-Fix, Playlist-Verhalten, Themen-Filter, Android Auto geplant), dann Auftrag: Rezept nach
 `templates/build-flutter.yml` und ABI-Split-Versionsschema (s. o.) → v1.3.2 mit `flutter pub get --enforce-lockfile`.
-**Offen: Release v1.3.2, Rezept im Fork ersetzen, Prüfung durch F-Droid (Schritt 7).**
+**v1.3.2 veröffentlicht 2026-10-05** (Tag auf `05f780f6d6d52982d402a35a08c75d536afe18b1`).
+**Offen: Rezept im Fork ersetzen (Benutzer), Prüfung durch F-Droid (Schritt 7).**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
    getaggten Stand.
