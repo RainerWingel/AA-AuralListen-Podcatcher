@@ -60,12 +60,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     try {
       final id = await ref
           .read(podcastRepositoryProvider)
-          .subscribe(result.feedUrl);
+          // Provisional until "Abonnieren" (user wish 2026-10-05).
+          .subscribe(result.feedUrl, provisional: true);
       if (!mounted) return;
       setState(() => _justSubscribed.add(result.feedUrl));
       showInfoSnackBar(
         messenger,
-        l10n.subscribedSnack(result.title),
+        l10n.addedProvisionalSnack(result.title),
         action: SnackBarAction(
           label: l10n.open,
           onPressed: () => context.go(Routes.podcast(id)),
@@ -221,24 +222,43 @@ class _ResultTile extends StatelessWidget {
       title: Text(result.title, maxLines: 2, overflow: TextOverflow.ellipsis),
       subtitle: Text(meta, maxLines: 1, overflow: TextOverflow.ellipsis),
       onTap: subscribed || busy ? null : onSubscribe,
+      // Spinner and ✓ sit in a button-sized box, so all three line up with
+      // the ⊕ of an IconButton (user report 2026-10-06: ✓ stood further right).
       trailing: busy
-          ? const SizedBox.square(
-              dimension: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
+          ? const _TrailingBox(
+              child: SizedBox.square(
+                dimension: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
             )
           : subscribed
-          ? Tooltip(
-              message: l10n.subscribed,
-              child: Icon(
-                Icons.check_circle,
-                color: Theme.of(context).colorScheme.primary,
+          ? _TrailingBox(
+              child: Tooltip(
+                message: l10n.podcastInAbos,
+                child: Icon(
+                  Icons.check_circle,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             )
           : IconButton(
-              tooltip: l10n.subscribeAction,
+              tooltip: l10n.podcastAdd,
               icon: const Icon(Icons.add_circle_outline),
               onPressed: onSubscribe,
             ),
     );
   }
+}
+
+/// Same size as an [IconButton] (48 × 48), content centred.
+class _TrailingBox extends StatelessWidget {
+  const _TrailingBox({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: kMinInteractiveDimension,
+    child: Center(child: child),
+  );
 }
