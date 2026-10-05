@@ -445,6 +445,23 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (next != null) await playEpisode(next, playlistId: _activePlaylistId);
   }
 
+  /// ⏮ in the full player's playlist row: the episode before this one in
+  /// the active playlist (user wish 2026-10-06). Like "next", the current
+  /// one keeps its state. Not offered in the notification.
+  @override
+  Future<void> skipToPrevious() async {
+    final playlistId = _activePlaylistId;
+    final current = _episodeId;
+    final playlists = _playlists;
+    if (playlistId == null || current == null || playlists == null) return;
+    final position = await playlists.positionOf(playlistId, current);
+    if (position == null) return;
+    final previous = await playlists.previousBefore(playlistId, position);
+    if (previous != null) {
+      await playEpisode(previous.episodeId, playlistId: playlistId);
+    }
+  }
+
   @override
   Future<void> play() async {
     final error = await _tryPlay();

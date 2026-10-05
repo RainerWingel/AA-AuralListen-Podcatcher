@@ -725,6 +725,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerNext => 'Next episode';
 
   @override
+  String get playerPrevious => 'Previous episode';
+
+  @override
   String playingFromPlaylist(String name) {
     return 'From playlist “$name”';
   }

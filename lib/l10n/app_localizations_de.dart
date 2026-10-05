@@ -728,6 +728,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get playerNext => 'Nächste Folge';
 
   @override
+  String get playerPrevious => 'Vorherige Folge';
+
+  @override
   String playingFromPlaylist(String name) {
     return 'Aus Playlist „$name“';
   }

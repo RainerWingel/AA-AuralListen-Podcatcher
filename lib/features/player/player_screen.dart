@@ -10,6 +10,7 @@ import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart' show DownloadState;
+import '../../data/playlist_repository.dart' show PlaylistEntry;
 import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
 import '../../l10n/app_localizations.dart';
@@ -332,6 +333,20 @@ class _PlaylistRow extends ConsumerWidget {
     final name = ref.watch(playlistProvider(playlistId)).value?.name;
     if (name == null) return const SizedBox.shrink();
     final handler = ref.read(audioHandlerProvider);
+    // Neighbours in the active playlist, live from the DB: ⏮/⏭ are off at
+    // its start/end.
+    final current = ref.watch(
+      mediaItemProvider.select((s) => s.value?.mediaItem?.id),
+    );
+    final order = [
+      for (final e
+          in ref.watch(playlistEntriesProvider(playlistId)).value ??
+              const <PlaylistEntry>[])
+        '${e.episode.id}',
+    ];
+    final index = order.indexOf(current ?? '');
+    final hasPrevious = index > 0;
+    final hasNext = index >= 0 && index < order.length - 1;
     // Offered: switches the playlist on and says so (user wish 2026-10-06).
     void activate() {
       handler.continueWithSuggestedPlaylist();
@@ -361,11 +376,27 @@ class _PlaylistRow extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        // ⏮ ⏭: neighbours in the active playlist (user wish 2026-10-06);
+        // while only offered, both just switch the playlist on.
+        IconButton(
+          tooltip: offered ? l10n.playlistContinueOffer : l10n.playerPrevious,
+          visualDensity: VisualDensity.compact,
+          icon: const Icon(Icons.skip_previous),
+          onPressed: offered
+              ? activate
+              : hasPrevious
+              ? handler.skipToPrevious
+              : null,
+        ),
         IconButton(
           tooltip: offered ? l10n.playlistContinueOffer : l10n.playerNext,
+          visualDensity: VisualDensity.compact,
           icon: const Icon(Icons.skip_next),
-          // While only offered, ⏭ also just switches the playlist on.
-          onPressed: offered ? activate : handler.skipToNext,
+          onPressed: offered
+              ? activate
+              : hasNext
+              ? handler.skipToNext
+              : null,
         ),
       ],
     );

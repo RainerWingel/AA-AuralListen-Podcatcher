@@ -1382,6 +1382,30 @@ void main() {
       expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
     });
 
+    test('previous: the episode before in the active playlist', () async {
+      await handler.playEpisode(ep3, playlistId: playlistId);
+      await handler.skipToPrevious();
+      expect(handler.currentEpisodeId, ep2);
+      expect(handler.activePlaylistId, playlistId);
+      await handler.skipToPrevious();
+      expect(handler.currentEpisodeId, episodeId);
+      // At the start: nothing happens.
+      await handler.skipToPrevious();
+      expect(handler.currentEpisodeId, episodeId);
+      expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+      // Not offered in the notification.
+      expect(
+        handler.playbackState.value.controls,
+        isNot(contains(MediaControl.skipToPrevious)),
+      );
+    });
+
+    test('previous without an active playlist does nothing', () async {
+      await handler.playEpisode(ep2);
+      await handler.skipToPrevious();
+      expect(handler.currentEpisodeId, ep2);
+    });
+
     test('played to the end: leaves only the active playlist', () async {
       final other = await playlists.create('Unterwegs');
       await playlists.add(other, episodeId);

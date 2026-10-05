@@ -434,6 +434,7 @@
   },
   "undo": "Rückgängig",
   "playerNext": "Nächste Folge",
+  "playerPrevious": "Vorherige Folge",
   "playingFromPlaylist": "Aus Playlist „{name}“",
   "@playingFromPlaylist": {
     "placeholders": {

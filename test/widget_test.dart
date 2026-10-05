@@ -2144,6 +2144,16 @@ void main() {
       expect(handler.activePlaylistId, list);
       expect(find.text('Playlist „Unterwegs“ ist aktiviert'), findsOneWidget);
 
+      // ⏮ ⏭ follow the active playlist: last entry → only ⏮ (2026-10-06).
+      IconButton button(String tooltip) => tester.widget<IconButton>(
+        find.ancestor(
+          of: find.byTooltip(tooltip),
+          matching: find.byType(IconButton),
+        ),
+      );
+      expect(button('Vorherige Folge').onPressed, isNotNull);
+      expect(button('Nächste Folge').onPressed, isNull);
+
       // Active: the playlist symbol closes the player and shows the
       // playlist, scrolled to this episode (user wish 2026-10-06).
       await tester.tap(find.byTooltip('Playlist öffnen'));

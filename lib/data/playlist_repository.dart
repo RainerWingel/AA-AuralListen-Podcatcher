@@ -125,6 +125,18 @@ class PlaylistRepository {
             ..limit(1))
           .getSingleOrNull();
 
+  /// The entry before [position] (⏮ in the player's playlist row).
+  Future<PlaylistItem?> previousBefore(int playlistId, int position) =>
+      (_db.select(_db.playlistItems)
+            ..where(
+              (i) =>
+                  i.playlistId.equals(playlistId) &
+                  i.position.isSmallerThanValue(position),
+            )
+            ..orderBy([(i) => OrderingTerm.desc(i.position)])
+            ..limit(1))
+          .getSingleOrNull();
+
   /// Ids of all playlists that contain [episodeId].
   Future<Set<int>> playlistIdsWith(int episodeId) async => {
     for (final item in await (_db.select(

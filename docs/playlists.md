@@ -109,6 +109,10 @@ gelesen, die neue Reihenfolge gilt also sofort.
   sichtbar, am Ende startet die nächste Folge der Playlist, Infobox **„Playlist „X“ ist aktiviert"** (2026-10-06).
   Steht sie in keiner oder in mehreren Playlists, gibt es weder Angebot noch aktive Playlist. Tippt man die gerade
   laufende Folge erneut an, bleibt ihr Playlist-Zustand.
+- **⏮ ⏭ rechts in der Zeile** (Benutzerwunsch 2026-10-06, vorher nur ⏭): vorherige/nächste Folge der **aktiven**
+  Playlist (`skipToPrevious`/`skipToNext`, die aktuelle bleibt ungespielt in der Playlist); am Anfang bzw. Ende
+  ausgegraut (live aus `playlistEntriesProvider`). Solange die Playlist nur angeboten ist, schalten beide sie nur ein.
+  ⏮ gibt es nicht in der Benachrichtigung (dort weiter nur ⏭).
 - **Aktive Zeile, Playlist-Symbol links** („Playlist öffnen", Benutzerwunsch 2026-10-06): schließt den Player und zeigt
   die Playlist im Playlists-Tab, gescrollt zur laufenden Folge (`Routes.playlistAt` → `?folge=ID&r=…`; `r` macht einen
   erneuten Sprung zur selben Folge zu einer neuen Adresse). `PlaylistScreen` springt erst grob (geschätzte Zeilenhöhe,

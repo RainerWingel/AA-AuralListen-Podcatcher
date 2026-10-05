@@ -199,6 +199,7 @@
   "removedFromNamedPlaylist": "Removed from “{name}”",
   "undo": "Undo",
   "playerNext": "Next episode",
+  "playerPrevious": "Previous episode",
   "playingFromPlaylist": "From playlist “{name}”",
   "dragToReorder": "Drag to reorder",
   "autoDownloadThemes": "Topics for automatic downloads",

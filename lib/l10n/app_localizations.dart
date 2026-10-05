@@ -1292,6 +1292,12 @@ abstract class AppLocalizations {
   /// **'Nächste Folge'**
   String get playerNext;
 
+  /// No description provided for @playerPrevious.
+  ///
+  /// In de, this message translates to:
+  /// **'Vorherige Folge'**
+  String get playerPrevious;
+
   /// No description provided for @playingFromPlaylist.
   ///
   /// In de, this message translates to:
