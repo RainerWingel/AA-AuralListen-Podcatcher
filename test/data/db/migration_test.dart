@@ -65,6 +65,24 @@ void main() {
     await db.close();
   });
 
+  test('upgrade v22 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(22);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v23: existing podcasts stay subscribed', () async {
+    final schema = await verifier.schemaAt(22);
+    schema.rawDatabase.execute(
+      'INSERT INTO podcasts (feed_url, title, subscribed_at) '
+      "VALUES ('https://example.com/feed', 'P', 1767225600)",
+    );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    expect((await db.select(db.podcasts).getSingle()).provisional, isFalse);
+    await db.close();
+  });
+
   test(
     'a database older than 1.3.1 starts empty instead of crashing',
     () async {

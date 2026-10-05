@@ -74,6 +74,13 @@ class PlayerScreen extends ConsumerWidget {
                     360.0,
                   );
                   final podcastId = item.extras?['podcastId'] as int?;
+                  // Live, so "Abonnieren" during playback shows them at once.
+                  final provisional = switch (podcastId) {
+                    final id? =>
+                      ref.watch(podcastProvider(id)).value?.provisional ??
+                          false,
+                    null => false,
+                  };
                   return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
@@ -129,7 +136,10 @@ class PlayerScreen extends ConsumerWidget {
                           ],
                         ),
                         if (item.extras?['episodeId'] case final int id)
-                          ChapterBookmarkButtons(episodeId: id),
+                          ChapterBookmarkButtons(
+                            episodeId: id,
+                            bookmarks: !provisional,
+                          ),
                         const SizedBox(height: 8),
                         // Boost and speed side by side (wrap on narrow
                         // screens or large fonts).
@@ -137,7 +147,8 @@ class PlayerScreen extends ConsumerWidget {
                           alignment: WrapAlignment.center,
                           spacing: 8,
                           children: [
-                            if (podcastId != null) _BoostButton(podcastId),
+                            if (podcastId != null && !provisional)
+                              _BoostButton(podcastId),
                             const _SpeedButton(),
                           ],
                         ),

@@ -131,6 +131,8 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 
 ## Hörposition
 - Gespeichert: alle **5 s** während der Wiedergabe, bei Pause, Seek, Stopp und Folgenwechsel.
+- **Vorläufige Podcasts** (`ui-ux.md`): nichts wird gespeichert – weder Position noch Status, Dauer, Verlauf,
+  „zuletzt gespielt" oder Boost (`PlaybackRepository.isProvisional`, bei jedem Schreiben geprüft).
 - Fortsetzen: **3 s** vor der gespeicherten Position – aber unter **15 s** gespeicherter Position ab **0:00**
   (`PodcastAudioHandler.resumeStart`; der Mini-Player zeigt dann 0:00). Ausnahme: nach einer Unterbrechung
   (Netzfehler, Hänger) oder einem Sprung ohne geladenes Audio geht es exakt an der Stelle weiter.

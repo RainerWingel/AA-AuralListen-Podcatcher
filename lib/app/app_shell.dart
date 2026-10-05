@@ -24,8 +24,11 @@ class AppShell extends ConsumerWidget {
       if (problem == null) return;
       // Streams the server builds anew per request: offer the download
       // for the episode playing now (docs/playback.md).
-      final episodeId = ref.read(audioHandlerProvider).currentEpisodeId;
-      final download = episodeId == null
+      final handler = ref.read(audioHandlerProvider);
+      final episodeId = handler.currentEpisodeId;
+      final provisional =
+          handler.mediaItem.value?.extras?['provisional'] == true;
+      final download = episodeId == null || provisional
           ? null
           : SnackBarAction(
               label: l10n.download,

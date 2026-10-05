@@ -30,10 +30,12 @@ Future<void> exportOpml(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   final now = ref.read(clockProvider)();
-  final podcasts = await ref
-      .read(podcastRepositoryProvider)
-      .watchPodcasts()
-      .first;
+  // Only real subscriptions; provisional podcasts are not subscribed yet.
+  final podcasts = [
+    for (final p
+        in await ref.read(podcastRepositoryProvider).watchPodcasts().first)
+      if (!p.provisional) p,
+  ];
   final xml = buildOpml(podcasts, created: now);
   try {
     if (await _saveAs(

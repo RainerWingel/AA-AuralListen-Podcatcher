@@ -32,16 +32,23 @@ class _PodcastDetailScreenState extends ConsumerState<PodcastDetailScreen> {
 
   int get podcastId => widget.podcastId;
 
+  /// "Deabonnieren" (button in the header), or "Entfernen" (⋮) for a
+  /// provisional podcast – both delete the podcast with its episodes.
   Future<void> _unsubscribe(
     BuildContext context,
     WidgetRef ref,
     Podcast podcast,
   ) async {
     final l10n = AppLocalizations.of(context);
+    final remove = podcast.provisional;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.unsubscribeConfirmTitle),
+        title: Text(
+          remove
+              ? l10n.podcastRemoveConfirmTitle
+              : l10n.unsubscribeConfirmTitle,
+        ),
         content: Text(l10n.unsubscribeConfirmBody(podcast.title)),
         actions: [
           TextButton(
@@ -50,7 +57,7 @@ class _PodcastDetailScreenState extends ConsumerState<PodcastDetailScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.unsubscribe),
+            child: Text(remove ? l10n.podcastRemove : l10n.unsubscribe),
           ),
         ],
       ),
@@ -99,52 +106,59 @@ class _PodcastDetailScreenState extends ConsumerState<PodcastDetailScreen> {
             actions: [
               PopupMenuButton<void>(
                 // Use the screen context: the menu's own context goes away on close.
+                // Provisional podcast: only "Entfernen" (user wish 2026-10-05).
                 itemBuilder: (_) => [
-                  PopupMenuItem(
-                    onTap: () => showPodcastSettingsSheet(context, podcast.id),
-                    child: Text(l10n.podcastSettings),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => playFromPodcastMenu(
-                      context,
-                      ref,
-                      podcast,
-                      PodcastPlayEntry.fresh,
+                  if (podcast.provisional)
+                    PopupMenuItem(
+                      onTap: () => _unsubscribe(context, ref, podcast),
+                      child: Text(l10n.podcastRemove),
+                    )
+                  else ...[
+                    PopupMenuItem(
+                      onTap: () =>
+                          showPodcastSettingsSheet(context, podcast.id),
+                      child: Text(l10n.podcastSettings),
                     ),
-                    child: Text(l10n.podcastMenuPlayNew),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => playFromPodcastMenu(
-                      context,
-                      ref,
-                      podcast,
-                      PodcastPlayEntry.since,
+                    PopupMenuItem(
+                      onTap: () => playFromPodcastMenu(
+                        context,
+                        ref,
+                        podcast,
+                        PodcastPlayEntry.fresh,
+                      ),
+                      child: Text(l10n.podcastMenuPlayNew),
                     ),
-                    child: Text(l10n.podcastMenuPlaySince),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => playFromPodcastMenu(
-                      context,
-                      ref,
-                      podcast,
-                      PodcastPlayEntry.all,
+                    PopupMenuItem(
+                      onTap: () => playFromPodcastMenu(
+                        context,
+                        ref,
+                        podcast,
+                        PodcastPlayEntry.since,
+                      ),
+                      child: Text(l10n.podcastMenuPlaySince),
                     ),
-                    child: Text(l10n.podcastMenuPlayUnplayed),
-                  ),
-                  PopupMenuItem(
-                    onTap: () =>
-                        markPlayedUntilFlow(context, ref, podcast, all),
-                    child: Text(l10n.markPlayedUntil),
-                  ),
-                  PopupMenuItem(
-                    onTap: () =>
-                        markUnplayedSinceFlow(context, ref, podcast, all),
-                    child: Text(l10n.markUnplayedSince),
-                  ),
-                  PopupMenuItem(
-                    onTap: () => _unsubscribe(context, ref, podcast),
-                    child: Text(l10n.unsubscribe),
-                  ),
+                    PopupMenuItem(
+                      onTap: () => playFromPodcastMenu(
+                        context,
+                        ref,
+                        podcast,
+                        PodcastPlayEntry.all,
+                      ),
+                      child: Text(l10n.podcastMenuPlayUnplayed),
+                    ),
+                    PopupMenuItem(
+                      onTap: () =>
+                          markPlayedUntilFlow(context, ref, podcast, all),
+                      child: Text(l10n.markPlayedUntil),
+                    ),
+                    PopupMenuItem(
+                      onTap: () =>
+                          markUnplayedSinceFlow(context, ref, podcast, all),
+                      child: Text(l10n.markUnplayedSince),
+                    ),
+                    // "Abo kündigen" is the "Deabonnieren" button in the
+                    // header now (user wish 2026-10-05).
+                  ],
                 ],
               ),
             ],
@@ -155,7 +169,11 @@ class _PodcastDetailScreenState extends ConsumerState<PodcastDetailScreen> {
               physics: const AlwaysScrollableScrollPhysics(),
               itemCount: items.length + extra,
               itemBuilder: (context, index) => switch (index) {
-                0 => _Header(podcast: podcast, episodeCount: all.length),
+                0 => _Header(
+                  podcast: podcast,
+                  episodeCount: all.length,
+                  onUnsubscribe: () => _unsubscribe(context, ref, podcast),
+                ),
                 1 when extra == 2 => _SeasonChips(
                   podcast: podcast,
                   seasons: seasons,
@@ -207,8 +225,11 @@ class _SeasonChips extends ConsumerWidget {
             for (final s in seasons) ...[
               const SizedBox(width: 8),
               GestureDetector(
-                onLongPress: () =>
-                    showPodcastPlayMenu(context, ref, podcast, season: s),
+                // Provisional: no playlists yet, so no play menu.
+                onLongPress: podcast.provisional
+                    ? null
+                    : () =>
+                          showPodcastPlayMenu(context, ref, podcast, season: s),
                 child: ChoiceChip(
                   label: Text(l10n.seasonLabel(s)),
                   selected: selected == s,
@@ -223,14 +244,19 @@ class _SeasonChips extends ConsumerWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.podcast, required this.episodeCount});
+class _Header extends ConsumerWidget {
+  const _Header({
+    required this.podcast,
+    required this.episodeCount,
+    required this.onUnsubscribe,
+  });
 
   final Podcast podcast;
   final int episodeCount;
+  final VoidCallback onUnsubscribe;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Padding(
@@ -257,6 +283,20 @@ class _Header extends StatelessWidget {
                       l10n.episodeCount(episodeCount),
                       style: theme.textTheme.bodySmall,
                     ),
+                    // "Abonnieren" (same as in the Abos menu) or, in the
+                    // same place, "Deabonnieren" (user wish 2026-10-05).
+                    const SizedBox(height: 8),
+                    if (podcast.provisional)
+                      FilledButton(
+                        onPressed: () =>
+                            subscribeProvisional(context, ref, podcast),
+                        child: Text(l10n.subscribeAction),
+                      )
+                    else
+                      OutlinedButton(
+                        onPressed: onUnsubscribe,
+                        child: Text(l10n.unsubscribe),
+                      ),
                   ],
                 ),
               ),

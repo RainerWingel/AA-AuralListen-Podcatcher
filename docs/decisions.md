@@ -110,3 +110,9 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   und Tests gelöscht: keine älteren Installationen bekannt, F-Droid startet mit 1.3.2. Ältere DB → leer neu anlegen statt
   Absturz. Backups vor 1.3.1 sind damit nicht mehr einspielbar (Benutzer hat vorher ein neues Backup gemacht; keine
   eigene Fehlermeldung dafür, Benutzer).
+- 2026-10-05 · **Vorläufige Podcasts** (Benutzer) · Per „+" oder Katalog hinzugefügte Podcasts sind erst vorläufig
+  (`podcasts.provisional`, v23): nur streamen, grau oben im Abos-Tab, „Abonnieren" im Abos-Menü oder auf der
+  Podcast-Seite. OPML-Import abonniert direkt (Umzug vorhandener Abos). Vorläufige stehen nicht auf „Start" und nicht
+  im OPML-Export. Abspielen vorläufiger speichert nichts (Position, Status, Verlauf, Lesezeichen, Boost).
+  „Abo kündigen" heißt jetzt „Deabonnieren" (Knopf auf der Podcast-Seite statt ⋮) und löscht wie bisher ganz
+  (Benutzerentscheidung, nicht zurück zu „vorläufig").

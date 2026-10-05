@@ -369,7 +369,8 @@ class PodcastRepository {
     ),
   );
 
-  /// Newest episodes across all subscriptions (home screen).
+  /// Newest episodes across all subscriptions (home screen); provisional
+  /// podcasts are not subscribed yet and stay out.
   Stream<List<EpisodeWithPodcast>> watchLatestEpisodes({int limit = 100}) {
     final query =
         _db.select(_db.episodes).join([
@@ -378,6 +379,7 @@ class PodcastRepository {
               _db.podcasts.id.equalsExp(_db.episodes.podcastId),
             ),
           ])
+          ..where(_db.podcasts.provisional.equals(false))
           ..orderBy([
             OrderingTerm(
               expression: _db.episodes.pubDate,
@@ -400,8 +402,10 @@ class PodcastRepository {
   // ---------------------------------------------------------- subscriptions
 
   /// Subscribes to the feed at [rawUrl] and returns the new podcast id.
+  /// [provisional]: added via "+" or the directory, subscribed only later
+  /// with [confirmSubscription] (user wish 2026-10-05).
   /// Throws [SubscribeException].
-  Future<int> subscribe(String rawUrl) async {
+  Future<int> subscribe(String rawUrl, {bool provisional = false}) async {
     final url = normalizeFeedUrl(rawUrl);
     if (url == null) throw const SubscribeException(SubscribeError.invalidUrl);
     await _throwIfSubscribed(url.toString());
@@ -447,12 +451,20 @@ class PodcastRepository {
               lastModified: Value(result.lastModified),
               lastRefreshAt: Value(now),
               subscribedAt: now,
+              provisional: Value(provisional),
             ),
           );
       await _upsertEpisodes(id, feed.episodes, now);
       return id;
     });
   }
+
+  /// "Abonnieren" for a provisional podcast: from now on a normal
+  /// subscription (downloads, playlists, settings).
+  Future<void> confirmSubscription(int podcastId) => _updatePodcast(
+    podcastId,
+    const PodcastsCompanion(provisional: Value(false)),
+  );
 
   /// Deletes the podcast, its episodes (cascade) and its cached cover images.
   Future<void> unsubscribe(int podcastId) async {

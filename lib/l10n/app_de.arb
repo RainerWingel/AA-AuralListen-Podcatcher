@@ -23,7 +23,7 @@
   "addFeedTitle": "Podcast hinzufügen",
   "addFeedLabel": "RSS-URL",
   "addFeedHint": "https://beispiel.de/feed.xml",
-  "addFeedSubmit": "Abonnieren",
+  "addFeedSubmit": "Hinzufügen",
   "subscribeErrorInvalidUrl": "Das ist keine gültige Adresse.",
   "subscribeErrorAlreadySubscribed": "Diesen Podcast hast du schon abonniert.",
   "subscribeErrorNetwork": "Der Feed konnte nicht geladen werden. Bitte Adresse und Internetverbindung prüfen.",
@@ -67,8 +67,8 @@
       }
     }
   },
-  "unsubscribe": "Abo kündigen",
-  "unsubscribeConfirmTitle": "Abo kündigen?",
+  "unsubscribe": "Deabonnieren",
+  "unsubscribeConfirmTitle": "Deabonnieren?",
   "unsubscribeConfirmBody": "„{title}“ und alle Folgen werden aus der App entfernt.",
   "@unsubscribeConfirmBody": {
     "placeholders": {
@@ -295,6 +295,13 @@
   "ratingStars": "{count, plural, =1{1 Stern} other{{count} Sterne}}",
   "@ratingStars": {"placeholders": {"count": {"type": "int"}}},
   "ratingRemove": "Bewertung entfernen",
+  "subsProvisional": "Vorläufig",
+  "podcastAdd": "Hinzufügen",
+  "podcastInAbos": "Schon in deinen Abos",
+  "addedProvisionalSnack": "„{title}“ vorläufig hinzugefügt",
+  "@addedProvisionalSnack": {"placeholders": {"title": {"type": "String"}}},
+  "podcastRemove": "Entfernen",
+  "podcastRemoveConfirmTitle": "Podcast entfernen?",
   "playlistColor": "Farbe…",
   "@playlistColor": {
     "description": "Playlist menu: pick a category color (dialog title too)."

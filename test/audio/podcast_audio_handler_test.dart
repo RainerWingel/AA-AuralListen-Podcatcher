@@ -127,6 +127,46 @@ void main() {
     expect(finished, [episodeId]);
   });
 
+  test('a provisional podcast stores nothing while playing', () async {
+    final finished = <int>[];
+    await handler.dispose();
+    engine = FakePlayerEngine();
+    handler = PodcastAudioHandler(
+      engine: engine,
+      playback: PlaybackRepository(db, () => now),
+      settings: settings,
+      onFinished: (id) async => finished.add(id),
+    );
+    await (db.update(db.podcasts)..where((p) => p.id.equals(podcastId))).write(
+      const PodcastsCompanion(provisional: Value(true)),
+    );
+    final fresh = await addEpisode('2');
+    final before = await episode(fresh);
+
+    await handler.playEpisode(fresh);
+    engine.emitPosition(const Duration(seconds: 40));
+    await handler.pause();
+    await handler.setBoost(6, forPodcastOnly: true);
+    await handler.setBoost(3, forPodcastOnly: false);
+    await handler.play();
+    engine.complete();
+    await pumpEventQueue();
+
+    final after = await episode(fresh);
+    expect(after.positionMs, before.positionMs);
+    expect(after.status, EpisodeStatus.newEpisode);
+    expect(after.durationMs, before.durationMs);
+    expect(finished, isEmpty);
+    expect(await settings.get(SettingsKeys.lastEpisodeId), isNull);
+    expect(await settings.get(SettingsKeys.boostDb), isNull);
+    final podcast = await (db.select(
+      db.podcasts,
+    )..where((p) => p.id.equals(podcastId))).getSingle();
+    expect(podcast.boostDb, isNull);
+    // The boost is still applied for now.
+    expect(engine.boostDb, 3);
+  });
+
   test('stores the duration reported by the player', () async {
     await handler.playEpisode(episodeId);
     expect(

@@ -129,6 +129,21 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _provisionalMeta = const VerificationMeta(
+    'provisional',
+  );
+  @override
+  late final GeneratedColumn<bool> provisional = GeneratedColumn<bool>(
+    'provisional',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("provisional" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _etagMeta = const VerificationMeta('etag');
   @override
   late final GeneratedColumn<String> etag = GeneratedColumn<String>(
@@ -333,6 +348,7 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     fundingUrl,
     fundingLabel,
     rating,
+    provisional,
     etag,
     lastModified,
     lastRefreshAt,
@@ -433,6 +449,15 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
       context.handle(
         _ratingMeta,
         rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta),
+      );
+    }
+    if (data.containsKey('provisional')) {
+      context.handle(
+        _provisionalMeta,
+        provisional.isAcceptableOrUnknown(
+          data['provisional']!,
+          _provisionalMeta,
+        ),
       );
     }
     if (data.containsKey('etag')) {
@@ -616,6 +641,10 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         DriftSqlType.int,
         data['${effectivePrefix}rating'],
       )!,
+      provisional: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}provisional'],
+      )!,
       etag: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}etag'],
@@ -716,6 +745,11 @@ class Podcast extends DataClass implements Insertable<Podcast> {
   /// The user's rating, 1–5 stars; 0 = not rated (v22). The Abos list is
   /// sorted by it, then by title.
   final int rating;
+
+  /// Added via "+" or the directory but not subscribed yet (v23): can be
+  /// streamed, but no downloads, playlists or settings; shown greyed out
+  /// above the subscriptions until "Abonnieren" (docs/ui-ux.md).
+  final bool provisional;
   final String? etag;
   final String? lastModified;
   final DateTime? lastRefreshAt;
@@ -765,6 +799,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     this.fundingUrl,
     this.fundingLabel,
     required this.rating,
+    required this.provisional,
     this.etag,
     this.lastModified,
     this.lastRefreshAt,
@@ -808,6 +843,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       map['funding_label'] = Variable<String>(fundingLabel);
     }
     map['rating'] = Variable<int>(rating);
+    map['provisional'] = Variable<bool>(provisional);
     if (!nullToAbsent || etag != null) {
       map['etag'] = Variable<String>(etag);
     }
@@ -872,6 +908,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ? const Value.absent()
           : Value(fundingLabel),
       rating: Value(rating),
+      provisional: Value(provisional),
       etag: etag == null && nullToAbsent ? const Value.absent() : Value(etag),
       lastModified: lastModified == null && nullToAbsent
           ? const Value.absent()
@@ -922,6 +959,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       fundingUrl: serializer.fromJson<String?>(json['fundingUrl']),
       fundingLabel: serializer.fromJson<String?>(json['fundingLabel']),
       rating: serializer.fromJson<int>(json['rating']),
+      provisional: serializer.fromJson<bool>(json['provisional']),
       etag: serializer.fromJson<String?>(json['etag']),
       lastModified: serializer.fromJson<String?>(json['lastModified']),
       lastRefreshAt: serializer.fromJson<DateTime?>(json['lastRefreshAt']),
@@ -963,6 +1001,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       'fundingUrl': serializer.toJson<String?>(fundingUrl),
       'fundingLabel': serializer.toJson<String?>(fundingLabel),
       'rating': serializer.toJson<int>(rating),
+      'provisional': serializer.toJson<bool>(provisional),
       'etag': serializer.toJson<String?>(etag),
       'lastModified': serializer.toJson<String?>(lastModified),
       'lastRefreshAt': serializer.toJson<DateTime?>(lastRefreshAt),
@@ -998,6 +1037,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     Value<String?> fundingUrl = const Value.absent(),
     Value<String?> fundingLabel = const Value.absent(),
     int? rating,
+    bool? provisional,
     Value<String?> etag = const Value.absent(),
     Value<String?> lastModified = const Value.absent(),
     Value<DateTime?> lastRefreshAt = const Value.absent(),
@@ -1026,6 +1066,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     fundingUrl: fundingUrl.present ? fundingUrl.value : this.fundingUrl,
     fundingLabel: fundingLabel.present ? fundingLabel.value : this.fundingLabel,
     rating: rating ?? this.rating,
+    provisional: provisional ?? this.provisional,
     etag: etag.present ? etag.value : this.etag,
     lastModified: lastModified.present ? lastModified.value : this.lastModified,
     lastRefreshAt: lastRefreshAt.present
@@ -1073,6 +1114,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ? data.fundingLabel.value
           : this.fundingLabel,
       rating: data.rating.present ? data.rating.value : this.rating,
+      provisional: data.provisional.present
+          ? data.provisional.value
+          : this.provisional,
       etag: data.etag.present ? data.etag.value : this.etag,
       lastModified: data.lastModified.present
           ? data.lastModified.value
@@ -1132,6 +1176,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ..write('fundingUrl: $fundingUrl, ')
           ..write('fundingLabel: $fundingLabel, ')
           ..write('rating: $rating, ')
+          ..write('provisional: $provisional, ')
           ..write('etag: $etag, ')
           ..write('lastModified: $lastModified, ')
           ..write('lastRefreshAt: $lastRefreshAt, ')
@@ -1165,6 +1210,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     fundingUrl,
     fundingLabel,
     rating,
+    provisional,
     etag,
     lastModified,
     lastRefreshAt,
@@ -1197,6 +1243,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           other.fundingUrl == this.fundingUrl &&
           other.fundingLabel == this.fundingLabel &&
           other.rating == this.rating &&
+          other.provisional == this.provisional &&
           other.etag == this.etag &&
           other.lastModified == this.lastModified &&
           other.lastRefreshAt == this.lastRefreshAt &&
@@ -1227,6 +1274,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
   final Value<String?> fundingUrl;
   final Value<String?> fundingLabel;
   final Value<int> rating;
+  final Value<bool> provisional;
   final Value<String?> etag;
   final Value<String?> lastModified;
   final Value<DateTime?> lastRefreshAt;
@@ -1255,6 +1303,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.fundingUrl = const Value.absent(),
     this.fundingLabel = const Value.absent(),
     this.rating = const Value.absent(),
+    this.provisional = const Value.absent(),
     this.etag = const Value.absent(),
     this.lastModified = const Value.absent(),
     this.lastRefreshAt = const Value.absent(),
@@ -1284,6 +1333,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.fundingUrl = const Value.absent(),
     this.fundingLabel = const Value.absent(),
     this.rating = const Value.absent(),
+    this.provisional = const Value.absent(),
     this.etag = const Value.absent(),
     this.lastModified = const Value.absent(),
     this.lastRefreshAt = const Value.absent(),
@@ -1315,6 +1365,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Expression<String>? fundingUrl,
     Expression<String>? fundingLabel,
     Expression<int>? rating,
+    Expression<bool>? provisional,
     Expression<String>? etag,
     Expression<String>? lastModified,
     Expression<DateTime>? lastRefreshAt,
@@ -1344,6 +1395,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       if (fundingUrl != null) 'funding_url': fundingUrl,
       if (fundingLabel != null) 'funding_label': fundingLabel,
       if (rating != null) 'rating': rating,
+      if (provisional != null) 'provisional': provisional,
       if (etag != null) 'etag': etag,
       if (lastModified != null) 'last_modified': lastModified,
       if (lastRefreshAt != null) 'last_refresh_at': lastRefreshAt,
@@ -1378,6 +1430,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Value<String?>? fundingUrl,
     Value<String?>? fundingLabel,
     Value<int>? rating,
+    Value<bool>? provisional,
     Value<String?>? etag,
     Value<String?>? lastModified,
     Value<DateTime?>? lastRefreshAt,
@@ -1407,6 +1460,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       fundingUrl: fundingUrl ?? this.fundingUrl,
       fundingLabel: fundingLabel ?? this.fundingLabel,
       rating: rating ?? this.rating,
+      provisional: provisional ?? this.provisional,
       etag: etag ?? this.etag,
       lastModified: lastModified ?? this.lastModified,
       lastRefreshAt: lastRefreshAt ?? this.lastRefreshAt,
@@ -1462,6 +1516,9 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     }
     if (rating.present) {
       map['rating'] = Variable<int>(rating.value);
+    }
+    if (provisional.present) {
+      map['provisional'] = Variable<bool>(provisional.value);
     }
     if (etag.present) {
       map['etag'] = Variable<String>(etag.value);
@@ -1532,6 +1589,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           ..write('fundingUrl: $fundingUrl, ')
           ..write('fundingLabel: $fundingLabel, ')
           ..write('rating: $rating, ')
+          ..write('provisional: $provisional, ')
           ..write('etag: $etag, ')
           ..write('lastModified: $lastModified, ')
           ..write('lastRefreshAt: $lastRefreshAt, ')
@@ -5669,6 +5727,7 @@ typedef $$PodcastsTableCreateCompanionBuilder = PodcastsCompanion Function({
   Value<String?> fundingUrl,
   Value<String?> fundingLabel,
   Value<int> rating,
+  Value<bool> provisional,
   Value<String?> etag,
   Value<String?> lastModified,
   Value<DateTime?> lastRefreshAt,
@@ -5698,6 +5757,7 @@ typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<String?> fundingUrl,
   Value<String?> fundingLabel,
   Value<int> rating,
+  Value<bool> provisional,
   Value<String?> etag,
   Value<String?> lastModified,
   Value<DateTime?> lastRefreshAt,
@@ -5801,6 +5861,11 @@ class $$PodcastsTableFilterComposer
 
   ColumnFilters<int> get rating => $composableBuilder(
     column: $table.rating,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get provisional => $composableBuilder(
+    column: $table.provisional,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5975,6 +6040,11 @@ class $$PodcastsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get provisional => $composableBuilder(
+    column: $table.provisional,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get etag => $composableBuilder(
     column: $table.etag,
     builder: (column) => ColumnOrderings(column),
@@ -6105,6 +6175,11 @@ class $$PodcastsTableAnnotationComposer
 
   GeneratedColumn<int> get rating =>
       $composableBuilder(column: $table.rating, builder: (column) => column);
+
+  GeneratedColumn<bool> get provisional => $composableBuilder(
+    column: $table.provisional,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get etag =>
       $composableBuilder(column: $table.etag, builder: (column) => column);
@@ -6246,6 +6321,7 @@ class $$PodcastsTableTableManager
                 Value<String?> fundingUrl = const Value.absent(),
                 Value<String?> fundingLabel = const Value.absent(),
                 Value<int> rating = const Value.absent(),
+                Value<bool> provisional = const Value.absent(),
                 Value<String?> etag = const Value.absent(),
                 Value<String?> lastModified = const Value.absent(),
                 Value<DateTime?> lastRefreshAt = const Value.absent(),
@@ -6274,6 +6350,7 @@ class $$PodcastsTableTableManager
                 fundingUrl: fundingUrl,
                 fundingLabel: fundingLabel,
                 rating: rating,
+                provisional: provisional,
                 etag: etag,
                 lastModified: lastModified,
                 lastRefreshAt: lastRefreshAt,
@@ -6304,6 +6381,7 @@ class $$PodcastsTableTableManager
                 Value<String?> fundingUrl = const Value.absent(),
                 Value<String?> fundingLabel = const Value.absent(),
                 Value<int> rating = const Value.absent(),
+                Value<bool> provisional = const Value.absent(),
                 Value<String?> etag = const Value.absent(),
                 Value<String?> lastModified = const Value.absent(),
                 Value<DateTime?> lastRefreshAt = const Value.absent(),
@@ -6332,6 +6410,7 @@ class $$PodcastsTableTableManager
                 fundingUrl: fundingUrl,
                 fundingLabel: fundingLabel,
                 rating: rating,
+                provisional: provisional,
                 etag: etag,
                 lastModified: lastModified,
                 lastRefreshAt: lastRefreshAt,

@@ -156,6 +156,8 @@ class DownloadService implements PodcastFilesCleaner {
       _db.episodes,
     )..where((e) => e.id.equals(episodeId))).getSingleOrNull();
     if (episode == null) return;
+    // Provisional podcasts can only be streamed (docs/ui-ux.md).
+    if (await _isProvisional(episode.podcastId)) return;
 
     final fileName = '$episodeId.${audioFileExtension(episode)}';
     // A retry keeps the failure count (not part of the companion).
@@ -353,7 +355,9 @@ class DownloadService implements PodcastFilesCleaner {
 
     final podcasts =
         await (_db.select(_db.podcasts)..where(
-              (p) => p.autoDownloadMode.equalsValue(AutoDownloadMode.off).not(),
+              (p) =>
+                  p.autoDownloadMode.equalsValue(AutoDownloadMode.off).not() &
+                  p.provisional.equals(false),
             ))
             .get();
 
@@ -523,6 +527,13 @@ class DownloadService implements PodcastFilesCleaner {
   Future<Download?> _row(int episodeId) => (_db.select(
     _db.downloads,
   )..where((d) => d.episodeId.equals(episodeId))).getSingleOrNull();
+
+  Future<bool> _isProvisional(int podcastId) async =>
+      (await (_db.select(
+            _db.podcasts,
+          )..where((p) => p.id.equals(podcastId))).getSingleOrNull())
+          ?.provisional ??
+      false;
 
   /// The joined episode is in no playlist.
   Expression<bool> _notInAnyPlaylist() => notExistsQuery(

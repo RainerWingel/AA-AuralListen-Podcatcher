@@ -48,8 +48,12 @@ class EpisodeTile extends ConsumerWidget {
     final playlists = ref.read(playlistRepositoryProvider);
     final activeId = handler.activePlaylistId;
     final currentId = handler.currentEpisodeId;
+    // Provisional podcast: only "Abspielen" and "Beschreibung" (user wish
+    // 2026-10-05) – no queue, playlists, download or marking.
+    final full = !podcast.provisional;
     final queue =
-        playlistId == null &&
+        full &&
+            playlistId == null &&
             activeId != null &&
             currentId != null &&
             currentId != episode.id
@@ -179,46 +183,48 @@ class EpisodeTile extends ConsumerWidget {
                   },
                 ),
               ],
-              ListTile(
-                leading: const Icon(Icons.playlist_add),
-                title: Text(l10n.addToPlaylist),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  addToPlaylist(outerContext, ref, episode.id);
-                },
-              ),
-              // Waiting for Wi-Fi: start now over mobile data (user wish
-              // 2026-10-05).
-              if (download case Download(
-                state: DownloadState.queued,
-                wifiOnly: true,
-              ))
+              if (full) ...[
                 ListTile(
-                  leading: const Icon(Icons.network_cell),
-                  title: Text(l10n.downloadNowMobile),
+                  leading: const Icon(Icons.playlist_add),
+                  title: Text(l10n.addToPlaylist),
                   onTap: () {
                     Navigator.of(context).pop();
-                    downloads.downloadNow(episode.id);
+                    addToPlaylist(outerContext, ref, episode.id);
                   },
                 ),
-              ListTile(
-                leading: Icon(downloadIcon),
-                title: Text(downloadLabel),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  onDownload();
-                },
-              ),
-              ListTile(
-                leading: Icon(played ? Icons.replay : Icons.check),
-                title: Text(played ? l10n.markUnplayed : l10n.markPlayed),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  played
-                      ? playback.markUnplayed(episode.id)
-                      : playback.markPlayed(episode.id);
-                },
-              ),
+                // Waiting for Wi-Fi: start now over mobile data (user wish
+                // 2026-10-05).
+                if (download case Download(
+                  state: DownloadState.queued,
+                  wifiOnly: true,
+                ))
+                  ListTile(
+                    leading: const Icon(Icons.network_cell),
+                    title: Text(l10n.downloadNowMobile),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      downloads.downloadNow(episode.id);
+                    },
+                  ),
+                ListTile(
+                  leading: Icon(downloadIcon),
+                  title: Text(downloadLabel),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    onDownload();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(played ? Icons.replay : Icons.check),
+                  title: Text(played ? l10n.markUnplayed : l10n.markPlayed),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    played
+                        ? playback.markUnplayed(episode.id)
+                        : playback.markPlayed(episode.id);
+                  },
+                ),
+              ],
             ],
           ),
         ),

@@ -62,7 +62,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addFeedHint => 'https://example.com/feed.xml';
 
   @override
-  String get addFeedSubmit => 'Subscribe';
+  String get addFeedSubmit => 'Add';
 
   @override
   String get subscribeErrorInvalidUrl => 'This is not a valid address.';
@@ -537,6 +537,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ratingRemove => 'Remove rating';
+
+  @override
+  String get subsProvisional => 'Provisional';
+
+  @override
+  String get podcastAdd => 'Add';
+
+  @override
+  String get podcastInAbos => 'Already in your subscriptions';
+
+  @override
+  String addedProvisionalSnack(String title) {
+    return '“$title” added provisionally';
+  }
+
+  @override
+  String get podcastRemove => 'Remove';
+
+  @override
+  String get podcastRemoveConfirmTitle => 'Remove podcast?';
 
   @override
   String get playlistColor => 'Color…';

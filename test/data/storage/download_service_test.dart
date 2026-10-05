@@ -395,6 +395,23 @@ void main() {
   });
 
   group('auto-download', () {
+    test('provisional podcasts: no downloads, no auto-download', () async {
+      await setPodcast(
+        const PodcastsCompanion(
+          provisional: Value(true),
+          autoDownloadMode: Value(AutoDownloadMode.always),
+        ),
+      );
+      final id = await addEpisode('1');
+      expect(await service.autoDownload(), 0);
+      await service.download(id);
+      expect(engine.active, isEmpty);
+      expect(await row(id), isNull);
+
+      await setPodcast(const PodcastsCompanion(provisional: Value(false)));
+      expect(await service.autoDownload(), 1);
+    });
+
     test('off by default', () async {
       await addEpisode('1');
       expect(await service.autoDownload(), 0);

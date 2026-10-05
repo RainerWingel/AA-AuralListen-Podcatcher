@@ -60,6 +60,8 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
   Name wird nachgeführt; gelöscht → beim nächsten Auto-Download unter dem gespeicherten Namen neu angelegt
   (`DownloadService._targetPlaylist`). Manuelle Downloads betrifft das nicht.
 - Manuelle Downloads (langes Drücken → „Herunterladen") laufen über jedes Netz.
+- **Vorläufige Podcasts** (`podcasts.provisional`) werden nie heruntergeladen – weder automatisch noch von Hand
+  (`DownloadService.download` lehnt ab); erst nach „Abonnieren".
 - **„Jetzt über Mobilfunk laden"** (Benutzerwunsch 2026-10-05): Eine Folge, die auf WLAN wartet, lässt sich per Menü
   (langes Drücken) oder Knopf im Downloads-Tab sofort über jedes Netz laden (`DownloadService.downloadNow`). Das Paket kann
   eine wartende Aufgabe nicht ändern, also wird sie abgebrochen und neu eingereiht; das späte „abgebrochen" der alten

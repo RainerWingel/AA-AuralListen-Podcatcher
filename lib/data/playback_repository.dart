@@ -25,6 +25,12 @@ class PlaybackRepository {
     );
   }
 
+  /// The episode belongs to a provisional podcast: playing it stores
+  /// nothing (position, status, duration, history; user wish 2026-10-05).
+  /// Read at every write, so subscribing during playback takes effect at once.
+  Future<bool> isProvisional(int episodeId) async =>
+      (await load(episodeId))?.podcast.provisional ?? false;
+
   Future<void> _update(int episodeId, EpisodesCompanion changes) => (_db.update(
     _db.episodes,
   )..where((e) => e.id.equals(episodeId))).write(changes);

@@ -14,7 +14,9 @@ Code: `lib/data/directory/directory_search.dart`, UI: `lib/features/search/searc
 - Fällt ein Dienst aus, werden die anderen trotzdem angezeigt (Hinweis-Banner „… nicht erreichbar").
 - iTunes-Treffer ohne `feedUrl` (Apple-exklusive Podcasts) werden übersprungen.
 - Suche startet 600 ms nach dem Tippen (ab 3 Zeichen) oder sofort per Enter/Lupe.
-- Bereits abonnierte Treffer zeigen ein Häkchen (Vergleich per `feedUrlKey`).
+- Bereits abonnierte Treffer zeigen ein Häkchen (Vergleich per `feedUrlKey`, Tooltip „Schon in deinen Abos").
+- ⊕ „Hinzufügen" legt den Podcast **vorläufig** an (wie „+" mit RSS-URL); abonniert wird erst im Abos-Tab bzw. auf der
+  Podcast-Seite (`ui-ux.md` „Vorläufige Podcasts").
 - **Podcast Index wird nicht genutzt** (siehe `decisions.md`). Falls später doch: Key nie im Code (Repo ist öffentlich),
   sondern in `config/secrets.json` (gitignored) und per `--dart-define-from-file` einbauen.
 

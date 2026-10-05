@@ -232,6 +232,9 @@ class _SubscriptionSearchResults extends ConsumerWidget {
   }
 }
 
+/// The Abos grid: provisional podcasts (added via "+" or the directory, not
+/// subscribed yet) on top, greyed out, then a bar and the subscriptions
+/// (user wish 2026-10-05). Without provisional ones: just the grid.
 class _PodcastGrid extends ConsumerWidget {
   const _PodcastGrid({required this.podcasts});
 
@@ -240,101 +243,168 @@ class _PodcastGrid extends ConsumerWidget {
   static const _spacing = 12.0;
   static const _columns = 3;
 
+  /// Luminance weights (ITU-R BT.709) → black and white.
+  static const _greyscale = ColorFilter.matrix([
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0.2126, 0.7152, 0.0722, 0, 0, //
+    0, 0, 0, 1, 0, //
+  ]);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unplayed = ref.watch(unplayedCountsProvider).value ?? const {};
     final l10n = AppLocalizations.of(context);
+    final provisional = [
+      for (final p in podcasts)
+        if (p.provisional) p,
+    ];
+    final subscribed = [
+      for (final p in podcasts)
+        if (!p.provisional) p,
+    ];
     return LayoutBuilder(
       builder: (context, constraints) {
         final tileWidth =
             (constraints.maxWidth - _spacing * (_columns + 1)) / _columns;
-        return GridView.builder(
+        Widget grid(List<Podcast> items) => SliverPadding(
           padding: const EdgeInsets.all(_spacing),
-          physics: const AlwaysScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: _columns,
-            mainAxisSpacing: _spacing,
-            crossAxisSpacing: _spacing,
-            // Cover plus two lines of title.
-            mainAxisExtent: tileWidth + 44,
+          sliver: SliverGrid.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: _columns,
+              mainAxisSpacing: _spacing,
+              crossAxisSpacing: _spacing,
+              // Cover plus two lines of title.
+              mainAxisExtent: tileWidth + 44,
+            ),
+            itemCount: items.length,
+            itemBuilder: (context, index) => _tile(
+              context,
+              ref,
+              l10n,
+              items[index],
+              tileWidth,
+              unplayed[items[index].id] ?? 0,
+            ),
           ),
-          itemCount: podcasts.length,
-          itemBuilder: (context, index) {
-            final podcast = podcasts[index];
-            final count = unplayed[podcast.id] ?? 0;
-            return InkWell(
-              borderRadius: BorderRadius.circular(10),
-              onTap: () => context.go(Routes.podcast(podcast.id)),
-              onLongPress: () => showPodcastPlayMenu(
-                context,
-                ref,
-                podcast,
-                // In the Abos grid only into a playlist (user wish 2026-10-03).
-                action: PodcastEpisodesAction.addToPlaylist,
-                rating: true,
+        );
+        Widget header(String text) => SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(_spacing, _spacing, 0, 0),
+            child: Text(text, style: Theme.of(context).textTheme.titleSmall),
+          ),
+        );
+        return CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            if (provisional.isNotEmpty) ...[
+              header(l10n.subsProvisional),
+              grid(provisional),
+              const SliverToBoxAdapter(
+                child: Divider(
+                  height: 8,
+                  thickness: 2,
+                  indent: _spacing,
+                  endIndent: _spacing,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Stack(
-                    children: [
-                      CoverImage(url: podcast.imageUrl, size: tileWidth),
-                      // Top left, so it never hides the badge.
-                      if (podcast.lastError != null)
-                        const Positioned(
-                          left: 4,
-                          top: 4,
-                          child: Icon(Icons.error, color: Colors.redAccent),
-                        ),
-                      if (count > 0)
-                        Positioned(
-                          right: 4,
-                          top: 4,
-                          child: Semantics(
-                            label: l10n.unplayedCount(count),
-                            excludeSemantics: true,
-                            // Shows "99+" above 99.
-                            child: Badge.count(
-                              count: count,
-                              maxCount: 99,
-                              // Clearly red in light and dark theme (the
-                              // dark error colour is a pale pink).
-                              backgroundColor: Colors.red.shade700,
-                              textColor: Colors.white,
-                              largeSize: 22,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      // Rating "★4" bottom left on the cover (user wish
-                      // 2026-10-05); unrated podcasts show nothing.
-                      if (podcast.rating > 0)
-                        Positioned(
-                          left: 4,
-                          bottom: 4,
-                          child: _RatingBadge(stars: podcast.rating),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    podcast.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            );
-          },
+              if (subscribed.isNotEmpty) header(l10n.subscribed),
+            ],
+            grid(subscribed),
+          ],
         );
       },
+    );
+  }
+
+  Widget _tile(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    Podcast podcast,
+    double tileWidth,
+    int count,
+  ) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: () => context.go(Routes.podcast(podcast.id)),
+      onLongPress: () => showPodcastPlayMenu(
+        context,
+        ref,
+        podcast,
+        // In the Abos grid only into a playlist (user wish 2026-10-03).
+        action: PodcastEpisodesAction.addToPlaylist,
+        rating: true,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              // Provisional: black and white and lighter (user wish
+              // 2026-10-05).
+              if (podcast.provisional)
+                Opacity(
+                  opacity: 0.55,
+                  child: ColorFiltered(
+                    colorFilter: _greyscale,
+                    child: CoverImage(url: podcast.imageUrl, size: tileWidth),
+                  ),
+                )
+              else
+                CoverImage(url: podcast.imageUrl, size: tileWidth),
+              // Top left, so it never hides the badge.
+              if (podcast.lastError != null)
+                const Positioned(
+                  left: 4,
+                  top: 4,
+                  child: Icon(Icons.error, color: Colors.redAccent),
+                ),
+              // All episodes of a provisional podcast are unplayed: no
+              // "99+" there (user wish 2026-10-05).
+              if (count > 0 && !podcast.provisional)
+                Positioned(
+                  right: 4,
+                  top: 4,
+                  child: Semantics(
+                    label: l10n.unplayedCount(count),
+                    excludeSemantics: true,
+                    // Shows "99+" above 99.
+                    child: Badge.count(
+                      count: count,
+                      maxCount: 99,
+                      // Clearly red in light and dark theme (the
+                      // dark error colour is a pale pink).
+                      backgroundColor: Colors.red.shade700,
+                      textColor: Colors.white,
+                      largeSize: 22,
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      textStyle: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              // Rating "★4" bottom left on the cover (user wish
+              // 2026-10-05); unrated podcasts show nothing.
+              if (podcast.rating > 0)
+                Positioned(
+                  left: 4,
+                  bottom: 4,
+                  child: _RatingBadge(stars: podcast.rating),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            podcast.title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
     );
   }
 }

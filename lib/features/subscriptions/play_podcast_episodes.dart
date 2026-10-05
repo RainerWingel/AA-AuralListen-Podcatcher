@@ -12,7 +12,7 @@ import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
 
-enum _PlayChoice { fresh, since, all, markAll }
+enum _PlayChoice { fresh, since, all, markAll, subscribe }
 
 /// What the three episode entries of [showPodcastPlayMenu] do: add to a
 /// chosen playlist and start playing (podcast page, seasons, topics), or
@@ -85,50 +85,65 @@ Future<void> showPodcastPlayMenu(
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(sheetContext).textTheme.titleMedium,
                 ),
+                // Provisional podcast: "Abonnieren" right of the name and
+                // nothing else – no playlists before subscribing (user wish
+                // 2026-10-05).
+                trailing: podcast.provisional
+                    ? FilledButton(
+                        onPressed: () =>
+                            Navigator.of(sheetContext)
+                                .pop(_PlayChoice.subscribe),
+                        child: Text(l10n.subscribeAction),
+                      )
+                    : null,
               ),
-              if (rating) _RatingStars(podcast: podcast),
-              ListTile(
-                leading: const Icon(Icons.fiber_new_outlined),
-                title: Text(
-                  play ? l10n.playNewEpisodes : l10n.addNewEpisodesToPlaylist,
+              if (!podcast.provisional) ...[
+                if (rating) _RatingStars(podcast: podcast),
+                ListTile(
+                  leading: const Icon(Icons.fiber_new_outlined),
+                  title: Text(
+                    play ? l10n.playNewEpisodes : l10n.addNewEpisodesToPlaylist,
+                  ),
+                  subtitle: Text(l10n.playNewEpisodesHint(fresh.length)),
+                  enabled: fresh.isNotEmpty,
+                  onTap: () =>
+                      Navigator.of(sheetContext).pop(_PlayChoice.fresh),
                 ),
-                subtitle: Text(l10n.playNewEpisodesHint(fresh.length)),
-                enabled: fresh.isNotEmpty,
-                onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.fresh),
-              ),
-              ListTile(
-                leading: const Icon(Icons.event_outlined),
-                title: Text(
-                  play
-                      ? l10n.playUnplayedSince
-                      : l10n.addUnplayedSinceToPlaylist,
+                ListTile(
+                  leading: const Icon(Icons.event_outlined),
+                  title: Text(
+                    play
+                        ? l10n.playUnplayedSince
+                        : l10n.addUnplayedSinceToPlaylist,
+                  ),
+                  subtitle: Text(l10n.playUnplayedSinceHint),
+                  enabled: unplayed.isNotEmpty,
+                  onTap: () =>
+                      Navigator.of(sheetContext).pop(_PlayChoice.since),
                 ),
-                subtitle: Text(l10n.playUnplayedSinceHint),
-                enabled: unplayed.isNotEmpty,
-                onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.since),
-              ),
-              ListTile(
-                leading: const Icon(Icons.playlist_play),
-                title: Text(
-                  play
-                      ? l10n.playUnplayedEpisodes
-                      : l10n.addUnplayedEpisodesToPlaylist,
+                ListTile(
+                  leading: const Icon(Icons.playlist_play),
+                  title: Text(
+                    play
+                        ? l10n.playUnplayedEpisodes
+                        : l10n.addUnplayedEpisodesToPlaylist,
+                  ),
+                  subtitle: Text(l10n.episodeCount(unplayed.length)),
+                  enabled: unplayed.isNotEmpty,
+                  onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.all),
                 ),
-                subtitle: Text(l10n.episodeCount(unplayed.length)),
-                enabled: unplayed.isNotEmpty,
-                onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.all),
-              ),
-              const Divider(height: 8),
-              ListTile(
-                leading: Icon(allPlayed ? Icons.remove_done : Icons.done_all),
-                title: Text(
-                  allPlayed ? l10n.markAllUnplayed : l10n.markAllPlayed,
+                const Divider(height: 8),
+                ListTile(
+                  leading: Icon(allPlayed ? Icons.remove_done : Icons.done_all),
+                  title: Text(
+                    allPlayed ? l10n.markAllUnplayed : l10n.markAllPlayed,
+                  ),
+                  subtitle: Text(l10n.episodeCount(total)),
+                  enabled: total > 0,
+                  onTap: () =>
+                      Navigator.of(sheetContext).pop(_PlayChoice.markAll),
                 ),
-                subtitle: Text(l10n.episodeCount(total)),
-                enabled: total > 0,
-                onTap: () =>
-                    Navigator.of(sheetContext).pop(_PlayChoice.markAll),
-              ),
+              ],
             ],
           ),
         ),
@@ -137,6 +152,8 @@ Future<void> showPodcastPlayMenu(
   );
   if (choice == null || !context.mounted) return;
   switch (choice) {
+    case _PlayChoice.subscribe:
+      await subscribeProvisional(context, ref, podcast);
     case _PlayChoice.fresh:
       await playPodcastEpisodes(
         context,
@@ -418,4 +435,17 @@ class _RatingStarsState extends ConsumerState<_RatingStars> {
       ),
     );
   }
+}
+
+/// "Abonnieren" for a provisional podcast (Abos menu, podcast page): from now
+/// on downloads, playlists and settings work.
+Future<void> subscribeProvisional(
+  BuildContext context,
+  WidgetRef ref,
+  Podcast podcast,
+) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final text = AppLocalizations.of(context).subscribedSnack(podcast.title);
+  await ref.read(podcastRepositoryProvider).confirmSubscription(podcast.id);
+  showInfoSnackBar(messenger, text);
 }

@@ -36,6 +36,11 @@ class Podcasts extends Table {
   /// sorted by it, then by title.
   IntColumn get rating => integer().withDefault(const Constant(0))();
 
+  /// Added via "+" or the directory but not subscribed yet (v23): can be
+  /// streamed, but no downloads, playlists or settings; shown greyed out
+  /// above the subscriptions until "Abonnieren" (docs/ui-ux.md).
+  BoolColumn get provisional => boolean().withDefault(const Constant(false))();
+
   // HTTP caching for conditional GET.
   TextColumn get etag => text().nullable()();
   TextColumn get lastModified => text().nullable()();

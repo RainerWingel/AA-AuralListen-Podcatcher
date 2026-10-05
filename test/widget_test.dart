@@ -242,9 +242,13 @@ void main() {
   );
 
   testWidgets(
-    'subscribes via RSS URL and shows the episodes',
+    'adds via RSS URL provisionally, then subscribes',
     timeout: timeout,
     (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
       await pumpApp(tester);
       await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
       await settle(tester);
@@ -254,25 +258,101 @@ void main() {
 
       // Invalid input shows an error and keeps the dialog open.
       await tester.enterText(find.byType(TextField), 'kein link');
-      await tester.tap(find.text('Abonnieren'));
+      await tester.tap(find.text('Hinzufügen'));
       await settle(tester);
       expect(find.text('Das ist keine gültige Adresse.'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField), 'example.com/feed');
-      await tester.tap(find.text('Abonnieren'));
+      await tester.tap(find.text('Hinzufügen'));
       await settle(tester);
 
-      // Now on the podcast detail screen.
+      // Now on the podcast detail screen – provisional.
       expect(find.text('Widget-Podcast'), findsWidgets);
       expect(find.text('Tester'), findsOneWidget);
       expect(find.text('1 Folge'), findsOneWidget);
       expect(find.text('Erste Folge'), findsOneWidget);
       expect(find.textContaining('1 Std. 5 Min.'), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Abonnieren'), findsOneWidget);
+      final podcast = await tester.runAsync(
+        () => db.select(db.podcasts).getSingle(),
+      );
+      expect(podcast!.provisional, isTrue);
 
-      // Home shows the episode too.
+      // ⋮ has only "Entfernen".
+      await tester.tap(find.byType(PopupMenuButton<void>));
+      await settle(tester);
+      expect(find.text('Entfernen'), findsOneWidget);
+      expect(find.text('Podcast-Einstellungen'), findsNothing);
+      expect(find.text('Abo kündigen'), findsNothing);
+      Navigator.of(tester.element(find.text('Entfernen'))).pop();
+      await settle(tester);
+
+      // Episode menu: only "Abspielen" and "Beschreibung".
+      await tester.longPress(find.text('Erste Folge'));
+      await settle(tester);
+      expect(find.text('Abspielen'), findsOneWidget);
+      expect(find.text('Beschreibung'), findsOneWidget);
+      expect(find.text('Herunterladen'), findsNothing);
+      expect(find.text('Zu Playlist hinzufügen…'), findsNothing);
+      expect(find.text('Als gespielt markieren'), findsNothing);
+      Navigator.of(tester.element(find.text('Beschreibung'))).pop();
+      await settle(tester);
+
+      // Not on Start yet.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Start'));
+      await settle(tester);
+      expect(find.text('Erste Folge'), findsNothing);
+
+      // Abos: in its own section on top; the menu offers only "Abonnieren".
+      ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+          .read(routerProvider)
+          .go(Routes.subscriptions);
+      await settle(tester);
+      expect(find.text('Vorläufig'), findsOneWidget);
+      expect(find.byType(ColorFiltered), findsOneWidget);
+      // No "unplayed" badge on provisional podcasts.
+      expect(find.byType(Badge), findsNothing);
+      await tester.longPress(find.text('Widget-Podcast'));
+      await settle(tester);
+      expect(find.byTooltip('3 Sterne'), findsNothing);
+      expect(find.textContaining('in Playlist'), findsNothing);
+      await tester.tap(find.widgetWithText(FilledButton, 'Abonnieren'));
+      await settle(tester);
+      expect(find.text('„Widget-Podcast“ abonniert'), findsOneWidget);
+      expect(find.text('Vorläufig'), findsNothing);
+      expect(find.byType(ColorFiltered), findsNothing);
+      expect(find.byType(Badge), findsOneWidget);
+
+      // Home shows the episode now.
       await tester.tap(find.widgetWithText(NavigationDestination, 'Start'));
       await settle(tester);
       expect(find.text('Erste Folge'), findsOneWidget);
+
+      // Subscribed: "Deabonnieren" where "Abonnieren" was, not in ⋮.
+      ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+          .read(routerProvider)
+          .go(Routes.podcast(podcast.id));
+      await settle(tester);
+      expect(
+        find.widgetWithText(OutlinedButton, 'Deabonnieren'),
+        findsOneWidget,
+      );
+      await tester.tap(find.byType(PopupMenuButton<void>));
+      await settle(tester);
+      expect(find.text('Podcast-Einstellungen'), findsOneWidget);
+      expect(find.text('Deabonnieren'), findsOneWidget); // only the button
+      expect(find.text('Entfernen'), findsNothing);
+      Navigator.of(tester.element(find.text('Podcast-Einstellungen'))).pop();
+      await settle(tester);
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Deabonnieren'));
+      await settle(tester);
+      expect(find.text('Deabonnieren?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Deabonnieren'));
+      await settle(tester);
+      expect(
+        await tester.runAsync(() => db.select(db.podcasts).get()),
+        isEmpty,
+      );
 
       await disposeApp(tester);
     },
@@ -342,15 +422,22 @@ void main() {
       expect(find.text('Widget-Podcast'), findsOneWidget);
       expect(find.text('Tester · 1 Folge'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Abonnieren'));
+      final plusX = tester.getCenter(find.byIcon(Icons.add_circle_outline)).dx;
+      await tester.tap(find.byTooltip('Hinzufügen'));
       await settle(tester);
-      expect(find.text('„Widget-Podcast“ abonniert'), findsOneWidget);
-      expect(find.byTooltip('Abonniert'), findsOneWidget);
+      // ✓ in the same column as the ⊕ was (user report 2026-10-06).
+      expect(tester.getCenter(find.byIcon(Icons.check_circle)).dx, plusX);
+      expect(
+        find.text('„Widget-Podcast“ vorläufig hinzugefügt'),
+        findsOneWidget,
+      );
+      expect(find.byTooltip('Schon in deinen Abos'), findsOneWidget);
 
       final podcasts = await tester.runAsync(
         () => db.select(db.podcasts).get(),
       );
       expect(podcasts!.single.title, 'Widget-Podcast');
+      expect(podcasts.single.provisional, isTrue);
 
       await disposeApp(tester);
     },

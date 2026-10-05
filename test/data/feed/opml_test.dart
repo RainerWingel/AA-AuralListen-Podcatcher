@@ -47,6 +47,7 @@ void main() {
           streamVaries: false,
           serial: false,
           rating: 0,
+          provisional: false,
         );
     final xml = buildOpml([
       podcast(1, 'Freak Show', 'https://feeds.metaebene.me/freakshow/mp3'),

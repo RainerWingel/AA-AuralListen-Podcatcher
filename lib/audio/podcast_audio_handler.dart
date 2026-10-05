@@ -337,7 +337,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     var row = await _playback.load(episodeId);
     if (row == null) return;
 
-    if (startAt != null) {
+    final provisional = row.podcast.provisional;
+    if (startAt != null && !provisional) {
       // E.g. from a bookmark: start exactly there (played episodes too).
       if (row.episode.status == EpisodeStatus.played) {
         await _playback.restartPlayed(episodeId);
@@ -353,7 +354,10 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _exactStart = startAt != null;
     mediaItem.add(_withPlaylist(_toMediaItem(row)));
     _setIdlePosition(_savedPosition(row.episode));
-    await _settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
+    // Provisional podcasts leave no trace (also not "last episode").
+    if (!provisional) {
+      await _settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
+    }
     await play();
   }
 
@@ -373,9 +377,12 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   /// Applies a new boost level: for the current podcast only, or globally.
+  /// Provisional podcast: only for now, nothing is stored.
   Future<void> setBoost(double db, {required bool forPodcastOnly}) async {
     final podcastId = _currentPodcastId;
-    if (forPodcastOnly && podcastId != null) {
+    if (_episodeId case final id? when await _playback.isProvisional(id)) {
+      // Nothing stored for provisional podcasts.
+    } else if (forPodcastOnly && podcastId != null) {
       await _playback.setPodcastBoost(podcastId, db);
     } else {
       await _settings.set(SettingsKeys.boostDb, '$db');
@@ -419,6 +426,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> clearPodcastBoost() async {
     final podcastId = _currentPodcastId;
     if (podcastId == null) return;
+    if (_episodeId case final id? when await _playback.isProvisional(id)) {
+      return;
+    }
     await _playback.setPodcastBoost(podcastId, null);
     await _engine.setBoostDb(
       await _settings.getDouble(SettingsKeys.boostDb) ?? 0,
@@ -500,7 +510,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _exactStart = true;
     _setIdlePosition(target);
     _broadcastState();
-    await _playback.savePosition(id, target);
+    if (!await _playback.isProvisional(id)) {
+      await _playback.savePosition(id, target);
+    }
   }
 
   @override
@@ -712,7 +724,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         _streamDurations[id] = duration;
       } else if ((duration - first).abs() > streamVariesTolerance) {
         _streamDurations[id] = duration;
-        if (!podcast.streamVaries) await _playback.markStreamVaries(podcast.id);
+        if (!podcast.streamVaries && !podcast.provisional) {
+          await _playback.markStreamVaries(podcast.id);
+        }
         _rememberHint(id);
         _emitProblem(PlaybackProblem.streamChanged);
         return;
@@ -760,6 +774,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Stores [position] – except while replaying a played episode under
   /// 15 s: that one stays "played" (and starts over next time) until then.
   Future<void> _persistPosition(int id, Duration position) async {
+    if (await _playback.isProvisional(id)) return;
     if (_replayOfPlayed) {
       if (position < PlaybackRepository.inProgressFrom) return;
       _replayOfPlayed = false;
@@ -828,6 +843,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (item != null && item.duration != duration) {
       mediaItem.add(item.copyWith(duration: duration));
     }
+    if (await _playback.isProvisional(id)) return;
     await _playback.updateDuration(id, duration);
   }
 
@@ -853,8 +869,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _membership = null;
       if (id != null && !_markedPlayed) {
         _markedPlayed = true;
-        await _playback.markFinished(id, playlistId: _activePlaylistId);
-        await _onFinished?.call(id);
+        // Provisional podcast: not "played", not in the history.
+        if (!await _playback.isProvisional(id)) {
+          await _playback.markFinished(id, playlistId: _activePlaylistId);
+          await _onFinished?.call(id);
+        }
       }
       await stop();
       if (sleepAtEnd) {
@@ -1195,6 +1214,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       extras: {
         'episodeId': e.id,
         'podcastId': p.id,
+        // No download offer for provisional podcasts (stream only).
+        'provisional': p.provisional,
         // Shown above the show notes in the player.
         'pubDateMs': e.pubDate?.millisecondsSinceEpoch,
       },

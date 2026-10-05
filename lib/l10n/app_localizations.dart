@@ -203,7 +203,7 @@ abstract class AppLocalizations {
   /// No description provided for @addFeedSubmit.
   ///
   /// In de, this message translates to:
-  /// **'Abonnieren'**
+  /// **'Hinzufügen'**
   String get addFeedSubmit;
 
   /// No description provided for @subscribeErrorInvalidUrl.
@@ -281,13 +281,13 @@ abstract class AppLocalizations {
   /// No description provided for @unsubscribe.
   ///
   /// In de, this message translates to:
-  /// **'Abo kündigen'**
+  /// **'Deabonnieren'**
   String get unsubscribe;
 
   /// No description provided for @unsubscribeConfirmTitle.
   ///
   /// In de, this message translates to:
-  /// **'Abo kündigen?'**
+  /// **'Deabonnieren?'**
   String get unsubscribeConfirmTitle;
 
   /// No description provided for @unsubscribeConfirmBody.
@@ -985,6 +985,42 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Bewertung entfernen'**
   String get ratingRemove;
+
+  /// No description provided for @subsProvisional.
+  ///
+  /// In de, this message translates to:
+  /// **'Vorläufig'**
+  String get subsProvisional;
+
+  /// No description provided for @podcastAdd.
+  ///
+  /// In de, this message translates to:
+  /// **'Hinzufügen'**
+  String get podcastAdd;
+
+  /// No description provided for @podcastInAbos.
+  ///
+  /// In de, this message translates to:
+  /// **'Schon in deinen Abos'**
+  String get podcastInAbos;
+
+  /// No description provided for @addedProvisionalSnack.
+  ///
+  /// In de, this message translates to:
+  /// **'„{title}“ vorläufig hinzugefügt'**
+  String addedProvisionalSnack(String title);
+
+  /// No description provided for @podcastRemove.
+  ///
+  /// In de, this message translates to:
+  /// **'Entfernen'**
+  String get podcastRemove;
+
+  /// No description provided for @podcastRemoveConfirmTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Podcast entfernen?'**
+  String get podcastRemoveConfirmTitle;
 
   /// Playlist menu: pick a category color (dialog title too).
   ///

@@ -47,9 +47,17 @@ class CurrentChapterLine extends ConsumerWidget {
 /// Buttons under the player controls: add bookmark, sleep timer, bookmarks.
 /// The chapter list opens from [CurrentChapterLine].
 class ChapterBookmarkButtons extends ConsumerWidget {
-  const ChapterBookmarkButtons({required this.episodeId, super.key});
+  const ChapterBookmarkButtons({
+    required this.episodeId,
+    this.bookmarks = true,
+    super.key,
+  });
 
   final int episodeId;
+
+  /// False for provisional podcasts: nothing is stored for them (user wish
+  /// 2026-10-05), so no bookmarks either.
+  final bool bookmarks;
 
   Future<void> _addBookmark(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
@@ -73,23 +81,24 @@ class ChapterBookmarkButtons extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final bookmarks =
+    final saved =
         ref.watch(episodeBookmarksProvider(episodeId)).value ?? const [];
     return Wrap(
       alignment: WrapAlignment.center,
       spacing: 4,
       children: [
-        TextButton.icon(
-          onPressed: () => _addBookmark(context, ref),
-          icon: const Icon(Icons.bookmark_add_outlined),
-          label: Text(l10n.bookmarkAdd),
-        ),
+        if (bookmarks)
+          TextButton.icon(
+            onPressed: () => _addBookmark(context, ref),
+            icon: const Icon(Icons.bookmark_add_outlined),
+            label: Text(l10n.bookmarkAdd),
+          ),
         const SleepTimerButton(),
-        if (bookmarks.isNotEmpty)
+        if (bookmarks && saved.isNotEmpty)
           TextButton.icon(
             onPressed: () => showEpisodeBookmarksSheet(context, episodeId),
             icon: const Icon(Icons.bookmarks_outlined),
-            label: Text(l10n.bookmarksCount(bookmarks.length)),
+            label: Text(l10n.bookmarksCount(saved.length)),
           ),
       ],
     );

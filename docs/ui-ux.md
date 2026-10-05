@@ -135,10 +135,33 @@ Podcast (markierbar), dann Autor, Folge (Nummer wie am Cover), Erschienen, Läng
 „Heruntergeladen" (Datum + Uhrzeit, nur fertige), Hörstand (Neu / Angefangen bei 12:34 / Gespielt am …); Knopf
 „Beschreibung" öffnet die Shownotes. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
 
+## Vorläufige Podcasts (Benutzerwunsch 2026-10-05)
+- Per **„+"** (RSS-URL, Knopf „Hinzufügen") oder aus dem **Katalog** (Suche, ⊕ „Hinzufügen", Infobox „… vorläufig
+  hinzugefügt") geladene Podcasts sind erst **vorläufig** (`podcasts.provisional`). OPML-Import und Backup abonnieren
+  direkt bzw. übernehmen den Zustand.
+- **Abos-Tab:** vorläufige oben unter „Vorläufig", darunter ein Balken und „Abonniert" mit den übrigen (ohne vorläufige
+  nur das Raster wie bisher). Cover vorläufiger **schwarz-weiß und blasser** (`ColorFiltered` + `Opacity` 0,55), ohne
+  rotes „ungespielt"-Abzeichen (dort ist ja alles ungespielt).
+- **Abonnieren** an zwei gleichwertigen Stellen: Menü beim langen Drücken (Knopf rechts neben dem Namen; sonst nichts im
+  Menü – keine Sterne, keine Playlists) und Podcast-Seite (Knopf unter „XY Folgen"). → `confirmSubscription`, Infobox
+  „… abonniert".
+- Vorläufig heißt: **nur streamen**. Kein Download (auch `DownloadService.download` lehnt ab, kein Auto-Download, kein
+  „Herunterladen" im Streaming-Hinweis), keine Playlists, keine Podcast-Einstellungen, nicht auf „Start", nicht im
+  OPML-Export. ⋮ auf der Podcast-Seite hat nur **„Entfernen"** (löscht wie „Abo kündigen"), Folgen-Menü nur
+  „Abspielen" und „Beschreibung", Staffel-Chips ohne Abspielmenü.
+- **Beim Abspielen wird nichts gespeichert** (Benutzerwunsch 2026-10-05): keine Hörposition, kein Status (neu/
+  angefangen/gespielt), keine Dauer-Korrektur, kein Abspielverlauf, nicht „zuletzt gespielt" (`player.lastEpisodeId`),
+  kein „wechselnde Werbung"-Merker. Im Player fehlen Lesezeichen- und Boost-Knopf (Boost gilt nur, wie er gerade ist).
+  Der Handler prüft das bei jedem Schreiben (`PlaybackRepository.isProvisional`), „Abonnieren" während der Wiedergabe
+  wirkt also sofort.
+- **Abonnierte Podcasts:** „Abo kündigen" steht nicht mehr im ⋮, sondern als Knopf **„Deabonnieren"** an derselben
+  Stelle wie „Abonnieren" (unter „XY Folgen"); löscht nach Rückfrage „Deabonnieren?" Podcast und Folgen.
+
 ## Podcast-Menü (⋮ im Podcast-Detail)
 Podcast-Einstellungen · Alle neuen Episoden abspielen · Ungespielte Episoden seit … abspielen · Alle ungespielten
 Episoden abspielen (Benutzerwunsch 2026-10-03, `playlists.md`) · Als gespielt markieren bis … · Als ungespielt markieren
-seit … (je Kalender → Rückfrage mit Anzahl → Infobox) · Abo kündigen. Langes Drücken auf einen Podcast im Abos-Tab packt
+seit … (je Kalender → Rückfrage mit Anzahl → Infobox). Kündigen über den Knopf „Deabonnieren" im Kopf (2026-10-05).
+Langes Drücken auf einen Podcast im Abos-Tab packt
 dagegen nur in eine Playlist (ohne Abspielen).
 
 ## Podcast-Einstellungen

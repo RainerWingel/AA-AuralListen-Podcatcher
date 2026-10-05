@@ -38,7 +38,8 @@ class _AddFeedDialogState extends ConsumerState<_AddFeedDialog> {
     try {
       final id = await ref
           .read(podcastRepositoryProvider)
-          .subscribe(_controller.text);
+          // Provisional until "Abonnieren" (user wish 2026-10-05).
+          .subscribe(_controller.text, provisional: true);
       if (mounted) Navigator.of(context).pop(id);
     } on SubscribeException catch (e) {
       if (!mounted) return;

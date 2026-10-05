@@ -62,7 +62,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addFeedHint => 'https://beispiel.de/feed.xml';
 
   @override
-  String get addFeedSubmit => 'Abonnieren';
+  String get addFeedSubmit => 'Hinzufügen';
 
   @override
   String get subscribeErrorInvalidUrl => 'Das ist keine gültige Adresse.';
@@ -125,10 +125,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get unsubscribe => 'Abo kündigen';
+  String get unsubscribe => 'Deabonnieren';
 
   @override
-  String get unsubscribeConfirmTitle => 'Abo kündigen?';
+  String get unsubscribeConfirmTitle => 'Deabonnieren?';
 
   @override
   String unsubscribeConfirmBody(String title) {
@@ -538,6 +538,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ratingRemove => 'Bewertung entfernen';
+
+  @override
+  String get subsProvisional => 'Vorläufig';
+
+  @override
+  String get podcastAdd => 'Hinzufügen';
+
+  @override
+  String get podcastInAbos => 'Schon in deinen Abos';
+
+  @override
+  String addedProvisionalSnack(String title) {
+    return '„$title“ vorläufig hinzugefügt';
+  }
+
+  @override
+  String get podcastRemove => 'Entfernen';
+
+  @override
+  String get podcastRemoveConfirmTitle => 'Podcast entfernen?';
 
   @override
   String get playlistColor => 'Farbe…';

@@ -631,6 +631,22 @@ void main() {
     expect(await since(DateTime.utc(2025, 7)), isEmpty);
   });
 
+  test('provisional: not on Start until subscribed', () async {
+    server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
+    final id = await repo.subscribe(
+      'https://example.com/feed',
+      provisional: true,
+    );
+    Future<Podcast> podcast() =>
+        (db.select(db.podcasts)..where((p) => p.id.equals(id))).getSingle();
+    expect((await podcast()).provisional, isTrue);
+    expect(await repo.watchLatestEpisodes().first, isEmpty);
+
+    await repo.confirmSubscription(id);
+    expect((await podcast()).provisional, isFalse);
+    expect(await repo.watchLatestEpisodes().first, isNotEmpty);
+  });
+
   test('Abos order: best rated first, then by title', () async {
     Future<int> add(String title) => db
         .into(db.podcasts)
@@ -685,6 +701,7 @@ void main() {
       streamVaries: false,
       serial: false,
       rating: 0,
+      provisional: false,
     );
     Episode added(DateTime at) => Episode(
       id: 1,
