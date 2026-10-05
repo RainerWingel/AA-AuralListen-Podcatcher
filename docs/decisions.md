@@ -59,7 +59,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-09-28 · **Pushen nur auf Ansage des Benutzers** · committen jederzeit auf `main`; CI läuft beim Push.
 - 2026-09-29 · **Umbenennung in „AA-AuralListen Podcatcher"** (markenrechtlich, Benutzer) · Launcher „AuralListen", applicationId `io.github.rainerwingel.aurallisten` (neue App, Neustart ohne Datenübernahme – alte Backups werden nicht angenommen); Keystore, Dart-Paket- und DB-Dateiname bleiben.
 - 2026-09-29 · **Kein Akku-Ausnahme-Dialog mehr** · nur Status + Knopf zu den App-Einstellungen; das Recht `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` ist für den Play Store heikel.
-- 2026-09-29 · **Play Store geplant** (hebt „nur Sideload" auf) · Datenschutzerklärung nötig, Klartext-HTTP im Datensicherheits-Formular angeben.
+- 2026-09-29 · **Play Store geplant** (hebt „nur Sideload" auf; *überholt 2026-10-05: verworfen*) · Datenschutzerklärung nötig, Klartext-HTTP im Datensicherheits-Formular angeben.
 - 2026-09-29 · **Weitere Sprachen geplant** (hebt „Nur Deutsch" auf, Benutzer) · vorerst weiter nur `app_de.arb`; die gen-l10n-Struktur ist dafür schon vorbereitet. README weist darauf hin.
 - 2026-10-01 · **F-Droid-Vorbereitung** (Benutzer) · Lizenz **GPL-3.0-only**. SQLite wird aus der offiziellen Quelle
   (`third_party/sqlite`, 3.53.4) kompiliert statt vom `sqlite3`-Hook heruntergeladen – F-Droid verlangt Bau komplett aus
@@ -102,4 +102,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-05 · **versionCode = Build-Nummer × 10 + ABI** (F-Droid-Prüfer) · Ersetzt Flutters 1000/2000/4000 + Build-
   Nummer, weil F-Droid die ABI-Ziffer an letzter Stelle braucht (neue Versionen müssen für jede ABI höhere Codes haben).
   Build-Nummer sprang einmalig von 6 auf 500, damit 5001–5003 über den bisherigen 1006–4006 liegen und GitHub-APKs
-  weiter als Update installierbar sind. Play Store verworfen (12 Tester × 14 Tage nicht machbar), Fokus F-Droid + GitHub.
+  weiter als Update installierbar sind.
+- 2026-10-05 · **Play Store verworfen** (Benutzer) · Neue private Entwicklerkonten brauchen vor der Veröffentlichung
+  einen geschlossenen Test mit ≥ 12 Testern über 14 Tage am Stück – nicht machbar. Vertrieb über F-Droid + GitHub-Releases.
+  Play-spezifische Vorsichtsmaßnahmen (z. B. kein Akku-Ausnahme-Recht) bleiben trotzdem bestehen.

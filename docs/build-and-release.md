@@ -1,9 +1,14 @@
 # Build & Release
 
 ## Zielgerät
-- Samsung Galaxy S25 (SM-S931B), Android 16 / API 36. Keine SD-Karte.
+- **Testhandy: Samsung Galaxy A05s** – frei nutzbar zum Installieren, Durchtippen, Test-Feeds, Screenshots.
+  WLAN-Debugging per `adb connect <IP>:<Port>` (Port wechselt; steht unter „Wireless Debugging" auf dem Handy).
+- **Samsung Galaxy S25 (SM-S931B) = Produktiv-Handy des Benutzers**, Android 16 / API 36, keine SD-Karte. **Nie zum
+  Testen benutzen**; nur auf ausdrückliche Ansage installieren (ein Neustart beim Installieren beendet laufende Aktionen,
+  z. B. ein Backup).
 - Verbindung per **WLAN-Debugging** (Kopplung einmalig mit `adb pair`). Nach Handy-Neustart oder WLAN-Wechsel
   „USB-Debugging über WLAN" wieder einschalten; `adb` findet das Gerät per mDNS. Prüfen: `adb devices`.
+  Fehlt ein Gerät trotz eingeschaltetem WLAN-Debugging: `adb kill-server && adb start-server`, dann `adb connect`.
 - Per USB meldet das S25 kein ADB, solange die Samsung-Funktion „Automatische Blockierung" aktiv ist.
 - Samsung-Akkuoptimierung kann Hintergrund-Wiedergabe beenden: App unter
   Einstellungen → Akku → Hintergrundnutzungsgrenzen als „Nie im Standby" eintragen.
@@ -50,11 +55,11 @@ adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ## GitHub Pages (Datenschutzerklärung)
 - Quelle: `main`, Ordner `/docs`. `docs/_config.yml` veröffentlicht **nur** `index.md` und `datenschutz.md`
   (interne Doku bleibt draußen).
-- Adresse: https://rainerwingel.github.io/AA-AuralListen-Podcatcher/datenschutz/ – für die Play Console.
+- Adresse: https://rainerwingel.github.io/AA-AuralListen-Podcatcher/datenschutz/ – verlinkt in README und Store-Texten.
 - Ändert sich, welche Server die App abruft, welche Berechtigungen sie hat oder was sie speichert: `datenschutz.md`
   im selben Commit anpassen (Stand-Datum!).
-- Kontakt ist bewusst pseudonym (GitHub-Issues). Für den Play Store muss der Entwicklername dort zur Angabe in der
-  Play Console passen; ggf. dort die Kontakt-E-Mail ergänzen (Benutzer).
+- Kontakt ist bewusst pseudonym (GitHub-Issues). Falls der Play Store doch noch kommt (derzeit verworfen, siehe
+  `decisions.md` 2026-10-05): Entwicklername muss zur Play Console passen.
 
 ## GitHub-Release
 Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für jeden herunterladbar).

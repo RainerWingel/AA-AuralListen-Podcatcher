@@ -60,6 +60,18 @@ bei wechselnder Werbung, VBR-Fix, Playlist-Verhalten, Themen-Filter, Android Aut
    Spätere Versionen erkennt F-Droid selbst am Tag (`UpdateCheckMode: Tags`) – dann nur noch Version erhöhen,
    Changelogs schreiben, taggen.
 
+## Ablauf der Prüfung (Erfahrungen MR !51179)
+- **Codequalitäts-Scan** im MR („32 neue Funde"): listet nur die Berechtigungen je Build-Block (3 ABIs × Berechtigungen),
+  INTERNET als „Minor", der Rest „Info". Harmlos, kein Handlungsbedarf. Herkunft: eigenes Manifest (INTERNET, WAKE_LOCK,
+  FOREGROUND_SERVICE[_MEDIA_PLAYBACK]); ACCESS_NETWORK_STATE und RECEIVE_BOOT_COMPLETED kommen von WorkManager
+  (über `background_downloader`). Neue Berechtigungen → auch `datenschutz.md`/`privacy.md` („Berechtigungen").
+- **„Gibt es schon viele ähnliche Apps"** ist die Standardfrage bei neuen Podcatchern, keine Ablehnung. Antwort kurz und
+  persönlich (nicht KI-artig) mit Alleinstellungsmerkmalen: Kapitel einzeln überspringen, Hinweis bei wechselnder Werbung,
+  VBR-MP3-Fix, Playlist-Verhalten, Themen-Filter beim Auto-Download, geplant Android Auto.
+- **Rezept muss `templates/build-flutter.yml` folgen** (fdroiddata) und das ABI-Versionsschema nutzen (oben).
+- Änderungen am Rezept: Benutzer ersetzt die Datei im Fork `ArtemArb/fdroiddata` (Branch `master`) über die
+  Weboberfläche; der MR aktualisiert sich selbst, die Pipeline läuft neu. Nachrichten im MR schreibt nur der Benutzer.
+
 ## Screenshots
 - Format **JPG, 720 × 1600, Qualität 80** (`sips -Z 1600 -s format jpeg -s formatOptions 80`), Hochformat, Dateinamen
   sortieren die Reihenfolge (`1.jpg`, `2.jpg` …), 2–8 Stück je Sprache. **Keine PNGs einchecken** (3–4× größer, bläht

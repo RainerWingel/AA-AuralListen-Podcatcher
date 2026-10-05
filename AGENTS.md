@@ -39,6 +39,10 @@ Alles Fachliche steht in Themen-Dateien unter `docs/`.
 - **Speicherlecks sind Fehler höchster Priorität** – vor jedem Code, der Dateien, Streams, Timer, Controller oder Caches
   anlegt, `docs/eviction.md` lesen.
 - **Neue Pakete** nur nach Rückfrage beim Benutzer; begründen in `docs/decisions.md`.
+- **Geräte:** Testen nur auf dem Galaxy A05s. Das Galaxy S25 ist das Produktiv-Handy des Benutzers – nie zum Testen,
+  installieren nur auf ausdrückliche Ansage (`docs/build-and-release.md`).
+- **Build-Nummer in `pubspec.yaml` nur erhöhen, nie senken** – sie bestimmt den `versionCode` (× 10 + ABI) für
+  F-Droid und GitHub-Updates (`docs/f-droid.md`).
 - **Keine Secrets ins Git** (Repo ist öffentlich!): API-Keys, Keystore, `android/key.properties`.
 - **Vor jedem Commit:** `dart format .` · `flutter analyze` (0 Probleme) · `flutter test` (alle grün).
 - **Direkt auf `main` committen (jederzeit), nie mit uncommitteten Änderungen enden. Nie automatisch pushen – nur auf
@@ -51,7 +55,7 @@ flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # Codegenerierung (Drift)
 flutter analyze
 flutter test
-flutter run                   # auf dem verbundenen Galaxy S25 (WLAN-Debugging)
+flutter run                   # auf dem Test-Handy Galaxy A05s (WLAN-Debugging; S25 nur auf Ansage)
 flutter build apk --release --split-per-abi   # signiert mit Release-Keystore (android/key.properties)
 dart run tool/smoke_feeds.dart "Suchbegriff"  # Parser gegen echte Feeds testen
 flutter test --run-skipped --tags soak test/soak   # Speicher-Soak-Test (nicht in CI)

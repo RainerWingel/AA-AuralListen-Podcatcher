@@ -57,7 +57,7 @@ Gerät. Geschrieben in Flutter.
 
 ## Installation
 
-Die App ist (noch) nicht im Play Store. Die signierte APK gibt es unter
+Die Aufnahme bei F-Droid läuft; der Play Store ist nicht geplant. Die signierte APK gibt es unter
 [Releases](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases):
 
 1. Beim neuesten Release die Datei `…-arm64-v8a.apk` herunterladen (64-Bit-ARM, praktisch alle aktuellen
