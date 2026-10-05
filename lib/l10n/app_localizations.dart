@@ -698,6 +698,12 @@ abstract class AppLocalizations {
   /// **'Wartet auf WLAN …'**
   String get downloadWifiWaiting;
 
+  /// No description provided for @downloadNowMobile.
+  ///
+  /// In de, this message translates to:
+  /// **'Jetzt über Mobilfunk laden'**
+  String get downloadNowMobile;
+
   /// No description provided for @downloadsEmpty.
   ///
   /// In de, this message translates to:

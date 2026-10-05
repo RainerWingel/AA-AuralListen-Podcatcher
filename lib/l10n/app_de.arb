@@ -226,6 +226,7 @@
   "downloadFailed": "Download fehlgeschlagen",
   "downloadQueued": "Wartet …",
   "downloadWifiWaiting": "Wartet auf WLAN …",
+  "downloadNowMobile": "Jetzt über Mobilfunk laden",
   "downloadsEmpty": "Keine Downloads",
   "downloadsEmptyHint": "Folge lange drücken → „Herunterladen“, oder Auto-Download in den Podcast-Einstellungen aktivieren.",
   "downloadsUsage": "{used} von {limit} belegt",

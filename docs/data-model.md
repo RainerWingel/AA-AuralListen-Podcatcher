@@ -1,13 +1,13 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 20** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
+Aktuell **schemaVersion 21** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
 v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`; v8: nur Daten – `angefangen` unter 15 s → `neu`, Position 0; v9: `playlists.color`; v10: `podcasts.autoPlaylistId`, `autoPlaylistName`; v11: `episodes.episodeNumber`, `podcasts.episodeCounter`, `episodeNumberOffset`, einmaliges Neulesen aller Feeds; v12: `podcasts.episodeOwnCount`; v13: `episode_notes`, Shownotes aus `episodes.description` dorthin verschoben,
 einmaliges Neulesen aller Feeds für die Links; v14: nur Daten – Shownotes-Grenze 6000 → 18000 Zeichen, einmaliges
 Neulesen aller Feeds; v15: nur Daten – einmaliges Neulesen aller Feeds, stellt Feed-Dauern wieder her, die der Player
 mit einer falschen VBR-Schätzung überschrieben hatte, `playback.md`; v16: `podcasts.streamVaries`; v17: `podcasts.fundingUrl`, `fundingLabel`, einmaliges Neulesen aller Feeds; v18: `episodes.season`, `podcasts.serial`,
 einmaliges Neulesen aller Feeds; v19: `play_history`; v20: nur Daten – einmaliges Neulesen aller Feeds
-für die vollständige Entity-Dekodierung). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+für die vollständige Entity-Dekodierung; v21: `downloads.failedAttempts`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 0. Neue Tabelle? → auch in `BackupService._restoredTables` eintragen (`backup.md`).
@@ -24,7 +24,7 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 | `podcasts` ✅ | id, feedUrl (unique), title, author, description, imageUrl, websiteUrl (nur http/https), fundingUrl + fundingLabel (v17, `podcast:funding`), serial (v18, `itunes:type` = serial → Hörreihenfolge), etag, lastModified, lastRefreshAt, lastError (null = ok), subscribedAt, autoDownloadMode (off/wifiOnly/always), autoDownloadMaxEpisodes (3), autoDownloadThemes (v5, JSON-Liste, null = alle Themen), autoDeletePlayed (true), boostDb (null = global), autoPlaylistId + autoPlaylistName (v10, Ziel-Playlist für Auto-Downloads, ohne FK – gelöschte wird unter dem Namen neu angelegt), episodeCounter (v11, true) + episodeNumberOffset (v11, 0, −9999…9999), episodeOwnCount (v12, false = Feed-Nummern), streamVaries (v16, false; Server liefert Streams je Anfrage anders → Download-Tipp, `playback.md`) |
 | `episodes` ✅ | id, podcastId (FK, ON DELETE CASCADE), guid (unique je Podcast), title, description (**seit v13 unbenutzt, immer NULL** – Spalte bleibt, weil Löschen die Tabelle samt
 Fremdschlüsseln neu aufbauen würde), audioUrl, audioMimeType, audioSizeBytes, durationMs, pubDate, imageUrl, chaptersUrl, theme (v5, z. B. `zum-thema`), episodeNumber (v11, `itunes:episode`), season (v18, `itunes:season` ≥ 1), status, positionMs, playedAt, addedAt |
-| `downloads` ✅ (v3) | episodeId (PK, FK → episodes, CASCADE), relativePath (`<id>.<ext>`), state (queued/running/done/failed), sizeBytes, wifiOnly, createdAt, completedAt. Regeln: `eviction.md` |
+| `downloads` ✅ (v3) | episodeId (PK, FK → episodes, CASCADE), relativePath (`<id>.<ext>`), state (queued/running/done/failed), sizeBytes, wifiOnly, failedAttempts (v21, Zahl der Fehlschläge – Auto-Download gibt nach 3 auf), createdAt, completedAt. Regeln: `eviction.md` |
 | `playlists` ✅ (v4) | id, name, sortOrder, createdAt, lastEpisodeId (v7, zuletzt aus der Playlist gespielte Folge für „Fortsetzen", ohne FK), color (v9, `PlaylistColor` als Name, null = keine). Standard-Playlist „Wiedergabeliste" (`AppDatabase.defaultPlaylistName`) |
 | `playlist_items` ✅ (v4) | PK (playlistId, episodeId), beide FK mit CASCADE, position (aufsteigend, neu = max + 1), addedAt |
 | `chapters` ✅ (v6) | PK (episodeId, startMs), FK CASCADE, title, url, imageUrl. Quellen: `playback.md` |

@@ -100,6 +100,7 @@
   "downloadFailed": "Download failed",
   "downloadQueued": "Waiting …",
   "downloadWifiWaiting": "Waiting for Wi-Fi …",
+  "downloadNowMobile": "Download now over mobile data",
   "downloadsEmpty": "No downloads",
   "downloadsEmptyHint": "Long-press an episode → “Download”, or turn on auto-download in the podcast settings.",
   "downloadsUsage": "{used} of {limit} used",

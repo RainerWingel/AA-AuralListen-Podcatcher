@@ -51,6 +51,15 @@ class DownloadService implements PodcastFilesCleaner {
 
   static const defaultLimitBytes = 5 * 1024 * 1024 * 1024;
 
+  /// Auto-download tries a failed episode again at the next maintenance runs,
+  /// this many failures in total (each with the engine's own retries). After
+  /// that it gives up (e.g. a dead link) and takes the next episode instead.
+  static const maxAutoAttempts = 3;
+
+  /// Downloads restarted by [downloadNow]: the "canceled" event of the old
+  /// task must not delete the row of the new one.
+  final _replacing = <int>{};
+
   final _progress = <int, double>{};
   final _progressController = StreamController<Map<int, double>>.broadcast();
   late final StreamSubscription<DownloadEvent> _subscription;
@@ -149,6 +158,7 @@ class DownloadService implements PodcastFilesCleaner {
     if (episode == null) return;
 
     final fileName = '$episodeId.${audioFileExtension(episode)}';
+    // A retry keeps the failure count (not part of the companion).
     await _db
         .into(_db.downloads)
         .insertOnConflictUpdate(
@@ -160,13 +170,47 @@ class DownloadService implements PodcastFilesCleaner {
             createdAt: _clock(),
           ),
         );
+    await _enqueue(episode, fileName, wifiOnly: wifiOnly);
+  }
+
+  /// A download waiting for Wi-Fi starts right away over any network
+  /// (user wish 2026-10-05). The engine cannot change a queued task, so it
+  /// is canceled and queued again.
+  Future<void> downloadNow(int episodeId) async {
+    final row = await _row(episodeId);
+    if (row == null || row.state != DownloadState.queued || !row.wifiOnly) {
+      return;
+    }
+    final episode = await (_db.select(
+      _db.episodes,
+    )..where((e) => e.id.equals(episodeId))).getSingleOrNull();
+    if (episode == null) return;
+
+    _replacing.add(episodeId);
+    await _engine.cancel(episodeId);
+    await (_db.update(
+      _db.downloads,
+    )..where((d) => d.episodeId.equals(episodeId))).write(
+      const DownloadsCompanion(
+        state: Value(DownloadState.queued),
+        wifiOnly: Value(false),
+      ),
+    );
+    await _enqueue(episode, row.relativePath, wifiOnly: false);
+  }
+
+  Future<void> _enqueue(
+    Episode episode,
+    String fileName, {
+    required bool wifiOnly,
+  }) async {
     final accepted = await _engine.enqueue(
-      episodeId: episodeId,
+      episodeId: episode.id,
       url: episode.audioUrl,
       fileName: fileName,
       wifiOnly: wifiOnly,
     );
-    if (!accepted) await _setState(episodeId, DownloadState.failed);
+    if (!accepted) await _fail(episode.id);
   }
 
   /// Stops a running download and removes everything belonging to it.
@@ -301,7 +345,8 @@ class DownloadService implements PodcastFilesCleaner {
   }
 
   /// Queues the newest unplayed episodes of podcasts with auto-download, up to
-  /// their limit, as long as the storage limit allows. Returns the count.
+  /// their limit, as long as the storage limit allows. Failed ones among them
+  /// are tried again (max. [maxAutoAttempts] failures). Returns the count.
   Future<int> autoDownload() async {
     var budget = await limitBytes() - await totalBytes();
     if (budget <= 0) return 0;
@@ -336,9 +381,18 @@ class DownloadService implements PodcastFilesCleaner {
                       e.podcastId.equals(podcast.id) &
                       inThemes(e.theme) &
                       e.status.equalsValue(EpisodeStatus.newEpisode) &
+                      // No download yet – or a failed one that is tried
+                      // again (up to maxAutoAttempts failures).
                       e.id.isNotInQuery(
                         _db.selectOnly(_db.downloads)
-                          ..addColumns([_db.downloads.episodeId]),
+                          ..addColumns([_db.downloads.episodeId])
+                          ..where(
+                            _db.downloads.state
+                                    .equalsValue(DownloadState.failed)
+                                    .not() |
+                                _db.downloads.failedAttempts
+                                    .isBiggerOrEqualValue(maxAutoAttempts),
+                          ),
                       ),
                 )
                 // Serial podcasts: the next ones to hear (oldest in listening
@@ -411,6 +465,10 @@ class DownloadService implements PodcastFilesCleaner {
 
   Future<void> _onEvent(DownloadEvent event) async {
     final id = event.episodeId;
+    // The replaced task's "canceled" is ignored once; any other event comes
+    // from the new task, so a "canceled" that never came is forgotten.
+    if (event is DownloadCanceled && _replacing.remove(id)) return;
+    _replacing.remove(id);
     switch (event) {
       case DownloadStarted():
         await _setState(id, DownloadState.running);
@@ -441,11 +499,11 @@ class DownloadService implements PodcastFilesCleaner {
         if (file.existsSync()) {
           await _markDone(id, file);
         } else {
-          await _setState(id, DownloadState.failed);
+          await _fail(id);
         }
       case DownloadFailed():
         _clearProgress(id);
-        await _setState(id, DownloadState.failed);
+        await _fail(id);
       case DownloadCanceled():
         _clearProgress(id);
         await delete(id);
@@ -504,6 +562,17 @@ class DownloadService implements PodcastFilesCleaner {
   Future<void> _setState(int episodeId, DownloadState state) =>
       (_db.update(_db.downloads)..where((d) => d.episodeId.equals(episodeId)))
           .write(DownloadsCompanion(state: Value(state)));
+
+  /// Marks the download failed and counts the failure.
+  Future<void> _fail(int episodeId) => _db.customUpdate(
+    'UPDATE downloads SET state = ?, failed_attempts = failed_attempts + 1 '
+    'WHERE episode_id = ?',
+    variables: [
+      Variable.withString(DownloadState.failed.name),
+      Variable.withInt(episodeId),
+    ],
+    updates: {_db.downloads},
+  );
 
   Future<void> _markDone(int episodeId, File file) =>
       (_db.update(

@@ -47,7 +47,11 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
   „Neueste ungespielte Folgen behalten" – umbenannt, weil es nichts löscht): 1/2/3/5/10, mit Hinweiszeile darunter.
 - Geladen werden die **neuesten** Folgen mit Status `neu` ohne Download, bis N ungespielte Downloads existieren –
   bei **Serien-Podcasts** (`podcasts.serial`) stattdessen die **nächsten in Hörreihenfolge** (`ui-ux.md` „Staffeln").
-  Fehlgeschlagene zählen nicht mit und werden nicht automatisch erneut versucht (Knopf „Erneut herunterladen").
+  Fehlgeschlagene zählen nicht mit. Gehört eine fehlgeschlagene Folge noch zu den N, die geladen würden, versucht
+  Auto-Download sie bei der nächsten Wartung **erneut** (Benutzerwunsch 2026-10-05) – bis sie insgesamt
+  `DownloadService.maxAutoAttempts` = 3-mal fehlgeschlagen ist (`downloads.failedAttempts`, jeder Fehlschlag schon nach
+  den 3 eigenen Versuchen des Pakets). Danach bleibt ⚠ stehen (z. B. toter Link) und die nächste Folge wird geladen;
+  von Hand geht „Erneut herunterladen" weiterhin.
 - **Themen-Filter** (Netzwerk-Feeds): Ist `autoDownloadThemes` gesetzt, zählen und laden nur Folgen dieser Themen
   (leere Liste = nichts). Folgen ohne Thema fallen bei gesetztem Filter heraus. Neue Themen sind nicht automatisch dabei.
 - Budget: Feed-Größenangabe (`audioSizeBytes`) gegen das Speicherlimit; reicht es nicht, wird gestoppt.
@@ -56,6 +60,10 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
   Name wird nachgeführt; gelöscht → beim nächsten Auto-Download unter dem gespeicherten Namen neu angelegt
   (`DownloadService._targetPlaylist`). Manuelle Downloads betrifft das nicht.
 - Manuelle Downloads (langes Drücken → „Herunterladen") laufen über jedes Netz.
+- **„Jetzt über Mobilfunk laden"** (Benutzerwunsch 2026-10-05): Eine Folge, die auf WLAN wartet, lässt sich per Menü
+  (langes Drücken) oder Knopf im Downloads-Tab sofort über jedes Netz laden (`DownloadService.downloadNow`). Das Paket kann
+  eine wartende Aufgabe nicht ändern, also wird sie abgebrochen und neu eingereiht; das späte „abgebrochen" der alten
+  Aufgabe wird einmal ignoriert (`_replacing`), sonst löschte es den neuen Eintrag.
 
 ### Wartung (`runMaintenance`)
 Reihenfolge: Abgleich → 96-h-Löschung → Speicherlimit → Auto-Download. Läuft beim App-Start (nach dem Refresh), nach jedem

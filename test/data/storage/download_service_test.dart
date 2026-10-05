@@ -175,6 +175,57 @@ void main() {
       expect((await row(failed))!.state, DownloadState.failed);
     });
 
+    test('"download now" restarts a Wi-Fi download over any network', () async {
+      final id = await addEpisode('1');
+      await service.download(id, wifiOnly: true);
+
+      await service.downloadNow(id);
+      expect(engine.canceled, [id]);
+      expect(engine.active[id]!.wifiOnly, isFalse);
+      final row1 = (await row(id))!;
+      expect(row1.state, DownloadState.queued);
+      expect(row1.wifiOnly, isFalse);
+
+      // The old task's late "canceled" must not delete the new download.
+      engine.emit(DownloadCanceled(id));
+      await pumpEventQueue();
+      expect(await row(id), isNotNull);
+      await engine.finish(id);
+      expect((await row(id))!.state, DownloadState.done);
+
+      // A later real cancel is handled normally again.
+      final other = await addEpisode('2');
+      await service.download(other);
+      engine.emit(DownloadCanceled(other));
+      await pumpEventQueue();
+      expect(await row(other), isNull);
+    });
+
+    test(
+      '"download now" only applies to downloads waiting for Wi-Fi',
+      () async {
+        final any = await addEpisode('1');
+        await service.download(any);
+        await service.downloadNow(any);
+        final running = await addEpisode('2');
+        await service.download(running, wifiOnly: true);
+        engine.emit(DownloadStarted(running));
+        await pumpEventQueue();
+        await service.downloadNow(running);
+        expect(engine.canceled, isEmpty);
+      },
+    );
+
+    test('failures are counted', () async {
+      final id = await addEpisode('1');
+      await service.download(id);
+      await engine.fail(id);
+      expect((await row(id))!.failedAttempts, 1);
+      await service.download(id);
+      await engine.fail(id);
+      expect((await row(id))!.failedAttempts, 2);
+    });
+
     test('cancel stops the engine and leaves nothing behind', () async {
       final id = await addEpisode('1');
       await service.download(id);
@@ -373,6 +424,39 @@ void main() {
 
       // Already at the maximum → nothing more.
       expect(await service.autoDownload(), 0);
+    });
+
+    test('retries a failed episode, gives up after 3 failures', () async {
+      await setPodcast(
+        const PodcastsCompanion(
+          autoDownloadMode: Value(AutoDownloadMode.always),
+          autoDownloadMaxEpisodes: Value(1),
+        ),
+      );
+      final older = await addEpisode('1', pubDate: DateTime(2026, 9, 1));
+      final newest = await addEpisode('2', pubDate: DateTime(2026, 9, 2));
+
+      expect(await service.autoDownload(), 1);
+      for (
+        var attempt = 1;
+        attempt < DownloadService.maxAutoAttempts;
+        attempt++
+      ) {
+        await engine.fail(newest);
+        // Next maintenance: the newest episode again, not the older one.
+        expect(await service.autoDownload(), 1);
+        expect(engine.active.keys, [newest]);
+      }
+      await engine.fail(newest);
+      expect(
+        (await row(newest))!.failedAttempts,
+        DownloadService.maxAutoAttempts,
+      );
+
+      // Given up (e.g. dead link): the next episode instead; ⚠ stays.
+      expect(await service.autoDownload(), 1);
+      expect(engine.active.keys, [older]);
+      expect((await row(newest))!.state, DownloadState.failed);
     });
 
     test('serial podcast: the next episodes in listening order', () async {

@@ -369,6 +369,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get downloadWifiWaiting => 'Wartet auf WLAN …';
 
   @override
+  String get downloadNowMobile => 'Jetzt über Mobilfunk laden';
+
+  @override
   String get downloadsEmpty => 'Keine Downloads';
 
   @override

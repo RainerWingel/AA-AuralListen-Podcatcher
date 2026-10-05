@@ -187,6 +187,20 @@ class EpisodeTile extends ConsumerWidget {
                   addToPlaylist(outerContext, ref, episode.id);
                 },
               ),
+              // Waiting for Wi-Fi: start now over mobile data (user wish
+              // 2026-10-05).
+              if (download case Download(
+                state: DownloadState.queued,
+                wifiOnly: true,
+              ))
+                ListTile(
+                  leading: const Icon(Icons.network_cell),
+                  title: Text(l10n.downloadNowMobile),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    downloads.downloadNow(episode.id);
+                  },
+                ),
               ListTile(
                 leading: Icon(downloadIcon),
                 title: Text(downloadLabel),

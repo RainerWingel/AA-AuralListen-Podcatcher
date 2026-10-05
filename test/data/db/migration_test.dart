@@ -295,6 +295,35 @@ void main() {
     await db.close();
   });
 
+  test('upgrade v20 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(20);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v21 keeps downloads, with no failures counted', () async {
+    final schema = await verifier.schemaAt(20);
+    schema.rawDatabase
+      ..execute(
+        'INSERT INTO podcasts (feed_url, title, subscribed_at) '
+        "VALUES ('https://example.com/feed', 'P', 1767225600)",
+      )
+      ..execute(
+        'INSERT INTO episodes (podcast_id, guid, title, audio_url, added_at) '
+        "VALUES (1, 'g', 'E', 'https://example.com/e.mp3', 1767225600)",
+      )
+      ..execute(
+        'INSERT INTO downloads (episode_id, relative_path, state, created_at) '
+        "VALUES (1, '1.mp3', 'failed', 1767225600)",
+      );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    final download = await db.select(db.downloads).getSingle();
+    expect(download.state, DownloadState.failed);
+    expect(download.failedAttempts, 0);
+    await db.close();
+  });
+
   test('upgrade to v20 re-reads every feed once', () async {
     final schema = await verifier.schemaAt(19);
     schema.rawDatabase.execute(

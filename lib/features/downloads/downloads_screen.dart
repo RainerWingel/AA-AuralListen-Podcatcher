@@ -182,6 +182,12 @@ class _DownloadTile extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (download.state == DownloadState.queued && download.wifiOnly)
+            IconButton(
+              tooltip: l10n.downloadNowMobile,
+              icon: const Icon(Icons.network_cell),
+              onPressed: () => service.downloadNow(episodeId),
+            ),
           IconButton(
             tooltip: l10n.addToPlaylist,
             icon: const Icon(Icons.playlist_add),

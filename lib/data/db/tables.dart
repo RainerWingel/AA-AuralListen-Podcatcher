@@ -153,6 +153,10 @@ class Downloads extends Table {
 
   /// Auto-downloads are queued with "Wi-Fi only" when the podcast says so.
   BoolColumn get wifiOnly => boolean().withDefault(const Constant(false))();
+
+  /// How often this download ended as failed (schema v21). Auto-download
+  /// retries failed episodes up to `DownloadService.maxAutoAttempts`.
+  IntColumn get failedAttempts => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get completedAt => dateTime().nullable()();
 

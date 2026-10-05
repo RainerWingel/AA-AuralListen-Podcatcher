@@ -2867,6 +2867,18 @@ class $DownloadsTable extends Downloads
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _failedAttemptsMeta = const VerificationMeta(
+    'failedAttempts',
+  );
+  @override
+  late final GeneratedColumn<int> failedAttempts = GeneratedColumn<int>(
+    'failed_attempts',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2896,6 +2908,7 @@ class $DownloadsTable extends Downloads
     state,
     sizeBytes,
     wifiOnly,
+    failedAttempts,
     createdAt,
     completedAt,
   ];
@@ -2938,6 +2951,15 @@ class $DownloadsTable extends Downloads
       context.handle(
         _wifiOnlyMeta,
         wifiOnly.isAcceptableOrUnknown(data['wifi_only']!, _wifiOnlyMeta),
+      );
+    }
+    if (data.containsKey('failed_attempts')) {
+      context.handle(
+        _failedAttemptsMeta,
+        failedAttempts.isAcceptableOrUnknown(
+          data['failed_attempts']!,
+          _failedAttemptsMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -2988,6 +3010,10 @@ class $DownloadsTable extends Downloads
         DriftSqlType.bool,
         data['${effectivePrefix}wifi_only'],
       )!,
+      failedAttempts: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}failed_attempts'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -3018,6 +3044,10 @@ class Download extends DataClass implements Insertable<Download> {
 
   /// Auto-downloads are queued with "Wi-Fi only" when the podcast says so.
   final bool wifiOnly;
+
+  /// How often this download ended as failed (schema v21). Auto-download
+  /// retries failed episodes up to `DownloadService.maxAutoAttempts`.
+  final int failedAttempts;
   final DateTime createdAt;
   final DateTime? completedAt;
   const Download({
@@ -3026,6 +3056,7 @@ class Download extends DataClass implements Insertable<Download> {
     required this.state,
     this.sizeBytes,
     required this.wifiOnly,
+    required this.failedAttempts,
     required this.createdAt,
     this.completedAt,
   });
@@ -3043,6 +3074,7 @@ class Download extends DataClass implements Insertable<Download> {
       map['size_bytes'] = Variable<int>(sizeBytes);
     }
     map['wifi_only'] = Variable<bool>(wifiOnly);
+    map['failed_attempts'] = Variable<int>(failedAttempts);
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || completedAt != null) {
       map['completed_at'] = Variable<DateTime>(completedAt);
@@ -3059,6 +3091,7 @@ class Download extends DataClass implements Insertable<Download> {
           ? const Value.absent()
           : Value(sizeBytes),
       wifiOnly: Value(wifiOnly),
+      failedAttempts: Value(failedAttempts),
       createdAt: Value(createdAt),
       completedAt: completedAt == null && nullToAbsent
           ? const Value.absent()
@@ -3079,6 +3112,7 @@ class Download extends DataClass implements Insertable<Download> {
       ),
       sizeBytes: serializer.fromJson<int?>(json['sizeBytes']),
       wifiOnly: serializer.fromJson<bool>(json['wifiOnly']),
+      failedAttempts: serializer.fromJson<int>(json['failedAttempts']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
     );
@@ -3094,6 +3128,7 @@ class Download extends DataClass implements Insertable<Download> {
       ),
       'sizeBytes': serializer.toJson<int?>(sizeBytes),
       'wifiOnly': serializer.toJson<bool>(wifiOnly),
+      'failedAttempts': serializer.toJson<int>(failedAttempts),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'completedAt': serializer.toJson<DateTime?>(completedAt),
     };
@@ -3105,6 +3140,7 @@ class Download extends DataClass implements Insertable<Download> {
     DownloadState? state,
     Value<int?> sizeBytes = const Value.absent(),
     bool? wifiOnly,
+    int? failedAttempts,
     DateTime? createdAt,
     Value<DateTime?> completedAt = const Value.absent(),
   }) => Download(
@@ -3113,6 +3149,7 @@ class Download extends DataClass implements Insertable<Download> {
     state: state ?? this.state,
     sizeBytes: sizeBytes.present ? sizeBytes.value : this.sizeBytes,
     wifiOnly: wifiOnly ?? this.wifiOnly,
+    failedAttempts: failedAttempts ?? this.failedAttempts,
     createdAt: createdAt ?? this.createdAt,
     completedAt: completedAt.present ? completedAt.value : this.completedAt,
   );
@@ -3125,6 +3162,9 @@ class Download extends DataClass implements Insertable<Download> {
       state: data.state.present ? data.state.value : this.state,
       sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
       wifiOnly: data.wifiOnly.present ? data.wifiOnly.value : this.wifiOnly,
+      failedAttempts: data.failedAttempts.present
+          ? data.failedAttempts.value
+          : this.failedAttempts,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       completedAt: data.completedAt.present
           ? data.completedAt.value
@@ -3140,6 +3180,7 @@ class Download extends DataClass implements Insertable<Download> {
           ..write('state: $state, ')
           ..write('sizeBytes: $sizeBytes, ')
           ..write('wifiOnly: $wifiOnly, ')
+          ..write('failedAttempts: $failedAttempts, ')
           ..write('createdAt: $createdAt, ')
           ..write('completedAt: $completedAt')
           ..write(')'))
@@ -3153,6 +3194,7 @@ class Download extends DataClass implements Insertable<Download> {
     state,
     sizeBytes,
     wifiOnly,
+    failedAttempts,
     createdAt,
     completedAt,
   );
@@ -3165,6 +3207,7 @@ class Download extends DataClass implements Insertable<Download> {
           other.state == this.state &&
           other.sizeBytes == this.sizeBytes &&
           other.wifiOnly == this.wifiOnly &&
+          other.failedAttempts == this.failedAttempts &&
           other.createdAt == this.createdAt &&
           other.completedAt == this.completedAt);
 }
@@ -3175,6 +3218,7 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
   final Value<DownloadState> state;
   final Value<int?> sizeBytes;
   final Value<bool> wifiOnly;
+  final Value<int> failedAttempts;
   final Value<DateTime> createdAt;
   final Value<DateTime?> completedAt;
   const DownloadsCompanion({
@@ -3183,6 +3227,7 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
     this.state = const Value.absent(),
     this.sizeBytes = const Value.absent(),
     this.wifiOnly = const Value.absent(),
+    this.failedAttempts = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.completedAt = const Value.absent(),
   });
@@ -3192,6 +3237,7 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
     required DownloadState state,
     this.sizeBytes = const Value.absent(),
     this.wifiOnly = const Value.absent(),
+    this.failedAttempts = const Value.absent(),
     required DateTime createdAt,
     this.completedAt = const Value.absent(),
   }) : relativePath = Value(relativePath),
@@ -3203,6 +3249,7 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
     Expression<String>? state,
     Expression<int>? sizeBytes,
     Expression<bool>? wifiOnly,
+    Expression<int>? failedAttempts,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? completedAt,
   }) {
@@ -3212,6 +3259,7 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
       if (state != null) 'state': state,
       if (sizeBytes != null) 'size_bytes': sizeBytes,
       if (wifiOnly != null) 'wifi_only': wifiOnly,
+      if (failedAttempts != null) 'failed_attempts': failedAttempts,
       if (createdAt != null) 'created_at': createdAt,
       if (completedAt != null) 'completed_at': completedAt,
     });
@@ -3223,6 +3271,7 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
     Value<DownloadState>? state,
     Value<int?>? sizeBytes,
     Value<bool>? wifiOnly,
+    Value<int>? failedAttempts,
     Value<DateTime>? createdAt,
     Value<DateTime?>? completedAt,
   }) {
@@ -3232,6 +3281,7 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
       state: state ?? this.state,
       sizeBytes: sizeBytes ?? this.sizeBytes,
       wifiOnly: wifiOnly ?? this.wifiOnly,
+      failedAttempts: failedAttempts ?? this.failedAttempts,
       createdAt: createdAt ?? this.createdAt,
       completedAt: completedAt ?? this.completedAt,
     );
@@ -3257,6 +3307,9 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
     if (wifiOnly.present) {
       map['wifi_only'] = Variable<bool>(wifiOnly.value);
     }
+    if (failedAttempts.present) {
+      map['failed_attempts'] = Variable<int>(failedAttempts.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -3274,6 +3327,7 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
           ..write('state: $state, ')
           ..write('sizeBytes: $sizeBytes, ')
           ..write('wifiOnly: $wifiOnly, ')
+          ..write('failedAttempts: $failedAttempts, ')
           ..write('createdAt: $createdAt, ')
           ..write('completedAt: $completedAt')
           ..write(')'))
@@ -7480,6 +7534,7 @@ typedef $$DownloadsTableCreateCompanionBuilder = DownloadsCompanion Function({
   required DownloadState state,
   Value<int?> sizeBytes,
   Value<bool> wifiOnly,
+  Value<int> failedAttempts,
   required DateTime createdAt,
   Value<DateTime?> completedAt,
 });
@@ -7489,6 +7544,7 @@ typedef $$DownloadsTableUpdateCompanionBuilder = DownloadsCompanion Function({
   Value<DownloadState> state,
   Value<int?> sizeBytes,
   Value<bool> wifiOnly,
+  Value<int> failedAttempts,
   Value<DateTime> createdAt,
   Value<DateTime?> completedAt,
 });
@@ -7542,6 +7598,11 @@ class $$DownloadsTableFilterComposer
 
   ColumnFilters<bool> get wifiOnly => $composableBuilder(
     column: $table.wifiOnly,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get failedAttempts => $composableBuilder(
+    column: $table.failedAttempts,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7608,6 +7669,11 @@ class $$DownloadsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get failedAttempts => $composableBuilder(
+    column: $table.failedAttempts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -7664,6 +7730,11 @@ class $$DownloadsTableAnnotationComposer
 
   GeneratedColumn<bool> get wifiOnly =>
       $composableBuilder(column: $table.wifiOnly, builder: (column) => column);
+
+  GeneratedColumn<int> get failedAttempts => $composableBuilder(
+    column: $table.failedAttempts,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -7730,6 +7801,7 @@ class $$DownloadsTableTableManager
                 Value<DownloadState> state = const Value.absent(),
                 Value<int?> sizeBytes = const Value.absent(),
                 Value<bool> wifiOnly = const Value.absent(),
+                Value<int> failedAttempts = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> completedAt = const Value.absent(),
               }) => DownloadsCompanion(
@@ -7738,6 +7810,7 @@ class $$DownloadsTableTableManager
                 state: state,
                 sizeBytes: sizeBytes,
                 wifiOnly: wifiOnly,
+                failedAttempts: failedAttempts,
                 createdAt: createdAt,
                 completedAt: completedAt,
               ),
@@ -7748,6 +7821,7 @@ class $$DownloadsTableTableManager
                 required DownloadState state,
                 Value<int?> sizeBytes = const Value.absent(),
                 Value<bool> wifiOnly = const Value.absent(),
+                Value<int> failedAttempts = const Value.absent(),
                 required DateTime createdAt,
                 Value<DateTime?> completedAt = const Value.absent(),
               }) => DownloadsCompanion.insert(
@@ -7756,6 +7830,7 @@ class $$DownloadsTableTableManager
                 state: state,
                 sizeBytes: sizeBytes,
                 wifiOnly: wifiOnly,
+                failedAttempts: failedAttempts,
                 createdAt: createdAt,
                 completedAt: completedAt,
               ),

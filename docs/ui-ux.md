@@ -67,7 +67,8 @@ Cover, Titel (max. 2 Zeilen), auf der Startseite der Podcast-Name in eigener Zei
 laufende Folge hervorgehoben; eine **gespielte** Folge gilt nur als laufend, solange sie wirklich noch spielt –
 nach dem Ende zeigt sie den Haken, auch wenn der Mini-Player sie noch anzeigt). Gespielte Folgen: Bild, Titel und Untertitel mit 50 % Deckkraft wie bei Castbox
 (`EpisodeTile.playedOpacity`), Haken bleibt voll sichtbar, die gerade laufende Folge wird nie abgeblendet. **Tippen = abspielen.** **Langes Drücken** = Menü: Abspielen, Als gespielt / ungespielt markieren.
-Menü außerdem: Herunterladen / Download abbrechen / Download löschen / Erneut herunterladen (je nach Zustand).
+Menü außerdem: Herunterladen / Download abbrechen / Download löschen / Erneut herunterladen (je nach Zustand); wartet
+der Download auf WLAN, zusätzlich „Jetzt über Mobilfunk laden" (`eviction.md`).
 **Folgennummer am Cover** (Benutzerwunsch 2026-09-30, `lib/data/episode_numbers.dart`, `_NumberedCover` in
 `episode_tile.dart`): schmaler schwarzer Streifen am linken Cover-Rand, zu 75 % transparent (Benutzerwunsch 2026-10-01), Zahl weiß mit
 leichtem Schatten, von unten nach oben
@@ -120,7 +121,7 @@ Adressen im Text werden zu Links. Außerdem „Zu Playlist hinzufügen…".
 ## Downloads-Tab
 Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %"
 mit Balken (nur solange wirklich übertragen wird) / „Wartet auf WLAN …" bzw. „Wartet …" / „Download fehlgeschlagen"; rechts „Zu Playlist hinzufügen…" (bei mehreren Playlists die bekannte
-Auswahl) und Löschen / Abbrechen / Erneut. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
+Auswahl) und Löschen / Abbrechen / Erneut; bei „Wartet auf WLAN …" zusätzlich 📶 „Jetzt über Mobilfunk laden". Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
 
 ## Podcast-Menü (⋮ im Podcast-Detail)
 Podcast-Einstellungen · Alle neuen Episoden abspielen · Ungespielte Episoden seit … abspielen · Alle ungespielten
