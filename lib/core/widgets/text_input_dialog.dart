@@ -87,6 +87,8 @@ class _TextInputDialogState extends State<_TextInputDialog> {
         decoration: InputDecoration(
           labelText: widget.label ?? l10n.playlistName,
           errorText: _error,
+          // Narrow dialogs: wrap instead of cutting the message off.
+          errorMaxLines: 3,
         ),
         // The message goes away as soon as the text is changed.
         onChanged: (_) {
