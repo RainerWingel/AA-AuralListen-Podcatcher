@@ -1393,7 +1393,11 @@ void main() {
       await handler.skipToPrevious();
       expect(handler.currentEpisodeId, episodeId);
       expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
-      // Not offered in the notification.
+      // Bluetooth "back" key: a system action, not a notification button.
+      expect(
+        handler.playbackState.value.systemActions,
+        contains(MediaAction.skipToPrevious),
+      );
       expect(
         handler.playbackState.value.controls,
         isNot(contains(MediaControl.skipToPrevious)),
@@ -1402,6 +1406,10 @@ void main() {
 
     test('previous without an active playlist does nothing', () async {
       await handler.playEpisode(ep2);
+      expect(
+        handler.playbackState.value.systemActions,
+        isNot(contains(MediaAction.skipToPrevious)),
+      );
       await handler.skipToPrevious();
       expect(handler.currentEpisodeId, ep2);
     });

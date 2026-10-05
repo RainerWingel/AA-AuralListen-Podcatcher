@@ -112,7 +112,9 @@ gelesen, die neue Reihenfolge gilt also sofort.
 - **⏮ ⏭ rechts in der Zeile** (Benutzerwunsch 2026-10-06, vorher nur ⏭): vorherige/nächste Folge der **aktiven**
   Playlist (`skipToPrevious`/`skipToNext`, die aktuelle bleibt ungespielt in der Playlist); am Anfang bzw. Ende
   ausgegraut (live aus `playlistEntriesProvider`). Solange die Playlist nur angeboten ist, schalten beide sie nur ein.
-  ⏮ gibt es nicht in der Benachrichtigung (dort weiter nur ⏭).
+  Die **Bluetooth-Zurück-Taste** (Kopfhörer, Auto) macht dasselbe wie ⏮ (Benutzerwunsch 2026-10-06,
+  `MediaAction.skipToPrevious`, nur bei aktiver Playlist); als Knopf in der Benachrichtigung steht weiter nur ⏭ – ab
+  Android 13 kann das System aus der Aktion aber selbst ein ⏮ in den Mediensteuerungen zeigen.
 - **Aktive Zeile, Playlist-Symbol links** („Playlist öffnen", Benutzerwunsch 2026-10-06): schließt den Player und zeigt
   die Playlist im Playlists-Tab, gescrollt zur laufenden Folge (`Routes.playlistAt` → `?folge=ID&r=…`; `r` macht einen
   erneuten Sprung zur selben Folge zu einer neuen Adresse). `PlaylistScreen` springt erst grob (geschätzte Zeilenhöhe,

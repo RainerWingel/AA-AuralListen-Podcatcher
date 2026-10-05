@@ -445,9 +445,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (next != null) await playEpisode(next, playlistId: _activePlaylistId);
   }
 
-  /// ⏮ in the full player's playlist row: the episode before this one in
-  /// the active playlist (user wish 2026-10-06). Like "next", the current
-  /// one keeps its state. Not offered in the notification.
+  /// ⏮ in the full player's playlist row and the Bluetooth "back" key: the
+  /// episode before this one in the active playlist (user wish 2026-10-06).
+  /// Like "next", the current one keeps its state.
   @override
   Future<void> skipToPrevious() async {
     final playlistId = _activePlaylistId;
@@ -1188,13 +1188,16 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
           MediaControl.fastForward,
           if (_activePlaylistId != null) MediaControl.skipToNext,
         ],
-        systemActions: const {
+        systemActions: {
           MediaAction.seek,
           MediaAction.seekForward,
           MediaAction.seekBackward,
           MediaAction.rewind,
           MediaAction.fastForward,
           MediaAction.skipToNext,
+          // Bluetooth "back" key → previous playlist episode (user wish
+          // 2026-10-06); only with an active playlist, like ⏮ in the player.
+          if (_activePlaylistId != null) MediaAction.skipToPrevious,
         },
         androidCompactActionIndices: const [0, 1, 2],
         processingState: !_loaded
