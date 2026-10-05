@@ -526,6 +526,20 @@ class AppLocalizationsDe extends AppLocalizations {
       'Eine Playlist mit diesem Namen gibt es schon.';
 
   @override
+  String ratingStars(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Sterne',
+      one: '1 Stern',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ratingRemove => 'Bewertung entfernen';
+
+  @override
   String get playlistColor => 'Farbe…';
 
   @override

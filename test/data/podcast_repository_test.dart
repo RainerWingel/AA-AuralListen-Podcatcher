@@ -631,6 +631,44 @@ void main() {
     expect(await since(DateTime.utc(2025, 7)), isEmpty);
   });
 
+  test('Abos order: best rated first, then by title', () async {
+    Future<int> add(String title) => db
+        .into(db.podcasts)
+        .insert(
+          PodcastsCompanion.insert(
+            feedUrl: 'https://example.com/$title',
+            title: title,
+            subscribedAt: clockNow,
+          ),
+        );
+    final alpha = await add('alpha');
+    final beta = await add('Beta');
+    final gamma = await add('Gamma');
+    await add('delta');
+    Future<List<String>> order() async => [
+      for (final p in await repo.watchPodcasts().first) p.title,
+    ];
+
+    // Unrated: by title, case ignored.
+    expect(await order(), ['alpha', 'Beta', 'delta', 'Gamma']);
+
+    await repo.setRating(gamma, 5);
+    await repo.setRating(beta, 3);
+    await repo.setRating(alpha, 3);
+    expect(await order(), ['Gamma', 'alpha', 'Beta', 'delta']);
+
+    // 0 removes the rating; values are kept within 0–5.
+    await repo.setRating(gamma, 0);
+    await repo.setRating(alpha, 9);
+    expect(await order(), ['alpha', 'Beta', 'delta', 'Gamma']);
+    expect(
+      (await (db.select(
+        db.podcasts,
+      )..where((p) => p.id.equals(alpha))).getSingle()).rating,
+      5,
+    );
+  });
+
   test('isFreshEpisode: refresh within 96 h, never the initial import', () {
     final subscribed = DateTime.utc(2026, 9, 1);
     final podcast = Podcast(
@@ -646,6 +684,7 @@ void main() {
       episodeOwnCount: false,
       streamVaries: false,
       serial: false,
+      rating: 0,
     );
     Episode added(DateTime at) => Episode(
       id: 1,

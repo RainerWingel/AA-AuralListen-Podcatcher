@@ -26,6 +26,12 @@ Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-3
    (Benutzerwunsch 2026-10-03).
    Rotes Zahlen-Abzeichen oben rechts = ungespielte Folgen (neu + angefangen), ab 100 „99+", bei 0 keins
    (`watchUnplayedCounts`: eine gruppierte Abfrage für alle Abos). Feed-Fehler: rotes Symbol oben links.
+   **Bewertung & Reihenfolge** (Benutzerwunsch 2026-10-05): Im Menü beim langen Drücken auf eine Kachel stehen unter dem
+   Titel fünf antippbare Sterne (`_RatingStars`, gespeichert in `podcasts.rating`, sofort; denselben Stern nochmal
+   tippen = Bewertung entfernen). Die Abos sind **nach Sternen absteigend, dann nach Name** sortiert
+   (`PodcastRepository.watchPodcasts`; unbewertet = 0 Sterne, also am Ende). Das Menü ist dafür kompakter (dichte
+   Einträge, `ListTileTheme.merge`) – gilt auch für die gleichen Menüs auf Podcast-Seite, Staffeln und Themen; Sterne
+   gibt es nur im Abos-Tab.
 3. **Playlists** – Liste der Playlists → Inhalt mit Drag & Drop
 4. **Downloads** – laufende und fertige Downloads
 5. **Optionen** (Bildschirmtitel „Einstellungen") – Sprünge, Boost-Standard, Speicher, OPML, Backup, Info

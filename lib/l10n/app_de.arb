@@ -292,6 +292,9 @@
   "playlistNew": "Neue Playlist",
   "playlistName": "Name",
   "playlistNameTaken": "Eine Playlist mit diesem Namen gibt es schon.",
+  "ratingStars": "{count, plural, =1{1 Stern} other{{count} Sterne}}",
+  "@ratingStars": {"placeholders": {"count": {"type": "int"}}},
+  "ratingRemove": "Bewertung entfernen",
   "playlistColor": "Farbe…",
   "@playlistColor": {
     "description": "Playlist menu: pick a category color (dialog title too)."

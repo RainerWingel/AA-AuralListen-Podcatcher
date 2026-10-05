@@ -7,6 +7,7 @@ import '../../core/clock.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/feed/rss_parser.dart' show themeDisplayName;
+import '../../data/podcast_repository.dart' show PodcastRepository;
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
@@ -22,7 +23,9 @@ enum PodcastEpisodesAction { play, addToPlaylist }
 /// "Ungespielte Episoden seit … spielen", "Alle ungespielten Episoden
 /// spielen" (docs/playlists.md). With [theme] (long press on a topic in the
 /// podcast settings) only that topic's episodes count, with [season] (long
-/// press on a season chip on the podcast page) only that season's.
+/// press on a season chip on the podcast page) only that season's. With
+/// [rating] (Abos tab) the podcast can be rated with 1–5 stars right below
+/// the title (user wish 2026-10-05).
 Future<void> showPodcastPlayMenu(
   BuildContext context,
   WidgetRef ref,
@@ -30,6 +33,7 @@ Future<void> showPodcastPlayMenu(
   String? theme,
   int? season,
   PodcastEpisodesAction action = PodcastEpisodesAction.play,
+  bool rating = false,
 }) async {
   final l10n = AppLocalizations.of(context);
   final play = action == PodcastEpisodesAction.play;
@@ -61,61 +65,72 @@ Future<void> showPodcastPlayMenu(
     isScrollControlled: true,
     builder: (sheetContext) => SafeArea(
       child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text(
-                [
-                  podcast.title,
-                  if (theme != null) themeDisplayName(theme),
-                  if (season != null) l10n.seasonLabel(season),
-                ].join(' · '),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(sheetContext).textTheme.titleMedium,
+        // Less air between the entries, so the stars fit without making
+        // the sheet taller (user wish 2026-10-05).
+        child: ListTileTheme.merge(
+          dense: true,
+          visualDensity: const VisualDensity(vertical: -3),
+          minVerticalPadding: 2,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(
+                  [
+                    podcast.title,
+                    if (theme != null) themeDisplayName(theme),
+                    if (season != null) l10n.seasonLabel(season),
+                  ].join(' · '),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(sheetContext).textTheme.titleMedium,
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.fiber_new_outlined),
-              title: Text(
-                play ? l10n.playNewEpisodes : l10n.addNewEpisodesToPlaylist,
+              if (rating) _RatingStars(podcast: podcast),
+              ListTile(
+                leading: const Icon(Icons.fiber_new_outlined),
+                title: Text(
+                  play ? l10n.playNewEpisodes : l10n.addNewEpisodesToPlaylist,
+                ),
+                subtitle: Text(l10n.playNewEpisodesHint(fresh.length)),
+                enabled: fresh.isNotEmpty,
+                onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.fresh),
               ),
-              subtitle: Text(l10n.playNewEpisodesHint(fresh.length)),
-              enabled: fresh.isNotEmpty,
-              onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.fresh),
-            ),
-            ListTile(
-              leading: const Icon(Icons.event_outlined),
-              title: Text(
-                play ? l10n.playUnplayedSince : l10n.addUnplayedSinceToPlaylist,
+              ListTile(
+                leading: const Icon(Icons.event_outlined),
+                title: Text(
+                  play
+                      ? l10n.playUnplayedSince
+                      : l10n.addUnplayedSinceToPlaylist,
+                ),
+                subtitle: Text(l10n.playUnplayedSinceHint),
+                enabled: unplayed.isNotEmpty,
+                onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.since),
               ),
-              subtitle: Text(l10n.playUnplayedSinceHint),
-              enabled: unplayed.isNotEmpty,
-              onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.since),
-            ),
-            ListTile(
-              leading: const Icon(Icons.playlist_play),
-              title: Text(
-                play
-                    ? l10n.playUnplayedEpisodes
-                    : l10n.addUnplayedEpisodesToPlaylist,
+              ListTile(
+                leading: const Icon(Icons.playlist_play),
+                title: Text(
+                  play
+                      ? l10n.playUnplayedEpisodes
+                      : l10n.addUnplayedEpisodesToPlaylist,
+                ),
+                subtitle: Text(l10n.episodeCount(unplayed.length)),
+                enabled: unplayed.isNotEmpty,
+                onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.all),
               ),
-              subtitle: Text(l10n.episodeCount(unplayed.length)),
-              enabled: unplayed.isNotEmpty,
-              onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.all),
-            ),
-            const Divider(),
-            ListTile(
-              leading: Icon(allPlayed ? Icons.remove_done : Icons.done_all),
-              title: Text(
-                allPlayed ? l10n.markAllUnplayed : l10n.markAllPlayed,
+              const Divider(height: 8),
+              ListTile(
+                leading: Icon(allPlayed ? Icons.remove_done : Icons.done_all),
+                title: Text(
+                  allPlayed ? l10n.markAllUnplayed : l10n.markAllPlayed,
+                ),
+                subtitle: Text(l10n.episodeCount(total)),
+                enabled: total > 0,
+                onTap: () =>
+                    Navigator.of(sheetContext).pop(_PlayChoice.markAll),
               ),
-              subtitle: Text(l10n.episodeCount(total)),
-              enabled: total > 0,
-              onTap: () => Navigator.of(sheetContext).pop(_PlayChoice.markAll),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     ),
@@ -357,5 +372,50 @@ Future<void> playFromPodcastMenu(
       );
     case PodcastPlayEntry.since:
       await _playUnplayedSince(context, ref, podcast, episodes);
+  }
+}
+
+/// Five tappable stars; tapping the current rating again removes it.
+/// Stored right away, the Abos list re-sorts behind the sheet.
+class _RatingStars extends ConsumerStatefulWidget {
+  const _RatingStars({required this.podcast});
+
+  final Podcast podcast;
+
+  @override
+  ConsumerState<_RatingStars> createState() => _RatingStarsState();
+}
+
+class _RatingStarsState extends ConsumerState<_RatingStars> {
+  late int _stars = widget.podcast.rating;
+
+  void _rate(int stars) {
+    final next = stars == _stars ? 0 : stars;
+    setState(() => _stars = next);
+    ref.read(podcastRepositoryProvider).setRating(widget.podcast.id, next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final empty = Theme.of(context).colorScheme.outline;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        children: [
+          for (var i = 1; i <= PodcastRepository.maxRating; i++)
+            IconButton(
+              tooltip: i == _stars ? l10n.ratingRemove : l10n.ratingStars(i),
+              visualDensity: VisualDensity.compact,
+              onPressed: () => _rate(i),
+              icon: Icon(
+                i <= _stars ? Icons.star_rounded : Icons.star_outline_rounded,
+                color: i <= _stars ? Colors.amber.shade600 : empty,
+                size: 30,
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

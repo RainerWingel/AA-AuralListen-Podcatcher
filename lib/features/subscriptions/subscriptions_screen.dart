@@ -214,6 +214,7 @@ class _SubscriptionSearchResults extends ConsumerWidget {
                 podcast,
                 // In the Abos grid only into a playlist (user wish 2026-10-03).
                 action: PodcastEpisodesAction.addToPlaylist,
+                rating: true,
               ),
             ),
         ],
@@ -270,6 +271,7 @@ class _PodcastGrid extends ConsumerWidget {
                 podcast,
                 // In the Abos grid only into a playlist (user wish 2026-10-03).
                 action: PodcastEpisodesAction.addToPlaylist,
+                rating: true,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

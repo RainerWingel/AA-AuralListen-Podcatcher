@@ -1,7 +1,7 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 21** (v20 = App 1.3.1/1.3.2; v21: `downloads.failedAttempts`).
+Aktuell **schemaVersion 22** (v20 = App 1.3.1/1.3.2; v21: `downloads.failedAttempts`; v22: `podcasts.rating`).
 **Migriert wird erst ab v20** (`AppDatabase.oldestMigratedSchema`, Benutzerentscheidung 2026-10-05): Die Schritte
 v1–v19 wurden gelöscht, weil keine älteren Installationen bekannt sind (GitHub-APKs nie heruntergeladen, F-Droid
 startet mit 1.3.2). Eine ältere Datenbank wird **leer neu angelegt** statt abzustürzen. Folge: Backups aus App-Versionen
@@ -22,7 +22,7 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 
 | Tabelle | Wichtige Spalten |
 |---------|------------------|
-| `podcasts` ✅ | id, feedUrl (unique), title, author, description, imageUrl, websiteUrl (nur http/https), fundingUrl + fundingLabel (v17, `podcast:funding`), serial (v18, `itunes:type` = serial → Hörreihenfolge), etag, lastModified, lastRefreshAt, lastError (null = ok), subscribedAt, autoDownloadMode (off/wifiOnly/always), autoDownloadMaxEpisodes (3), autoDownloadThemes (v5, JSON-Liste, null = alle Themen), autoDeletePlayed (true), boostDb (null = global), autoPlaylistId + autoPlaylistName (v10, Ziel-Playlist für Auto-Downloads, ohne FK – gelöschte wird unter dem Namen neu angelegt), episodeCounter (v11, true) + episodeNumberOffset (v11, 0, −9999…9999), episodeOwnCount (v12, false = Feed-Nummern), streamVaries (v16, false; Server liefert Streams je Anfrage anders → Download-Tipp, `playback.md`) |
+| `podcasts` ✅ | id, feedUrl (unique), title, author, description, imageUrl, websiteUrl (nur http/https), fundingUrl + fundingLabel (v17, `podcast:funding`), serial (v18, `itunes:type` = serial → Hörreihenfolge), rating (v22, Bewertung 1–5 Sterne, 0 = keine; Sortierung im Abos-Tab, im Backup enthalten), etag, lastModified, lastRefreshAt, lastError (null = ok), subscribedAt, autoDownloadMode (off/wifiOnly/always), autoDownloadMaxEpisodes (3), autoDownloadThemes (v5, JSON-Liste, null = alle Themen), autoDeletePlayed (true), boostDb (null = global), autoPlaylistId + autoPlaylistName (v10, Ziel-Playlist für Auto-Downloads, ohne FK – gelöschte wird unter dem Namen neu angelegt), episodeCounter (v11, true) + episodeNumberOffset (v11, 0, −9999…9999), episodeOwnCount (v12, false = Feed-Nummern), streamVaries (v16, false; Server liefert Streams je Anfrage anders → Download-Tipp, `playback.md`) |
 | `episodes` ✅ | id, podcastId (FK, ON DELETE CASCADE), guid (unique je Podcast), title, description (**seit v13 unbenutzt, immer NULL** – Spalte bleibt, weil Löschen die Tabelle samt
 Fremdschlüsseln neu aufbauen würde), audioUrl, audioMimeType, audioSizeBytes, durationMs, pubDate, imageUrl, chaptersUrl, theme (v5, z. B. `zum-thema`), episodeNumber (v11, `itunes:episode`), season (v18, `itunes:season` ≥ 1), status, positionMs, playedAt, addedAt |
 | `downloads` ✅ (v3) | episodeId (PK, FK → episodes, CASCADE), relativePath (`<id>.<ext>`), state (queued/running/done/failed), sizeBytes, wifiOnly, failedAttempts (v21, Zahl der Fehlschläge – Auto-Download gibt nach 3 auf), createdAt, completedAt. Regeln: `eviction.md` |

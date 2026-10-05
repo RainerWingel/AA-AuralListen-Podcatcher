@@ -522,6 +522,47 @@ void main() {
     await disposeApp(tester);
   });
 
+  testWidgets(
+    'rating a podcast with stars in the Abos menu',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final podcastId = await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      Future<int> rating() async => (await tester.runAsync(
+        () => (db.select(
+          db.podcasts,
+        )..where((p) => p.id.equals(podcastId!))).getSingle(),
+      ))!.rating;
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.longPress(find.text('Widget-Podcast'));
+      await settle(tester);
+      expect(find.byIcon(Icons.star_outline_rounded), findsNWidgets(5));
+
+      await tester.tap(find.byTooltip('3 Sterne'));
+      await settle(tester);
+      expect(await rating(), 3);
+      expect(find.byIcon(Icons.star_rounded), findsNWidgets(3));
+      // The menu stays open; the same star again removes the rating.
+      await tester.tap(find.byTooltip('Bewertung entfernen'));
+      await settle(tester);
+      expect(await rating(), 0);
+      expect(find.byIcon(Icons.star_outline_rounded), findsNWidgets(5));
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('a playlist name can only exist once', timeout: timeout, (
     tester,
   ) async {

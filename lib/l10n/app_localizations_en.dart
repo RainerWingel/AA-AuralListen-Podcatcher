@@ -525,6 +525,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistNameTaken => 'A playlist with this name already exists.';
 
   @override
+  String ratingStars(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stars',
+      one: '1 star',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ratingRemove => 'Remove rating';
+
+  @override
   String get playlistColor => 'Color…';
 
   @override

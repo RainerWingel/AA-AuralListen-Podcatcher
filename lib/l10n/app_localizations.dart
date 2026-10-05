@@ -974,6 +974,18 @@ abstract class AppLocalizations {
   /// **'Eine Playlist mit diesem Namen gibt es schon.'**
   String get playlistNameTaken;
 
+  /// No description provided for @ratingStars.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, =1{1 Stern} other{{count} Sterne}}'**
+  String ratingStars(int count);
+
+  /// No description provided for @ratingRemove.
+  ///
+  /// In de, this message translates to:
+  /// **'Bewertung entfernen'**
+  String get ratingRemove;
+
   /// Playlist menu: pick a category color (dialog title too).
   ///
   /// In de, this message translates to:

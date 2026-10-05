@@ -85,11 +85,21 @@ class PodcastRepository {
 
   // ---------------------------------------------------------------- queries
 
+  /// Best rated first, then by title (user wish 2026-10-05).
   Stream<List<Podcast>> watchPodcasts() =>
       (_db.select(_db.podcasts)..orderBy([
+            (p) => OrderingTerm.desc(p.rating),
             (p) => OrderingTerm(expression: p.title.collate(Collate.noCase)),
           ]))
           .watch();
+
+  /// Sets the user's rating: 1–5 stars, 0 removes it.
+  Future<void> setRating(int podcastId, int stars) => _updatePodcast(
+    podcastId,
+    PodcastsCompanion(rating: Value(stars.clamp(0, maxRating))),
+  );
+
+  static const maxRating = 5;
 
   Stream<Podcast?> watchPodcast(int id) => (_db.select(
     _db.podcasts,

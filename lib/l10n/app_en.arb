@@ -146,6 +146,8 @@
   "playlistNew": "New playlist",
   "playlistName": "Name",
   "playlistNameTaken": "A playlist with this name already exists.",
+  "ratingStars": "{count, plural, =1{1 star} other{{count} stars}}",
+  "ratingRemove": "Remove rating",
   "playlistColor": "Color…",
   "playlistColorNone": "No color",
   "colorRed": "Red",

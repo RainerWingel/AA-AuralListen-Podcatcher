@@ -32,6 +32,10 @@ class Podcasts extends Table {
   TextColumn get fundingUrl => text().nullable()();
   TextColumn get fundingLabel => text().nullable()();
 
+  /// The user's rating, 1–5 stars; 0 = not rated (v22). The Abos list is
+  /// sorted by it, then by title.
+  IntColumn get rating => integer().withDefault(const Constant(0))();
+
   // HTTP caching for conditional GET.
   TextColumn get etag => text().nullable()();
   TextColumn get lastModified => text().nullable()();
