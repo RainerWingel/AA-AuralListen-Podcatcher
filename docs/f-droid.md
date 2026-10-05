@@ -44,7 +44,8 @@ grün. Im MR erklärt bzw. nicht angehakt: Flutter als srclib, keine Reproducibl
 bei wechselnder Werbung, VBR-Fix, Playlist-Verhalten, Themen-Filter, Android Auto geplant), dann Auftrag: Rezept nach
 `templates/build-flutter.yml` und ABI-Split-Versionsschema (s. o.) → v1.3.2 mit `flutter pub get --enforce-lockfile`.
 **v1.3.2 veröffentlicht 2026-10-05** (Tag auf `05f780f6d6d52982d402a35a08c75d536afe18b1`).
-**Offen: Rezept im Fork ersetzen (Benutzer), Prüfung durch F-Droid (Schritt 7).**
+Rezept im Fork ersetzt (2026-10-05, Inhalt mit dieser Datei identisch geprüft), neue MR-Pipeline lief an.
+**Offen: Prüfung durch F-Droid (Schritt 7).**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
    getaggten Stand.
@@ -71,6 +72,79 @@ bei wechselnder Werbung, VBR-Fix, Playlist-Verhalten, Themen-Filter, Android Aut
 - **Rezept muss `templates/build-flutter.yml` folgen** (fdroiddata) und das ABI-Versionsschema nutzen (oben).
 - Änderungen am Rezept: Benutzer ersetzt die Datei im Fork `ArtemArb/fdroiddata` (Branch `master`) über die
   Weboberfläche; der MR aktualisiert sich selbst, die Pipeline läuft neu. Nachrichten im MR schreibt nur der Benutzer.
+
+## Fragen & Antworten für den Benutzer
+
+### Muss ich warten, bis die App bei F-Droid gelistet ist, bevor ich neue Versionen veröffentliche?
+Nein. GitHub-Releases gehen jederzeit. Der Merge Request ist auf v1.3.2 festgelegt und wird nur damit geprüft – eine
+neuere Version während der Prüfung braucht **keine** Änderung am MR. Nach dem Merge findet F-Droid die neueste
+Version selbst (nächste Frage).
+
+### Wird automatisch bei F-Droid veröffentlicht, wenn ich ein GitHub-Release erzeuge? Und beim bloßen Pushen?
+- **Release (genauer: der Git-Tag `vX.Y.Z`) → ja**, sobald die App aufgenommen ist. Ein F-Droid-Bot schaut etwa täglich
+  nach neuen Tags (`UpdateCheckMode: Tags ^v[0-9.]+$`), liest die Version aus `pubspec.yaml` am Tag und trägt den neuen
+  Build selbst in fdroiddata ein (`AutoUpdateMode: Version`). Danach baut und signiert der Buildserver. Bis die Version
+  bei den Nutzern ist: meist einige Tage bis etwa eine Woche.
+- **Nur pushen → nein.** Ohne neuen Tag passiert bei F-Droid nichts; Pushen ist also gefahrlos.
+- Vor jedem Tag muss stimmen (erledigt Claude beim „Release freigeben"): Versionsname **und** Build-Nummer in
+  `pubspec.yaml` erhöht (Build-Nummer nur nach oben), Changelogs für alle drei Codes im Repo, `flutter-version:` in
+  `ci.yml` im gewohnten Format, `pubspec.lock` aktuell.
+
+### Wo trage ich den Changelog ein – und auf Deutsch oder Englisch?
+- **Beide Sprachen**, je eine Datei pro Versionscode:
+  `fastlane/metadata/android/de-DE/changelogs/<Code>.txt` und `fastlane/metadata/android/en-US/changelogs/<Code>.txt`.
+- Code = Build-Nummer × 10 + 1/2/3, also bei Build-Nummer 501 die Dateien `5011.txt`, `5012.txt`, `5013.txt` (gleicher
+  Inhalt, weil F-Droid jedem Handy die APK seiner CPU-Art zeigt). Max. 500 Zeichen, einfacher Text, Aufzählung mit „•".
+- Die F-Droid-App zeigt den Text in der Sprache des Handys; gibt es die nicht, Englisch (en-US). Englisch also nie
+  weglassen.
+- Die Changelog-Dateien müssen **vor** dem Tag im Repo sein – F-Droid liest sie aus dem getaggten Stand.
+- Die Release-Notizen auf GitHub sind davon unabhängig (schreibt Claude beim Release, Deutsch mit englischer Kurzfassung).
+
+### Wie ergänze oder tausche ich Screenshots?
+1. Neue Bilder machen (Format und Tipps im Abschnitt „Screenshots" unten).
+2. In `fastlane/metadata/android/de-DE/images/phoneScreenshots/` bzw. `…/en-US/…` legen. Reihenfolge = Dateiname
+   (`1.jpg`, `2.jpg` …). Austauschen = Datei mit gleichem Namen ersetzen; Bild entfernen = Datei löschen und die übrigen
+   lückenlos durchnummerieren. Fehlt eine Sprache, zeigt F-Droid die englischen Bilder.
+3. Claude wandelt PNGs in kleine JPGs um, committet und pusht (auf Ansage).
+4. **Sichtbar werden sie erst mit dem nächsten Release (Tag)** – F-Droid liest Bilder und Texte aus dem Stand der
+   neuesten gebauten Version, nicht aus dem aktuellen `main`.
+
+### Wie ändere ich die App-Beschreibung auf F-Droid?
+Genauso wie die Screenshots – alles kommt aus diesem Repo, nicht aus fdroiddata:
+- `title.txt` – App-Name (Stand: „AA-AuralListen Podcatcher")
+- `short_description.txt` – Kurzbeschreibung, **max. 80 Zeichen**
+- `full_description.txt` – lange Beschreibung, **max. 4000 Zeichen**, einfaches HTML erlaubt (`<b>`, `<i>`, `<ul><li>`)
+- `images/icon.png` – Symbol (512 × 512)
+
+jeweils unter `fastlane/metadata/android/de-DE/` und `…/en-US/`. Ändern lassen (oder selbst ändern), committen,
+pushen – sichtbar mit dem **nächsten Release**. Dinge im Rezept (Kategorie, Lizenz, Spenden-Link, Autor) ändern sich
+dagegen nur per Merge Request in fdroiddata (Datei im Fork bearbeiten → MR).
+
+### Wie gehe ich im Notfall auf ein älteres Release zurück?
+Echtes „Zurückdrehen" gibt es bei Android nicht: Ein Update mit **kleinerem** Versionscode lehnt Android ab (außer man
+deinstalliert vorher – dann sind die Daten weg, also erst Backup!). Darum:
+1. **Vorwärts reparieren (empfohlen):** Den kaputten Stand im Code rückgängig machen (Claude: `git revert` der
+   schuldigen Commits oder den Code eines älteren Tags wiederherstellen), dann **neue** Version mit **höherer**
+   Build-Nummer veröffentlichen, z. B. v1.3.4+503 mit dem Inhalt von 1.3.2. Für Nutzer ist das ein normales Update –
+   F-Droid und GitHub-Nutzer bekommen es automatisch bzw. als Update.
+2. **GitHub:** Ein kaputtes Release kann man als „Pre-release" markieren oder löschen – betrifft nur neue Downloads.
+   Den Tag dabei **nicht** auf einen anderen Commit verschieben (F-Droid hat ihn evtl. schon gebaut).
+3. **F-Droid:** Eine schon veröffentlichte Version kann nur das F-Droid-Team zurückziehen (MR in fdroiddata, der den
+   Build-Eintrag mit `disable: <Grund>` markiert, oder Issue). Das dauert ebenfalls Tage – Weg 1 ist fast immer
+   schneller. In der F-Droid-App können Nutzer ältere Versionen sehen; installieren geht wegen des kleineren Codes nur
+   nach Deinstallation.
+4. Vorbeugend: Vor jedem Release Backup-Funktion und Datenbank-Migration testen (Testhandy A05s) – eine Migration
+   lässt sich auch mit Weg 1 nicht rückgängig machen; die neue Version muss mit der schon migrierten Datenbank klarkommen.
+
+### Welche Android-Version braucht die App?
+Android 7.0 (API 24, Flutter-Standard), Ziel-API 36. F-Droid zeigt das automatisch an („Benötigt Android 7.0").
+Auf Android 7–9 ungetestet.
+
+### Was sind „Pipelines" bei GitLab? Sind fehlgeschlagene Einträge schlimm?
+- GitLab-Pipeline = das, was bei GitHub „Actions" heißt (bei Azure DevOps „Azure Pipelines"): automatischer Build und
+  Prüfung bei jedem Push/MR, gesteuert über eine YAML-Datei. Bei fdroiddata zwei Phasen: Rezept prüfen, App bauen.
+- Die Pipeline-Liste von fdroiddata zeigt **alle** MRs aller Leute – rote Einträge dort betreffen fremde Apps.
+  Die eigene Pipeline steht im MR !51179 unter dem Reiter „Pipelines". Nur die muss grün sein.
 
 ## Screenshots
 - Format **JPG, 720 × 1600, Qualität 80** (`sips -Z 1600 -s format jpeg -s formatOptions 80`), Hochformat, Dateinamen
