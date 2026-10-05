@@ -106,3 +106,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-05 · **Play Store verworfen** (Benutzer) · Neue private Entwicklerkonten brauchen vor der Veröffentlichung
   einen geschlossenen Test mit ≥ 12 Testern über 14 Tage am Stück – nicht machbar. Vertrieb über F-Droid + GitHub-Releases.
   Play-spezifische Vorsichtsmaßnahmen (z. B. kein Akku-Ausnahme-Recht) bleiben trotzdem bestehen.
+- 2026-10-05 · **Datenbank-Migrationen erst ab Schema 20 (App 1.3.1)** (Benutzer) · Schritte v1–v19 samt Schnappschüssen
+  und Tests gelöscht: keine älteren Installationen bekannt, F-Droid startet mit 1.3.2. Ältere DB → leer neu anlegen statt
+  Absturz. Backups vor 1.3.1 sind damit nicht mehr einspielbar (Benutzer hat vorher ein neues Backup gemacht; keine
+  eigene Fehlermeldung dafür, Benutzer).

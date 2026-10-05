@@ -211,15 +211,20 @@ void main() {
   );
 
   test('a backup from an older schema is migrated on restore', () async {
-    // Build a v3 database file (before themes, playlists, chapters …).
+    // A v20 database file (app 1.3.1/1.3.2, before downloads.failedAttempts;
+    // older schemas are no longer migrated, docs/data-model.md).
     final verifier = SchemaVerifier(GeneratedHelper());
-    final schema = await verifier.schemaAt(3);
-    schema.rawDatabase.execute(
-      'INSERT INTO podcasts (feed_url, title, subscribed_at) '
-      "VALUES ('https://example.com/alt', 'Alt', 1767225600)",
-    );
-    final v3File = File('${temp.path}/v3.sqlite');
-    schema.rawDatabase.execute('VACUUM INTO ?', [v3File.path]);
+    final schema = await verifier.schemaAt(20);
+    schema.rawDatabase
+      ..execute(
+        'INSERT INTO podcasts (feed_url, title, subscribed_at) '
+        "VALUES ('https://example.com/alt', 'Alt', 1767225600)",
+      )
+      ..execute(
+        "INSERT INTO playlists (name, created_at) VALUES ('Liste', 1767225600)",
+      );
+    final oldFile = File('${temp.path}/v20.sqlite');
+    schema.rawDatabase.execute('VACUUM INTO ?', [oldFile.path]);
     final zip = ZipEncoder().encodeBytes(
       Archive()
         ..addFile(
@@ -228,7 +233,7 @@ void main() {
             jsonEncode({
               'app': 'AA-AuralListen',
               'format': 1,
-              'schemaVersion': 3,
+              'schemaVersion': 20,
               'createdAt': now.toIso8601String(),
             }),
           ),
@@ -236,11 +241,11 @@ void main() {
         ..addFile(
           ArchiveFile.bytes(
             BackupService.databaseName,
-            v3File.readAsBytesSync(),
+            oldFile.readAsBytesSync(),
           ),
         ),
     );
-    v3File.deleteSync();
+    oldFile.deleteSync();
 
     final target = await filledDb(title: 'Neu');
     final service = serviceFor(target);
@@ -248,11 +253,7 @@ void main() {
     await service.restore(preview);
 
     expect((await target.select(target.podcasts).getSingle()).title, 'Alt');
-    // v4 migration created the default playlist inside the backup copy.
-    expect(
-      (await target.select(target.playlists).getSingle()).name,
-      AppDatabase.defaultPlaylistName,
-    );
+    expect((await target.select(target.playlists).getSingle()).name, 'Liste');
     await target.close();
   });
 

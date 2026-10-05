@@ -1,13 +1,13 @@
 # Datenmodell (Drift / SQLite)
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
-Aktuell **schemaVersion 21** (v1: `podcasts`, `episodes`; v2: `settings`; v3: `downloads`; v4: `playlists`, `playlist_items`;
-v5: `episodes.theme`, `podcasts.autoDownloadThemes`; v6: `chapters`, `bookmarks`; v7: `playlists.lastEpisodeId`; v8: nur Daten – `angefangen` unter 15 s → `neu`, Position 0; v9: `playlists.color`; v10: `podcasts.autoPlaylistId`, `autoPlaylistName`; v11: `episodes.episodeNumber`, `podcasts.episodeCounter`, `episodeNumberOffset`, einmaliges Neulesen aller Feeds; v12: `podcasts.episodeOwnCount`; v13: `episode_notes`, Shownotes aus `episodes.description` dorthin verschoben,
-einmaliges Neulesen aller Feeds für die Links; v14: nur Daten – Shownotes-Grenze 6000 → 18000 Zeichen, einmaliges
-Neulesen aller Feeds; v15: nur Daten – einmaliges Neulesen aller Feeds, stellt Feed-Dauern wieder her, die der Player
-mit einer falschen VBR-Schätzung überschrieben hatte, `playback.md`; v16: `podcasts.streamVaries`; v17: `podcasts.fundingUrl`, `fundingLabel`, einmaliges Neulesen aller Feeds; v18: `episodes.season`, `podcasts.serial`,
-einmaliges Neulesen aller Feeds; v19: `play_history`; v20: nur Daten – einmaliges Neulesen aller Feeds
-für die vollständige Entity-Dekodierung; v21: `downloads.failedAttempts`). Die übrigen Tabellen kommen mit ihren Meilensteinen.
+Aktuell **schemaVersion 21** (v20 = App 1.3.1/1.3.2; v21: `downloads.failedAttempts`).
+**Migriert wird erst ab v20** (`AppDatabase.oldestMigratedSchema`, Benutzerentscheidung 2026-10-05): Die Schritte
+v1–v19 wurden gelöscht, weil keine älteren Installationen bekannt sind (GitHub-APKs nie heruntergeladen, F-Droid
+startet mit 1.3.2). Eine ältere Datenbank wird **leer neu angelegt** statt abzustürzen. Folge: Backups aus App-Versionen
+vor 1.3.1 lassen sich nicht mehr sinnvoll einspielen (ergäben leere Daten) – bewusst ohne eigene Prüfung (Benutzer).
+Wie sich das Schema bis v20 entwickelt hat, steht in der Git-Historie dieser Datei.
+Die übrigen Tabellen kommen mit ihren Meilensteinen.
 
 ### Schema ändern (Pflichtablauf)
 0. Neue Tabelle? → auch in `BackupService._restoredTables` eintragen (`backup.md`).
@@ -16,7 +16,8 @@ für die vollständige Entity-Dekodierung; v21: `downloads.failedAttempts`). Die
 3. `dart run drift_dev schema dump lib/data/db/app_database.dart drift_schemas/` (Schnappschuss `drift_schema_vN.json`)
 4. `dart run drift_dev schema generate drift_schemas/ test/generated_migrations/`
 5. Testfall in `test/data/db/migration_test.dart` ergänzen (Upgrade + Daten bleiben erhalten).
-Alte Schnappschüsse in `drift_schemas/` **nie** löschen oder ändern.
+Schnappschüsse in `drift_schemas/` **ab v20 nie** löschen oder ändern (v12 bleibt nur für den Test „ältere DB fängt
+leer an"; v1–v11, v13–v19 wurden 2026-10-05 mit den alten Migrationen entfernt).
 Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-outputs` (erzeugt `app_database.g.dart`, wird committet).
 
 | Tabelle | Wichtige Spalten |

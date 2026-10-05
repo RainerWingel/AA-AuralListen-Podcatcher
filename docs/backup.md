@@ -24,7 +24,8 @@ Optionen → Sicherung → „Backup wiederherstellen" → Datei wählen → Vor
 Lesezeichen) → Bestätigen. **Ersetzt alle aktuellen Daten.**
 1. Prüfen: ZIP, Manifest von dieser App, `schemaVersion` ≤ aktuelle (sonst „aus neuerer App-Version"), SQLite-Kennung.
 2. Die Sicherungs-DB wird in eine Temp-Datei entpackt und mit `AppDatabase` geöffnet → **Migration auf das aktuelle
-   Schema** (alte Backups funktionieren also).
+   Schema** (Backups ab App 1.3.1 funktionieren also). Backups vor 1.3.1 (Schema < 20) werden nicht mehr migriert
+   (`data-model.md`) – sie ergäben leere Daten; bewusst ohne eigene Prüfung (Benutzerentscheidung 2026-10-05).
 3. Wiedergabe stoppen, alle Downloads abbrechen.
 4. `ATTACH` der Sicherung, in **einer Transaktion**: alle Tabellen leeren (Kinder zuerst) und aus der Sicherung
    füllen (Eltern zuerst) – mit **expliziten Spaltenlisten**, weil migrierte DBs Spalten in anderer Reihenfolge haben.
