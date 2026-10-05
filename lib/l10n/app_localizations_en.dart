@@ -372,6 +372,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadNowMobile => 'Download now over mobile data';
 
   @override
+  String downloadDeleteConfirm(String title) {
+    return 'Delete “$title” from the device? The episode stays in the app and can still be streamed.';
+  }
+
+  @override
+  String get detailsEpisode => 'Episode';
+
+  @override
+  String get detailsAuthor => 'Author';
+
+  @override
+  String get detailsPublished => 'Published';
+
+  @override
+  String get detailsDuration => 'Length';
+
+  @override
+  String get detailsSize => 'Size';
+
+  @override
+  String get detailsDownloadedAt => 'Downloaded';
+
+  @override
+  String get detailsStatus => 'Download';
+
+  @override
+  String get detailsListening => 'Listening state';
+
+  @override
+  String detailsInProgress(String position) {
+    return 'Started, at $position';
+  }
+
+  @override
+  String detailsPlayedAt(String date) {
+    return 'Played on $date';
+  }
+
+  @override
   String get downloadsEmpty => 'No downloads';
 
   @override

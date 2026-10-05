@@ -704,6 +704,72 @@ abstract class AppLocalizations {
   /// **'Jetzt über Mobilfunk laden'**
   String get downloadNowMobile;
 
+  /// No description provided for @downloadDeleteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'„{title}“ vom Gerät löschen? Die Folge bleibt in der App und kann weiter gestreamt werden.'**
+  String downloadDeleteConfirm(String title);
+
+  /// No description provided for @detailsEpisode.
+  ///
+  /// In de, this message translates to:
+  /// **'Folge'**
+  String get detailsEpisode;
+
+  /// No description provided for @detailsAuthor.
+  ///
+  /// In de, this message translates to:
+  /// **'Autor'**
+  String get detailsAuthor;
+
+  /// No description provided for @detailsPublished.
+  ///
+  /// In de, this message translates to:
+  /// **'Erschienen'**
+  String get detailsPublished;
+
+  /// No description provided for @detailsDuration.
+  ///
+  /// In de, this message translates to:
+  /// **'Länge'**
+  String get detailsDuration;
+
+  /// No description provided for @detailsSize.
+  ///
+  /// In de, this message translates to:
+  /// **'Größe'**
+  String get detailsSize;
+
+  /// No description provided for @detailsDownloadedAt.
+  ///
+  /// In de, this message translates to:
+  /// **'Heruntergeladen'**
+  String get detailsDownloadedAt;
+
+  /// No description provided for @detailsStatus.
+  ///
+  /// In de, this message translates to:
+  /// **'Download'**
+  String get detailsStatus;
+
+  /// No description provided for @detailsListening.
+  ///
+  /// In de, this message translates to:
+  /// **'Hörstand'**
+  String get detailsListening;
+
+  /// No description provided for @detailsInProgress.
+  ///
+  /// In de, this message translates to:
+  /// **'Angefangen bei {position}'**
+  String detailsInProgress(String position);
+
+  /// No description provided for @detailsPlayedAt.
+  ///
+  /// In de, this message translates to:
+  /// **'Gespielt am {date}'**
+  String detailsPlayedAt(String date);
+
   /// No description provided for @downloadsEmpty.
   ///
   /// In de, this message translates to:

@@ -17,6 +17,7 @@ import 'package:aapodcastguru/data/playlist_repository.dart';
 import 'package:aapodcastguru/data/providers.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
+import 'package:aapodcastguru/features/episodes/episode_description.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
 import 'package:aapodcastguru/features/player/player_screen.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
@@ -555,7 +556,47 @@ void main() {
     expect(find.text('Erste Folge'), findsOneWidget);
     expect(find.text('1 MB'), findsOneWidget);
 
+    // Long press → details: full title, author, dates, size, state.
+    await tester.longPress(find.text('Erste Folge'));
+    await settle(tester);
+    expect(find.textContaining('Widget-Podcast'), findsWidgets);
+    for (final (label, value) in [
+      ('Autor', 'Tester'),
+      ('Erschienen', '10. Juni 2025'),
+      ('Länge', '1 Std. 5 Min.'),
+      ('Download', 'Heruntergeladen'),
+      ('Größe', '1 MB'),
+      ('Hörstand', 'Neu'),
+    ]) {
+      expect(find.text(label), findsOneWidget, reason: label);
+      expect(find.text(value), findsWidgets, reason: value);
+    }
+    expect(find.text('Heruntergeladen'), findsWidgets);
+    // "Beschreibung" swaps the details for the show notes.
+    await tester.tap(find.text('Beschreibung'));
+    await settle(tester);
+    expect(find.text('Hörstand'), findsNothing);
+    final notes = find.byWidgetPredicate(
+      (w) =>
+          w is NotesText ||
+          (w is Text &&
+              w.data == 'Für diese Folge gibt es keine Beschreibung.'),
+    );
+    expect(notes, findsOneWidget);
+    Navigator.of(tester.element(notes)).pop();
+    await settle(tester);
+
+    // The trash asks first; "Abbrechen" keeps the file.
     await tester.tap(find.byTooltip('Download löschen'));
+    await settle(tester);
+    expect(find.textContaining('vom Gerät löschen?'), findsOneWidget);
+    await tester.tap(find.text('Abbrechen'));
+    await settle(tester);
+    expect(episodesDir.listSync(), hasLength(1));
+
+    await tester.tap(find.byTooltip('Download löschen'));
+    await settle(tester);
+    await tester.tap(find.widgetWithText(FilledButton, 'Löschen'));
     await settle(tester);
     expect(find.text('Keine Downloads'), findsOneWidget);
     expect(episodesDir.listSync(), isEmpty);

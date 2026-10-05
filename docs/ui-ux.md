@@ -121,7 +121,12 @@ Adressen im Text werden zu Links. Außerdem „Zu Playlist hinzufügen…".
 ## Downloads-Tab
 Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %"
 mit Balken (nur solange wirklich übertragen wird) / „Wartet auf WLAN …" bzw. „Wartet …" / „Download fehlgeschlagen"; rechts „Zu Playlist hinzufügen…" (bei mehreren Playlists die bekannte
-Auswahl) und Löschen / Abbrechen / Erneut; bei „Wartet auf WLAN …" zusätzlich 📶 „Jetzt über Mobilfunk laden". Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
+Auswahl) und Löschen / Abbrechen / Erneut; bei „Wartet auf WLAN …" zusätzlich 📶 „Jetzt über Mobilfunk laden".
+**Löschen fragt nach** („„Titel" vom Gerät löschen? Die Folge bleibt …", Benutzerwunsch 2026-10-05).
+**Langes Drücken** = Details-Sheet (`download_details_sheet.dart`, Benutzerwunsch 2026-10-05): Cover, voller Titel und
+Podcast (markierbar), dann Autor, Folge (Nummer wie am Cover), Erschienen, Länge, Download-Zustand (live), Größe und
+„Heruntergeladen" (Datum + Uhrzeit, nur fertige), Hörstand (Neu / Angefangen bei 12:34 / Gespielt am …); Knopf
+„Beschreibung" öffnet die Shownotes. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
 
 ## Podcast-Menü (⋮ im Podcast-Detail)
 Podcast-Einstellungen · Alle neuen Episoden abspielen · Ungespielte Episoden seit … abspielen · Alle ungespielten

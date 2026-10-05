@@ -13,6 +13,7 @@ import '../../data/providers.dart';
 import '../../data/storage/download_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
+import 'download_details_sheet.dart';
 
 /// Runs the eviction rules now and reports the freed space.
 Future<void> cleanUpDownloads(BuildContext context, WidgetRef ref) async {
@@ -121,7 +122,7 @@ class _DownloadTile extends ConsumerWidget {
         IconButton(
           tooltip: l10n.downloadDelete,
           icon: const Icon(Icons.delete_outline),
-          onPressed: () => service.delete(episodeId),
+          onPressed: () => _confirmDelete(context, service, item.episode),
         ),
       ),
       DownloadState.failed => (
@@ -154,6 +155,7 @@ class _DownloadTile extends ConsumerWidget {
 
     return ListTile(
       onTap: () => ref.read(audioHandlerProvider).playEpisode(episodeId),
+      onLongPress: () => showDownloadDetailsSheet(context, item),
       leading: CoverImage(
         url: item.episode.imageUrl ?? item.podcast.imageUrl,
         size: 56,
@@ -199,4 +201,31 @@ class _DownloadTile extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Deleting a downloaded file asks first (user wish 2026-10-05).
+Future<void> _confirmDelete(
+  BuildContext context,
+  DownloadService service,
+  Episode episode,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(l10n.downloadDelete),
+      content: Text(l10n.downloadDeleteConfirm(episode.title)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(l10n.delete),
+        ),
+      ],
+    ),
+  );
+  if (confirmed == true) await service.delete(episode.id);
 }

@@ -372,6 +372,45 @@ class AppLocalizationsDe extends AppLocalizations {
   String get downloadNowMobile => 'Jetzt über Mobilfunk laden';
 
   @override
+  String downloadDeleteConfirm(String title) {
+    return '„$title“ vom Gerät löschen? Die Folge bleibt in der App und kann weiter gestreamt werden.';
+  }
+
+  @override
+  String get detailsEpisode => 'Folge';
+
+  @override
+  String get detailsAuthor => 'Autor';
+
+  @override
+  String get detailsPublished => 'Erschienen';
+
+  @override
+  String get detailsDuration => 'Länge';
+
+  @override
+  String get detailsSize => 'Größe';
+
+  @override
+  String get detailsDownloadedAt => 'Heruntergeladen';
+
+  @override
+  String get detailsStatus => 'Download';
+
+  @override
+  String get detailsListening => 'Hörstand';
+
+  @override
+  String detailsInProgress(String position) {
+    return 'Angefangen bei $position';
+  }
+
+  @override
+  String detailsPlayedAt(String date) {
+    return 'Gespielt am $date';
+  }
+
+  @override
   String get downloadsEmpty => 'Keine Downloads';
 
   @override
