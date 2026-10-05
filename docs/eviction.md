@@ -21,6 +21,11 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 4. Jeder Code, der eine Datei anlegt, hat auch den Löschpfad (inkl. Fehlerfall).
 5. Der `DownloadService` hört ab seiner Erzeugung auf Download-Ereignisse; `start()` holt Ereignisse nach, die passiert
    sind, während die App geschlossen war.
+6. Zustände: `queued` = wartet (auf WLAN bei „Nur WLAN", auf Netz, auf den nächsten Versuch, oder pausiert – Android
+   pausiert Downloads nach 9 min und setzt sie dank `allowPause` selbst fort), `running` = Bytes fließen. Die Paket-Status
+   `enqueued`/`waitingToRetry`/`paused` werden zu `DownloadWaiting` (`downloadEventFor`) und setzen `running` zurück auf
+   `queued`, **nicht** auf „0 % Fortschritt" (Bug 2026-10-05: der Ring bei 0 % war eine leere Lücke). `done`/`failed`
+   bleiben davon unberührt.
 
 ### Automatisches Löschen (Regel des Benutzers)
 - Eine Folge gilt als **gespielt**, sobald sie bis zum Ende abgelaufen ist (`data-model.md`; bis 2026-10-03: ab 98 %).

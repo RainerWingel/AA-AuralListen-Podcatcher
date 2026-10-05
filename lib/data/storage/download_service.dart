@@ -414,6 +414,18 @@ class DownloadService implements PodcastFilesCleaner {
     switch (event) {
       case DownloadStarted():
         await _setState(id, DownloadState.running);
+      case DownloadWaiting():
+        // Back to "queued" (e.g. connection lost, retry pending); the old
+        // progress is no longer current. Done/failed rows stay as they are.
+        _clearProgress(id);
+        await (_db.update(_db.downloads)..where(
+              (d) =>
+                  d.episodeId.equals(id) &
+                  d.state.equalsValue(DownloadState.running),
+            ))
+            .write(
+              const DownloadsCompanion(state: Value(DownloadState.queued)),
+            );
       case DownloadProgress(:final fraction):
         _progress[id] = fraction;
         _emitProgress();

@@ -13,8 +13,16 @@ sealed class DownloadEvent {
   final int episodeId;
 }
 
+/// Bytes are being transferred.
 class DownloadStarted extends DownloadEvent {
   const DownloadStarted(super.episodeId);
+}
+
+/// Queued but not transferring: waiting for Wi-Fi ("Nur WLAN"), for a network
+/// or for the next retry. Not a progress of 0 % (user report 2026-10-05: the
+/// ring at 0 % showed as an empty gap).
+class DownloadWaiting extends DownloadEvent {
+  const DownloadWaiting(super.episodeId);
 }
 
 class DownloadProgress extends DownloadEvent {
@@ -38,6 +46,24 @@ class DownloadFailed extends DownloadEvent {
 class DownloadCanceled extends DownloadEvent {
   const DownloadCanceled(super.episodeId);
 }
+
+/// Translates a background_downloader status into our event.
+DownloadEvent downloadEventFor(
+  int episodeId,
+  TaskStatus status,
+  String? errorDescription,
+) => switch (status) {
+  TaskStatus.running => DownloadStarted(episodeId),
+  TaskStatus.complete => DownloadCompleted(episodeId),
+  TaskStatus.canceled => DownloadCanceled(episodeId),
+  TaskStatus.failed || TaskStatus.notFound => DownloadFailed(
+    episodeId,
+    errorDescription ?? status.name,
+  ),
+  TaskStatus.enqueued ||
+  TaskStatus.waitingToRetry ||
+  TaskStatus.paused => DownloadWaiting(episodeId),
+};
 
 /// Downloads files into the episodes directory. Interface so the download and
 /// eviction logic can be tested without network (think: IDownloadClient).
@@ -101,16 +127,7 @@ class BackgroundDownloadEngine implements DownloadEngine {
     if (id == null) return;
     switch (update) {
       case TaskStatusUpdate(:final status, :final exception):
-        _events.add(switch (status) {
-          TaskStatus.running => DownloadStarted(id),
-          TaskStatus.complete => DownloadCompleted(id),
-          TaskStatus.canceled => DownloadCanceled(id),
-          TaskStatus.failed || TaskStatus.notFound => DownloadFailed(
-            id,
-            exception?.description ?? status.name,
-          ),
-          _ => DownloadProgress(id, 0),
-        });
+        _events.add(downloadEventFor(id, status, exception?.description));
       case TaskProgressUpdate(:final progress):
         if (progress >= 0 && progress <= 1) {
           _events.add(DownloadProgress(id, progress));

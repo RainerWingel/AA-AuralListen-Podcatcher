@@ -133,12 +133,17 @@ class _DownloadTile extends ConsumerWidget {
               service.download(episodeId, wifiOnly: download.wifiOnly),
         ),
       ),
-      DownloadState.queued || DownloadState.running => (
-        progress != null
-            ? '${(progress * 100).round()} %'
-            : download.wifiOnly
-            ? l10n.downloadWifiWaiting
-            : l10n.downloadQueued,
+      // Waiting is a state of its own, not "0 %" (user report 2026-10-05).
+      DownloadState.queued => (
+        download.wifiOnly ? l10n.downloadWifiWaiting : l10n.downloadQueued,
+        IconButton(
+          tooltip: l10n.downloadCancel,
+          icon: const Icon(Icons.close),
+          onPressed: () => service.cancel(episodeId),
+        ),
+      ),
+      DownloadState.running => (
+        progress != null ? '${(progress * 100).round()} %' : '…',
         IconButton(
           tooltip: l10n.downloadCancel,
           icon: const Icon(Icons.close),
@@ -167,8 +172,7 @@ class _DownloadTile extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
           ),
           Text(status),
-          if (download.state == DownloadState.running ||
-              download.state == DownloadState.queued)
+          if (download.state == DownloadState.running)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: LinearProgressIndicator(value: progress),

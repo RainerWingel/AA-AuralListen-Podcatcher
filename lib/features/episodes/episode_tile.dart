@@ -337,7 +337,8 @@ class EpisodeTile extends ConsumerWidget {
   }
 }
 
-/// Small icon in front of the date: downloaded ✓, progress ring, or error.
+/// Small icon in front of the date: downloaded ✓, waiting 🕓 (e.g. for
+/// Wi-Fi), progress ring, or error.
 class _DownloadIndicator extends ConsumerWidget {
   const _DownloadIndicator({required this.episodeId});
 
@@ -345,8 +346,11 @@ class _DownloadIndicator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(
-      downloadStatesProvider.select((s) => s.value?[episodeId]?.state),
+    final (state, wifiOnly) = ref.watch(
+      downloadStatesProvider.select((s) {
+        final row = s.value?[episodeId];
+        return (row?.state, row?.wifiOnly ?? false);
+      }),
     );
     if (state == null) return const SizedBox.shrink();
 
@@ -361,10 +365,18 @@ class _DownloadIndicator extends ConsumerWidget {
         message: l10n.downloadFailed,
         child: Icon(Icons.error_outline, size: 16, color: colors.error),
       ),
-      DownloadState.queued || DownloadState.running => SizedBox.square(
+      // Waiting (user wish 2026-10-05: a clock instead of an empty gap).
+      DownloadState.queued => Tooltip(
+        message: wifiOnly ? l10n.downloadWifiWaiting : l10n.downloadQueued,
+        child: Icon(Icons.schedule, size: 16, color: colors.primary),
+      ),
+      // Without a progress value yet: spinning; the track keeps the ring
+      // visible at 0 %.
+      DownloadState.running => SizedBox.square(
         dimension: 14,
         child: CircularProgressIndicator(
           strokeWidth: 2,
+          backgroundColor: colors.primary.withValues(alpha: 0.25),
           value: ref.watch(
             downloadProgressProvider.select((p) => p.value?[episodeId]),
           ),

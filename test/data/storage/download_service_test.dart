@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/playlist_repository.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
+import 'package:aapodcastguru/data/storage/download_engine.dart';
 import 'package:aapodcastguru/data/storage/download_service.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
@@ -133,6 +134,45 @@ void main() {
 
       await service.download(id); // retry
       expect(engine.active, contains(id));
+    });
+
+    test('waiting (e.g. for Wi-Fi) is "queued" without progress', () async {
+      final id = await addEpisode('1');
+      await service.download(id, wifiOnly: true);
+      final progress = <Map<int, double>>[];
+      final sub = service.progress.listen(progress.add);
+
+      engine
+        ..emit(DownloadWaiting(id)) // enqueued, no Wi-Fi yet
+        ..emit(DownloadStarted(id))
+        ..emit(DownloadProgress(id, 0.4));
+      await pumpEventQueue();
+      expect((await row(id))!.state, DownloadState.running);
+      expect(progress.last, {id: 0.4});
+
+      // Connection lost, retry pending: back to waiting, old progress gone.
+      engine.emit(DownloadWaiting(id));
+      await pumpEventQueue();
+      final waiting = (await row(id))!;
+      expect(waiting.state, DownloadState.queued);
+      expect(waiting.wifiOnly, isTrue);
+      expect(progress.last, isEmpty);
+      await sub.cancel();
+    });
+
+    test('a late "waiting" event does not touch done or failed rows', () async {
+      final done = await addEpisode('1');
+      await downloaded(done);
+      final failed = await addEpisode('2');
+      await service.download(failed);
+      await engine.fail(failed);
+
+      engine
+        ..emit(DownloadWaiting(done))
+        ..emit(DownloadWaiting(failed));
+      await pumpEventQueue();
+      expect((await row(done))!.state, DownloadState.done);
+      expect((await row(failed))!.state, DownloadState.failed);
     });
 
     test('cancel stops the engine and leaves nothing behind', () async {

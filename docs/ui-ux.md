@@ -95,7 +95,9 @@ ausgegraut mit Hinweis. „Eigene Zählung" nummeriert auch Folgen ohne Feed-Num
   Staffel, dann Folgennummer, dann Datum (ohne Staffel/Nummer jeweils dahinter) – in der Podcast-Liste, bei „Alle
   ungespielten spielen" und beim Auto-Download (die nächsten statt der neuesten, `eviction.md`). Normale Podcasts
   (`episodic`, Standard) bleiben neueste zuerst. Code: `PodcastRepository.serialOrder`.
-Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, Fortschrittskreis, ⚠ fehlgeschlagen. Daneben
+Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, 🕓 wartet (`Icons.schedule`, Tooltip „Wartet auf WLAN …"
+bzw. „Wartet …" – Benutzerwunsch 2026-10-05, vorher leere Lücke), Fortschrittskreis (mit blasser Spur, damit er auch bei
+0 % sichtbar ist; ohne Wert dreht er), ⚠ fehlgeschlagen. Daneben
 Playlist-Symbol (`playlist_add_check`, Tooltip „In einer Playlist"), solange die Folge in mindestens einer Playlist
 steht – live aus der DB (`episodesInPlaylistsProvider`), verschwindet beim Entfernen aus der letzten Playlist; in der
 Playlist-Ansicht selbst nicht angezeigt (Benutzerwunsch 2026-10-01).
@@ -116,8 +118,8 @@ Adressen im Text werden zu Links. Außerdem „Zu Playlist hinzufügen…".
   Podcast-Namen, über dem Positionsregler.
 
 ## Downloads-Tab
-Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %" /
-„Wartet auf WLAN …" / „Download fehlgeschlagen"; rechts „Zu Playlist hinzufügen…" (bei mehreren Playlists die bekannte
+Oben „x von y belegt" mit Balken, darunter alle Downloads (neueste zuerst): Cover, Titel, Podcast, Größe bzw. „42 %"
+mit Balken (nur solange wirklich übertragen wird) / „Wartet auf WLAN …" bzw. „Wartet …" / „Download fehlgeschlagen"; rechts „Zu Playlist hinzufügen…" (bei mehreren Playlists die bekannte
 Auswahl) und Löschen / Abbrechen / Erneut. Tippen spielt ab. AppBar: 🧹 Jetzt aufräumen.
 
 ## Podcast-Menü (⋮ im Podcast-Detail)
