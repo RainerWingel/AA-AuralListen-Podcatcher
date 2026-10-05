@@ -522,6 +522,53 @@ void main() {
     await disposeApp(tester);
   });
 
+  testWidgets('a playlist name can only exist once', timeout: timeout, (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Playlists'));
+    await settle(tester);
+
+    // Same name as the default playlist (case and spaces ignored) → error,
+    // the dialog stays open.
+    await tester.tap(find.byTooltip('Neue Playlist'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), ' wiedergabeliste ');
+    await tester.tap(find.widgetWithText(FilledButton, 'Anlegen'));
+    await settle(tester);
+    const taken = 'Eine Playlist mit diesem Namen gibt es schon.';
+    expect(find.text(taken), findsOneWidget);
+    expect(find.byType(AlertDialog), findsOneWidget);
+
+    // Typing removes the message; a new name is accepted.
+    await tester.enterText(find.byType(TextField), 'Arbeit');
+    await settle(tester);
+    expect(find.text(taken), findsNothing);
+    await tester.tap(find.widgetWithText(FilledButton, 'Anlegen'));
+    await settle(tester);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('Arbeit'), findsOneWidget);
+
+    // Renaming: another playlist's name is refused, its own name is fine.
+    await tester.tap(find.text('Arbeit'));
+    await settle(tester);
+    await tester.tap(find.byType(PopupMenuButton<void>).last);
+    await settle(tester);
+    await tester.tap(find.text('Umbenennen'));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'Wiedergabeliste');
+    await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+    await settle(tester);
+    expect(find.text(taken), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'arbeit');
+    await tester.tap(find.widgetWithText(FilledButton, 'Speichern'));
+    await settle(tester);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('arbeit'), findsWidgets);
+
+    await disposeApp(tester);
+  });
+
   testWidgets('downloads an episode and deletes it again', timeout: timeout, (
     tester,
   ) async {

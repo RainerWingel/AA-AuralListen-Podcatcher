@@ -522,6 +522,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistName => 'Name';
 
   @override
+  String get playlistNameTaken => 'A playlist with this name already exists.';
+
+  @override
   String get playlistColor => 'Color…';
 
   @override

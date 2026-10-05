@@ -11,13 +11,31 @@ import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import 'playlist_colors.dart';
 
+/// Error message if another playlist already has [name] (case and outer
+/// spaces ignored), else null (user wish 2026-10-05).
+Future<String? Function(String)> _uniqueName(
+  WidgetRef ref,
+  AppLocalizations l10n, {
+  int? exceptId,
+}) async {
+  final taken = {
+    for (final p in await ref.read(playlistRepositoryProvider).playlists())
+      if (p.id != exceptId) p.name.trim().toLowerCase(),
+  };
+  return (String name) =>
+      taken.contains(name.toLowerCase()) ? l10n.playlistNameTaken : null;
+}
+
 /// Dialog → new playlist. Returns its id, or null if cancelled.
 Future<int?> createPlaylist(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
+  final validate = await _uniqueName(ref, l10n);
+  if (!context.mounted) return null;
   final name = await showTextInputDialog(
     context,
     title: l10n.playlistNew,
     confirmLabel: l10n.create,
+    validate: validate,
   );
   if (name == null) return null;
   return ref.read(playlistRepositoryProvider).create(name);
@@ -29,11 +47,14 @@ Future<void> renamePlaylist(
   Playlist playlist,
 ) async {
   final l10n = AppLocalizations.of(context);
+  final validate = await _uniqueName(ref, l10n, exceptId: playlist.id);
+  if (!context.mounted) return;
   final name = await showTextInputDialog(
     context,
     title: l10n.playlistRename,
     confirmLabel: l10n.save,
     initialValue: playlist.name,
+    validate: validate,
   );
   if (name != null) {
     await ref.read(playlistRepositoryProvider).rename(playlist.id, name);

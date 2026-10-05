@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Asks for a short text (e.g. a playlist name). Returns null if cancelled
-/// (or empty, unless [allowEmpty]).
+/// (or empty, unless [allowEmpty]). [validate] returns an error message for
+/// the trimmed text (shown under the field, the dialog stays open) or null.
 Future<String?> showTextInputDialog(
   BuildContext context, {
   required String title,
@@ -11,6 +12,7 @@ Future<String?> showTextInputDialog(
   String initialValue = '',
   String? label,
   bool allowEmpty = false,
+  String? Function(String text)? validate,
 }) => showDialog<String>(
   context: context,
   builder: (_) => _TextInputDialog(
@@ -19,6 +21,7 @@ Future<String?> showTextInputDialog(
     initialValue: initialValue,
     label: label,
     allowEmpty: allowEmpty,
+    validate: validate,
   ),
 );
 
@@ -29,6 +32,7 @@ class _TextInputDialog extends StatefulWidget {
     required this.initialValue,
     required this.label,
     required this.allowEmpty,
+    required this.validate,
   });
 
   final String title;
@@ -41,12 +45,15 @@ class _TextInputDialog extends StatefulWidget {
   /// Returns '' (instead of null) for an empty field, e.g. an optional note.
   final bool allowEmpty;
 
+  final String? Function(String text)? validate;
+
   @override
   State<_TextInputDialog> createState() => _TextInputDialogState();
 }
 
 class _TextInputDialogState extends State<_TextInputDialog> {
   late final _controller = TextEditingController(text: widget.initialValue);
+  String? _error;
 
   @override
   void dispose() {
@@ -56,7 +63,16 @@ class _TextInputDialogState extends State<_TextInputDialog> {
 
   void _submit() {
     final text = _controller.text.trim();
-    Navigator.of(context).pop(text.isEmpty && !widget.allowEmpty ? null : text);
+    if (text.isEmpty && !widget.allowEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
+    final error = widget.validate?.call(text);
+    if (error != null) {
+      setState(() => _error = error);
+      return;
+    }
+    Navigator.of(context).pop(text);
   }
 
   @override
@@ -70,7 +86,12 @@ class _TextInputDialogState extends State<_TextInputDialog> {
         textCapitalization: TextCapitalization.sentences,
         decoration: InputDecoration(
           labelText: widget.label ?? l10n.playlistName,
+          errorText: _error,
         ),
+        // The message goes away as soon as the text is changed.
+        onChanged: (_) {
+          if (_error != null) setState(() => _error = null);
+        },
         onSubmitted: (_) => _submit(),
       ),
       actions: [

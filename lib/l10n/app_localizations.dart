@@ -968,6 +968,12 @@ abstract class AppLocalizations {
   /// **'Name'**
   String get playlistName;
 
+  /// No description provided for @playlistNameTaken.
+  ///
+  /// In de, this message translates to:
+  /// **'Eine Playlist mit diesem Namen gibt es schon.'**
+  String get playlistNameTaken;
+
   /// Playlist menu: pick a category color (dialog title too).
   ///
   /// In de, this message translates to:

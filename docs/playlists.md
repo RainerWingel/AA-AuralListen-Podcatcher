@@ -9,6 +9,10 @@ Code: `lib/data/playlist_repository.dart` (Verwaltung, `nextAfter`), `lib/audio/
 ## Verwaltung
 - Playlists anlegen, umbenennen, löschen, sortieren (Griff ≡ ziehen). Beim ersten Start – und beim Update auf Schema v4 –
   wird die Playlist „Wiedergabeliste" angelegt. Löschen einer Playlist löscht nur die Einträge, nicht die Folgen.
+- **Namen sind eindeutig** (Benutzerwunsch 2026-10-05): Anlegen oder Umbenennen auf einen schon vorhandenen Namen
+  (Groß-/Kleinschreibung und Leerzeichen außen egal) zeigt im Dialog „Eine Playlist mit diesem Namen gibt es schon."
+  und lässt ihn offen; der eigene Name beim Umbenennen ist erlaubt (`playlist_actions.dart`, `_uniqueName`). Nur eine
+  Dialog-Prüfung, keine DB-Bedingung (die automatische Ziel-Playlist von Auto-Download legt Namen selbst an).
 - Folge hinzufügen über Folgen-Menü („Zu Playlist hinzufügen…") oder den Playlist-Knopf in der Downloads-Liste – ans
   Ende der gewählten Playlist. Gibt es nur eine
   Playlist, wird direkt hinzugefügt; sonst Auswahl-Sheet (inkl. „Neue Playlist").
