@@ -560,6 +560,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get podcastRemoveConfirmTitle => 'Podcast entfernen?';
 
   @override
+  String playlistActivated(String name) {
+    return 'Playlist „$name“ ist aktiviert';
+  }
+
+  @override
+  String get playlistOpen => 'Playlist öffnen';
+
+  @override
   String get playlistColor => 'Farbe…';
 
   @override

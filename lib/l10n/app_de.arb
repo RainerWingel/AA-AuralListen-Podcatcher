@@ -302,6 +302,9 @@
   "@addedProvisionalSnack": {"placeholders": {"title": {"type": "String"}}},
   "podcastRemove": "Entfernen",
   "podcastRemoveConfirmTitle": "Podcast entfernen?",
+  "playlistActivated": "Playlist „{name}“ ist aktiviert",
+  "@playlistActivated": {"placeholders": {"name": {"type": "String"}}},
+  "playlistOpen": "Playlist öffnen",
   "playlistColor": "Farbe…",
   "@playlistColor": {
     "description": "Playlist menu: pick a category color (dialog title too)."

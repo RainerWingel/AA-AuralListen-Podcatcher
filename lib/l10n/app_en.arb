@@ -154,6 +154,8 @@
   "addedProvisionalSnack": "“{title}” added provisionally",
   "podcastRemove": "Remove",
   "podcastRemoveConfirmTitle": "Remove podcast?",
+  "playlistActivated": "Playlist “{name}” is active",
+  "playlistOpen": "Open playlist",
   "playlistColor": "Color…",
   "playlistColorNone": "No color",
   "colorRed": "Red",

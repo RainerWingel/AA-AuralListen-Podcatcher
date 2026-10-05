@@ -559,6 +559,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get podcastRemoveConfirmTitle => 'Remove podcast?';
 
   @override
+  String playlistActivated(String name) {
+    return 'Playlist “$name” is active';
+  }
+
+  @override
+  String get playlistOpen => 'Open playlist';
+
+  @override
   String get playlistColor => 'Color…';
 
   @override

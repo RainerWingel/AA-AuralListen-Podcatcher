@@ -73,6 +73,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: ':id',
                     builder: (context, state) => PlaylistScreen(
                       playlistId: int.parse(state.pathParameters['id']!),
+                      scrollToEpisodeId: int.tryParse(
+                        state.uri.queryParameters['folge'] ?? '',
+                      ),
+                      scrollRequest: int.tryParse(
+                        state.uri.queryParameters['r'] ?? '',
+                      ),
                     ),
                   ),
                 ],

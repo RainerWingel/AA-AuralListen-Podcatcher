@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/routes.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart' show DownloadState;
 import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
@@ -329,11 +332,28 @@ class _PlaylistRow extends ConsumerWidget {
     final name = ref.watch(playlistProvider(playlistId)).value?.name;
     if (name == null) return const SizedBox.shrink();
     final handler = ref.read(audioHandlerProvider);
+    // Offered: switches the playlist on and says so (user wish 2026-10-06).
+    void activate() {
+      handler.continueWithSuggestedPlaylist();
+      showInfoSnackBar(
+        ScaffoldMessenger.of(context),
+        l10n.playlistActivated(name),
+      );
+    }
+
     final row = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.playlist_play, size: 20),
-        const SizedBox(width: 6),
+        // Active: the symbol leads to the playlist, scrolled to this
+        // episode; the player closes (user wish 2026-10-06).
+        IconButton(
+          tooltip: offered ? l10n.playlistContinueOffer : l10n.playlistOpen,
+          visualDensity: VisualDensity.compact,
+          icon: const Icon(Icons.playlist_play, size: 20),
+          onPressed: offered
+              ? activate
+              : () => _openPlaylist(context, handler.currentEpisodeId),
+        ),
         Flexible(
           child: Text(
             l10n.playingFromPlaylist(name),
@@ -345,9 +365,7 @@ class _PlaylistRow extends ConsumerWidget {
           tooltip: offered ? l10n.playlistContinueOffer : l10n.playerNext,
           icon: const Icon(Icons.skip_next),
           // While only offered, ⏭ also just switches the playlist on.
-          onPressed: offered
-              ? handler.continueWithSuggestedPlaylist
-              : handler.skipToNext,
+          onPressed: offered ? activate : handler.skipToNext,
         ),
       ],
     );
@@ -356,9 +374,23 @@ class _PlaylistRow extends ConsumerWidget {
       message: l10n.playlistContinueOffer,
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
-        onTap: handler.continueWithSuggestedPlaylist,
+        onTap: activate,
         child: Opacity(opacity: 0.5, child: row),
       ),
+    );
+  }
+
+  /// Closes the player (it is a route above the tabs) and shows the
+  /// playlist in its tab, scrolled to [episodeId].
+  void _openPlaylist(BuildContext context, int? episodeId) {
+    context.go(
+      episodeId == null
+          ? Routes.playlist(playlistId)
+          : Routes.playlistAt(
+              playlistId,
+              episodeId,
+              DateTime.now().millisecondsSinceEpoch,
+            ),
     );
   }
 }

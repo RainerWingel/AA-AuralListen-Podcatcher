@@ -20,9 +20,11 @@ import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:aapodcastguru/features/episodes/episode_description.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
 import 'package:aapodcastguru/features/player/player_screen.dart';
+import 'package:aapodcastguru/features/playlists/playlist_screen.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
 import 'package:aapodcastguru/features/settings/settings_screen.dart';
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart'
+    show OrderingTerm, StringExpressionOperators, Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -2076,10 +2078,46 @@ void main() {
             .subscribe('https://example.com/feed'),
       );
       final list = await tester.runAsync(() => playlists.create('Unterwegs'));
-      await tester.runAsync(() async {
-        final episode = await db.select(db.episodes).getSingle();
-        await playlists.add(list!, episode.id);
-      });
+      final first = await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      );
+      // Older episodes first in the playlist, so the jump has to scroll.
+      // One batch each: many single awaits in runAsync hang the test.
+      await tester.runAsync(
+        () => db.batch(
+          (b) => b.insertAll(db.episodes, [
+            for (var i = 0; i < 25; i++)
+              EpisodesCompanion.insert(
+                podcastId: first!.podcastId,
+                guid: 'alt-$i',
+                title: 'Alte Folge $i',
+                audioUrl: 'https://example.com/alt-$i.mp3',
+                pubDate: Value(DateTime.utc(2020, 1, 1 + i)),
+                addedAt: DateTime.utc(2026),
+              ),
+          ]),
+        ),
+      );
+      final older = await tester.runAsync(
+        () =>
+            (db.select(db.episodes)
+                  ..where((e) => e.guid.like('alt-%'))
+                  ..orderBy([(e) => OrderingTerm.asc(e.pubDate)]))
+                .get(),
+      );
+      await tester.runAsync(
+        () => db.batch(
+          (b) => b.insertAll(db.playlistItems, [
+            for (final (i, e) in [...older!, first!].indexed)
+              PlaylistItemsCompanion.insert(
+                playlistId: list!,
+                episodeId: e.id,
+                position: i,
+                addedAt: DateTime.utc(2026),
+              ),
+          ]),
+        ),
+      );
       await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
       await settle(tester);
       await tester.tap(find.text('Widget-Podcast'));
@@ -2104,6 +2142,29 @@ void main() {
       await settle(tester);
       expect(dimmed(), findsNothing);
       expect(handler.activePlaylistId, list);
+      expect(find.text('Playlist „Unterwegs“ ist aktiviert'), findsOneWidget);
+
+      // Active: the playlist symbol closes the player and shows the
+      // playlist, scrolled to this episode (user wish 2026-10-06).
+      await tester.tap(find.byTooltip('Playlist öffnen'));
+      await settle(tester);
+      expect(find.byType(PlayerScreen), findsNothing);
+      expect(find.text('Unterwegs'), findsOneWidget); // app bar
+      // (The mini player shows the title too.)
+      final target = find.descendant(
+        of: find.byType(PlaylistScreen),
+        matching: find.text('Erste Folge'),
+      );
+      expect(target, findsOneWidget);
+      // Fully visible above the mini player (as the last entry it cannot
+      // move further up than the end of the list allows).
+      final rect = tester.getRect(target);
+      expect(rect.top, greaterThan(0));
+      expect(
+        rect.bottom,
+        lessThan(tester.getRect(find.byType(MiniPlayer)).top),
+      );
+      expect(find.text('Alte Folge 0'), findsNothing); // scrolled away
 
       await disposeApp(tester);
     },

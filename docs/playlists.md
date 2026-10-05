@@ -106,8 +106,13 @@ gelesen, die neue Reihenfolge gilt also sofort.
   2026-09-30 „gilt automatisch als aus der Playlist gespielt"): Zeile „Aus Playlist „X““ im Player **halbtransparent
   (50 %)**, kein ⏭ in der Benachrichtigung, „Fortsetzen" merkt sie sich nicht, **am Ende stoppt die Wiedergabe**.
   Tippt der Benutzer auf die Zeile (oder ihr ⏭), wird die Playlist aktiv (`continueWithSuggestedPlaylist`): Zeile voll
-  sichtbar, am Ende startet die nächste Folge der Playlist. Steht sie in keiner oder in mehreren Playlists, gibt es
-  weder Angebot noch aktive Playlist. Tippt man die gerade laufende Folge erneut an, bleibt ihr Playlist-Zustand.
+  sichtbar, am Ende startet die nächste Folge der Playlist, Infobox **„Playlist „X“ ist aktiviert"** (2026-10-06).
+  Steht sie in keiner oder in mehreren Playlists, gibt es weder Angebot noch aktive Playlist. Tippt man die gerade
+  laufende Folge erneut an, bleibt ihr Playlist-Zustand.
+- **Aktive Zeile, Playlist-Symbol links** („Playlist öffnen", Benutzerwunsch 2026-10-06): schließt den Player und zeigt
+  die Playlist im Playlists-Tab, gescrollt zur laufenden Folge (`Routes.playlistAt` → `?folge=ID&r=…`; `r` macht einen
+  erneuten Sprung zur selben Folge zu einer neuen Adresse). `PlaylistScreen` springt erst grob (geschätzte Zeilenhöhe,
+  die Liste baut nur Sichtbares) und richtet die Folge dann mit `Scrollable.ensureVisible` auf ein Drittel der Höhe aus.
 - **Während der Wiedergabe** beobachtet der Player, in welchen Playlists die laufende Folge steht
   (`watchPlaylistIdsWith`, nur echte Änderungen): Die aktive Playlist bleibt, solange die Folge darin steht; wird sie
   dort entfernt, wird die einzige verbliebene Playlist nur **angeboten**, sonst keine; kommt sie in genau eine Playlist,

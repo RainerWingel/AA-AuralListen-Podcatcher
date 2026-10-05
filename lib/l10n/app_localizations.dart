@@ -1022,6 +1022,18 @@ abstract class AppLocalizations {
   /// **'Podcast entfernen?'**
   String get podcastRemoveConfirmTitle;
 
+  /// No description provided for @playlistActivated.
+  ///
+  /// In de, this message translates to:
+  /// **'Playlist „{name}“ ist aktiviert'**
+  String playlistActivated(String name);
+
+  /// No description provided for @playlistOpen.
+  ///
+  /// In de, this message translates to:
+  /// **'Playlist öffnen'**
+  String get playlistOpen;
+
   /// Playlist menu: pick a category color (dialog title too).
   ///
   /// In de, this message translates to:

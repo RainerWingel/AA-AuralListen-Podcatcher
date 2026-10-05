@@ -13,11 +13,91 @@ import 'playlist_actions.dart';
 import 'playlist_colors.dart';
 
 /// Episodes of one playlist: drag to reorder, swipe to remove, tap to play
-/// (the playlist then continues automatically).
-class PlaylistScreen extends ConsumerWidget {
-  const PlaylistScreen({required this.playlistId, super.key});
+/// (the playlist then continues automatically). With [scrollToEpisodeId]
+/// (from the player's playlist symbol) the list scrolls to that episode.
+class PlaylistScreen extends ConsumerStatefulWidget {
+  const PlaylistScreen({
+    required this.playlistId,
+    this.scrollToEpisodeId,
+    this.scrollRequest,
+    super.key,
+  });
 
   final int playlistId;
+  final int? scrollToEpisodeId;
+
+  /// Changes with every jump from the player, so the same episode can be
+  /// scrolled to again after the user scrolled away.
+  final int? scrollRequest;
+
+  @override
+  ConsumerState<PlaylistScreen> createState() => _PlaylistScreenState();
+}
+
+class _PlaylistScreenState extends ConsumerState<PlaylistScreen> {
+  /// Rough height of one entry; only used to get near an entry that the
+  /// lazy list has not built yet, the exact place comes afterwards.
+  static const _estimatedEntryHeight = 96.0;
+
+  final _scroll = ScrollController();
+  final _targetKey = GlobalKey();
+
+  /// Episode the list scrolls to once it shows it (null = none pending).
+  int? _pending;
+
+  int get playlistId => widget.playlistId;
+
+  @override
+  void initState() {
+    super.initState();
+    _pending = widget.scrollToEpisodeId;
+  }
+
+  @override
+  void didUpdateWidget(PlaylistScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.scrollRequest != oldWidget.scrollRequest ||
+        widget.scrollToEpisodeId != oldWidget.scrollToEpisodeId) {
+      _pending = widget.scrollToEpisodeId;
+    }
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _scheduleScroll(List<PlaylistEntry> items) {
+    final id = _pending;
+    if (id == null) return;
+    _pending = null;
+    final index = items.indexWhere((e) => e.episode.id == id);
+    if (index < 0) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _reveal(index, 0));
+  }
+
+  /// Scrolls the entry at [index] into view (a third from the top).
+  Future<void> _reveal(int index, int attempt) async {
+    if (!mounted) return;
+    final target = _targetKey.currentContext;
+    if (target != null) {
+      await Scrollable.ensureVisible(
+        target,
+        alignment: 0.3,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+      return;
+    }
+    if (attempt >= 3 || !_scroll.hasClients) return;
+    // Not built yet: jump close to it, then align it in the next frame.
+    final max = _scroll.position.maxScrollExtent;
+    _scroll.jumpTo((index * _estimatedEntryHeight).clamp(0, max));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _reveal(index, attempt + 1),
+    );
+  }
 
   Future<void> _remove(
     BuildContext context,
@@ -40,11 +120,13 @@ class PlaylistScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final playlist = ref.watch(playlistProvider(playlistId)).value;
     final entries = ref.watch(playlistEntriesProvider(playlistId));
     final items = entries.value ?? const <PlaylistEntry>[];
+    if (entries.hasValue) _scheduleScroll(items);
+    final targetId = widget.scrollToEpisodeId;
 
     // Category color: app bar in the soft tint, below it fading out downwards.
     final gradient = playlistGradient(
@@ -90,6 +172,7 @@ class PlaylistScreen extends ConsumerWidget {
                 hint: l10n.playlistEmptyHint,
               )
             : ReorderableListView.builder(
+                scrollController: _scroll,
                 buildDefaultDragHandles: false,
                 itemCount: items.length,
                 onReorderItem: (oldIndex, newIndex) => ref
@@ -108,6 +191,7 @@ class PlaylistScreen extends ConsumerWidget {
                     ),
                     onDismissed: (_) => _remove(context, ref, entry),
                     child: Row(
+                      key: entry.episode.id == targetId ? _targetKey : null,
                       children: [
                         Expanded(
                           child: EpisodeTile(
