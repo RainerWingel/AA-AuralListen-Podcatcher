@@ -30,7 +30,9 @@ aus `third_party/sqlite` (3.53.4).
   Damit die neuen Codes darüber liegen (sonst kein Update über GitHub-APKs), sprang die Build-Nummer von 6 auf **500**
   (Codes 5001/5002/5003). Build-Nummer ab jetzt nur noch erhöhen.
 - `short_description.txt` max. 80 Zeichen, `full_description.txt` max. 4000 (einfaches HTML erlaubt).
-- Flutter-Version im Rezept (`flutter@…`) = Version in `.github/workflows/ci.yml`.
+- Flutter-Version: Das Rezept (srclib `flutter@stable`) liest sie beim Bauen aus `flutter-version: '…'` in
+  `.github/workflows/ci.yml` – diese Zeile im Format nicht ändern. `pubspec.lock` muss eingecheckt und aktuell sein
+  (`pub get --enforce-lockfile`).
 
 ## Schritte für den Benutzer
 Stand 2026-10-04: **v1.3.1 veröffentlicht** (+6, Codes 1006/2006/4006; Tag auf
