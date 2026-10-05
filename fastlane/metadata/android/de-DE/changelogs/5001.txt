@@ -1,0 +1,2 @@
+• Neues Versionsnummern-Schema für F-Droid (technisch, keine Funktionsänderung)
+• Sonst wie 1.3.1: Shownotes, Tempo, Staffeln, Abspielverlauf, „Als Nächstes spielen“

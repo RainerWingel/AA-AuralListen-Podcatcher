@@ -82,8 +82,9 @@ Bei jedem Push/PR: `flutter pub get` → `dart format --set-exit-if-changed` →
 - Workflow: `.github/workflows/ci.yml`, Flutter-Version dort fest eingetragen – bei Flutter-Upgrade mit anpassen.
 
 ## Bekannte Stolpersteine
-- **Immer mit `--split-per-abi` bauen.** Das erhöht den internen `versionCode` (+2000 für arm64). Eine APK ohne
-  diesen Schalter hätte einen kleineren `versionCode` und ließe sich nicht mehr über die installierte App spielen (Downgrade).
+- **Immer mit `--split-per-abi` bauen.** Erst dann wird der `versionCode` zu Build-Nummer × 10 + ABI (arm64 = 2, seit
+  1.3.2, siehe `f-droid.md`). Eine APK ohne diesen Schalter hätte nur die Build-Nummer als `versionCode` und ließe sich
+  nicht mehr über die installierte App spielen (Downgrade).
 - `Execution failed for task ':app:compileFlutterBuildRelease' … problem occurred starting process 'flutter'`:
   hängender Gradle-Daemon → `cd android && ./gradlew --stop`, dann erneut bauen.
 - Fehlen im Release-Build Benachrichtigungs-Symbole („You must specify an icon resource id to build a CustomAction" im Log):

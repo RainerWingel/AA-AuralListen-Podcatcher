@@ -99,3 +99,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   eigene Zählung samt Versatz ist bei Staffel-Podcasts deaktiviert (nur Feed-Nummern), weil sie Staffeln vermischen würde.
 - 2026-10-03 · **Staffel-Podcast erst ab 2 Staffeln** (Benutzer) · Feeds mit vereinzelt gesetztem `itunes:season`
   (z. B. „Hi Freaks") bekamen sonst nutzlose Chips und verloren ihre eigene Zählung; eine einzige Staffel filtert ohnehin nichts.
+- 2026-10-05 · **versionCode = Build-Nummer × 10 + ABI** (F-Droid-Prüfer) · Ersetzt Flutters 1000/2000/4000 + Build-
+  Nummer, weil F-Droid die ABI-Ziffer an letzter Stelle braucht (neue Versionen müssen für jede ABI höhere Codes haben).
+  Build-Nummer sprang einmalig von 6 auf 500, damit 5001–5003 über den bisherigen 1006–4006 liegen und GitHub-APKs
+  weiter als Update installierbar sind. Play Store verworfen (12 Tester × 14 Tage nicht machbar), Fokus F-Droid + GitHub.

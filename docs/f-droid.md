@@ -1,7 +1,7 @@
 # F-Droid
 
 F-Droid baut die App **selbst aus dem Quellcode** (Git-Tag) und signiert sie mit eigenem Schlüssel. Die Store-Texte
-kommen aus diesem Repo. Stand 2026-10-04: v1.3.1 bei F-Droid eingereicht (MR !51179), Prüfung läuft.
+kommen aus diesem Repo. Stand 2026-10-05: eingereicht (MR !51179); Prüfer verlangt ABI-Split-Versionsschema → v1.3.2.
 
 ## Was im Repo dafür vorbereitet ist
 | Was | Wo |
@@ -12,6 +12,7 @@ kommen aus diesem Repo. Stand 2026-10-04: v1.3.1 bei F-Droid eingereicht (MR !51
 | Screenshots (macht der Benutzer selbst) | `fastlane/metadata/android/<Sprache>/images/phoneScreenshots/` |
 | SQLite aus Quellcode statt heruntergeladener Binärdatei | `third_party/sqlite/`, `hooks:` in `pubspec.yaml` |
 | Ohne `key.properties` bleibt die Release-APK unsigniert | `android/app/build.gradle.kts` |
+| Versionsschema Build-Nummer × 10 + ABI (F-Droid-Vorgabe) | `android/app/build.gradle.kts` (`abiCodes`) |
 
 Geprüft: keine Google-Play-Dienste/Firebase/Tracker (voller Gradle-Abhängigkeitsbaum: nur Material + Guava, beide
 Apache-2.0), keine Binärdateien im Repo, Build ohne Schlüssel ergibt eine unsignierte APK, SQLite im APK ist die Version
@@ -22,7 +23,12 @@ aus `third_party/sqlite` (3.53.4).
 - Keine Build-Schritte, die Binärdateien herunterladen (Beispiel: `sqlite3` lädt sonst vorkompilierte Bibliotheken).
 - Neue Version = `version:` in `pubspec.yaml` erhöhen (Build-Nummer!), Git-Tag `vX.Y.Z` auf GitHub. F-Droid erkennt
   Tags automatisch (`UpdateCheckMode: Tags`). Changelog je Sprache als `changelogs/<versionCode>.txt` für alle drei
-  Codes (1000/2000/4000 + Build-Nummer, max. 500 Zeichen).
+  Codes (max. 500 Zeichen).
+- **Versionsschema (seit 1.3.2, Vorgabe der F-Droid-Prüfer):** `versionCode` = Build-Nummer × 10 + ABI
+  (armeabi-v7a 1, arm64-v8a 2, x86_64 3), gesetzt in `android/app/build.gradle.kts`; im Rezept
+  `VercodeOperation: '%c * 10 + 1/2/3'`. Bis 1.3.1 galt Flutters Schema 1000/2000/4000 + Build-Nummer (1006/2006/4006).
+  Damit die neuen Codes darüber liegen (sonst kein Update über GitHub-APKs), sprang die Build-Nummer von 6 auf **500**
+  (Codes 5001/5002/5003). Build-Nummer ab jetzt nur noch erhöhen.
 - `short_description.txt` max. 80 Zeichen, `full_description.txt` max. 4000 (einfaches HTML erlaubt).
 - Flutter-Version im Rezept (`flutter@…`) = Version in `.github/workflows/ci.yml`.
 
@@ -32,7 +38,10 @@ Stand 2026-10-04: **v1.3.1 veröffentlicht** (+6, Codes 1006/2006/4006; Tag auf
 eingereicht – eingereicht wird direkt 1.3.1.
 **Eingereicht 2026-10-04:** Merge Request https://gitlab.com/fdroid/fdroiddata/-/merge_requests/51179 – F-Droid-Pipeline
 grün. Im MR erklärt bzw. nicht angehakt: Flutter als srclib, keine Reproducible Builds (F-Droid signiert selbst).
-**Offen: Prüfung durch F-Droid (Schritt 7).**
+**2026-10-05, Rückmeldung der Prüfer:** erst Frage nach Alleinstellungsmerkmalen (beantwortet: Kapitel-Skip, Hinweis
+bei wechselnder Werbung, VBR-Fix, Playlist-Verhalten, Themen-Filter, Android Auto geplant), dann Auftrag: Rezept nach
+`templates/build-flutter.yml` und ABI-Split-Versionsschema (s. o.) → v1.3.2 mit `flutter pub get --enforce-lockfile`.
+**Offen: Release v1.3.2, Rezept im Fork ersetzen, Prüfung durch F-Droid (Schritt 7).**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
    getaggten Stand.
