@@ -44,7 +44,7 @@ grün. Im MR erklärt bzw. nicht angehakt: Flutter als srclib, keine Reproducibl
 bei wechselnder Werbung, VBR-Fix, Playlist-Verhalten, Themen-Filter, Android Auto geplant), dann Auftrag: Rezept nach
 `templates/build-flutter.yml` und ABI-Split-Versionsschema (s. o.) → v1.3.2 mit `flutter pub get --enforce-lockfile`.
 **v1.3.2 veröffentlicht 2026-10-05** (Tag auf `05f780f6d6d52982d402a35a08c75d536afe18b1`).
-Rezept im Fork ersetzt (2026-10-05, Inhalt mit dieser Datei identisch geprüft), neue MR-Pipeline lief an.
+Rezept im Fork ersetzt (2026-10-05, Inhalt mit dieser Datei identisch geprüft), neue MR-Pipeline #2914723501 grün (alle drei ABIs gebaut, 24 min).
 **Offen: Prüfung durch F-Droid (Schritt 7).**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
