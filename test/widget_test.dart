@@ -1312,6 +1312,84 @@ void main() {
     await disposeApp(tester);
   });
 
+  testWidgets(
+    'the chapter list closes when the next episode starts',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final first = await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      );
+      await tester.runAsync(
+        () => db.batch(
+          (b) => b.insert(
+            db.episodes,
+            EpisodesCompanion.insert(
+              podcastId: first!.podcastId,
+              guid: 'zwei',
+              title: 'Zweite Folge',
+              audioUrl: 'https://example.com/zwei.mp3',
+              addedAt: DateTime.utc(2026),
+            ),
+          ),
+        ),
+      );
+      final second = await tester.runAsync(
+        () => (db.select(
+          db.episodes,
+        )..where((e) => e.guid.equals('zwei'))).getSingle(),
+      );
+      final list = (await tester.runAsync(
+        () => db.select(db.playlists).getSingle(),
+      ))!.id;
+      await tester.runAsync(
+        () => db.batch(
+          (b) => b.insertAll(db.playlistItems, [
+            for (final (i, e) in [first!, second!].indexed)
+              PlaylistItemsCompanion.insert(
+                playlistId: list,
+                episodeId: e.id,
+                position: i,
+                addedAt: DateTime.utc(2026),
+              ),
+          ]),
+        ),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Playlists'));
+      await settle(tester);
+      await tester.tap(find.text('Wiedergabeliste'));
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      await tester.tap(find.text('Kapitel 1/2: Begrüßung'));
+      await settle(tester);
+      expect(find.text('Hauptteil'), findsOneWidget);
+
+      // End of the episode: the next one starts, the old chapters go away.
+      engine.complete();
+      await settle(tester);
+      expect(handler.currentEpisodeId, second!.id);
+      expect(find.text('Hauptteil'), findsNothing);
+      expect(find.byType(PlayerScreen), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('marks all episodes up to a date as played', timeout: timeout, (
     tester,
   ) async {

@@ -294,6 +294,23 @@ class _CustomMinutesDialogState extends State<_CustomMinutesDialog> {
   }
 }
 
+/// Closes a sheet about [episodeId] as soon as another episode is in the
+/// player (end of the episode, ⏭ …; user wish 2026-10-06) – it would show
+/// the old episode's chapters or bookmarks otherwise.
+void _closeOnEpisodeChange(BuildContext context, WidgetRef ref, int episodeId) {
+  ref.listen(mediaItemProvider.select((s) => s.value?.mediaItem?.id), (
+    _,
+    current,
+  ) {
+    if (current == null || current == '$episodeId') return;
+    final route = ModalRoute.of(context);
+    if (route == null || !route.isActive) return;
+    final navigator = Navigator.of(context);
+    // Something opened above it (e.g. a dialog): remove just the sheet.
+    route.isCurrent ? navigator.pop() : navigator.removeRoute(route);
+  });
+}
+
 Future<void> showChaptersSheet(BuildContext context, int episodeId) =>
     showModalBottomSheet<void>(
       context: context,
@@ -309,6 +326,7 @@ class _ChaptersSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    _closeOnEpisodeChange(context, ref, episodeId);
     final l10n = AppLocalizations.of(context);
     final handler = ref.watch(audioHandlerProvider);
     final chapters = ref.watch(chaptersProvider(episodeId)).value ?? const [];
@@ -401,6 +419,7 @@ class _EpisodeBookmarksSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    _closeOnEpisodeChange(context, ref, episodeId);
     final l10n = AppLocalizations.of(context);
     final bookmarks =
         ref.watch(episodeBookmarksProvider(episodeId)).value ?? const [];

@@ -216,6 +216,8 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
   höchstens ein Versuch pro Folge (auch ohne Ergebnis).
 - Anzeige: unter dem Slider „Kapitel 3/7: Titel" (einziger Zugang, tippen → Liste mit Startzeit,
   aktuelles Kapitel hervorgehoben, Tippen springt dorthin). Ein eigener Knopf „Kapitel (n)" wurde entfernt (doppelt).
+- Kapitel-Liste und Lesezeichen-Liste der Folge **schließen sich beim Folgenwechsel** (Folgenende, ⏭, ⏮ …;
+  Benutzerwunsch 2026-10-06, `_closeOnEpisodeChange`), statt die Einträge der vorigen Folge weiter zu zeigen.
 - Werkzeug: `dart run tool/smoke_chapters.dart <Feed-URL>` prüft ID3-Kapitel echter Folgen.
 
 ### Kapitel überspringen („Skip", Benutzerwunsch)
