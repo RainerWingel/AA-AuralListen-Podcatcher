@@ -45,6 +45,8 @@ bei wechselnder Werbung, VBR-Fix, Playlist-Verhalten, Themen-Filter, Android Aut
 `templates/build-flutter.yml` und ABI-Split-Versionsschema (s. o.) → v1.3.2 mit `flutter pub get --enforce-lockfile`.
 **v1.3.2 veröffentlicht 2026-10-05** (Tag auf `05f780f6d6d52982d402a35a08c75d536afe18b1`).
 Rezept im Fork ersetzt (2026-10-05, Inhalt mit dieser Datei identisch geprüft), neue MR-Pipeline #2914723501 grün (alle drei ABIs gebaut, 24 min).
+**v1.3.3 veröffentlicht 2026-10-07** (Tag auf `72294e4bf67caed7f43ac633f31b3c4c5ff7a9b4`) – der MR bleibt bewusst auf
+v1.3.2; nach dem Merge findet der Bot v1.3.3 selbst (`UpdateCheckMode: Tags`). Rezept im MR nicht anfassen.
 **Offen: Prüfung durch F-Droid (Schritt 7).**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
