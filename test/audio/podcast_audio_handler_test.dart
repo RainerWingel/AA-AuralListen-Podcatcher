@@ -376,6 +376,83 @@ void main() {
     expect(e.positionMs, 0);
   });
 
+  group('marked as played elsewhere while it is the current episode', () {
+    late PlaybackRepository playback;
+    late DateTime clockNow;
+    final finished = <int>[];
+
+    setUp(() async {
+      clockNow = now;
+      playback = PlaybackRepository(db, () => clockNow);
+      finished.clear();
+      await handler.dispose();
+      engine = FakePlayerEngine();
+      handler = PodcastAudioHandler(
+        engine: engine,
+        playback: playback,
+        settings: settings,
+        playlists: playlists,
+        onFinished: (id) async => finished.add(id),
+      );
+    });
+
+    test('stops and shows the end; stays played', () async {
+      final list = await playlists.create('Liste');
+      final next = await addEpisode('2');
+      await playlists.add(list, episodeId);
+      await playlists.add(list, next);
+      await handler.playEpisode(episodeId, playlistId: list);
+      engine.emitPosition(const Duration(minutes: 3));
+      await pumpEventQueue();
+
+      await playback.markPlayed(episodeId);
+      await pumpEventQueue();
+
+      expect(engine.calls.last, 'stop');
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(handler.position, const Duration(minutes: 10));
+      // No later position save turns it back into "in progress".
+      engine.emitPosition(const Duration(minutes: 3, seconds: 10));
+      await pumpEventQueue();
+      final e = await episode();
+      expect(e.status, EpisodeStatus.played);
+      // Not "played to the end": no history, the playlist does not go on.
+      expect(finished, isEmpty);
+      expect(handler.currentEpisodeId, episodeId);
+
+      // Play starts it over.
+      await handler.play();
+      expect(engine.loadedAt, Duration.zero);
+    });
+
+    test('also while paused, and for a replay of a played one', () async {
+      await handler.playEpisode(episodeId);
+      await handler.pause();
+      await playback.markPlayed(episodeId);
+      await pumpEventQueue();
+      expect(handler.position, const Duration(minutes: 10));
+
+      // Replay (still "played" under 15 s), marked again: a new playedAt.
+      clockNow = clockNow.add(const Duration(minutes: 1));
+      await handler.play();
+      engine.emitPosition(const Duration(seconds: 5));
+      await pumpEventQueue();
+      expect(handler.playbackState.value.playing, isTrue);
+      await playback.markPlayed(episodeId);
+      await pumpEventQueue();
+      expect(handler.playbackState.value.playing, isFalse);
+      expect(handler.position, const Duration(minutes: 10));
+    });
+
+    test('another episode marked as played changes nothing', () async {
+      final other = await addEpisode('2');
+      await handler.playEpisode(episodeId);
+      await playback.markPlayed(other);
+      await pumpEventQueue();
+      expect(handler.playbackState.value.playing, isTrue);
+    });
+  });
+
   test('completion marks as played and unloads; play again restarts', () async {
     await handler.playEpisode(episodeId);
     engine.complete();

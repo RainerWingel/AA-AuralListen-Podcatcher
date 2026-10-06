@@ -128,6 +128,11 @@ gelesen, die neue Reihenfolge gilt also sofort.
   **nicht** als gespielt markiert und **bleibt** in der Playlist.
 - Manuelles „Als gespielt markieren" (auch „bis …") entfernt die Folge dagegen aus **allen** Playlists
   (`PlaybackRepository.markPlayed`); das Ende der Wiedergabe nutzt `markFinished(id, playlistId: aktive)`.
+- **Die gerade laufende Folge wird als gespielt markiert** (Folgen-Menü, „Alle als gespielt markieren", „bis …";
+  Benutzerwunsch 2026-10-06): Der Player **stoppt** und zeigt das **Ende** – wie am Dateiende, aber ohne Weiterspielen
+  in der Playlist und ohne Eintrag im Abspielverlauf. Der Handler beobachtet dafür `playedAt` der aktuellen Folge
+  (`PlaybackRepository.watchPlayedAt`, Abo endet beim Folgenwechsel und in `dispose`); ein neuer Wert = neue Markierung,
+  auch bei einer Wiederholung einer schon gespielten Folge. Play startet die Folge danach von vorn.
 
 ### Umsetzungsdetails
 - Am Ende (`PodcastAudioHandler._complete`) in dieser Reihenfolge: nächste Folge lesen (die laufende steht noch in der

@@ -59,6 +59,14 @@ class PlaybackRepository {
             ),
           );
 
+  /// `playedAt` of a played episode, null otherwise (the player stops when
+  /// the current episode gets marked as played elsewhere).
+  Stream<DateTime?> watchPlayedAt(int episodeId) =>
+      (_db.select(_db.episodes)..where((e) => e.id.equals(episodeId)))
+          .watchSingleOrNull()
+          .map((e) => e?.status == EpisodeStatus.played ? e?.playedAt : null)
+          .distinct();
+
   /// Marked as played by the user: removes the episode from ALL playlists
   /// (docs/playlists.md). `playedAt` starts the 96 h eviction timer.
   Future<void> markPlayed(int episodeId) => _db.transaction(() async {

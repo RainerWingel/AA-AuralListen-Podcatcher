@@ -157,6 +157,10 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Playlist membership of the current episode (only one at a time).
   StreamSubscription<Set<int>>? _membership;
+
+  /// Follows the current episode's "played" mark: set elsewhere (episode
+  /// menu, "Alle als gespielt markieren" …) it stops playback at the end.
+  StreamSubscription<DateTime?>? _playedMark;
   Timer? _pauseTimer;
 
   int? _episodeId;
@@ -312,8 +316,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   }) async {
     _resetRecovery();
     // The old episode's membership watcher must not act while switching.
-    await _membership?.cancel();
-    _membership = null;
+    await _stopWatching();
     // Started elsewhere (Home, Downloads …) but in exactly one playlist:
     // that playlist is only offered; it continues there only after the user
     // taps "Aus Playlist …" (user wish 2026-10-03, before: automatically).
@@ -396,8 +399,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> resetAfterRestore() async {
     await stop();
     _episodeId = null;
-    await _membership?.cancel();
-    _membership = null;
+    await _stopWatching();
     _activePlaylistId = null;
     _suggestedPlaylistId = null;
     _playlistPosition = -1;
@@ -571,8 +573,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       await s.cancel();
     }
     _subscriptions.clear();
-    await _membership?.cancel();
-    _membership = null;
+    await _stopWatching();
     await _positions.close();
     await _problems.close();
     await _sleepStates.close();
@@ -584,7 +585,15 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Follows the current episode being added to or removed from playlists
   /// while it plays, so "Aus Playlist …" and what comes next stay right.
+  Future<void> _stopWatching() async {
+    await _membership?.cancel();
+    _membership = null;
+    await _playedMark?.cancel();
+    _playedMark = null;
+  }
+
   void _watchMembership(int episodeId) {
+    _watchPlayedMark(episodeId);
     unawaited(_membership?.cancel());
     _membership = _playlists
         ?.watchPlaylistIdsWith(episodeId)
@@ -592,6 +601,29 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         // this episode's playlists actually changed.
         .distinct(setEquals)
         .listen((ids) => _onMembership(episodeId, ids));
+  }
+
+  /// Marked as played from outside while it is the current episode (user
+  /// wish 2026-10-06): stop, show the end – like playing to the end, but the
+  /// playlist does not continue. The first value is only the starting point;
+  /// a new `playedAt` is a new mark (also for an already played replay).
+  void _watchPlayedMark(int episodeId) {
+    unawaited(_playedMark?.cancel());
+    var first = true;
+    DateTime? last;
+    _playedMark = _playback.watchPlayedAt(episodeId).listen((at) {
+      final changed = !first && at != null && at != last;
+      first = false;
+      last = at;
+      if (changed) unawaited(_onMarkedPlayed(episodeId));
+    });
+  }
+
+  Future<void> _onMarkedPlayed(int episodeId) async {
+    // Own marks (end of file) set [_markedPlayed] before writing.
+    if (episodeId != _episodeId || _markedPlayed || _completing) return;
+    _markedPlayed = true; // no more position saves
+    await stop(); // shows the end because of [_markedPlayed]
   }
 
   /// Same rules as when starting: the active playlist stays while it still
@@ -882,8 +914,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       final sleepAtEnd = _sleepTimer is SleepTimerAtEpisodeEnd;
       final next = sleepAtEnd ? null : await _nextInPlaylist();
       // Leaving the playlist now is intended, not a membership change.
-      await _membership?.cancel();
-      _membership = null;
+      await _stopWatching();
       if (id != null && !_markedPlayed) {
         _markedPlayed = true;
         // Provisional podcast: not "played", not in the history.
