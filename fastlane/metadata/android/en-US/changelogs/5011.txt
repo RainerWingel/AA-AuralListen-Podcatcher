@@ -1,0 +1,7 @@
+• Provisional podcasts: listen in first, then subscribe
+• Rate podcasts with 1–5 stars, subscriptions sorted by it
+• Playlists: ⏮ ⏭, "Open playlist" from the player, finished episodes removed after 10 min (adjustable)
+• Chapters: progress of the current chapter
+• Topics: mark new episodes as played automatically
+• Downloads: details, delete confirmation, "Download now over mobile data"
+• Many fixes

@@ -3,6 +3,8 @@
 <p><b>Finden und abonnieren</b></p>
 <ul>
 <li>Suche über Apple Podcasts und fyyd.de, Abo per RSS-Adresse, OPML-Import und -Export</li>
+<li>Neue Podcasts erst vorläufig: reinhören (nur streamen), dann abonnieren</li>
+<li>Podcasts mit 1 bis 5 Sternen bewerten – die Abos sind danach sortiert</li>
 <li>Aktualisieren per Herunterziehen; umgezogene Podcasts (neue Feed-Adresse) werden übernommen</li>
 <li>Rote Zahl ungespielter Folgen an jedem Abo; Suche innerhalb deiner Abos</li>
 <li>Podcast-Seite mit Beschreibung sowie Links zur Website und zum Unterstützen</li>
@@ -15,7 +17,7 @@
 <li>Sprünge −15 s / +30 s, Tempo 1,0× bis 2,0×, Lautstärke-Boost (global oder pro Podcast)</li>
 <li>Restzeit oder Gesamtlänge per Antippen; bei höherem Tempo zusätzlich die tatsächliche Restzeit</li>
 <li>Shownotes mit antippbaren Links, Folgennummer und Erscheinungsdatum</li>
-<li>Kapitel (Podlove, JSON, ID3) mit „Skip“ je Kapitel, Lesezeichen mit Notiz</li>
+<li>Kapitel (Podlove, JSON, ID3) mit Fortschritt des laufenden Kapitels und „Skip“ je Kapitel, Lesezeichen mit Notiz</li>
 <li>Sleep-Timer mit sanftem Ausblenden, auch „bis Ende der Folge“</li>
 <li>Merkt sich die Position jeder Folge; gespielt ist eine Folge erst am Ende</li>
 <li>Abspielverlauf der letzten 100 zu Ende gehörten Folgen</li>
@@ -25,14 +27,16 @@
 <p><b>Playlists</b></p>
 <ul>
 <li>Mehrere Playlists mit automatischem Weiterspielen, Farben, Sortieren und „Fortsetzen“</li>
-<li>„Als Nächstes spielen“ und „Ans Ende anfügen“ für die laufende Playlist</li>
+<li>„Als Nächstes spielen“ und „Ans Ende anfügen“ für die laufende Playlist; ⏮ ⏭ im Player und per Bluetooth</li>
+<li>Fertige Folgen verlassen die Playlist sofort, nach 10 Minuten oder nie – wie du willst</li>
 <li>Alle neuen oder ungespielten Folgen eines Podcasts, Themas oder einer Staffel in eine Playlist</li>
 <li>Symbol an jeder Folge, die in einer Playlist steht</li>
 </ul>
 
 <p><b>Downloads</b></p>
 <ul>
-<li>Manuelle oder automatische Downloads pro Podcast, wahlweise direkt in eine Playlist</li>
+<li>Manuelle oder automatische Downloads pro Podcast, wahlweise direkt in eine Playlist; „Nur WLAN“ mit „Jetzt über Mobilfunk laden“</li>
+<li>Netzwerk-Feeds: Downloads nur für bestimmte Themen; neue Folgen eines Themas auf Wunsch gleich als gespielt</li>
 <li>Gespielte Downloads werden nach 96 Stunden gelöscht (nicht, solange sie in einer Playlist stehen); einstellbares Speicherlimit</li>
 </ul>
 

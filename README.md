@@ -18,6 +18,8 @@ Gerät. Geschrieben in Flutter.
 
 **Podcasts finden und abonnieren**
 - Suche über Apple Podcasts und fyyd.de, Abo per RSS-Adresse, OPML-Import und -Export (z. B. aus anderen Apps)
+- Neue Podcasts erst vorläufig (grau, nur streamen, nichts wird gespeichert), dann „Abonnieren“
+- Bewertung mit 1–5 Sternen; die Abos sind danach sortiert („★4“ am Cover)
 - Aktualisierung beim Start und per Herunterziehen; Umzüge von Podcasts (neue Feed-Adresse) werden übernommen
 - Rote Zahl mit ungespielten Folgen an jedem Abo; Punkt bei frischen Folgen (letzte 96 Stunden)
 - Podcast-Seite mit Beschreibung, Links zur Website und zum Unterstützen (falls im Feed), Suche in den Abos
@@ -29,7 +31,7 @@ Gerät. Geschrieben in Flutter.
 - Sprünge −15 s / +30 s, Abspielgeschwindigkeit 1,0× / 1,2× / 1,5× / 2,0×, Lautstärke-Boost (global oder pro Podcast)
 - Restzeit (bei höherem Tempo zusätzlich die tatsächliche Restzeit) oder Gesamtlänge – per Antippen umschaltbar
 - Shownotes mit antippbaren Links, Folgennummer und Erscheinungsdatum
-- Kapitel (Podlove, JSON, ID3) mit „Skip" je Kapitel, Lesezeichen mit Notiz
+- Kapitel (Podlove, JSON, ID3) mit Fortschritt des laufenden Kapitels und „Skip" je Kapitel, Lesezeichen mit Notiz
 - Sleep-Timer: 5 / 15 / 30 / 60 Minuten, eigene Zeit oder bis Ende der Folge – mit sanftem Ausblenden
 - Hörposition wird gemerkt; erst bis zum Ende gehört gilt eine Folge als gespielt
 - Abspielverlauf der letzten 100 zu Ende gehörten Folgen (bleibt auch nach dem Kündigen eines Abos)
@@ -40,14 +42,18 @@ Gerät. Geschrieben in Flutter.
 - Mehrere Playlists mit automatischem Weiterspielen; eine zu Ende gehörte Folge verlässt die Playlist, aus der sie
   lief (manuell als gespielt markiert: alle Playlists)
 - Folge woanders gestartet: ihre Playlist wird nur angeboten und erst nach Antippen fortgesetzt
-- „Als Nächstes spielen" und „Ans Ende der Playlist anfügen" für die laufende Playlist
+- „Als Nächstes spielen" und „Ans Ende der Playlist anfügen" für die laufende Playlist; ⏮ ⏭ im Player (auch per
+  Bluetooth), „Playlist öffnen“ springt zur laufenden Folge
+- Fertige Folgen verlassen die Playlist sofort, nach 10 Minuten (Standard) oder nie
 - „Fortsetzen" mit der zuletzt gespielten Folge jeder Playlist, Sortieren nach Datum oder Namen, „Alles downloaden"
 - Aus dem Abo-Menü: alle neuen, alle ungespielten oder alle ungespielten seit einem Datum in eine Playlist; über die
   Podcast-Seite gleich abspielen
 - Symbol an jeder Folge, die in einer Playlist steht
 
 **Downloads und Speicher**
-- Downloads manuell oder automatisch pro Podcast (auch nur bestimmte Themen, z. B. bei Netzwerk-Feeds wie WRINT)
+- Downloads manuell oder automatisch pro Podcast (auch nur bestimmte Themen, z. B. bei Netzwerk-Feeds wie WRINT);
+  „Nur WLAN“ mit „Jetzt über Mobilfunk laden“, fehlgeschlagene automatische Downloads werden erneut versucht
+- Neue Folgen eines Themas auf Wunsch gleich als gespielt
 - Automatisches Löschen gespielter Folgen nach 96 Stunden (nicht, solange sie noch in einer Playlist stehen),
   einstellbares Speicherlimit
 

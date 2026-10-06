@@ -1,6 +1,6 @@
 /// App version as in pubspec.yaml – update both together on a release
 /// (docs/build-and-release.md → GitHub-Release).
-const appVersion = '1.3.2';
+const appVersion = '1.3.3';
 
 /// Name shown to people (store, settings); the launcher uses "AuralListen".
 const appName = 'AA-AuralListen Podcatcher';
