@@ -244,10 +244,11 @@ void main() {
       expect(await titles(list), ['A', 'B', 'C']);
     });
 
-    test('without keeping, the item leaves at once (default)', () async {
+    test('without keeping, the item leaves at once ("Sofort")', () async {
       await playback.markFinished(a, playlistId: list);
       expect(await titles(list), ['B', 'C']);
-      expect(FinishedRemoval.fromSetting(null), FinishedRemoval.now);
+      // Default (user wish 2026-10-06): after 10 minutes.
+      expect(FinishedRemoval.fromSetting(null), FinishedRemoval.after10Minutes);
       expect(FinishedRemoval.fromSetting('never'), FinishedRemoval.never);
     });
   });

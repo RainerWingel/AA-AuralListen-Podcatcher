@@ -19,8 +19,11 @@ enum FinishedRemoval {
     never => null,
   };
 
+  /// Default: after 10 minutes (user wish 2026-10-06).
+  static const standard = after10Minutes;
+
   static FinishedRemoval fromSetting(String? value) =>
-      values.where((v) => v.name == value).firstOrNull ?? now;
+      values.where((v) => v.name == value).firstOrNull ?? standard;
 }
 
 /// A playlist with its episode count and total duration (Playlists tab).

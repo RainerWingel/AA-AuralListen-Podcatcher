@@ -27,7 +27,8 @@ abstract final class SettingsKeys {
   static const showTotalTime = 'player.showTotalTime';
 
   /// When an episode played to the end leaves its playlist: `now`,
-  /// `after10Minutes` or `never` (FinishedRemoval names; missing = now).
+  /// `after10Minutes` or `never` (FinishedRemoval names; missing =
+  /// after10Minutes).
   static const removeFinished = 'playlists.removeFinished';
 
   /// Playlist the current episode was started from (null = none).

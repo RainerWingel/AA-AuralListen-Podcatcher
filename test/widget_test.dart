@@ -667,7 +667,7 @@ void main() {
       expect(
         find.descendant(
           of: find.ancestor(of: tile, matching: find.byType(ListTile)),
-          matching: find.text('Sofort'),
+          matching: find.text('Nach 10 Minuten'),
         ),
         findsOneWidget,
       );

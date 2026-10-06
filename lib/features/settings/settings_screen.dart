@@ -309,7 +309,7 @@ class _FinishedRemovalTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final current =
-        ref.watch(finishedRemovalProvider).value ?? FinishedRemoval.now;
+        ref.watch(finishedRemovalProvider).value ?? FinishedRemoval.standard;
     return ListTile(
       leading: const Icon(Icons.playlist_remove),
       title: Text(l10n.finishedRemoval),

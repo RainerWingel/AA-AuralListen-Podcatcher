@@ -339,7 +339,7 @@ final seedColorProvider = Provider<Color>(
 );
 
 /// Player: total length instead of the remaining time (tap toggles it).
-/// Setting "Fertige Folgen aus Playlist entfernen" (default: now).
+/// Setting "Fertige Folgen aus Playlist entfernen" (default: after 10 min).
 final finishedRemovalProvider = StreamProvider.autoDispose<FinishedRemoval>(
   (ref) => ref
       .watch(settingsRepositoryProvider)

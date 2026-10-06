@@ -1276,6 +1276,18 @@ void main() {
       for (final id in [episodeId, ep2, ep3]) {
         await playlists.add(playlistId, id);
       }
+      // These tests check the leaving itself: "Sofort". The default (after
+      // 10 minutes) has its own test below.
+      await settings.set(SettingsKeys.removeFinished, 'now');
+    });
+
+    test('default: a finished episode stays 10 minutes, next starts', () async {
+      await settings.remove(SettingsKeys.removeFinished);
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep2);
+      expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
     });
 
     test(
