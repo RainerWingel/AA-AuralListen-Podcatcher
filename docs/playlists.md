@@ -140,6 +140,10 @@ gelesen, die neue Reihenfolge gilt also sofort.
     `finishedAt` (`clearFinished`).
   - Fertige Einträge sieht man weiter (abgeblendet ✓). Weiterspielen, ⏭ und „Fortsetzen" überspringen sie
     (`nextAfter`, `resumeEpisode`); ⏮ erreicht sie (gerade fertig gehört → zurück).
+- **Gespielte Folgen werden beim Weiterspielen generell übersprungen** (Benutzerwunsch 2026-10-06): nicht nur die in
+  dieser Playlist fertig gehörten, auch solche, die woanders gehört oder schon gespielt hinzugefügt wurden. Gilt für
+  automatisches Weiterspielen, ⏭ (im Player ausgegraut, wenn danach nur noch gespielte kommen) und „Fortsetzen".
+  ⏮ und Antippen spielen auch gespielte Folgen.
   - „Nach 10 Minuten": Timer im Handler (10 min + 5 s, in `dispose` beendet); zusätzlich räumt
     `cleanUpFinishedPlaylistItems` beim App-Start und nach einer Änderung der Einstellung auf (nach „Sofort"
     verschwinden alle fertigen sofort).

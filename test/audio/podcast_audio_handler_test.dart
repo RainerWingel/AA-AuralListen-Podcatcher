@@ -1495,6 +1495,18 @@ void main() {
       );
     });
 
+    test('⏭ skips an episode that is already played', () async {
+      await (db.update(db.episodes)..where((e) => e.id.equals(ep2))).write(
+        const EpisodesCompanion(status: Value(EpisodeStatus.played)),
+      );
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      await handler.skipToNext();
+      expect(handler.currentEpisodeId, ep3);
+      // ⏮ still reaches it.
+      await handler.skipToPrevious();
+      expect(handler.currentEpisodeId, ep2);
+    });
+
     test('previous without an active playlist does nothing', () async {
       await handler.playEpisode(ep2);
       expect(

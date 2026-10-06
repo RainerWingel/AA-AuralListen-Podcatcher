@@ -147,16 +147,28 @@ class PlaylistRepository {
           ),
       );
 
+  /// The episode of the item is not played (yet).
+  Expression<bool> _unplayed($PlaylistItemsTable i) => existsQuery(
+    _db.selectOnly(_db.episodes)
+      ..addColumns([_db.episodes.id])
+      ..where(
+        _db.episodes.id.equalsExp(i.episodeId) &
+            _db.episodes.status.equalsValue(EpisodeStatus.played).not(),
+      ),
+  );
+
   /// The entry after [position] – read at the moment it is needed, so items
-  /// added during playback are included (docs/playlists.md). Finished ones
-  /// that are kept in the playlist are skipped.
+  /// added during playback are included (docs/playlists.md). Played
+  /// episodes are skipped – finished ones kept in the playlist as well as
+  /// ones played elsewhere (user report 2026-10-06); ⏮ and a tap still
+  /// reach them.
   Future<PlaylistItem?> nextAfter(int playlistId, int position) =>
       (_db.select(_db.playlistItems)
             ..where(
               (i) =>
                   i.playlistId.equals(playlistId) &
                   i.position.isBiggerThanValue(position) &
-                  _finished(i).not(),
+                  _unplayed(i),
             )
             ..orderBy([(i) => OrderingTerm.asc(i.position)])
             ..limit(1))
@@ -208,8 +220,8 @@ class PlaylistRepository {
     )..where((p) => p.id.equals(playlistId))).getSingleOrNull())?.lastEpisodeId;
     final position = last == null ? null : await positionOf(playlistId, last);
     if (last != null && position != null) {
-      // Finished but kept there: go on with the next one instead.
-      if (!await _isFinished(playlistId, last)) return last;
+      // Played (e.g. finished but kept there): go on with the next one.
+      if (!await _isPlayed(last)) return last;
       final next = await nextAfter(playlistId, position);
       if (next != null) return next.episodeId;
     }
@@ -222,15 +234,11 @@ class PlaylistRepository {
             ?.episodeId;
   }
 
-  Future<bool> _isFinished(int playlistId, int episodeId) async =>
-      await (_db.select(_db.playlistItems)..where(
-            (i) =>
-                i.playlistId.equals(playlistId) &
-                i.episodeId.equals(episodeId) &
-                _finished(i),
-          ))
-          .getSingleOrNull() !=
-      null;
+  Future<bool> _isPlayed(int episodeId) async =>
+      (await (_db.select(
+        _db.episodes,
+      )..where((e) => e.id.equals(episodeId))).getSingleOrNull())?.status ==
+      EpisodeStatus.played;
 
   /// Keeps [episodeId] in [playlistId] as finished (instead of removing it).
   Future<void> markFinishedIn(int playlistId, int episodeId) =>

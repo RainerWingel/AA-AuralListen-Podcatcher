@@ -9,7 +9,7 @@ import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/info_snack_bar.dart';
-import '../../data/db/app_database.dart' show DownloadState;
+import '../../data/db/app_database.dart' show DownloadState, EpisodeStatus;
 import '../../data/playlist_repository.dart' show PlaylistEntry;
 import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
@@ -338,15 +338,18 @@ class _PlaylistRow extends ConsumerWidget {
     final current = ref.watch(
       mediaItemProvider.select((s) => s.value?.mediaItem?.id),
     );
-    final order = [
-      for (final e
-          in ref.watch(playlistEntriesProvider(playlistId)).value ??
-              const <PlaylistEntry>[])
-        '${e.episode.id}',
-    ];
-    final index = order.indexOf(current ?? '');
+    final entries =
+        ref.watch(playlistEntriesProvider(playlistId)).value ??
+        const <PlaylistEntry>[];
+    final index = entries.indexWhere((e) => '${e.episode.id}' == current);
     final hasPrevious = index > 0;
-    final hasNext = index >= 0 && index < order.length - 1;
+    // ⏭ skips played episodes, like the playlist does (user report
+    // 2026-10-06): only an unplayed one further down counts.
+    final hasNext =
+        index >= 0 &&
+        entries
+            .skip(index + 1)
+            .any((e) => e.episode.status != EpisodeStatus.played);
     // Offered: switches the playlist on and says so (user wish 2026-10-06).
     void activate() {
       handler.continueWithSuggestedPlaylist();

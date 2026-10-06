@@ -218,6 +218,17 @@ void main() {
       expect((await repo.previousBefore(list, positionOfB))!.episodeId, a);
     });
 
+    test('an episode played elsewhere is skipped by "next" too', () async {
+      await playback.markPlayed(b); // removes it from all playlists …
+      await repo.add(list, b); // … so it comes back played (user report)
+      await repo.move(list, 2, 1); // order again: A, B, C
+      expect(await titles(list), ['A', 'B', 'C']);
+      final positionOfA = (await repo.positionOf(list, a))!;
+      expect((await repo.nextAfter(list, positionOfA))!.episodeId, c);
+      await repo.setLastEpisode(list, b);
+      expect(await repo.resumeEpisode(list), c);
+    });
+
     test('removed by mode and age; "never" keeps it', () async {
       await playback.markFinished(a, playlistId: list, keepInPlaylist: true);
       expect(await repo.removeFinished(FinishedRemoval.never), 0);
