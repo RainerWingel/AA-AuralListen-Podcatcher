@@ -603,22 +603,24 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       );
 
   /// Applies "Fertige Folgen aus Playlist entfernen" to items finished
-  /// earlier: at app start and after the setting changed. With "after 10
-  /// minutes" a timer catches the ones that are not due yet.
+  /// earlier: at app start, on every episode change and after the setting
+  /// changed. With "after 10 minutes" a timer is set for the next item that
+  /// becomes due – only if one is waiting (the one in the player never is).
   Future<void> cleanUpFinishedPlaylistItems() async {
-    final removal = await _finishedRemoval();
-    await _playlists?.removeFinished(removal, keepEpisodeId: _episodeId);
-    if (removal == FinishedRemoval.after10Minutes) {
-      _scheduleFinishedCleanUp();
-    } else {
-      _finishedCleanUp?.cancel();
-    }
-  }
-
-  void _scheduleFinishedCleanUp() {
     _finishedCleanUp?.cancel();
+    _finishedCleanUp = null;
+    final playlists = _playlists;
+    if (playlists == null) return;
+    final removal = await _finishedRemoval();
+    final current = _episodeId;
+    await playlists.removeFinished(removal, keepEpisodeId: current);
+    final dueIn = await playlists.nextFinishedDueIn(
+      removal,
+      exceptEpisodeId: current,
+    );
+    if (dueIn == null) return;
     _finishedCleanUp = Timer(
-      FinishedRemoval.after10Minutes.delay! + const Duration(seconds: 5),
+      dueIn + const Duration(seconds: 1),
       () => unawaited(cleanUpFinishedPlaylistItems()),
     );
   }
@@ -992,9 +994,6 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
             playlistId: _activePlaylistId,
             keepInPlaylist: removal != FinishedRemoval.now,
           );
-          if (removal == FinishedRemoval.after10Minutes) {
-            _scheduleFinishedCleanUp();
-          }
           await _onFinished?.call(id);
         }
       }

@@ -259,6 +259,30 @@ class PlaylistRepository {
           ))
           .write(const PlaylistItemsCompanion(finishedAt: Value(null)));
 
+  /// How long until the next finished item (not [exceptEpisodeId]) is due
+  /// under [mode]; null = none waiting or never removed. For the clean-up
+  /// timer.
+  Future<Duration?> nextFinishedDueIn(
+    FinishedRemoval mode, {
+    int? exceptEpisodeId,
+  }) async {
+    final delay = mode.delay;
+    if (delay == null) return null;
+    final oldest = _db.playlistItems.finishedAt.min();
+    final query = _db.selectOnly(_db.playlistItems)
+      ..addColumns([oldest])
+      ..where(
+        _finished(_db.playlistItems) &
+            (exceptEpisodeId == null
+                ? const Constant(true)
+                : _db.playlistItems.episodeId.equals(exceptEpisodeId).not()),
+      );
+    final at = await query.map((r) => r.read(oldest)).getSingleOrNull();
+    if (at == null) return null;
+    final dueIn = at.add(delay).difference(_clock());
+    return dueIn.isNegative ? Duration.zero : dueIn;
+  }
+
   /// Removes finished items whose time is up under [mode] (all of them for
   /// "now", none for "never"). [keepEpisodeId]: the episode in the player –
   /// never removed while it is there (user wish 2026-10-06); a later run
