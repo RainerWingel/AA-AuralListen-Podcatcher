@@ -59,6 +59,10 @@ class Podcasts extends Table {
   /// Themes that are auto-downloaded (JSON list of theme keys, v5);
   /// null = all episodes regardless of theme.
   TextColumn get autoDownloadThemes => text().nullable()();
+
+  /// Themes whose new episodes are marked as played when fetched (JSON list
+  /// of theme keys, v25; null = none). Set per topic in its long-press menu.
+  TextColumn get autoPlayedThemes => text().nullable()();
   IntColumn get autoDownloadMaxEpisodes =>
       integer().withDefault(const Constant(3))();
   BoolColumn get autoDeletePlayed =>

@@ -1064,6 +1064,12 @@ abstract class AppLocalizations {
   /// **'Nie'**
   String get finishedRemovalNever;
 
+  /// No description provided for @autoMarkNewPlayed.
+  ///
+  /// In de, this message translates to:
+  /// **'Neue automatisch als gespielt markieren'**
+  String get autoMarkNewPlayed;
+
   /// Playlist menu: pick a category color (dialog title too).
   ///
   /// In de, this message translates to:

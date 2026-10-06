@@ -219,6 +219,17 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _autoPlayedThemesMeta = const VerificationMeta(
+    'autoPlayedThemes',
+  );
+  @override
+  late final GeneratedColumn<String> autoPlayedThemes = GeneratedColumn<String>(
+    'auto_played_themes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _autoDownloadMaxEpisodesMeta =
       const VerificationMeta('autoDownloadMaxEpisodes');
   @override
@@ -356,6 +367,7 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     subscribedAt,
     autoDownloadMode,
     autoDownloadThemes,
+    autoPlayedThemes,
     autoDownloadMaxEpisodes,
     autoDeletePlayed,
     boostDb,
@@ -507,6 +519,15 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         autoDownloadThemes.isAcceptableOrUnknown(
           data['auto_download_themes']!,
           _autoDownloadThemesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('auto_played_themes')) {
+      context.handle(
+        _autoPlayedThemesMeta,
+        autoPlayedThemes.isAcceptableOrUnknown(
+          data['auto_played_themes']!,
+          _autoPlayedThemesMeta,
         ),
       );
     }
@@ -675,6 +696,10 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         DriftSqlType.string,
         data['${effectivePrefix}auto_download_themes'],
       ),
+      autoPlayedThemes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}auto_played_themes'],
+      ),
       autoDownloadMaxEpisodes: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}auto_download_max_episodes'],
@@ -762,6 +787,10 @@ class Podcast extends DataClass implements Insertable<Podcast> {
   /// Themes that are auto-downloaded (JSON list of theme keys, v5);
   /// null = all episodes regardless of theme.
   final String? autoDownloadThemes;
+
+  /// Themes whose new episodes are marked as played when fetched (JSON list
+  /// of theme keys, v25; null = none). Set per topic in its long-press menu.
+  final String? autoPlayedThemes;
   final int autoDownloadMaxEpisodes;
   final bool autoDeletePlayed;
 
@@ -807,6 +836,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     required this.subscribedAt,
     required this.autoDownloadMode,
     this.autoDownloadThemes,
+    this.autoPlayedThemes,
     required this.autoDownloadMaxEpisodes,
     required this.autoDeletePlayed,
     this.boostDb,
@@ -864,6 +894,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     }
     if (!nullToAbsent || autoDownloadThemes != null) {
       map['auto_download_themes'] = Variable<String>(autoDownloadThemes);
+    }
+    if (!nullToAbsent || autoPlayedThemes != null) {
+      map['auto_played_themes'] = Variable<String>(autoPlayedThemes);
     }
     map['auto_download_max_episodes'] = Variable<int>(autoDownloadMaxEpisodes);
     map['auto_delete_played'] = Variable<bool>(autoDeletePlayed);
@@ -924,6 +957,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       autoDownloadThemes: autoDownloadThemes == null && nullToAbsent
           ? const Value.absent()
           : Value(autoDownloadThemes),
+      autoPlayedThemes: autoPlayedThemes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(autoPlayedThemes),
       autoDownloadMaxEpisodes: Value(autoDownloadMaxEpisodes),
       autoDeletePlayed: Value(autoDeletePlayed),
       boostDb: boostDb == null && nullToAbsent
@@ -971,6 +1007,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       autoDownloadThemes: serializer.fromJson<String?>(
         json['autoDownloadThemes'],
       ),
+      autoPlayedThemes: serializer.fromJson<String?>(json['autoPlayedThemes']),
       autoDownloadMaxEpisodes: serializer.fromJson<int>(
         json['autoDownloadMaxEpisodes'],
       ),
@@ -1011,6 +1048,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
         $PodcastsTable.$converterautoDownloadMode.toJson(autoDownloadMode),
       ),
       'autoDownloadThemes': serializer.toJson<String?>(autoDownloadThemes),
+      'autoPlayedThemes': serializer.toJson<String?>(autoPlayedThemes),
       'autoDownloadMaxEpisodes': serializer.toJson<int>(
         autoDownloadMaxEpisodes,
       ),
@@ -1045,6 +1083,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     DateTime? subscribedAt,
     AutoDownloadMode? autoDownloadMode,
     Value<String?> autoDownloadThemes = const Value.absent(),
+    Value<String?> autoPlayedThemes = const Value.absent(),
     int? autoDownloadMaxEpisodes,
     bool? autoDeletePlayed,
     Value<double?> boostDb = const Value.absent(),
@@ -1078,6 +1117,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     autoDownloadThemes: autoDownloadThemes.present
         ? autoDownloadThemes.value
         : this.autoDownloadThemes,
+    autoPlayedThemes: autoPlayedThemes.present
+        ? autoPlayedThemes.value
+        : this.autoPlayedThemes,
     autoDownloadMaxEpisodes:
         autoDownloadMaxEpisodes ?? this.autoDownloadMaxEpisodes,
     autoDeletePlayed: autoDeletePlayed ?? this.autoDeletePlayed,
@@ -1134,6 +1176,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       autoDownloadThemes: data.autoDownloadThemes.present
           ? data.autoDownloadThemes.value
           : this.autoDownloadThemes,
+      autoPlayedThemes: data.autoPlayedThemes.present
+          ? data.autoPlayedThemes.value
+          : this.autoPlayedThemes,
       autoDownloadMaxEpisodes: data.autoDownloadMaxEpisodes.present
           ? data.autoDownloadMaxEpisodes.value
           : this.autoDownloadMaxEpisodes,
@@ -1184,6 +1229,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ..write('subscribedAt: $subscribedAt, ')
           ..write('autoDownloadMode: $autoDownloadMode, ')
           ..write('autoDownloadThemes: $autoDownloadThemes, ')
+          ..write('autoPlayedThemes: $autoPlayedThemes, ')
           ..write('autoDownloadMaxEpisodes: $autoDownloadMaxEpisodes, ')
           ..write('autoDeletePlayed: $autoDeletePlayed, ')
           ..write('boostDb: $boostDb, ')
@@ -1218,6 +1264,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     subscribedAt,
     autoDownloadMode,
     autoDownloadThemes,
+    autoPlayedThemes,
     autoDownloadMaxEpisodes,
     autoDeletePlayed,
     boostDb,
@@ -1251,6 +1298,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           other.subscribedAt == this.subscribedAt &&
           other.autoDownloadMode == this.autoDownloadMode &&
           other.autoDownloadThemes == this.autoDownloadThemes &&
+          other.autoPlayedThemes == this.autoPlayedThemes &&
           other.autoDownloadMaxEpisodes == this.autoDownloadMaxEpisodes &&
           other.autoDeletePlayed == this.autoDeletePlayed &&
           other.boostDb == this.boostDb &&
@@ -1282,6 +1330,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
   final Value<DateTime> subscribedAt;
   final Value<AutoDownloadMode> autoDownloadMode;
   final Value<String?> autoDownloadThemes;
+  final Value<String?> autoPlayedThemes;
   final Value<int> autoDownloadMaxEpisodes;
   final Value<bool> autoDeletePlayed;
   final Value<double?> boostDb;
@@ -1311,6 +1360,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.subscribedAt = const Value.absent(),
     this.autoDownloadMode = const Value.absent(),
     this.autoDownloadThemes = const Value.absent(),
+    this.autoPlayedThemes = const Value.absent(),
     this.autoDownloadMaxEpisodes = const Value.absent(),
     this.autoDeletePlayed = const Value.absent(),
     this.boostDb = const Value.absent(),
@@ -1341,6 +1391,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     required DateTime subscribedAt,
     this.autoDownloadMode = const Value.absent(),
     this.autoDownloadThemes = const Value.absent(),
+    this.autoPlayedThemes = const Value.absent(),
     this.autoDownloadMaxEpisodes = const Value.absent(),
     this.autoDeletePlayed = const Value.absent(),
     this.boostDb = const Value.absent(),
@@ -1373,6 +1424,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Expression<DateTime>? subscribedAt,
     Expression<String>? autoDownloadMode,
     Expression<String>? autoDownloadThemes,
+    Expression<String>? autoPlayedThemes,
     Expression<int>? autoDownloadMaxEpisodes,
     Expression<bool>? autoDeletePlayed,
     Expression<double>? boostDb,
@@ -1404,6 +1456,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       if (autoDownloadMode != null) 'auto_download_mode': autoDownloadMode,
       if (autoDownloadThemes != null)
         'auto_download_themes': autoDownloadThemes,
+      if (autoPlayedThemes != null) 'auto_played_themes': autoPlayedThemes,
       if (autoDownloadMaxEpisodes != null)
         'auto_download_max_episodes': autoDownloadMaxEpisodes,
       if (autoDeletePlayed != null) 'auto_delete_played': autoDeletePlayed,
@@ -1438,6 +1491,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Value<DateTime>? subscribedAt,
     Value<AutoDownloadMode>? autoDownloadMode,
     Value<String?>? autoDownloadThemes,
+    Value<String?>? autoPlayedThemes,
     Value<int>? autoDownloadMaxEpisodes,
     Value<bool>? autoDeletePlayed,
     Value<double?>? boostDb,
@@ -1468,6 +1522,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
       subscribedAt: subscribedAt ?? this.subscribedAt,
       autoDownloadMode: autoDownloadMode ?? this.autoDownloadMode,
       autoDownloadThemes: autoDownloadThemes ?? this.autoDownloadThemes,
+      autoPlayedThemes: autoPlayedThemes ?? this.autoPlayedThemes,
       autoDownloadMaxEpisodes:
           autoDownloadMaxEpisodes ?? this.autoDownloadMaxEpisodes,
       autoDeletePlayed: autoDeletePlayed ?? this.autoDeletePlayed,
@@ -1543,6 +1598,9 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     if (autoDownloadThemes.present) {
       map['auto_download_themes'] = Variable<String>(autoDownloadThemes.value);
     }
+    if (autoPlayedThemes.present) {
+      map['auto_played_themes'] = Variable<String>(autoPlayedThemes.value);
+    }
     if (autoDownloadMaxEpisodes.present) {
       map['auto_download_max_episodes'] = Variable<int>(
         autoDownloadMaxEpisodes.value,
@@ -1597,6 +1655,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           ..write('subscribedAt: $subscribedAt, ')
           ..write('autoDownloadMode: $autoDownloadMode, ')
           ..write('autoDownloadThemes: $autoDownloadThemes, ')
+          ..write('autoPlayedThemes: $autoPlayedThemes, ')
           ..write('autoDownloadMaxEpisodes: $autoDownloadMaxEpisodes, ')
           ..write('autoDeletePlayed: $autoDeletePlayed, ')
           ..write('boostDb: $boostDb, ')
@@ -5790,6 +5849,7 @@ typedef $$PodcastsTableCreateCompanionBuilder = PodcastsCompanion Function({
   required DateTime subscribedAt,
   Value<AutoDownloadMode> autoDownloadMode,
   Value<String?> autoDownloadThemes,
+  Value<String?> autoPlayedThemes,
   Value<int> autoDownloadMaxEpisodes,
   Value<bool> autoDeletePlayed,
   Value<double?> boostDb,
@@ -5820,6 +5880,7 @@ typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<DateTime> subscribedAt,
   Value<AutoDownloadMode> autoDownloadMode,
   Value<String?> autoDownloadThemes,
+  Value<String?> autoPlayedThemes,
   Value<int> autoDownloadMaxEpisodes,
   Value<bool> autoDeletePlayed,
   Value<double?> boostDb,
@@ -5957,6 +6018,11 @@ class $$PodcastsTableFilterComposer
 
   ColumnFilters<String> get autoDownloadThemes => $composableBuilder(
     column: $table.autoDownloadThemes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get autoPlayedThemes => $composableBuilder(
+    column: $table.autoPlayedThemes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6135,6 +6201,11 @@ class $$PodcastsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get autoPlayedThemes => $composableBuilder(
+    column: $table.autoPlayedThemes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get autoDownloadMaxEpisodes => $composableBuilder(
     column: $table.autoDownloadMaxEpisodes,
     builder: (column) => ColumnOrderings(column),
@@ -6268,6 +6339,11 @@ class $$PodcastsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get autoPlayedThemes => $composableBuilder(
+    column: $table.autoPlayedThemes,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get autoDownloadMaxEpisodes => $composableBuilder(
     column: $table.autoDownloadMaxEpisodes,
     builder: (column) => column,
@@ -6384,6 +6460,7 @@ class $$PodcastsTableTableManager
                 Value<DateTime> subscribedAt = const Value.absent(),
                 Value<AutoDownloadMode> autoDownloadMode = const Value.absent(),
                 Value<String?> autoDownloadThemes = const Value.absent(),
+                Value<String?> autoPlayedThemes = const Value.absent(),
                 Value<int> autoDownloadMaxEpisodes = const Value.absent(),
                 Value<bool> autoDeletePlayed = const Value.absent(),
                 Value<double?> boostDb = const Value.absent(),
@@ -6413,6 +6490,7 @@ class $$PodcastsTableTableManager
                 subscribedAt: subscribedAt,
                 autoDownloadMode: autoDownloadMode,
                 autoDownloadThemes: autoDownloadThemes,
+                autoPlayedThemes: autoPlayedThemes,
                 autoDownloadMaxEpisodes: autoDownloadMaxEpisodes,
                 autoDeletePlayed: autoDeletePlayed,
                 boostDb: boostDb,
@@ -6444,6 +6522,7 @@ class $$PodcastsTableTableManager
                 required DateTime subscribedAt,
                 Value<AutoDownloadMode> autoDownloadMode = const Value.absent(),
                 Value<String?> autoDownloadThemes = const Value.absent(),
+                Value<String?> autoPlayedThemes = const Value.absent(),
                 Value<int> autoDownloadMaxEpisodes = const Value.absent(),
                 Value<bool> autoDeletePlayed = const Value.absent(),
                 Value<double?> boostDb = const Value.absent(),
@@ -6473,6 +6552,7 @@ class $$PodcastsTableTableManager
                 subscribedAt: subscribedAt,
                 autoDownloadMode: autoDownloadMode,
                 autoDownloadThemes: autoDownloadThemes,
+                autoPlayedThemes: autoPlayedThemes,
                 autoDownloadMaxEpisodes: autoDownloadMaxEpisodes,
                 autoDeletePlayed: autoDeletePlayed,
                 boostDb: boostDb,

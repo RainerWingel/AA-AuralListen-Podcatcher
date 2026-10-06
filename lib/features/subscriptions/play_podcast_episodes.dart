@@ -7,7 +7,8 @@ import '../../core/clock.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/feed/rss_parser.dart' show themeDisplayName;
-import '../../data/podcast_repository.dart' show PodcastRepository;
+import '../../data/podcast_repository.dart'
+    show PodcastRepository, autoPlayedThemesOf;
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
@@ -143,6 +144,10 @@ Future<void> showPodcastPlayMenu(
                   onTap: () =>
                       Navigator.of(sheetContext).pop(_PlayChoice.markAll),
                 ),
+                // Topic menu only: new episodes of it arrive as played
+                // (user wish 2026-10-06).
+                if (theme != null)
+                  _AutoPlayedToggle(podcast: podcast, theme: theme),
               ],
             ],
           ),
@@ -448,4 +453,38 @@ Future<void> subscribeProvisional(
   final text = AppLocalizations.of(context).subscribedSnack(podcast.title);
   await ref.read(podcastRepositoryProvider).confirmSubscription(podcast.id);
   showInfoSnackBar(messenger, text);
+}
+
+/// "Neue automatisch als gespielt markieren" for one topic: stored at once,
+/// the menu stays open.
+class _AutoPlayedToggle extends ConsumerStatefulWidget {
+  const _AutoPlayedToggle({required this.podcast, required this.theme});
+
+  final Podcast podcast;
+  final String theme;
+
+  @override
+  ConsumerState<_AutoPlayedToggle> createState() => _AutoPlayedToggleState();
+}
+
+class _AutoPlayedToggleState extends ConsumerState<_AutoPlayedToggle> {
+  late bool _on = autoPlayedThemesOf(widget.podcast).contains(widget.theme);
+
+  @override
+  Widget build(BuildContext context) => CheckboxListTile(
+    secondary: const Icon(Icons.playlist_add_check_circle_outlined),
+    title: Text(AppLocalizations.of(context).autoMarkNewPlayed),
+    value: _on,
+    onChanged: (value) {
+      final enabled = value ?? false;
+      setState(() => _on = enabled);
+      ref
+          .read(podcastRepositoryProvider)
+          .setAutoPlayedTheme(
+            widget.podcast.id,
+            widget.theme,
+            enabled: enabled,
+          );
+    },
+  );
 }

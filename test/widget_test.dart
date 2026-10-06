@@ -922,6 +922,31 @@ void main() {
     // Nothing starts while the settings are still being chosen …
     expect(downloadEngine.active, isEmpty);
 
+    // Long press on a topic: 5th entry "Neue automatisch als gespielt
+    // markieren", checkable, stored at once (user wish 2026-10-06).
+    // (Scrolled out of view by the mode choice above.)
+    await tester.ensureVisible(find.text('Die Wrintheit'));
+    await settle(tester);
+    await tester.longPress(find.text('Die Wrintheit'));
+    await settle(tester);
+    final autoPlayed = find.widgetWithText(
+      CheckboxListTile,
+      'Neue automatisch als gespielt markieren',
+    );
+    expect(autoPlayed, findsOneWidget);
+    expect(tester.widget<CheckboxListTile>(autoPlayed).value, isFalse);
+    await tester.tap(autoPlayed);
+    await settle(tester);
+    expect(tester.widget<CheckboxListTile>(autoPlayed).value, isTrue);
+    final marked = await tester.runAsync(
+      () => (db.select(
+        db.podcasts,
+      )..where((p) => p.id.equals(podcastId!))).getSingle(),
+    );
+    expect(marked!.autoPlayedThemes, '["die-wrintheit"]');
+    Navigator.of(tester.element(autoPlayed)).pop();
+    await settle(tester);
+
     // … the number is choosable, and closing the sheet applies it all.
     await tester.tap(find.widgetWithText(SegmentedButton<int>, '1'));
     await settle(tester);

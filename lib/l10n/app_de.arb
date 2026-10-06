@@ -310,6 +310,7 @@
   "finishedRemovalNow": "Sofort",
   "finishedRemovalAfter10Minutes": "Nach 10 Minuten",
   "finishedRemovalNever": "Nie",
+  "autoMarkNewPlayed": "Neue automatisch als gespielt markieren",
   "playlistColor": "Farbe…",
   "@playlistColor": {
     "description": "Playlist menu: pick a category color (dialog title too)."

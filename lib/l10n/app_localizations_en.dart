@@ -583,6 +583,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get finishedRemovalNever => 'Never';
 
   @override
+  String get autoMarkNewPlayed => 'Mark new ones as played automatically';
+
+  @override
   String get playlistColor => 'Color…';
 
   @override

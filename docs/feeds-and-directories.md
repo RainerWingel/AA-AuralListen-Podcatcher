@@ -93,6 +93,11 @@ Manche Feeds bündeln mehrere Sendereihen („Die Wrintheit", „Zum Thema" …)
 - Gespeichert in `episodes.theme` (Schema v5). Feeds ohne solche Links haben kein Thema; die Themen-Auswahl erscheint
   erst ab 2 Themen.
 - Beim Update auf v5 werden ETag/Last-Modified gelöscht, damit der nächste Refresh alle Folgen neu liest und das Thema nachträgt.
+- **„Neue automatisch als gespielt markieren"** (Benutzerwunsch 2026-10-06): 5. Eintrag (abhakbar) im Menü beim
+  langen Drücken auf ein Thema in den Podcast-Einstellungen; sofort gespeichert in `podcasts.autoPlayedThemes` (v25,
+  JSON-Liste). Beim Abruf neu hinzugekommene Folgen dieses Themas (`addedAt` = jetzt) werden direkt **gespielt**
+  (`_markNewOfAutoPlayedThemes`): kein Punkt, keine ungespielt-Zahl, kein Auto-Download. Schon bekannte Folgen bleiben
+  unberührt.
 
 ## OPML
 Code: `lib/data/feed/opml.dart` (Parser), `lib/data/opml_importer.dart` (Import), `lib/features/settings/opml_import_flow.dart` (UI).

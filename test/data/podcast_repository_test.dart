@@ -780,6 +780,43 @@ void main() {
     expect(autoDownloadThemesOf(podcast), isNull);
   });
 
+  test('topic "mark new ones as played": only new episodes of it', () async {
+    String item(String guid, String theme) =>
+        '<item><title>T$guid</title><guid>$guid</guid>'
+        '<link>https://wrint.network.podigee.io/podcast/1-$theme/$guid</link>'
+        '<enclosure url="https://example.com/$guid.mp3" type="audio/mpeg"/>'
+        '</item>';
+    String feed(List<String> items) =>
+        '<rss><channel><title>WRINT</title>${items.join()}</channel></rss>';
+    var body = feed([item('1', 'zum-thema'), item('2', 'die-wrintheit')]);
+    server['https://example.com/wrint'] = () => http.Response(body, 200);
+    final id = await repo.subscribe('https://example.com/wrint');
+
+    await repo.setAutoPlayedTheme(id, 'zum-thema', enabled: true);
+    expect(autoPlayedThemesOf((await repo.watchPodcast(id).first)!), {
+      'zum-thema',
+    });
+
+    body = feed([
+      item('3', 'zum-thema'),
+      item('4', 'die-wrintheit'),
+      item('1', 'zum-thema'),
+      item('2', 'die-wrintheit'),
+    ]);
+    clockNow = clockNow.add(const Duration(hours: 1));
+    await repo.refreshPodcast((await repo.watchPodcast(id).first)!);
+
+    Future<EpisodeStatus> status(String guid) async => (await (db.select(
+      db.episodes,
+    )..where((e) => e.guid.equals(guid))).getSingle()).status;
+    expect(await status('3'), EpisodeStatus.played); // new, the topic
+    expect(await status('4'), EpisodeStatus.newEpisode); // other topic
+    expect(await status('1'), EpisodeStatus.newEpisode); // known before
+
+    await repo.setAutoPlayedTheme(id, 'zum-thema', enabled: false);
+    expect(autoPlayedThemesOf((await repo.watchPodcast(id).first)!), isEmpty);
+  });
+
   test('Podlove chapters from the feed are stored once', () async {
     String feed(String firstTitle) =>
         '''

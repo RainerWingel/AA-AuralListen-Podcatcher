@@ -47,6 +47,14 @@ Set<String>? autoDownloadThemesOf(Podcast podcast) {
   return {...(jsonDecode(json) as List<Object?>).whereType<String>()};
 }
 
+/// Themes whose new episodes are marked as played on arrival (column is
+/// JSON; empty = none).
+Set<String> autoPlayedThemesOf(Podcast podcast) {
+  final json = podcast.autoPlayedThemes;
+  if (json == null) return const {};
+  return {...(jsonDecode(json) as List<Object?>).whereType<String>()};
+}
+
 /// "Fresh": fetched by a refresh within [PodcastRepository.freshFor]; the
 /// initial import when subscribing never counts (docs/playlists.md). Same
 /// rule as the SQL in [PodcastRepository.unplayedEpisodes].
@@ -546,6 +554,29 @@ class PodcastRepository {
         ),
       );
 
+  /// "Neue automatisch als gespielt markieren" for one topic (user wish
+  /// 2026-10-06): new episodes of [theme] arrive as played.
+  Future<void> setAutoPlayedTheme(
+    int podcastId,
+    String theme, {
+    required bool enabled,
+  }) => _db.transaction(() async {
+    final podcast = await (_db.select(
+      _db.podcasts,
+    )..where((p) => p.id.equals(podcastId))).getSingleOrNull();
+    if (podcast == null) return;
+    final themes = {...autoPlayedThemesOf(podcast)};
+    enabled ? themes.add(theme) : themes.remove(theme);
+    await _updatePodcast(
+      podcastId,
+      PodcastsCompanion(
+        autoPlayedThemes: Value(
+          themes.isEmpty ? null : jsonEncode(themes.toList()..sort()),
+        ),
+      ),
+    );
+  });
+
   /// Per-podcast download settings (podcast settings sheet).
   Future<void> updatePodcastSettings(
     int podcastId, {
@@ -765,8 +796,33 @@ class PodcastRepository {
     DateTime now,
   ) async {
     await _upsertEpisodeRows(podcastId, episodes, now);
+    await _markNewOfAutoPlayedThemes(podcastId, now);
     await _storeEpisodeNotes(podcastId, episodes);
     await _storeFeedChapters(podcastId, episodes);
+  }
+
+  /// New episodes (added just now) of topics set to "Neue automatisch als
+  /// gespielt markieren" arrive as played – no dot, no auto-download.
+  Future<void> _markNewOfAutoPlayedThemes(int podcastId, DateTime now) async {
+    final podcast = await (_db.select(
+      _db.podcasts,
+    )..where((p) => p.id.equals(podcastId))).getSingleOrNull();
+    if (podcast == null) return;
+    final themes = autoPlayedThemesOf(podcast);
+    if (themes.isEmpty) return;
+    await (_db.update(_db.episodes)..where(
+          (e) =>
+              e.podcastId.equals(podcastId) &
+              e.addedAt.equals(now) &
+              e.theme.isIn(themes) &
+              e.status.equalsValue(EpisodeStatus.newEpisode),
+        ))
+        .write(
+          EpisodesCompanion(
+            status: const Value(EpisodeStatus.played),
+            playedAt: Value(now),
+          ),
+        );
   }
 
   /// Show notes go to their own table (episode lists never load them).
