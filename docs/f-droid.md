@@ -75,6 +75,9 @@ Rezept im Fork ersetzt (2026-10-05, Inhalt mit dieser Datei identisch geprüft),
 - **Netzdienste** (Prüferfrage 2026-10-06): Feeds/Cover/Audio direkt von den Podcast-Servern, Suche über Apple iTunes
   Search API und fyyd.de, kein eigener Server, kein Konto. Wegen Apple steht im Rezept das Anti-Feature
   **`NonFreeNet`** (RSS-Adresse und OPML gehen ohne).
+- **Format exakt wie `fdroid rewritemeta`**, sonst wird der Pipeline-Job „fdroid rewritemeta" rot (2026-10-06: nur
+  ein anderer Zeilenumbruch im Anti-Feature-Text). Lange Texte bricht rewritemeta nach etwa 80 Zeichen um; im Zweifel
+  den Diff aus dem Job-Log übernehmen.
 - Änderungen am Rezept: Benutzer ersetzt die Datei im Fork `ArtemArb/fdroiddata` (Branch `master`) über die
   Weboberfläche; der MR aktualisiert sich selbst, die Pipeline läuft neu. Nachrichten im MR schreibt nur der Benutzer.
 

@@ -1,7 +1,7 @@
 AntiFeatures:
   NonFreeNet:
-    en-US: The podcast search uses the Apple iTunes Search API (besides fyyd.de). Subscribing
-      by RSS address and OPML import work without it.
+    en-US: The podcast search uses the Apple iTunes Search API (besides fyyd.de).
+      Subscribing by RSS address and OPML import work without it.
 Categories:
   - Podcast
 License: GPL-3.0-only
