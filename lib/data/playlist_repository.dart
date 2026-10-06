@@ -4,6 +4,25 @@ import '../core/clock.dart';
 import '../core/text_utils.dart';
 import 'db/app_database.dart';
 
+/// Setting "Fertige Folgen aus Playlist entfernen" (user wish 2026-10-06):
+/// when an episode played to the end leaves the playlist it was played
+/// from. Manual "mark as played" always removes it from all playlists.
+enum FinishedRemoval {
+  now,
+  after10Minutes,
+  never;
+
+  /// How long a finished episode stays (null = for good).
+  Duration? get delay => switch (this) {
+    now => Duration.zero,
+    after10Minutes => const Duration(minutes: 10),
+    never => null,
+  };
+
+  static FinishedRemoval fromSetting(String? value) =>
+      values.where((v) => v.name == value).firstOrNull ?? now;
+}
+
 /// A playlist with its episode count and total duration (Playlists tab).
 typedef PlaylistSummary = ({Playlist playlist, int count, Duration duration});
 
@@ -112,14 +131,29 @@ class PlaylistRepository {
               .getSingleOrNull())
           ?.position;
 
+  /// The item is kept after being played to the end from its playlist and
+  /// the episode is still played (any "mark as unplayed" ends that).
+  Expression<bool> _finished($PlaylistItemsTable i) =>
+      i.finishedAt.isNotNull() &
+      existsQuery(
+        _db.selectOnly(_db.episodes)
+          ..addColumns([_db.episodes.id])
+          ..where(
+            _db.episodes.id.equalsExp(i.episodeId) &
+                _db.episodes.status.equalsValue(EpisodeStatus.played),
+          ),
+      );
+
   /// The entry after [position] – read at the moment it is needed, so items
-  /// added during playback are included (docs/playlists.md).
+  /// added during playback are included (docs/playlists.md). Finished ones
+  /// that are kept in the playlist are skipped.
   Future<PlaylistItem?> nextAfter(int playlistId, int position) =>
       (_db.select(_db.playlistItems)
             ..where(
               (i) =>
                   i.playlistId.equals(playlistId) &
-                  i.position.isBiggerThanValue(position),
+                  i.position.isBiggerThanValue(position) &
+                  _finished(i).not(),
             )
             ..orderBy([(i) => OrderingTerm.asc(i.position)])
             ..limit(1))
@@ -169,15 +203,61 @@ class PlaylistRepository {
     final last = (await (_db.select(
       _db.playlists,
     )..where((p) => p.id.equals(playlistId))).getSingleOrNull())?.lastEpisodeId;
-    if (last != null && await positionOf(playlistId, last) != null) {
-      return last;
+    final position = last == null ? null : await positionOf(playlistId, last);
+    if (last != null && position != null) {
+      // Finished but kept there: go on with the next one instead.
+      if (!await _isFinished(playlistId, last)) return last;
+      final next = await nextAfter(playlistId, position);
+      if (next != null) return next.episodeId;
     }
-    return (await (_db.select(_db.playlistItems)
-              ..where((i) => i.playlistId.equals(playlistId))
-              ..orderBy([(i) => OrderingTerm.asc(i.position)])
-              ..limit(1))
-            .getSingleOrNull())
-        ?.episodeId;
+    return (await nextAfter(playlistId, -1))?.episodeId ??
+        (await (_db.select(_db.playlistItems)
+                  ..where((i) => i.playlistId.equals(playlistId))
+                  ..orderBy([(i) => OrderingTerm.asc(i.position)])
+                  ..limit(1))
+                .getSingleOrNull())
+            ?.episodeId;
+  }
+
+  Future<bool> _isFinished(int playlistId, int episodeId) async =>
+      await (_db.select(_db.playlistItems)..where(
+            (i) =>
+                i.playlistId.equals(playlistId) &
+                i.episodeId.equals(episodeId) &
+                _finished(i),
+          ))
+          .getSingleOrNull() !=
+      null;
+
+  /// Keeps [episodeId] in [playlistId] as finished (instead of removing it).
+  Future<void> markFinishedIn(int playlistId, int episodeId) =>
+      (_db.update(_db.playlistItems)..where(
+            (i) =>
+                i.playlistId.equals(playlistId) & i.episodeId.equals(episodeId),
+          ))
+          .write(PlaylistItemsCompanion(finishedAt: Value(_clock())));
+
+  /// Started again from [playlistId]: no longer finished there (a replay must
+  /// not be removed after 10 minutes).
+  Future<void> clearFinished(int playlistId, int episodeId) =>
+      (_db.update(_db.playlistItems)..where(
+            (i) =>
+                i.playlistId.equals(playlistId) &
+                i.episodeId.equals(episodeId) &
+                i.finishedAt.isNotNull(),
+          ))
+          .write(const PlaylistItemsCompanion(finishedAt: Value(null)));
+
+  /// Removes finished items whose time is up under [mode] (all of them for
+  /// "now", none for "never"). Returns the number removed.
+  Future<int> removeFinished(FinishedRemoval mode) {
+    final delay = mode.delay;
+    if (delay == null) return Future.value(0);
+    final cutoff = _clock().subtract(delay);
+    return (_db.delete(_db.playlistItems)..where(
+          (i) => _finished(i) & i.finishedAt.isSmallerOrEqualValue(cutoff),
+        ))
+        .go();
   }
 
   /// Sets the category color (null = none).

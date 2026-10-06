@@ -128,6 +128,18 @@ gelesen, die neue Reihenfolge gilt also sofort.
   **nicht** als gespielt markiert und **bleibt** in der Playlist.
 - Manuelles „Als gespielt markieren" (auch „bis …") entfernt die Folge dagegen aus **allen** Playlists
   (`PlaybackRepository.markPlayed`); das Ende der Wiedergabe nutzt `markFinished(id, playlistId: aktive)`.
+- **Optionen → Hören → „Fertige Folgen aus Playlist entfernen"** (Benutzerwunsch 2026-10-06, `FinishedRemoval`,
+  `settings['playlists.removeFinished']`): **Sofort** (Standard, wie bisher) · **Nach 10 Minuten** · **Nie**. Gilt nur
+  für zu Ende gehörte Folgen; „Als gespielt markieren" entfernt immer sofort aus allen.
+  - Statt Löschen bekommt der Eintrag `playlist_items.finishedAt` (v24). „Fertig" zählt nur, solange die Folge noch
+    gespielt ist – jedes „als ungespielt markieren" hebt es also auf; erneutes Abspielen aus der Playlist löscht
+    `finishedAt` (`clearFinished`).
+  - Fertige Einträge sieht man weiter (abgeblendet ✓). Weiterspielen, ⏭ und „Fortsetzen" überspringen sie
+    (`nextAfter`, `resumeEpisode`); ⏮ erreicht sie (gerade fertig gehört → zurück).
+  - „Nach 10 Minuten": Timer im Handler (10 min + 5 s, in `dispose` beendet); zusätzlich räumt
+    `cleanUpFinishedPlaylistItems` beim App-Start und nach einer Änderung der Einstellung auf (nach „Sofort"
+    verschwinden alle fertigen sofort).
+  - Downloads: Ein fertiger Eintrag **schützt den Download nicht** vor der 96-h-Löschung (`eviction.md`).
 - **Die gerade laufende Folge wird als gespielt markiert** (Folgen-Menü, „Alle als gespielt markieren", „bis …";
   Benutzerwunsch 2026-10-06): Der Player **stoppt** und zeigt das **Ende** – wie am Dateiende, aber ohne Weiterspielen
   in der Playlist und ohne Eintrag im Abspielverlauf. Der Handler beobachtet dafür `playedAt` der aktuellen Folge

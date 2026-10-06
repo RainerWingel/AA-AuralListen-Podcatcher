@@ -654,6 +654,39 @@ void main() {
     },
   );
 
+  testWidgets(
+    'setting: when finished episodes leave the playlist',
+    timeout: timeout,
+    (tester) async {
+      await pumpApp(tester);
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      final tile = find.text('Fertige Folgen aus Playlist entfernen');
+      await tester.ensureVisible(tile);
+      await settle(tester);
+      expect(
+        find.descendant(
+          of: find.ancestor(of: tile, matching: find.byType(ListTile)),
+          matching: find.text('Sofort'),
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(tile);
+      await settle(tester);
+      await tester.tap(find.text('Nie'));
+      await settle(tester);
+      expect(
+        await tester.runAsync(
+          () => SettingsRepository(db).get(SettingsKeys.removeFinished),
+        ),
+        'never',
+      );
+      expect(find.text('Nie'), findsOneWidget); // subtitle
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('a playlist name can only exist once', timeout: timeout, (
     tester,
   ) async {
@@ -1633,6 +1666,9 @@ void main() {
       await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
       await settle(tester);
       expect(find.textContaining('Akku-Optimierung aktiv'), findsOneWidget);
+      // Further down since the playlist setting sits above it.
+      await tester.ensureVisible(find.text('Hintergrund-Wiedergabe'));
+      await settle(tester);
       await tester.tap(find.text('Hintergrund-Wiedergabe'));
       await settle(tester);
       expect(battery.settingsOpened, 1);

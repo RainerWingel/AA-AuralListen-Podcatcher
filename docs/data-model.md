@@ -2,7 +2,7 @@
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
 Aktuell **schemaVersion 23** (v20 = App 1.3.1/1.3.2; v21: `downloads.failedAttempts`; v22: `podcasts.rating`;
-v23: `podcasts.provisional`).
+v23: `podcasts.provisional`; v24: `playlist_items.finishedAt`).
 **Migriert wird erst ab v20** (`AppDatabase.oldestMigratedSchema`, Benutzerentscheidung 2026-10-05): Die Schritte
 v1–v19 wurden gelöscht, weil keine älteren Installationen bekannt sind (GitHub-APKs nie heruntergeladen, F-Droid
 startet mit 1.3.2). Eine ältere Datenbank wird **leer neu angelegt** statt abzustürzen. Folge: Backups aus App-Versionen
@@ -28,12 +28,12 @@ Nach Änderungen an Tabellen: `dart run build_runner build --delete-conflicting-
 Fremdschlüsseln neu aufbauen würde), audioUrl, audioMimeType, audioSizeBytes, durationMs, pubDate, imageUrl, chaptersUrl, theme (v5, z. B. `zum-thema`), episodeNumber (v11, `itunes:episode`), season (v18, `itunes:season` ≥ 1), status, positionMs, playedAt, addedAt |
 | `downloads` ✅ (v3) | episodeId (PK, FK → episodes, CASCADE), relativePath (`<id>.<ext>`), state (queued/running/done/failed), sizeBytes, wifiOnly, failedAttempts (v21, Zahl der Fehlschläge – Auto-Download gibt nach 3 auf), createdAt, completedAt. Regeln: `eviction.md` |
 | `playlists` ✅ (v4) | id, name, sortOrder, createdAt, lastEpisodeId (v7, zuletzt aus der Playlist gespielte Folge für „Fortsetzen", ohne FK), color (v9, `PlaylistColor` als Name, null = keine). Standard-Playlist „Wiedergabeliste" (`AppDatabase.defaultPlaylistName`) |
-| `playlist_items` ✅ (v4) | PK (playlistId, episodeId), beide FK mit CASCADE, position (aufsteigend, neu = max + 1), addedAt |
+| `playlist_items` ✅ (v4) | PK (playlistId, episodeId), beide FK mit CASCADE, position (aufsteigend, neu = max + 1), addedAt, finishedAt (v24, zu Ende gehört und behalten – Einstellung „Fertige Folgen aus Playlist entfernen", `playlists.md`) |
 | `chapters` ✅ (v6) | PK (episodeId, startMs), FK CASCADE, title, url, imageUrl. Quellen: `playback.md` |
 | `episode_notes` ✅ (v13) | episodeId (PK, FK → episodes, CASCADE), notes. Shownotes **getrennt von `episodes`**, damit Folgenlisten sie nicht in den Arbeitsspeicher laden; gelesen nur beim Anzeigen (`episodeNotesProvider`, autoDispose). Format: Text mit Zeilenumbrüchen und „• " für Aufzählungen, Links als `\uE000Text\uE001URL\uE002` (nur http/https), max. **18000** Zeichen inkl. URLs (Benutzerwunsch 2026-10-03, vorher 6000; nur beim Anzeigen im Speicher), Links werden beim Kürzen nie zerteilt (`htmlToNotes`/`parseNotes` in `lib/core/text_utils.dart`). Beim Feed-Refresh neu geschrieben; Folge ohne Shownotes → Zeile gelöscht. Die Abos-Suche sucht auch hier. |
 | `play_history` ✅ (v19) | id, feedUrl, guid, episodeTitle, podcastTitle, imageUrl, durationMs, playedAt. Abspielverlauf, max. 100 neueste; **ohne FK**, damit Einträge das Abo-Kündigen überleben; eindeutig über feedUrl + guid (`playback.md`) |
 | `bookmarks` ✅ (v6) | id, episodeId (FK CASCADE), positionMs, note (null = keine), createdAt |
-| `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb`, `player.activePlaylistId`, `player.showTotalTime` (`true` = Gesamtlänge statt Restzeit, fehlt = Restzeit), `player.speed` (Abspieltempo, fehlt = 1,0), `downloads.limitBytes`, `ui.themeMode`, `ui.language` (`de`/`en`, fehlt = noch nicht gewählt), `ui.appColor` (`AppColor`-Name, fehlt = wallpaper, ohne Wallpaper-Farben orange) |
+| `settings` ✅ (v2) | key (PK), value (Text). Schlüssel in `lib/data/settings_keys.dart`: `player.lastEpisodeId`, `player.boostDb`, `player.activePlaylistId`, `player.showTotalTime` (`true` = Gesamtlänge statt Restzeit, fehlt = Restzeit), `player.speed` (Abspieltempo, fehlt = 1,0), `downloads.limitBytes`, `playlists.removeFinished` (`now`/`after10Minutes`/`never`, fehlt = now), `ui.themeMode`, `ui.language` (`de`/`en`, fehlt = noch nicht gewählt), `ui.appColor` (`AppColor`-Name, fehlt = wallpaper, ohne Wallpaper-Farben orange) |
 | ~~`player_state`~~ | entfällt – letzte Folge und aktive Playlist stehen in `settings` |
 
 ## Episoden-Status

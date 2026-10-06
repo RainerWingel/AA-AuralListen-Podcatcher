@@ -567,6 +567,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playlistOpen => 'Open playlist';
 
   @override
+  String get finishedRemoval => 'Remove finished episodes from playlist';
+
+  @override
+  String get finishedRemovalHint =>
+      'Applies to episodes played to the end. “Mark as played” always removes from all playlists at once.';
+
+  @override
+  String get finishedRemovalNow => 'Immediately';
+
+  @override
+  String get finishedRemovalAfter10Minutes => 'After 10 minutes';
+
+  @override
+  String get finishedRemovalNever => 'Never';
+
+  @override
   String get playlistColor => 'Color…';
 
   @override

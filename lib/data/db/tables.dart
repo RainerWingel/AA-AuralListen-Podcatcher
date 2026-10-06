@@ -204,6 +204,11 @@ class PlaylistItems extends Table {
   IntColumn get position => integer()();
   DateTimeColumn get addedAt => dateTime()();
 
+  /// Played to the end from this playlist but kept in it (setting "Fertige
+  /// Folgen aus Playlist entfernen": after 10 minutes / never; v24). Counts
+  /// only while the episode is still played (docs/playlists.md).
+  DateTimeColumn get finishedAt => dateTime().nullable()();
+
   @override
   Set<Column> get primaryKey => {playlistId, episodeId};
 }

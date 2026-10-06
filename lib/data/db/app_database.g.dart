@@ -3916,12 +3916,24 @@ class $PlaylistItemsTable extends PlaylistItems
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _finishedAtMeta = const VerificationMeta(
+    'finishedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> finishedAt = GeneratedColumn<DateTime>(
+    'finished_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     playlistId,
     episodeId,
     position,
     addedAt,
+    finishedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3967,6 +3979,12 @@ class $PlaylistItemsTable extends PlaylistItems
     } else if (isInserting) {
       context.missing(_addedAtMeta);
     }
+    if (data.containsKey('finished_at')) {
+      context.handle(
+        _finishedAtMeta,
+        finishedAt.isAcceptableOrUnknown(data['finished_at']!, _finishedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -3992,6 +4010,10 @@ class $PlaylistItemsTable extends PlaylistItems
         DriftSqlType.dateTime,
         data['${effectivePrefix}added_at'],
       )!,
+      finishedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}finished_at'],
+      ),
     );
   }
 
@@ -4008,11 +4030,17 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
   /// Order inside the playlist (ascending). New items get max + 1.
   final int position;
   final DateTime addedAt;
+
+  /// Played to the end from this playlist but kept in it (setting "Fertige
+  /// Folgen aus Playlist entfernen": after 10 minutes / never; v24). Counts
+  /// only while the episode is still played (docs/playlists.md).
+  final DateTime? finishedAt;
   const PlaylistItem({
     required this.playlistId,
     required this.episodeId,
     required this.position,
     required this.addedAt,
+    this.finishedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4021,6 +4049,9 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
     map['episode_id'] = Variable<int>(episodeId);
     map['position'] = Variable<int>(position);
     map['added_at'] = Variable<DateTime>(addedAt);
+    if (!nullToAbsent || finishedAt != null) {
+      map['finished_at'] = Variable<DateTime>(finishedAt);
+    }
     return map;
   }
 
@@ -4030,6 +4061,9 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
       episodeId: Value(episodeId),
       position: Value(position),
       addedAt: Value(addedAt),
+      finishedAt: finishedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(finishedAt),
     );
   }
 
@@ -4043,6 +4077,7 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
       episodeId: serializer.fromJson<int>(json['episodeId']),
       position: serializer.fromJson<int>(json['position']),
       addedAt: serializer.fromJson<DateTime>(json['addedAt']),
+      finishedAt: serializer.fromJson<DateTime?>(json['finishedAt']),
     );
   }
   @override
@@ -4053,6 +4088,7 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
       'episodeId': serializer.toJson<int>(episodeId),
       'position': serializer.toJson<int>(position),
       'addedAt': serializer.toJson<DateTime>(addedAt),
+      'finishedAt': serializer.toJson<DateTime?>(finishedAt),
     };
   }
 
@@ -4061,11 +4097,13 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
     int? episodeId,
     int? position,
     DateTime? addedAt,
+    Value<DateTime?> finishedAt = const Value.absent(),
   }) => PlaylistItem(
     playlistId: playlistId ?? this.playlistId,
     episodeId: episodeId ?? this.episodeId,
     position: position ?? this.position,
     addedAt: addedAt ?? this.addedAt,
+    finishedAt: finishedAt.present ? finishedAt.value : this.finishedAt,
   );
   PlaylistItem copyWithCompanion(PlaylistItemsCompanion data) {
     return PlaylistItem(
@@ -4075,6 +4113,9 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
       episodeId: data.episodeId.present ? data.episodeId.value : this.episodeId,
       position: data.position.present ? data.position.value : this.position,
       addedAt: data.addedAt.present ? data.addedAt.value : this.addedAt,
+      finishedAt: data.finishedAt.present
+          ? data.finishedAt.value
+          : this.finishedAt,
     );
   }
 
@@ -4084,13 +4125,15 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
           ..write('playlistId: $playlistId, ')
           ..write('episodeId: $episodeId, ')
           ..write('position: $position, ')
-          ..write('addedAt: $addedAt')
+          ..write('addedAt: $addedAt, ')
+          ..write('finishedAt: $finishedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(playlistId, episodeId, position, addedAt);
+  int get hashCode =>
+      Object.hash(playlistId, episodeId, position, addedAt, finishedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4098,7 +4141,8 @@ class PlaylistItem extends DataClass implements Insertable<PlaylistItem> {
           other.playlistId == this.playlistId &&
           other.episodeId == this.episodeId &&
           other.position == this.position &&
-          other.addedAt == this.addedAt);
+          other.addedAt == this.addedAt &&
+          other.finishedAt == this.finishedAt);
 }
 
 class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
@@ -4106,12 +4150,14 @@ class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
   final Value<int> episodeId;
   final Value<int> position;
   final Value<DateTime> addedAt;
+  final Value<DateTime?> finishedAt;
   final Value<int> rowid;
   const PlaylistItemsCompanion({
     this.playlistId = const Value.absent(),
     this.episodeId = const Value.absent(),
     this.position = const Value.absent(),
     this.addedAt = const Value.absent(),
+    this.finishedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PlaylistItemsCompanion.insert({
@@ -4119,6 +4165,7 @@ class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
     required int episodeId,
     required int position,
     required DateTime addedAt,
+    this.finishedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : playlistId = Value(playlistId),
        episodeId = Value(episodeId),
@@ -4129,6 +4176,7 @@ class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
     Expression<int>? episodeId,
     Expression<int>? position,
     Expression<DateTime>? addedAt,
+    Expression<DateTime>? finishedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -4136,6 +4184,7 @@ class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
       if (episodeId != null) 'episode_id': episodeId,
       if (position != null) 'position': position,
       if (addedAt != null) 'added_at': addedAt,
+      if (finishedAt != null) 'finished_at': finishedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -4145,6 +4194,7 @@ class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
     Value<int>? episodeId,
     Value<int>? position,
     Value<DateTime>? addedAt,
+    Value<DateTime?>? finishedAt,
     Value<int>? rowid,
   }) {
     return PlaylistItemsCompanion(
@@ -4152,6 +4202,7 @@ class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
       episodeId: episodeId ?? this.episodeId,
       position: position ?? this.position,
       addedAt: addedAt ?? this.addedAt,
+      finishedAt: finishedAt ?? this.finishedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -4171,6 +4222,9 @@ class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
     if (addedAt.present) {
       map['added_at'] = Variable<DateTime>(addedAt.value);
     }
+    if (finishedAt.present) {
+      map['finished_at'] = Variable<DateTime>(finishedAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -4184,6 +4238,7 @@ class PlaylistItemsCompanion extends UpdateCompanion<PlaylistItem> {
           ..write('episodeId: $episodeId, ')
           ..write('position: $position, ')
           ..write('addedAt: $addedAt, ')
+          ..write('finishedAt: $finishedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -8367,6 +8422,7 @@ typedef $$PlaylistItemsTableCreateCompanionBuilder =
       required int episodeId,
       required int position,
       required DateTime addedAt,
+      Value<DateTime?> finishedAt,
       Value<int> rowid,
     });
 typedef $$PlaylistItemsTableUpdateCompanionBuilder =
@@ -8375,6 +8431,7 @@ typedef $$PlaylistItemsTableUpdateCompanionBuilder =
       Value<int> episodeId,
       Value<int> position,
       Value<DateTime> addedAt,
+      Value<DateTime?> finishedAt,
       Value<int> rowid,
     });
 
@@ -8437,6 +8494,11 @@ class $$PlaylistItemsTableFilterComposer
 
   ColumnFilters<DateTime> get addedAt => $composableBuilder(
     column: $table.addedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get finishedAt => $composableBuilder(
+    column: $table.finishedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8506,6 +8568,11 @@ class $$PlaylistItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get finishedAt => $composableBuilder(
+    column: $table.finishedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$PlaylistsTableOrderingComposer get playlistId {
     final $$PlaylistsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -8567,6 +8634,11 @@ class $$PlaylistItemsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get addedAt =>
       $composableBuilder(column: $table.addedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get finishedAt => $composableBuilder(
+    column: $table.finishedAt,
+    builder: (column) => column,
+  );
 
   $$PlaylistsTableAnnotationComposer get playlistId {
     final $$PlaylistsTableAnnotationComposer composer = $composerBuilder(
@@ -8647,12 +8719,14 @@ class $$PlaylistItemsTableTableManager
                 Value<int> episodeId = const Value.absent(),
                 Value<int> position = const Value.absent(),
                 Value<DateTime> addedAt = const Value.absent(),
+                Value<DateTime?> finishedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PlaylistItemsCompanion(
                 playlistId: playlistId,
                 episodeId: episodeId,
                 position: position,
                 addedAt: addedAt,
+                finishedAt: finishedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -8661,12 +8735,14 @@ class $$PlaylistItemsTableTableManager
                 required int episodeId,
                 required int position,
                 required DateTime addedAt,
+                Value<DateTime?> finishedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PlaylistItemsCompanion.insert(
                 playlistId: playlistId,
                 episodeId: episodeId,
                 position: position,
                 addedAt: addedAt,
+                finishedAt: finishedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

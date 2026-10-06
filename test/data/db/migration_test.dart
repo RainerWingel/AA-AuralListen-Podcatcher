@@ -83,6 +83,13 @@ void main() {
     await db.close();
   });
 
+  test('upgrade v23 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(23);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
   test(
     'a database older than 1.3.1 starts empty instead of crashing',
     () async {

@@ -1034,6 +1034,36 @@ abstract class AppLocalizations {
   /// **'Playlist öffnen'**
   String get playlistOpen;
 
+  /// No description provided for @finishedRemoval.
+  ///
+  /// In de, this message translates to:
+  /// **'Fertige Folgen aus Playlist entfernen'**
+  String get finishedRemoval;
+
+  /// No description provided for @finishedRemovalHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Gilt für bis zum Ende gehörte Folgen. „Als gespielt markieren“ entfernt immer sofort aus allen Playlists.'**
+  String get finishedRemovalHint;
+
+  /// No description provided for @finishedRemovalNow.
+  ///
+  /// In de, this message translates to:
+  /// **'Sofort'**
+  String get finishedRemovalNow;
+
+  /// No description provided for @finishedRemovalAfter10Minutes.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach 10 Minuten'**
+  String get finishedRemovalAfter10Minutes;
+
+  /// No description provided for @finishedRemovalNever.
+  ///
+  /// In de, this message translates to:
+  /// **'Nie'**
+  String get finishedRemovalNever;
+
   /// Playlist menu: pick a category color (dialog title too).
   ///
   /// In de, this message translates to:

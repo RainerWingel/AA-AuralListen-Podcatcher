@@ -189,6 +189,69 @@ void main() {
     },
   );
 
+  group('finished items kept in the playlist (setting)', () {
+    late DateTime clock;
+    late PlaybackRepository playback;
+    late int list;
+    late int a;
+    late int b;
+    late int c;
+
+    setUp(() async {
+      clock = now;
+      repo = PlaylistRepository(db, () => clock);
+      playback = PlaybackRepository(db, () => clock);
+      list = await repo.create('Liste');
+      a = await addEpisode('A');
+      b = await addEpisode('B');
+      c = await addEpisode('C');
+      await repo.addAll(list, [a, b, c]);
+    });
+
+    test('kept, skipped by "next" and "resume", ⏮ still finds it', () async {
+      await playback.markFinished(a, playlistId: list, keepInPlaylist: true);
+      expect(await titles(list), ['A', 'B', 'C']);
+      expect((await repo.nextAfter(list, -1))!.episodeId, b);
+      await repo.setLastEpisode(list, a);
+      expect(await repo.resumeEpisode(list), b);
+      final positionOfB = (await repo.positionOf(list, b))!;
+      expect((await repo.previousBefore(list, positionOfB))!.episodeId, a);
+    });
+
+    test('removed by mode and age; "never" keeps it', () async {
+      await playback.markFinished(a, playlistId: list, keepInPlaylist: true);
+      expect(await repo.removeFinished(FinishedRemoval.never), 0);
+      clock = clock.add(const Duration(minutes: 9));
+      expect(await repo.removeFinished(FinishedRemoval.after10Minutes), 0);
+      clock = clock.add(const Duration(minutes: 1));
+      expect(await repo.removeFinished(FinishedRemoval.after10Minutes), 1);
+      expect(await titles(list), ['B', 'C']);
+
+      await playback.markFinished(b, playlistId: list, keepInPlaylist: true);
+      expect(await repo.removeFinished(FinishedRemoval.now), 1);
+      expect(await titles(list), ['C']);
+    });
+
+    test('"mark as unplayed" or a replay from the list un-finishes', () async {
+      await playback.markFinished(a, playlistId: list, keepInPlaylist: true);
+      await playback.markUnplayed(a);
+      expect((await repo.nextAfter(list, -1))!.episodeId, a);
+      expect(await repo.removeFinished(FinishedRemoval.now), 0);
+
+      await playback.markFinished(b, playlistId: list, keepInPlaylist: true);
+      await repo.clearFinished(list, b);
+      expect(await repo.removeFinished(FinishedRemoval.now), 0);
+      expect(await titles(list), ['A', 'B', 'C']);
+    });
+
+    test('without keeping, the item leaves at once (default)', () async {
+      await playback.markFinished(a, playlistId: list);
+      expect(await titles(list), ['B', 'C']);
+      expect(FinishedRemoval.fromSetting(null), FinishedRemoval.now);
+      expect(FinishedRemoval.fromSetting('never'), FinishedRemoval.never);
+    });
+  });
+
   test('setColor stores and clears the category color', () async {
     final list = await repo.create('Bunt');
     Future<PlaylistColor?> color() async =>

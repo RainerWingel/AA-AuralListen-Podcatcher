@@ -116,3 +116,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   im OPML-Export. Abspielen vorläufiger speichert nichts (Position, Status, Verlauf, Lesezeichen, Boost).
   „Abo kündigen" heißt jetzt „Deabonnieren" (Knopf auf der Podcast-Seite statt ⋮) und löscht wie bisher ganz
   (Benutzerentscheidung, nicht zurück zu „vorläufig").
+- 2026-10-06 · **„Fertige Folgen aus Playlist entfernen": Sofort / Nach 10 Minuten / Nie** (Benutzer) · Ergänzt „Zu
+  Ende gehört → nur aus der aktiven Playlist" (2026-10-03, bleibt Standard „Sofort"). Nur für zu Ende gehörte Folgen,
+  manuelles Markieren entfernt weiter sofort aus allen. Behaltene fertige Einträge schützen ihren Download nicht.

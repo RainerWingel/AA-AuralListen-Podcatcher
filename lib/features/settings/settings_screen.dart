@@ -7,6 +7,7 @@ import '../../audio/audio_providers.dart';
 import '../../core/app_info.dart';
 import '../../core/app_language.dart';
 import '../../core/formatting.dart';
+import '../../data/playlist_repository.dart' show FinishedRemoval;
 import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
 import '../../data/storage/download_service.dart';
@@ -125,6 +126,7 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: Text(l10n.historySubtitle),
             onTap: () => context.go(Routes.history),
           ),
+          const _FinishedRemovalTile(),
           const _BackgroundPlaybackTile(),
           _SectionHeader(l10n.settingsSectionSubscriptions),
           ListTile(
@@ -248,6 +250,71 @@ class _BackgroundPlaybackTileState
       // Always the app's system settings (Akku → "Nicht eingeschränkt"):
       // the app does not request the exemption itself (docs/playback.md).
       onTap: battery.openAppSettings,
+    );
+  }
+}
+
+/// "Fertige Folgen aus Playlist entfernen": sofort / nach 10 Minuten / nie
+/// (user wish 2026-10-06, docs/playlists.md).
+class _FinishedRemovalTile extends ConsumerWidget {
+  const _FinishedRemovalTile();
+
+  static String label(AppLocalizations l10n, FinishedRemoval value) =>
+      switch (value) {
+        FinishedRemoval.now => l10n.finishedRemovalNow,
+        FinishedRemoval.after10Minutes => l10n.finishedRemovalAfter10Minutes,
+        FinishedRemoval.never => l10n.finishedRemovalNever,
+      };
+
+  Future<void> _choose(
+    BuildContext context,
+    WidgetRef ref,
+    FinishedRemoval current,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final chosen = await showDialog<FinishedRemoval>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text(l10n.finishedRemoval),
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(l10n.finishedRemovalHint),
+          ),
+          RadioGroup<FinishedRemoval>(
+            groupValue: current,
+            onChanged: (v) => Navigator.of(context).pop(v),
+            child: Column(
+              children: [
+                for (final value in FinishedRemoval.values)
+                  RadioListTile<FinishedRemoval>(
+                    value: value,
+                    title: Text(label(l10n, value)),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+    if (chosen == null || chosen == current) return;
+    await ref
+        .read(settingsRepositoryProvider)
+        .set(SettingsKeys.removeFinished, chosen.name);
+    // Items finished earlier follow the new choice right away.
+    await ref.read(audioHandlerProvider).cleanUpFinishedPlaylistItems();
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final current =
+        ref.watch(finishedRemovalProvider).value ?? FinishedRemoval.now;
+    return ListTile(
+      leading: const Icon(Icons.playlist_remove),
+      title: Text(l10n.finishedRemoval),
+      subtitle: Text(label(l10n, current)),
+      onTap: () => _choose(context, ref, current),
     );
   }
 }

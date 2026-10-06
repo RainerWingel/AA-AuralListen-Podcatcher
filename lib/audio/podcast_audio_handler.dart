@@ -161,6 +161,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Follows the current episode's "played" mark: set elsewhere (episode
   /// menu, "Alle als gespielt markieren" …) it stops playback at the end.
   StreamSubscription<DateTime?>? _playedMark;
+
+  /// Removes finished playlist items 10 minutes after their end (setting).
+  Timer? _finishedCleanUp;
   Timer? _pauseTimer;
 
   int? _episodeId;
@@ -281,6 +284,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Shows the last episode in the mini player after an app start, without
   /// loading audio (no network until the user presses play).
   Future<void> restoreLastEpisode() async {
+    // Finished playlist items whose time ran out while the app was closed.
+    await cleanUpFinishedPlaylistItems();
     final id = await _settings.getInt(SettingsKeys.lastEpisodeId);
     if (id == null || _episodeId != null) return;
     final row = await _playback.load(id);
@@ -566,6 +571,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Releases everything (tests and app shutdown).
   Future<void> dispose() async {
     _pauseTimer?.cancel();
+    _finishedCleanUp?.cancel();
     _cancelSleepTimers();
     _watchdog?.cancel();
     _retryTimer?.cancel();
@@ -585,6 +591,32 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Follows the current episode being added to or removed from playlists
   /// while it plays, so "Aus Playlist …" and what comes next stay right.
+  Future<FinishedRemoval> _finishedRemoval() async =>
+      FinishedRemoval.fromSetting(
+        await _settings.get(SettingsKeys.removeFinished),
+      );
+
+  /// Applies "Fertige Folgen aus Playlist entfernen" to items finished
+  /// earlier: at app start and after the setting changed. With "after 10
+  /// minutes" a timer catches the ones that are not due yet.
+  Future<void> cleanUpFinishedPlaylistItems() async {
+    final removal = await _finishedRemoval();
+    await _playlists?.removeFinished(removal);
+    if (removal == FinishedRemoval.after10Minutes) {
+      _scheduleFinishedCleanUp();
+    } else {
+      _finishedCleanUp?.cancel();
+    }
+  }
+
+  void _scheduleFinishedCleanUp() {
+    _finishedCleanUp?.cancel();
+    _finishedCleanUp = Timer(
+      FinishedRemoval.after10Minutes.delay! + const Duration(seconds: 5),
+      () => unawaited(cleanUpFinishedPlaylistItems()),
+    );
+  }
+
   Future<void> _stopWatching() async {
     await _membership?.cancel();
     _membership = null;
@@ -657,6 +689,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     } else {
       _activePlaylistId = playlistId;
       _playlistPosition = position;
+      // Started (again) from there: no longer a finished item.
+      await _playlists?.clearFinished(playlistId, episodeId);
       // "Resume" in the playlist continues with this episode.
       await _playlists?.setLastEpisode(playlistId, episodeId);
       await _settings.set(
@@ -919,7 +953,15 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         _markedPlayed = true;
         // Provisional podcast: not "played", not in the history.
         if (!await _playback.isProvisional(id)) {
-          await _playback.markFinished(id, playlistId: _activePlaylistId);
+          final removal = await _finishedRemoval();
+          await _playback.markFinished(
+            id,
+            playlistId: _activePlaylistId,
+            keepInPlaylist: removal != FinishedRemoval.now,
+          );
+          if (removal == FinishedRemoval.after10Minutes) {
+            _scheduleFinishedCleanUp();
+          }
           await _onFinished?.call(id);
         }
       }

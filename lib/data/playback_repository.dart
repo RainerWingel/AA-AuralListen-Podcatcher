@@ -78,18 +78,26 @@ class PlaybackRepository {
 
   /// Played to the end: leaves only [playlistId] – the playlist it was
   /// played from – and stays in all others (user wish 2026-10-03). Without
-  /// an active playlist it stays everywhere.
-  Future<void> markFinished(int episodeId, {int? playlistId}) =>
-      _db.transaction(() async {
-        await _setPlayed(episodeId);
-        if (playlistId == null) return;
-        await (_db.delete(_db.playlistItems)..where(
-              (i) =>
-                  i.episodeId.equals(episodeId) &
-                  i.playlistId.equals(playlistId),
-            ))
-            .go();
-      });
+  /// an active playlist it stays everywhere. [keepInPlaylist] (setting
+  /// "after 10 minutes" / "never"): marked as finished there instead.
+  Future<void> markFinished(
+    int episodeId, {
+    int? playlistId,
+    bool keepInPlaylist = false,
+  }) => _db.transaction(() async {
+    await _setPlayed(episodeId);
+    if (playlistId == null) return;
+    final item = _db.playlistItems;
+    Expression<bool> where($PlaylistItemsTable i) =>
+        i.episodeId.equals(episodeId) & i.playlistId.equals(playlistId);
+    if (keepInPlaylist) {
+      await (_db.update(item)..where(where)).write(
+        PlaylistItemsCompanion(finishedAt: Value(_clock())),
+      );
+    } else {
+      await (_db.delete(item)..where(where)).go();
+    }
+  });
 
   Future<void> _setPlayed(int episodeId) => _update(
     episodeId,

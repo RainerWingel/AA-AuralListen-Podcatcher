@@ -535,11 +535,16 @@ class DownloadService implements PodcastFilesCleaner {
           ?.provisional ??
       false;
 
-  /// The joined episode is in no playlist.
+  /// The joined episode is in no playlist – except as a finished item kept
+  /// there (setting "after 10 minutes" / "never"): that one does not protect
+  /// the download (user decision 2026-10-06).
   Expression<bool> _notInAnyPlaylist() => notExistsQuery(
     _db.selectOnly(_db.playlistItems)
       ..addColumns([_db.playlistItems.episodeId])
-      ..where(_db.playlistItems.episodeId.equalsExp(_db.episodes.id)),
+      ..where(
+        _db.playlistItems.episodeId.equalsExp(_db.episodes.id) &
+            _db.playlistItems.finishedAt.isNull(),
+      ),
   );
 
   Future<List<Download>> _rowsWhere(

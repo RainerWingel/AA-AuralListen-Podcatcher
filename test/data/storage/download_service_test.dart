@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:aapodcastguru/data/db/app_database.dart';
+import 'package:aapodcastguru/data/playback_repository.dart';
 import 'package:aapodcastguru/data/playlist_repository.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/storage/download_engine.dart';
@@ -323,6 +324,23 @@ void main() {
       await PlaylistRepository(db, () => now).add(list, id);
       await service.evictPlayed();
       expect(fileOf(id).existsSync(), isTrue);
+    });
+
+    test('a finished item kept in a playlist does not protect', () async {
+      final playlist = (await PlaylistRepository(
+        db,
+        () => now,
+      ).playlists()).single.id;
+      final id = await addEpisode('1');
+      await downloaded(id);
+      await PlaylistRepository(db, () => now).add(playlist, id);
+      await PlaybackRepository(
+        db,
+        () => now,
+      ).markFinished(id, playlistId: playlist, keepInPlaylist: true);
+      now = now.add(DownloadService.deletePlayedAfter);
+      await service.evictPlayed();
+      expect(await row(id), isNull);
     });
 
     test('never deletes the episode in the player', () async {

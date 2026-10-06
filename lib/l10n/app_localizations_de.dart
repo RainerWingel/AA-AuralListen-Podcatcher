@@ -568,6 +568,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get playlistOpen => 'Playlist öffnen';
 
   @override
+  String get finishedRemoval => 'Fertige Folgen aus Playlist entfernen';
+
+  @override
+  String get finishedRemovalHint =>
+      'Gilt für bis zum Ende gehörte Folgen. „Als gespielt markieren“ entfernt immer sofort aus allen Playlists.';
+
+  @override
+  String get finishedRemovalNow => 'Sofort';
+
+  @override
+  String get finishedRemovalAfter10Minutes => 'Nach 10 Minuten';
+
+  @override
+  String get finishedRemovalNever => 'Nie';
+
+  @override
   String get playlistColor => 'Farbe…';
 
   @override

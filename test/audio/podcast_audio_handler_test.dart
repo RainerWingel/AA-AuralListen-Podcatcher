@@ -1491,6 +1491,39 @@ void main() {
       expect(handler.currentEpisodeId, ep2);
     });
 
+    test('setting "never": finished stays in the list, next starts', () async {
+      await settings.set(SettingsKeys.removeFinished, 'never');
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep2);
+      expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+      expect((await episode()).status, EpisodeStatus.played);
+      // ⏮ goes back to the finished one; it is not finished there any more.
+      await handler.skipToPrevious();
+      expect(handler.currentEpisodeId, episodeId);
+      final item =
+          await (db.select(db.playlistItems)..where(
+                (i) =>
+                    i.playlistId.equals(playlistId) &
+                    i.episodeId.equals(episodeId),
+              ))
+              .getSingle();
+      expect(item.finishedAt, isNull);
+    });
+
+    test('setting "now" again removes earlier finished items', () async {
+      await settings.set(SettingsKeys.removeFinished, 'after10Minutes');
+      await handler.playEpisode(episodeId, playlistId: playlistId);
+      engine.complete();
+      await pumpEventQueue();
+      expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+
+      await settings.set(SettingsKeys.removeFinished, 'now');
+      await handler.cleanUpFinishedPlaylistItems();
+      expect(await itemsOf(playlistId), [ep2, ep3]);
+    });
+
     test('played to the end: leaves only the active playlist', () async {
       final other = await playlists.create('Unterwegs');
       await playlists.add(other, episodeId);

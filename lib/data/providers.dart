@@ -339,6 +339,14 @@ final seedColorProvider = Provider<Color>(
 );
 
 /// Player: total length instead of the remaining time (tap toggles it).
+/// Setting "Fertige Folgen aus Playlist entfernen" (default: now).
+final finishedRemovalProvider = StreamProvider.autoDispose<FinishedRemoval>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.removeFinished)
+      .map(FinishedRemoval.fromSetting),
+);
+
 final showTotalTimeProvider = StreamProvider<bool>(
   (ref) => ref
       .watch(settingsRepositoryProvider)

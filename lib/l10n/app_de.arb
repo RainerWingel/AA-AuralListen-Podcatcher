@@ -305,6 +305,11 @@
   "playlistActivated": "Playlist „{name}“ ist aktiviert",
   "@playlistActivated": {"placeholders": {"name": {"type": "String"}}},
   "playlistOpen": "Playlist öffnen",
+  "finishedRemoval": "Fertige Folgen aus Playlist entfernen",
+  "finishedRemovalHint": "Gilt für bis zum Ende gehörte Folgen. „Als gespielt markieren“ entfernt immer sofort aus allen Playlists.",
+  "finishedRemovalNow": "Sofort",
+  "finishedRemovalAfter10Minutes": "Nach 10 Minuten",
+  "finishedRemovalNever": "Nie",
   "playlistColor": "Farbe…",
   "@playlistColor": {
     "description": "Playlist menu: pick a category color (dialog title too)."
