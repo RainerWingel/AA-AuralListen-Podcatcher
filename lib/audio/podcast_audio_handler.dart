@@ -930,23 +930,50 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await _playback.updateDuration(id, duration);
   }
 
+  /// Playback that stops this close to the end counts as played to the end
+  /// (user wish 2026-10-06: an episode paused one second before its end
+  /// stayed unplayed). Covers pauses, interruptions, errors and hangs.
+  static const endTolerance = Duration(seconds: 3);
+
+  bool _wasPlaying = false;
+
+  bool get _nearEnd {
+    final duration = _engine.duration;
+    return _loaded &&
+        duration != null &&
+        duration > endTolerance &&
+        duration - _engine.position <= endTolerance;
+  }
+
   Future<void> _onEngineState(EngineState state) async {
+    final completed = state.processing == EngineProcessing.completed;
+    final stoppedNearEnd =
+        _wasPlaying && !state.playing && !completed && !_recovering && _nearEnd;
+    _wasPlaying = state.playing && !completed;
     _broadcastState();
-    if (state.processing == EngineProcessing.completed) await _complete();
+    if (completed) {
+      await _complete();
+    } else if (stoppedNearEnd) {
+      // Paused on purpose (or by another app): finished, but do not start
+      // the next playlist episode.
+      await _complete(continuePlaylist: false);
+    }
   }
 
   /// End of the file – only then an episode counts as played (user rule
   /// 2026-10-03, before: from 98 %). Order matters: read the next playlist
   /// episode first, because marking played removes this one from the
   /// active playlist (only that one); then mark, unload, continue.
-  Future<void> _complete() async {
+  Future<void> _complete({bool continuePlaylist = true}) async {
     if (_completing) return;
     _completing = true;
     try {
       final id = _episodeId;
       // Sleep timer "Bis Ende der Folge": stay stopped, then it is off.
       final sleepAtEnd = _sleepTimer is SleepTimerAtEpisodeEnd;
-      final next = sleepAtEnd ? null : await _nextInPlaylist();
+      final next = sleepAtEnd || !continuePlaylist
+          ? null
+          : await _nextInPlaylist();
       // Leaving the playlist now is intended, not a membership change.
       await _stopWatching();
       if (id != null && !_markedPlayed) {
@@ -1106,6 +1133,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _recoveries = 0; // it plays again: a later hang gets fresh attempts
       return;
     }
+    // No progress in the last seconds: that was the end, not a hang.
+    if (_nearEnd) {
+      unawaited(_complete());
+      return;
+    }
     if (++_stalledChecks >= stallChecks) {
       _stalledChecks = 0;
       unawaited(_recover());
@@ -1120,6 +1152,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> _onEngineError(EngineException error) async {
     final id = _episodeId;
     if (id == null || !_loaded || _recovering) return;
+    // Failing in the last seconds (e.g. the stream ends early): that was
+    // the end – no reload.
+    if (_nearEnd) return _complete();
     // Read before just_audio pauses itself in reaction to the error.
     final wasPlaying = _engine.state.playing || _watchdog != null;
     final position = _knownPosition;

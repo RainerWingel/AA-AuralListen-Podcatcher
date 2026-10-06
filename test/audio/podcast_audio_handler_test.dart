@@ -358,13 +358,15 @@ void main() {
   test('only the end of the file marks as played (no 98 % rule)', () async {
     await handler.playEpisode(episodeId);
 
-    engine.emitPosition(const Duration(minutes: 9, seconds: 58)); // 99.7 %
+    // 98.3 % – but more than the 3 s end tolerance before the end.
+    engine.emitPosition(const Duration(minutes: 9, seconds: 50));
     await handler.pause();
+    await pumpEventQueue();
     var e = await episode();
     expect(e.status, EpisodeStatus.inProgress);
     expect(
       e.positionMs,
-      const Duration(minutes: 9, seconds: 58).inMilliseconds,
+      const Duration(minutes: 9, seconds: 50).inMilliseconds,
     );
 
     await handler.play();
@@ -1501,6 +1503,60 @@ void main() {
       );
       await handler.skipToPrevious();
       expect(handler.currentEpisodeId, ep2);
+    });
+
+    group('stopping in the last 3 seconds counts as the end', () {
+      setUp(() => settings.remove(SettingsKeys.removeFinished));
+
+      test(
+        'pause 2 s before the end: played, shows the end, no next',
+        () async {
+          await handler.playEpisode(episodeId, playlistId: playlistId);
+          engine.emitPosition(const Duration(minutes: 9, seconds: 58));
+          await pumpEventQueue();
+          await handler.pause();
+          await pumpEventQueue();
+
+          expect((await episode()).status, EpisodeStatus.played);
+          expect(handler.position, const Duration(minutes: 10));
+          expect(handler.currentEpisodeId, episodeId);
+          expect(handler.playbackState.value.playing, isFalse);
+          // Default "after 10 minutes": still in the playlist for now.
+          expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+        },
+      );
+
+      test('paused by another app (audio focus) works the same', () async {
+        await handler.playEpisode(episodeId, playlistId: playlistId);
+        engine.emitPosition(const Duration(minutes: 9, seconds: 59));
+        await pumpEventQueue();
+        await engine.pause(); // just_audio pauses itself
+        await pumpEventQueue();
+        expect((await episode()).status, EpisodeStatus.played);
+      });
+
+      test('a pause 10 s before the end is just a pause', () async {
+        await handler.playEpisode(episodeId, playlistId: playlistId);
+        engine.emitPosition(const Duration(minutes: 9, seconds: 50));
+        await pumpEventQueue();
+        await handler.pause();
+        await pumpEventQueue();
+        expect((await episode()).status, EpisodeStatus.inProgress);
+        expect(handler.position, const Duration(minutes: 9, seconds: 50));
+      });
+
+      test(
+        'an error in the last seconds ends it, the playlist goes on',
+        () async {
+          await handler.playEpisode(episodeId, playlistId: playlistId);
+          engine.emitPosition(const Duration(minutes: 9, seconds: 59));
+          await pumpEventQueue();
+          engine.emitError();
+          await pumpEventQueue();
+          expect((await episode()).status, EpisodeStatus.played);
+          expect(handler.currentEpisodeId, ep2);
+        },
+      );
     });
 
     test('setting "never": finished stays in the list, next starts', () async {
