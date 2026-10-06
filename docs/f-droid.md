@@ -70,6 +70,11 @@ Rezept im Fork ersetzt (2026-10-05, Inhalt mit dieser Datei identisch geprüft),
   persönlich (nicht KI-artig) mit Alleinstellungsmerkmalen: Kapitel einzeln überspringen, Hinweis bei wechselnder Werbung,
   VBR-MP3-Fix, Playlist-Verhalten, Themen-Filter beim Auto-Download, geplant Android Auto.
 - **Rezept muss `templates/build-flutter.yml` folgen** (fdroiddata) und das ABI-Versionsschema nutzen (oben).
+- **Kategorie** aus `config/categories.yml` (fdroiddata) wählen – passend ist **`Podcast`** (nicht `Multimedia`,
+  Prüfer 2026-10-06).
+- **Netzdienste** (Prüferfrage 2026-10-06): Feeds/Cover/Audio direkt von den Podcast-Servern, Suche über Apple iTunes
+  Search API und fyyd.de, kein eigener Server, kein Konto. Wegen Apple steht im Rezept das Anti-Feature
+  **`NonFreeNet`** (RSS-Adresse und OPML gehen ohne).
 - Änderungen am Rezept: Benutzer ersetzt die Datei im Fork `ArtemArb/fdroiddata` (Branch `master`) über die
   Weboberfläche; der MR aktualisiert sich selbst, die Pipeline läuft neu. Nachrichten im MR schreibt nur der Benutzer.
 
