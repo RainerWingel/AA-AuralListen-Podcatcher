@@ -120,3 +120,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Ende gehört → nur aus der aktiven Playlist" (2026-10-03). **Standard: „Nach 10 Minuten"** (Benutzer). Nur für zu
   Ende gehörte Folgen,
   manuelles Markieren entfernt weiter sofort aus allen. Behaltene fertige Einträge schützen ihren Download nicht.
+- 2026-10-07 · **F-Droid-Anti-Feature NonFreeNet bleibt** (Benutzer) · Wegen der Suche über Apples iTunes Search API.
+  Die Apple-Suche abzuschalten (nur fyyd.de) würde das Etikett entfernen, kostet aber viele Treffer – verworfen.
