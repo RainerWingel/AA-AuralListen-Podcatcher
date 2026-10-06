@@ -162,6 +162,7 @@
   "finishedRemovalAfter10Minutes": "After 10 minutes",
   "finishedRemovalNever": "Never",
   "autoMarkNewPlayed": "Mark new ones as played automatically",
+  "chapterProgress": "{percent}%",
   "playlistColor": "Color…",
   "playlistColorNone": "No color",
   "colorRed": "Red",

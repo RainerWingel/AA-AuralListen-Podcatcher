@@ -335,6 +335,23 @@ class _ChaptersSheet extends ConsumerWidget {
     final skipped =
         ref.watch(skippedChaptersProvider(episodeId)).value ?? const {};
     final colors = Theme.of(context).colorScheme;
+    final episodeLength = ref.watch(
+      mediaItemProvider.select((s) => s.value?.mediaItem?.duration),
+    );
+
+    /// Share of chapter [index] already heard (0…1), from the same position
+    /// stream as the player's slider; null if its end is unknown.
+    double? progressOf(int index) {
+      final start = chapters[index].startMs;
+      final end = index + 1 < chapters.length
+          ? chapters[index + 1].startMs
+          : episodeLength?.inMilliseconds;
+      if (end == null || end <= start) return null;
+      return ((position.inMilliseconds - start) / (end - start)).clamp(
+        0.0,
+        1.0,
+      );
+    }
 
     Future<void> setSkipped(int index, {required bool skip}) =>
         handler.setChapterSkipped(
@@ -362,6 +379,13 @@ class _ChaptersSheet extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final c = chapters[index];
                   final isSkipped = skipped.contains(c.startMs);
+                  final start = Text(
+                    formatClock(Duration(milliseconds: c.startMs)),
+                  );
+                  // The chapter playing now: live percentage and a thick bar
+                  // across the whole text area, up to the Skip chip (user
+                  // wish 2026-10-06).
+                  final progress = c == current ? progressOf(index) : null;
                   return ListTile(
                     selected: c == current,
                     selectedTileColor: colors.secondaryContainer,
@@ -377,9 +401,42 @@ class _ChaptersSheet extends ConsumerWidget {
                             )
                           : null,
                     ),
-                    subtitle: Text(
-                      formatClock(Duration(milliseconds: c.startMs)),
-                    ),
+                    subtitle: progress == null
+                        ? start
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  start,
+                                  const Spacer(),
+                                  Text(
+                                    l10n.chapterProgress(
+                                      (progress * 100).floor(),
+                                    ),
+                                    style: TextStyle(
+                                      color: colors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      fontFeatures: const [
+                                        FontFeature.tabularFigures(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: progress,
+                                  minHeight: 8,
+                                  backgroundColor: colors.primary.withValues(
+                                    alpha: 0.18,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                     trailing: FilterChip(
                       label: Text(l10n.chapterSkip),
                       tooltip: l10n.chapterSkipHint,

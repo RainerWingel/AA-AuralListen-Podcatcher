@@ -587,6 +587,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoMarkNewPlayed => 'Neue automatisch als gespielt markieren';
 
   @override
+  String chapterProgress(int percent) {
+    return '$percent %';
+  }
+
+  @override
   String get playlistColor => 'Farbe…';
 
   @override

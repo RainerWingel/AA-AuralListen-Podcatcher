@@ -1070,6 +1070,12 @@ abstract class AppLocalizations {
   /// **'Neue automatisch als gespielt markieren'**
   String get autoMarkNewPlayed;
 
+  /// No description provided for @chapterProgress.
+  ///
+  /// In de, this message translates to:
+  /// **'{percent} %'**
+  String chapterProgress(int percent);
+
   /// Playlist menu: pick a category color (dialog title too).
   ///
   /// In de, this message translates to:

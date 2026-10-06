@@ -216,6 +216,10 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
   höchstens ein Versuch pro Folge (auch ohne Ergebnis).
 - Anzeige: unter dem Slider „Kapitel 3/7: Titel" (einziger Zugang, tippen → Liste mit Startzeit,
   aktuelles Kapitel hervorgehoben, Tippen springt dorthin). Ein eigener Knopf „Kapitel (n)" wurde entfernt (doppelt).
+- Das **laufende Kapitel** zeigt in der Liste rechts „42 %" (gehörter Anteil des Kapitels) und darunter einen dicken
+  Fortschrittsbalken über die ganze Textbreite bis vor den Skip-Chip (Benutzerwunsch 2026-10-06). Beides hängt am
+  selben `positionProvider` wie der Slider im Player, aktualisiert sich also genauso oft. Ende des letzten Kapitels =
+  Länge der Folge.
 - Kapitel-Liste und Lesezeichen-Liste der Folge **schließen sich beim Folgenwechsel** (Folgenende, ⏭, ⏮ …;
   Benutzerwunsch 2026-10-06, `_closeOnEpisodeChange`), statt die Einträge der vorigen Folge weiter zu zeigen.
 - Werkzeug: `dart run tool/smoke_chapters.dart <Feed-URL>` prüft ID3-Kapitel echter Folgen.

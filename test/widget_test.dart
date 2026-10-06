@@ -1265,8 +1265,25 @@ void main() {
 
     // Chapters from the feed.
     expect(find.text('Kapitel 1/2: Begrüßung'), findsOneWidget);
+    await handlerSeek(tester, handler, const Duration(minutes: 5));
     await tester.tap(find.text('Kapitel 1/2: Begrüßung'));
     await settle(tester);
+    // The current chapter (0:00–10:00) shows how much of it is heard.
+    expect(find.text('50 %'), findsOneWidget);
+    final bar = tester.widget<LinearProgressIndicator>(
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('Begrüßung'),
+          matching: find.byType(ListTile),
+        ),
+        matching: find.byType(LinearProgressIndicator),
+      ),
+    );
+    expect(bar.value, 0.5);
+    // Live, from the same position stream as the player's slider.
+    engine.emitPosition(const Duration(minutes: 7, seconds: 30));
+    await settle(tester);
+    expect(find.text('75 %'), findsOneWidget);
     await tester.tap(find.text('Hauptteil'));
     await settle(tester);
     expect(handler.position, const Duration(minutes: 10));
