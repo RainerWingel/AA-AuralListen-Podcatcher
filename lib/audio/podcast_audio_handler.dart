@@ -284,12 +284,13 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Shows the last episode in the mini player after an app start, without
   /// loading audio (no network until the user presses play).
   Future<void> restoreLastEpisode() async {
-    // Finished playlist items whose time ran out while the app was closed.
-    await cleanUpFinishedPlaylistItems();
     final id = await _settings.getInt(SettingsKeys.lastEpisodeId);
-    if (id == null || _episodeId != null) return;
+    if (id == null || _episodeId != null) {
+      // Finished playlist items whose time ran out while the app was closed.
+      return cleanUpFinishedPlaylistItems();
+    }
     final row = await _playback.load(id);
-    if (row == null) return;
+    if (row == null) return cleanUpFinishedPlaylistItems();
     _episodeId = id;
     _watchMembership(id);
     final saved = (await _settings.get(SettingsKeys.activePlaylistId))
@@ -298,6 +299,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _activePlaylistId = int.tryParse(saved[0]);
       _playlistPosition = int.tryParse(saved[1]) ?? -1;
     }
+    // Due finished items go now; the restored episode stays while shown.
+    await cleanUpFinishedPlaylistItems();
     mediaItem.add(_withPlaylist(_toMediaItem(row)));
     // A finished episode shows its end, not 0:00 (user wish 2026-10-04);
     // Play still starts it over.
@@ -358,6 +361,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
     _episodeId = episodeId;
     _watchMembership(episodeId);
+    // The previous episode may have stayed only because it was in the
+    // player: its finished item goes now if it is due.
+    unawaited(cleanUpFinishedPlaylistItems());
     _loaded = false;
     _exactStart = startAt != null;
     mediaItem.add(_withPlaylist(_toMediaItem(row)));
@@ -601,7 +607,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// minutes" a timer catches the ones that are not due yet.
   Future<void> cleanUpFinishedPlaylistItems() async {
     final removal = await _finishedRemoval();
-    await _playlists?.removeFinished(removal);
+    await _playlists?.removeFinished(removal, keepEpisodeId: _episodeId);
     if (removal == FinishedRemoval.after10Minutes) {
       _scheduleFinishedCleanUp();
     } else {

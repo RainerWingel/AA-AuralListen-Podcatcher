@@ -1592,6 +1592,36 @@ void main() {
       expect(item.finishedAt, isNull);
     });
 
+    test(
+      'a due finished item stays while its episode is in the player',
+      () async {
+        await settings.remove(SettingsKeys.removeFinished); // 10 minutes
+        final clock = [now];
+        final timedPlaylists = PlaylistRepository(db, () => clock.first);
+        await handler.dispose();
+        engine = FakePlayerEngine();
+        handler = PodcastAudioHandler(
+          engine: engine,
+          playback: PlaybackRepository(db, () => clock.first),
+          settings: settings,
+          playlists: timedPlaylists,
+        );
+        await handler.playEpisode(ep3, playlistId: playlistId);
+        engine.complete(); // last one: stays in the player, finished
+        await pumpEventQueue();
+        expect(handler.currentEpisodeId, ep3);
+
+        clock[0] = now.add(const Duration(minutes: 11));
+        await handler.cleanUpFinishedPlaylistItems();
+        expect(await itemsOf(playlistId), contains(ep3));
+
+        // Another episode comes into the player: now it goes.
+        await handler.playEpisode(episodeId);
+        await pumpEventQueue();
+        expect(await itemsOf(playlistId), isNot(contains(ep3)));
+      },
+    );
+
     test('setting "now" again removes earlier finished items', () async {
       await settings.set(SettingsKeys.removeFinished, 'after10Minutes');
       await handler.playEpisode(episodeId, playlistId: playlistId);

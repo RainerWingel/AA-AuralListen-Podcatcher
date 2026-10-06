@@ -243,6 +243,19 @@ void main() {
       expect(await titles(list), ['C']);
     });
 
+    test('the episode in the player is kept until it leaves it', () async {
+      await playback.markFinished(a, playlistId: list, keepInPlaylist: true);
+      clock = clock.add(const Duration(minutes: 11));
+      expect(
+        await repo.removeFinished(
+          FinishedRemoval.after10Minutes,
+          keepEpisodeId: a,
+        ),
+        0,
+      );
+      expect(await repo.removeFinished(FinishedRemoval.after10Minutes), 1);
+    });
+
     test('"mark as unplayed" or a replay from the list un-finishes', () async {
       await playback.markFinished(a, playlistId: list, keepInPlaylist: true);
       await playback.markUnplayed(a);

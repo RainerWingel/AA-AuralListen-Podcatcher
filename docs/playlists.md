@@ -148,6 +148,11 @@ gelesen, die neue Reihenfolge gilt also sofort.
     `cleanUpFinishedPlaylistItems` beim App-Start und nach einer Änderung der Einstellung auf (nach „Sofort"
     verschwinden alle fertigen sofort).
   - Downloads: Ein fertiger Eintrag **schützt den Download nicht** vor der 96-h-Löschung (`eviction.md`).
+  - **Countdown**: Wird die fertige Folge aus der Playlist erneut gestartet (Antippen, ⏮), ist sie dort kein fertiger
+    Eintrag mehr (Countdown aus); Pause/Umschalten starten ihn nicht neu – erst ein erneutes Ende. Von woanders
+    gestartet, läuft er weiter (ab 15 s gehört gilt sie als angefangen und wird nicht entfernt). **Solange die Folge im
+    Player ist, wird ihr Eintrag nie entfernt** (Benutzerwunsch 2026-10-06, `removeFinished(keepEpisodeId:)`); das
+    Aufräumen beim nächsten Folgenwechsel holt es nach (auch nach App-Start bleibt die im Mini-Player gezeigte stehen).
 - **Die gerade laufende Folge wird als gespielt markiert** (Folgen-Menü, „Alle als gespielt markieren", „bis …";
   Benutzerwunsch 2026-10-06): Der Player **stoppt** und zeigt das **Ende** – wie am Dateiende, aber ohne Weiterspielen
   in der Playlist und ohne Eintrag im Abspielverlauf. Der Handler beobachtet dafür `playedAt` der aktuellen Folge

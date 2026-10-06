@@ -260,13 +260,20 @@ class PlaylistRepository {
           .write(const PlaylistItemsCompanion(finishedAt: Value(null)));
 
   /// Removes finished items whose time is up under [mode] (all of them for
-  /// "now", none for "never"). Returns the number removed.
-  Future<int> removeFinished(FinishedRemoval mode) {
+  /// "now", none for "never"). [keepEpisodeId]: the episode in the player –
+  /// never removed while it is there (user wish 2026-10-06); a later run
+  /// catches up. Returns the number removed.
+  Future<int> removeFinished(FinishedRemoval mode, {int? keepEpisodeId}) {
     final delay = mode.delay;
     if (delay == null) return Future.value(0);
     final cutoff = _clock().subtract(delay);
     return (_db.delete(_db.playlistItems)..where(
-          (i) => _finished(i) & i.finishedAt.isSmallerOrEqualValue(cutoff),
+          (i) =>
+              _finished(i) &
+              i.finishedAt.isSmallerOrEqualValue(cutoff) &
+              (keepEpisodeId == null
+                  ? const Constant(true)
+                  : i.episodeId.equals(keepEpisodeId).not()),
         ))
         .go();
   }
