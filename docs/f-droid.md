@@ -83,6 +83,19 @@ v1.3.2; nach dem Merge findet der Bot v1.3.3 selbst (`UpdateCheckMode: Tags`). R
 - Änderungen am Rezept: Benutzer ersetzt die Datei im Fork `ArtemArb/fdroiddata` (Branch `master`) über die
   Weboberfläche; der MR aktualisiert sich selbst, die Pipeline läuft neu. Nachrichten im MR schreibt nur der Benutzer.
 
+## Reproduzierbare Builds (in Arbeit, Prüferwunsch 2026-10-07)
+Ziel: F-Droid veröffentlicht **unsere** signierten APKs (`binary:` je Build + `AllowedAPKSigningKeys`), nachdem es
+selbst gebaut und verglichen hat. Dafür müssen unsere Release-APKs bitgleich mit F-Droids Build sein.
+- Mac-Builds sind es **nicht** (v1.3.2: 6–8 von 359 Dateien anders – u. a. `libdartjni.so` vom macOS-Compiler,
+  `libapp.so`/`classes.dex` durch andere Pfade/Toolchain; außerdem baut F-Droid jede ABI einzeln mit
+  `--target-platform`, was die eingebettete Native-Assets-Liste ändert).
+- **`tool/fdroid_release_build.sh <out> [--sign] [versionCode …]`** baut im F-Droid-Image
+  `fdroidserver:buildserver-trixie` (OrbStack/Docker, linux/amd64) genau wie der CI-Job „fdroid build"
+  (`fetchsrclibs` + `build --on-server`, Pfade `/home/vagrant/build/…`), aus `fdroid/<appid>.yml`. Test 2026-10-07:
+  v1.3.2 arm64 **SHA-256-gleich** mit F-Droids CI-Build (~13 min unter Emulation).
+- Signieren mit `apksigner sign --alignment-preserved` (ohne die Option richtet apksigner neu aus → F-Droids
+  `apksigcopier compare` schlägt fehl); das Skript prüft danach selbst mit `apksigcopier compare`.
+
 ## Fragen & Antworten für den Benutzer
 
 ### Muss ich warten, bis die App bei F-Droid gelistet ist, bevor ich neue Versionen veröffentliche?
