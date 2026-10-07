@@ -35,17 +35,20 @@ OUT="$(cd "$OUT" && pwd)"
 WORK="$OUT/work"
 rm -rf "$WORK" "$OUT/unsigned"
 mkdir -p "$WORK/metadata" "$WORK/srclibs" "$WORK/tmp" "$OUT/unsigned"
-cp "$RECIPE" "$WORK/metadata/"
+# Without "binary:" (and its continuation line): that is F-Droid's check
+# against our uploaded APKs, which do not exist yet while we build them.
+awk '/^    binary:/ { skip = 1; next }
+     skip && /^      / { next }
+     { skip = 0; print }' "$RECIPE" > "$WORK/metadata/$APP_ID.yml"
 curl -fsSL -o "$WORK/srclibs/flutter.yml" \
   https://gitlab.com/fdroid/fdroiddata/-/raw/master/srclibs/flutter.yml
 
-TARGETS=()
-for code in "${CODES[@]}"; do TARGETS+=("$APP_ID:$code"); done
-echo "Building ${TARGETS[*]} in $IMAGE …"
-
-# Same steps as the "fdroid build" job of fdroiddata's CI.
-docker run --rm --platform linux/amd64 -v "$WORK:/work" \
-  -e TARGETS="${TARGETS[*]}" --entrypoint /bin/bash "$IMAGE" -c '
+# Same steps as the "fdroid build" job of fdroiddata's CI – one fresh
+# container per build: "--on-server" removes sudo after a build.
+for code in "${CODES[@]}"; do
+  echo "Building $APP_ID:$code in $IMAGE …"
+  docker run --rm --platform linux/amd64 -v "$WORK:/work" \
+    -e TARGET="$APP_ID:$code" --entrypoint /bin/bash "$IMAGE" -c '
 set -euo pipefail
 source /etc/profile.d/bsenv.sh
 update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
@@ -63,13 +66,12 @@ as_vagrant() {
   sudo --preserve-env --user vagrant env PATH="$PATH" PYTHONPATH="$PYTHONPATH" \
     PYTHONUNBUFFERED=true HOME="$home_vagrant" "$@"
 }
-for target in $TARGETS; do
-  # Clone the app and Flutter first, then build – like the CI job.
-  as_vagrant fdroid fetchsrclibs "$target" --verbose
-  as_vagrant fdroid build --verbose --test --refresh-scanner --on-server \
-    --no-tarball "$target"
-done
+# Clone the app and Flutter first, then build.
+as_vagrant fdroid fetchsrclibs "$TARGET" --verbose
+as_vagrant fdroid build --verbose --test --refresh-scanner --on-server \
+  --no-tarball "$TARGET"
 '
+done
 
 cp "$WORK"/tmp/"$APP_ID"_*.apk "$OUT/unsigned/"
 echo "Unsigned APKs: $OUT/unsigned"

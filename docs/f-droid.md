@@ -21,7 +21,7 @@ aus `third_party/sqlite` (3.53.4).
 ## Regeln für Agenten
 - **Keine Pakete mit Google-Play-Diensten, Firebase, Crashlytics, Analytics** – sonst lehnt F-Droid die App ab.
 - Keine Build-Schritte, die Binärdateien herunterladen (Beispiel: `sqlite3` lädt sonst vorkompilierte Bibliotheken).
-- Neue Version = `version:` in `pubspec.yaml` erhöhen (Build-Nummer!), Git-Tag `vX.Y.Z` auf GitHub. F-Droid erkennt
+- Neue Version: Ablauf in `build-and-release.md` („GitHub-Release", reproduzierbar per Skript). Git-Tag `vX.Y.Z`. F-Droid erkennt
   Tags automatisch (`UpdateCheckMode: Tags`). Changelog je Sprache als `changelogs/<versionCode>.txt` für alle drei
   Codes (max. 500 Zeichen).
 - **Versionsschema (seit 1.3.2, Vorgabe der F-Droid-Prüfer):** `versionCode` = Build-Nummer × 10 + ABI
@@ -47,6 +47,8 @@ bei wechselnder Werbung, VBR-Fix, Playlist-Verhalten, Themen-Filter, Android Aut
 Rezept im Fork ersetzt (2026-10-05, Inhalt mit dieser Datei identisch geprüft), neue MR-Pipeline #2914723501 grün (alle drei ABIs gebaut, 24 min).
 **v1.3.3 veröffentlicht 2026-10-07** (Tag auf `72294e4bf67caed7f43ac633f31b3c4c5ff7a9b4`) – der MR bleibt bewusst auf
 v1.3.2; nach dem Merge findet der Bot v1.3.3 selbst (`UpdateCheckMode: Tags`). Rezept im MR nicht anfassen.
+**2026-10-07:** Prüfer verlangt reproduzierbare Builds → Rezept auf v1.3.3 mit `binary:` + `AllowedAPKSigningKeys`
+umgestellt (vorher v1.3.2, F-Droid-signiert); Benutzer ersetzt die Datei im Fork.
 **Offen: Prüfung durch F-Droid (Schritt 7).**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
@@ -83,7 +85,7 @@ v1.3.2; nach dem Merge findet der Bot v1.3.3 selbst (`UpdateCheckMode: Tags`). R
 - Änderungen am Rezept: Benutzer ersetzt die Datei im Fork `ArtemArb/fdroiddata` (Branch `master`) über die
   Weboberfläche; der MR aktualisiert sich selbst, die Pipeline läuft neu. Nachrichten im MR schreibt nur der Benutzer.
 
-## Reproduzierbare Builds (in Arbeit, Prüferwunsch 2026-10-07)
+## Reproduzierbare Builds (seit v1.3.3, Prüferwunsch 2026-10-07)
 Ziel: F-Droid veröffentlicht **unsere** signierten APKs (`binary:` je Build + `AllowedAPKSigningKeys`), nachdem es
 selbst gebaut und verglichen hat. Dafür müssen unsere Release-APKs bitgleich mit F-Droids Build sein.
 - Mac-Builds sind es **nicht** (v1.3.2: 6–8 von 359 Dateien anders – u. a. `libdartjni.so` vom macOS-Compiler,
@@ -95,6 +97,13 @@ selbst gebaut und verglichen hat. Dafür müssen unsere Release-APKs bitgleich m
   v1.3.2 arm64 **SHA-256-gleich** mit F-Droids CI-Build (~13 min unter Emulation).
 - Signieren mit `apksigner sign --alignment-preserved` (ohne die Option richtet apksigner neu aus → F-Droids
   `apksigcopier compare` schlägt fehl); das Skript prüft danach selbst mit `apksigcopier compare`.
+- Das Skript nimmt `binary:` aus seiner Rezept-Kopie heraus (sonst lädt `fdroid build` die noch nicht hochgeladenen
+  APKs zum Vergleich) und startet **pro Build einen frischen Container** (`--on-server` entfernt `sudo` nach einem Build).
+- Rezept: je Build `binary: …/releases/download/v%v/AA-AuralListen-%v-<abi>.apk` und
+  `AllowedAPKSigningKeys: ffe35bb2…0aba81` (SHA-256 des Release-Zertifikats). **Ab jetzt nur noch eigene Signatur** –
+  der Keystore ist unersetzlich (Benutzer hat ihn samt Passwort gesichert, 2026-10-07).
+- v1.3.3: alle drei ABIs im Container gebaut, signiert, `verified`, die Mac-APK im GitHub-Release ersetzt (Prüfsummen
+  in den Release-Notizen).
 
 ## Fragen & Antworten für den Benutzer
 

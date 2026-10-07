@@ -56,7 +56,7 @@ dart run build_runner build --delete-conflicting-outputs   # Codegenerierung (Dr
 flutter analyze
 flutter test
 flutter run                   # auf dem Test-Handy Galaxy A05s (WLAN-Debugging; S25 nur auf Ansage)
-flutter build apk --release --split-per-abi   # signiert mit Release-Keystore (android/key.properties)
+flutter build apk --release --split-per-abi   # nur zum Testen; Releases: tool/fdroid_release_build.sh (reproduzierbar)
 dart run tool/smoke_feeds.dart "Suchbegriff"  # Parser gegen echte Feeds testen
 flutter test --run-skipped --tags soak test/soak   # Speicher-Soak-Test (nicht in CI)
 ```

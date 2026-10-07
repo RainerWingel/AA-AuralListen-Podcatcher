@@ -122,3 +122,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   manuelles Markieren entfernt weiter sofort aus allen. Behaltene fertige Einträge schützen ihren Download nicht.
 - 2026-10-07 · **F-Droid-Anti-Feature NonFreeNet bleibt** (Benutzer) · Wegen der Suche über Apples iTunes Search API.
   Die Apple-Suche abzuschalten (nur fyyd.de) würde das Etikett entfernen, kostet aber viele Treffer – verworfen.
+- 2026-10-07 · **Reproduzierbare Builds, eigene Signatur bei F-Droid** (Benutzer, auf Wunsch des F-Droid-Prüfers) ·
+  Ersetzt „F-Droid signiert selbst". Release-APKs entstehen im F-Droid-Image (`tool/fdroid_release_build.sh`, OrbStack),
+  F-Droid veröffentlicht nach Vergleich unsere signierten APKs. Folge: überall eine Signatur (GitHub ↔ F-Droid
+  updatefähig); der Keystore ist unersetzlich.

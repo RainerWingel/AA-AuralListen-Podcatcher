@@ -63,12 +63,21 @@ adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
 ## GitHub-Release
 Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für jeden herunterladbar).
+**Seit v1.3.3 reproduzierbar** (F-Droid veröffentlicht unsere signierten APKs, `f-droid.md`) – Release-APKs nie
+mehr mit `flutter build` auf dem Mac, sondern im F-Droid-Container:
 1. `version:` in `pubspec.yaml` erhöhen (Name + Build-Nummer) **und** `appVersion` in `lib/core/app_info.dart`
-   (User-Agent; ein Test vergleicht beide), committen, pushen, von `main` bauen.
-2. Prüfen: `apksigner verify --print-certs` (Release-Zertifikat), keine DB/Key-Dateien in der APK (`unzip -l`).
-3. APK als `AA-AuralListen-<version>-arm64-v8a.apk` hochladen (bis v1.1.0: `AA-PodcastGuru-…`):
-   `gh release create v<version> <apk> --target <volle SHA von origin/main> --title … --notes-file …`
-   (kurze SHA lehnt GitHub ab). Notizen auf Deutsch, mit SHA-256 der APK.
+   (User-Agent; ein Test vergleicht beide); F-Droid-Changelogs für die drei Codes; committen, pushen.
+2. Im Rezept `fdroid/<appid>.yml` die drei Build-Blöcke auf die neue Version setzen (versionName, versionCode =
+   Build-Nummer × 10 + 1/2/3, `commit:` = volle SHA des Release-Commits) und committen – das Skript baut daraus.
+3. `tool/fdroid_release_build.sh <out> --sign` (Docker/OrbStack, ~40 min für 3 ABIs): baut wie F-Droid, signiert mit
+   `--alignment-preserved` und prüft jede APK mit `apksigcopier compare`. Nur weiter, wenn alle drei „verified" sind.
+4. Die drei APKs aus `<out>/signed` als `AA-AuralListen-<version>-armeabi-v7a.apk`, `…-arm64-v8a.apk`,
+   `…-x86_64.apk` hochladen – genau diese Namen stehen als `binary:` im Rezept:
+   `gh release create v<version> <apks> --target <volle SHA> --title … --notes-file …` (kurze SHA lehnt GitHub ab).
+   Notizen auf Deutsch, mit SHA-256 aller drei APKs.
+5. Nach der Aufnahme bei F-Droid erkennt dessen Bot neue Tags selbst und übernimmt `binary:` aus dem letzten Block.
+Bis v1.3.2 (Mac-Build, nur arm64): `flutter build apk --release --split-per-abi`, Datei
+`AA-AuralListen-<version>-arm64-v8a.apk` (bis v1.1.0: `AA-PodcastGuru-…`).
 - v1.0.0 (2026-09-27): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.0.0
 - v1.1.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.1.0
 - v1.2.0 (2026-09-29): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.0 – erster
