@@ -398,11 +398,25 @@ class _PodcastLinks extends ConsumerWidget {
   }
 }
 
-/// Average of the episodes whose length is known (feed or player); null if
-/// none is.
+/// How many of the newest episodes the average looks at.
+const averageOf = 70;
+
+/// Average of the [averageOf] newest episodes whose length is known (feed or
+/// player); null if none is. Older episodes of long-running podcasts would
+/// distort it (user wish 2026-10-08).
 Duration? averageEpisodeLength(List<Episode> episodes) {
+  // Newest first, undated last – the list itself may be in listening order.
+  final newest = [...episodes]
+    ..sort(
+      (a, b) => switch ((a.pubDate, b.pubDate)) {
+        (final pa?, final pb?) => pb.compareTo(pa),
+        (null, null) => 0,
+        (null, _) => 1,
+        (_, null) => -1,
+      },
+    );
   final lengths = [
-    for (final e in episodes)
+    for (final e in newest.take(averageOf))
       if (e.durationMs case final ms? when ms > 0) ms,
   ];
   if (lengths.isEmpty) return null;

@@ -3,13 +3,14 @@ import 'package:aapodcastguru/features/subscriptions/podcast_detail_screen.dart'
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Episode episode(int? durationMs) => Episode(
+  Episode episode(int? durationMs, {DateTime? pubDate}) => Episode(
     id: 1,
     podcastId: 1,
     guid: 'g',
     title: 't',
     audioUrl: 'https://example.com/a.mp3',
     durationMs: durationMs,
+    pubDate: pubDate,
     positionMs: 0,
     status: EpisodeStatus.newEpisode,
     addedAt: DateTime.utc(2026),
@@ -27,5 +28,19 @@ void main() {
     );
     expect(averageEpisodeLength([episode(null)]), isNull);
     expect(averageEpisodeLength([]), isNull);
+  });
+
+  test('only the 70 newest episodes count', () {
+    final old = [
+      for (var i = 0; i < 30; i++)
+        episode(600000, pubDate: DateTime.utc(2020, 1, 1 + i)), // 10 min
+    ];
+    final recent = [
+      for (var i = 0; i < 70; i++)
+        episode(3600000, pubDate: DateTime.utc(2026, 1, 1 + i)), // 60 min
+    ];
+    // Order of the list does not matter (e.g. serial podcasts).
+    expect(averageEpisodeLength([...old, ...recent]), const Duration(hours: 1));
+    expect(averageOf, 70);
   });
 }
