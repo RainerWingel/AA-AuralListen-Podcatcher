@@ -2210,8 +2210,9 @@ class Episode extends DataClass implements Insertable<Episode> {
   final int positionMs;
   final DateTime? playedAt;
 
-  /// Played to the end at least once (v26) – unlike "played", which a manual
-  /// "mark as played" also sets. Basis of the 🔥 on Start (docs/ui-ux.md).
+  /// Heard to at least 90 % once (v26; until v27: to the end) – unlike
+  /// "played", which a manual "mark as played" also sets. Basis of the 🔥 on
+  /// Start (docs/ui-ux.md).
   final bool finishedListening;
   final DateTime addedAt;
   const Episode({

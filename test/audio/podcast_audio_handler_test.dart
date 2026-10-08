@@ -167,6 +167,21 @@ void main() {
     expect(engine.boostDb, 3);
   });
 
+  test('"heard" for the 🔥 from 90 %, still in progress', () async {
+    final fresh = await addEpisode('2');
+    await handler.playEpisode(fresh);
+    engine.emitPosition(const Duration(minutes: 8, seconds: 50));
+    await handler.pause();
+    expect((await episode(fresh)).finishedListening, isFalse);
+
+    await handler.play();
+    engine.emitPosition(const Duration(minutes: 9));
+    await handler.pause();
+    final e = await episode(fresh);
+    expect(e.finishedListening, isTrue);
+    expect(e.status, EpisodeStatus.inProgress); // not "played"
+  });
+
   test('stores the duration reported by the player', () async {
     await handler.playEpisode(episodeId);
     expect(

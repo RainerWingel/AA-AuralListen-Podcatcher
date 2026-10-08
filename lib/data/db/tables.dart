@@ -134,8 +134,9 @@ class Episodes extends Table {
   IntColumn get positionMs => integer().withDefault(const Constant(0))();
   DateTimeColumn get playedAt => dateTime().nullable()();
 
-  /// Played to the end at least once (v26) – unlike "played", which a manual
-  /// "mark as played" also sets. Basis of the 🔥 on Start (docs/ui-ux.md).
+  /// Heard to at least 90 % once (v26; until v27: to the end) – unlike
+  /// "played", which a manual "mark as played" also sets. Basis of the 🔥 on
+  /// Start (docs/ui-ux.md).
   BoolColumn get finishedListening =>
       boolean().withDefault(const Constant(false))();
   DateTimeColumn get addedAt => dateTime()();

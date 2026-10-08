@@ -181,6 +181,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   bool _loaded = false;
   bool _markedPlayed = false;
 
+  /// The 90 % "heard" mark is already set for the loaded episode.
+  bool _heardMarked = false;
+
   /// A played episode is being replayed but has not reached
   /// [PlaybackRepository.inProgressFrom] yet: it stays "played" until then.
   bool _replayOfPlayed = false;
@@ -794,6 +797,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _loaded = true;
     _broadcastState();
     _markedPlayed = false;
+    _heardMarked = false;
     _lastSaved = start;
   }
 
@@ -871,7 +875,20 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _replayOfPlayed = false;
       await _playback.restartPlayed(id);
     }
-    await _playback.savePosition(id, position);
+    final heard = !_heardMarked && _reachedHeardShare(position);
+    await _playback.savePosition(id, position, heard: heard);
+    if (heard) _heardMarked = true;
+  }
+
+  /// "Heard" for the 🔥 on Start already from [heardShare] of the length –
+  /// many skip the outro (user wish 2026-10-09). Does not mark as played.
+  static const heardShare = 0.9;
+
+  bool _reachedHeardShare(Duration position) {
+    final duration = _engine.duration ?? mediaItem.value?.duration;
+    return duration != null &&
+        duration > Duration.zero &&
+        position.inMilliseconds >= duration.inMilliseconds * heardShare;
   }
 
   void _setIdlePosition(Duration position) {

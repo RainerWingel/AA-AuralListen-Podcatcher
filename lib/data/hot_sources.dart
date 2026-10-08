@@ -53,9 +53,9 @@ class HotSources {
           themes.contains((episode.podcastId, episode.theme!)));
 
   /// Judges every podcast and every topic: of its [window] newest episodes
-  /// older than [grace] – counting only from the oldest one ever played to
-  /// the end, so a backlog from before subscribing does not count as skipped
-  /// – at least [minShare] must be heard (to the end, or started).
+  /// older than [grace] – counting only from the oldest one ever heard, so a
+  /// backlog from before subscribing does not count as skipped – at least
+  /// [minShare] must be heard ("finishedListening": 90 % of it; or started).
   static HotSources compute(Iterable<HotEpisodeFacts> facts, DateTime now) {
     final byPodcast = <int, List<HotEpisodeFacts>>{};
     final byTheme = <(int, String), List<HotEpisodeFacts>>{};

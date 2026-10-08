@@ -22,8 +22,9 @@ Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-3
 1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh. **🔥 „Beliebt"** (Benutzerwunsch 2026-10-08, nur hier):
    rechts bei noch nicht angefangenen Folgen eines Podcasts **oder Themas**, das du fast nie auslässt – knapp über dem
    96-h-Punkt bzw. allein (`_NewMarks`, `Icons.local_fire_department`). Regel (`HotSources`): von den **10 neuesten**
-   Folgen, die **älter als 7 Tage** sind und nicht älter als die älteste je zu Ende gehörte, sind **≥ 80 %** gehört (zu
-   Ende = `episodes.finishedListening`, oder angefangen); mindestens 5 solcher Folgen. „Als gespielt markieren" zählt
+   Folgen, die **älter als 7 Tage** sind und nicht älter als die älteste je gehörte, sind **≥ 80 %** gehört
+   (`episodes.finishedListening` – gesetzt ab **90 % der Länge**, viele überspringen das Outro, Benutzerwunsch
+   2026-10-09; ändert „gespielt" nicht – oder angefangen); mindestens 5 solcher Folgen. „Als gespielt markieren" zählt
    als ausgelassen. Eine kleine beobachtete Abfrage (5 Spalten) wird im Speicher ausgewertet; die Oberfläche hört nur
    von geändertem Ergebnis (`distinct`). Kein nachgeschobenes `asyncMap`-Query – das hing in Widget-Tests.
 2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen. Im Kopf des

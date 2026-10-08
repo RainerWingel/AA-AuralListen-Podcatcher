@@ -44,7 +44,13 @@ class PlaybackRepository {
   /// progress" (replays restart via [restartPlayed]).
   /// The status only moves forward: new → in progress at [inProgressFrom];
   /// below that it stays as it is (also when seeking back to the start).
-  Future<void> savePosition(int episodeId, Duration position) =>
+  /// [heard]: also set the 🔥 "heard" mark (from 90 % of the length) – in
+  /// the same write.
+  Future<void> savePosition(
+    int episodeId,
+    Duration position, {
+    bool heard = false,
+  }) =>
       (_db.update(_db.episodes)..where(
             (e) =>
                 e.id.equals(episodeId) &
@@ -55,6 +61,9 @@ class PlaybackRepository {
               positionMs: Value(position.inMilliseconds),
               status: position >= inProgressFrom
                   ? const Value(EpisodeStatus.inProgress)
+                  : const Value.absent(),
+              finishedListening: heard
+                  ? const Value(true)
                   : const Value.absent(),
             ),
           );

@@ -130,6 +130,38 @@ void main() {
     await db.close();
   });
 
+  test('upgrade to v27: episodes at 90 % or more count as heard', () async {
+    final schema = await verifier.schemaAt(26);
+    schema.rawDatabase
+      ..execute(
+        'INSERT INTO podcasts (feed_url, title, subscribed_at) '
+        "VALUES ('https://example.com/feed', 'P', 1767225600)",
+      )
+      ..execute(
+        'INSERT INTO episodes (podcast_id, guid, title, audio_url, added_at, '
+        'duration_ms, position_ms) VALUES '
+        "(1, 'a', 'A', 'https://e.com/a.mp3', 1767225600, 600000, 540000),"
+        "(1, 'b', 'B', 'https://e.com/b.mp3', 1767225600, 600000, 530000),"
+        "(1, 'c', 'C', 'https://e.com/c.mp3', 1767225600, NULL, 530000)",
+      );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    expect(
+      {
+        for (final e in await db.select(db.episodes).get())
+          e.guid: e.finishedListening,
+      },
+      {'a': true, 'b': false, 'c': false},
+    );
+    await db.close();
+  });
+
+  test('upgrade v26 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(26);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
   test(
     'a database older than 1.3.1 starts empty instead of crashing',
     () async {
