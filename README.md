@@ -72,6 +72,11 @@ Die Aufnahme bei F-Droid läuft; der Play Store ist nicht geplant. Die signierte
 3. Empfehlung: In den App-Einstellungen unter **Akku → „Nicht eingeschränkt"** wählen (in der App: Optionen →
    Hören → „Hintergrund-Wiedergabe"), damit Android lange Wiedergaben mit ausgeschaltetem Bildschirm nicht beendet.
 
+**Updates:** Die App sucht nicht selbst nach neuen Versionen. Über F-Droid kommen Updates automatisch. Wer die APK
+von GitHub nutzt, kann neue Releases mit der freien App [Obtainium](https://github.com/ImranR98/Obtainium) beobachten
+und installieren lassen (dort die Adresse dieses Repos eintragen). Seit v1.3.3 tragen die APKs von GitHub und F-Droid
+dieselbe Signatur – ein Wechsel zwischen beiden geht ohne Neuinstallation.
+
 ## Unterstützen
 
 Wenn dir der AA-AuralListen Podcatcher gefällt und du die Entwicklung freiwillig unterstützen möchtest, kannst du mir
