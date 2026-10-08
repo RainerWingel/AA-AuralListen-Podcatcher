@@ -1,52 +1,75 @@
 import 'package:flutter/material.dart';
 
-/// Episode titles of [longTitleLength] characters or more are shown at
-/// [longTitleScale] of their normal size – in lists (episode rows,
-/// Downloads, history, bookmarks), not in the player or sheets (user wish
-/// 2026-10-09).
-const longTitleLength = 60;
+/// Episode titles in lists (episode rows, Downloads, history, bookmarks) that
+/// do not fit into [titleLines] lines are shown at [longTitleScale] of their
+/// size – not in the player or sheets (user wish 2026-10-09; before: from 60
+/// characters on, which missed long words and shrank short lines too).
+const titleLines = 2;
 const longTitleScale = 0.65;
 
-bool isLongEpisodeTitle(String title) =>
-    title.characters.length >= longTitleLength;
-
-/// [style] (on top of the surrounding text style) made smaller for a long
-/// [title]; for places that need a style, e.g. a [TextSpan].
-TextStyle episodeTitleStyle(
+/// [text] in [style] needs more than [maxLines] lines at [maxWidth].
+bool textOverflows(
   BuildContext context,
-  String title, [
+  InlineSpan text, {
+  required double maxWidth,
+  int maxLines = titleLines,
+}) {
+  final painter = TextPainter(
+    text: text,
+    maxLines: maxLines,
+    textDirection: Directionality.of(context),
+    textScaler: MediaQuery.textScalerOf(context),
+  )..layout(maxWidth: maxWidth);
+  final overflows = painter.didExceedMaxLines;
+  painter.dispose();
+  return overflows;
+}
+
+/// [style] on top of the surrounding text style, made smaller when [shrink].
+TextStyle episodeTitleStyle(
+  BuildContext context, {
+  required bool shrink,
   TextStyle? style,
-]) {
+}) {
   final base = DefaultTextStyle.of(context).style.merge(style);
   final size = base.fontSize;
-  return isLongEpisodeTitle(title) && size != null
+  return shrink && size != null
       ? base.copyWith(fontSize: size * longTitleScale)
       : base;
 }
 
-/// An episode title: like [Text], but smaller when it is long.
+/// An episode title in a list: like [Text], but smaller when it does not fit
+/// into [maxLines] lines at the normal size.
 class EpisodeTitle extends StatelessWidget {
   const EpisodeTitle(
     this.title, {
     this.style,
-    this.maxLines,
+    this.maxLines = titleLines,
     this.overflow,
-    this.textAlign,
     super.key,
   });
 
   final String title;
   final TextStyle? style;
-  final int? maxLines;
+  final int maxLines;
   final TextOverflow? overflow;
-  final TextAlign? textAlign;
 
   @override
-  Widget build(BuildContext context) => Text(
-    title,
-    style: episodeTitleStyle(context, title, style),
-    maxLines: maxLines,
-    overflow: overflow,
-    textAlign: textAlign,
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final normal = episodeTitleStyle(context, shrink: false, style: style);
+      final shrink = textOverflows(
+        context,
+        TextSpan(text: title, style: normal),
+        maxWidth: constraints.maxWidth,
+        maxLines: maxLines,
+      );
+      return Text(
+        title,
+        style: episodeTitleStyle(context, shrink: shrink, style: style),
+        maxLines: maxLines,
+        overflow: overflow,
+      );
+    },
   );
 }

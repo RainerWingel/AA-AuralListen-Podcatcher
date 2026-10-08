@@ -556,20 +556,30 @@ class BookmarkTile extends ConsumerWidget {
     return ListTile(
       leading: leading ?? const Icon(Icons.bookmark_outline),
       title: Text(bookmark.note ?? time),
-      // The subtitle is the episode title (bookmarks list): smaller when
-      // long, like everywhere else.
-      subtitle: Builder(
-        builder: (context) => Text.rich(
-          TextSpan(
+      // The subtitle is the episode title (bookmarks list): smaller when the
+      // line does not fit into two lines, like in the other lists.
+      subtitle: LayoutBuilder(
+        builder: (context, constraints) {
+          TextSpan line({required bool shrink}) => TextSpan(
+            style: DefaultTextStyle.of(context).style,
             children: [
               if (bookmark.note != null) TextSpan(text: time),
               if (bookmark.note != null && subtitle != null)
                 const TextSpan(text: ' · '),
               if (subtitle case final title?)
-                TextSpan(text: title, style: episodeTitleStyle(context, title)),
+                TextSpan(
+                  text: title,
+                  style: episodeTitleStyle(context, shrink: shrink),
+                ),
             ],
-          ),
-        ),
+          );
+          final shrink = textOverflows(
+            context,
+            line(shrink: false),
+            maxWidth: constraints.maxWidth,
+          );
+          return Text.rich(line(shrink: shrink));
+        },
       ),
       onTap: onTap,
       onLongPress: () => _editNote(context, ref),
