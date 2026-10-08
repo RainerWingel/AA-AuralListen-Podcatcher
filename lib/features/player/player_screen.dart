@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/routes.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
+import '../../core/perceived_brightness.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart' show DownloadState, EpisodeStatus;
@@ -56,123 +57,128 @@ class PlayerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    // Dark mode: buttons, slider and description a bit brighter
+    // (Weber–Fechner, perceived_brightness.dart).
+    final theme = playerTheme(Theme.of(context));
     final item = ref.watch(mediaItemProvider).value?.mediaItem;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          tooltip: l10n.playerClose,
-          icon: const Icon(Icons.keyboard_arrow_down),
-          onPressed: () => Navigator.of(context).maybePop(),
+    return Theme(
+      data: theme,
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            tooltip: l10n.playerClose,
+            icon: const Icon(Icons.keyboard_arrow_down),
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          title: Text(l10n.nowPlaying),
         ),
-        title: Text(l10n.nowPlaying),
-      ),
-      body: item == null
-          ? const SizedBox.shrink()
-          : SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final coverSize = (constraints.maxWidth - 64).clamp(
-                    120.0,
-                    360.0,
-                  );
-                  final podcastId = item.extras?['podcastId'] as int?;
-                  // Live, so "Abonnieren" during playback shows them at once.
-                  final provisional = switch (podcastId) {
-                    final id? =>
-                      ref.watch(podcastProvider(id)).value?.provisional ??
-                          false,
-                    null => false,
-                  };
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 16),
-                        CoverImage(
-                          url: item.artUri?.toString(),
-                          size: coverSize,
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          item.title,
-                          textAlign: TextAlign.center,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (item.extras?['episodeId'] case final int id)
-                              _DownloadedIcon(episodeId: id),
-                            Flexible(
-                              child: Text(
-                                item.album ?? '',
-                                textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
+        body: item == null
+            ? const SizedBox.shrink()
+            : SafeArea(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final coverSize = (constraints.maxWidth - 64).clamp(
+                      120.0,
+                      360.0,
+                    );
+                    final podcastId = item.extras?['podcastId'] as int?;
+                    // Live, so "Abonnieren" during playback shows them at once.
+                    final provisional = switch (podcastId) {
+                      final id? =>
+                        ref.watch(podcastProvider(id)).value?.provisional ??
+                            false,
+                      null => false,
+                    };
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 16),
+                          CoverImage(
+                            url: item.artUri?.toString(),
+                            size: coverSize,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            item.title,
+                            textAlign: TextAlign.center,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (item.extras?['episodeId'] case final int id)
+                                _DownloadedIcon(episodeId: id),
+                              Flexible(
+                                child: Text(
+                                  item.album ?? '',
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ),
+                            ],
+                          ),
+                          // Above the seek bar, so the playlist context sits
+                          // with the title (user request 2026-10-01).
+                          if (item.extras?['playlistId'] case final int id)
+                            _PlaylistRow(playlistId: id)
+                          else if (item.extras?['suggestedPlaylistId']
+                              case final int id)
+                            _PlaylistRow(playlistId: id, offered: true),
+                          const SizedBox(height: 16),
+                          _SeekBar(total: item.duration),
+                          if (item.extras?['episodeId'] case final int id)
+                            CurrentChapterLine(episodeId: id),
+                          const SizedBox(height: 8),
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              SkipButton.back(),
+                              PlayPauseButton(size: 48, filled: true),
+                              SkipButton.forward(),
+                            ],
+                          ),
+                          if (item.extras?['episodeId'] case final int id)
+                            ChapterBookmarkButtons(
+                              episodeId: id,
+                              bookmarks: !provisional,
                             ),
-                          ],
-                        ),
-                        // Above the seek bar, so the playlist context sits
-                        // with the title (user request 2026-10-01).
-                        if (item.extras?['playlistId'] case final int id)
-                          _PlaylistRow(playlistId: id)
-                        else if (item.extras?['suggestedPlaylistId']
-                            case final int id)
-                          _PlaylistRow(playlistId: id, offered: true),
-                        const SizedBox(height: 16),
-                        _SeekBar(total: item.duration),
-                        if (item.extras?['episodeId'] case final int id)
-                          CurrentChapterLine(episodeId: id),
-                        const SizedBox(height: 8),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            SkipButton.back(),
-                            PlayPauseButton(size: 48, filled: true),
-                            SkipButton.forward(),
-                          ],
-                        ),
-                        if (item.extras?['episodeId'] case final int id)
-                          ChapterBookmarkButtons(
-                            episodeId: id,
-                            bookmarks: !provisional,
+                          const SizedBox(height: 8),
+                          // Boost and speed side by side (wrap on narrow
+                          // screens or large fonts).
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 8,
+                            children: [
+                              if (podcastId != null && !provisional)
+                                _BoostButton(podcastId),
+                              const _SpeedButton(),
+                            ],
                           ),
-                        const SizedBox(height: 8),
-                        // Boost and speed side by side (wrap on narrow
-                        // screens or large fonts).
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 8,
-                          children: [
-                            if (podcastId != null && !provisional)
-                              _BoostButton(podcastId),
-                            const _SpeedButton(),
-                          ],
-                        ),
-                        if (item.extras?['episodeId'] case final int id)
-                          EpisodeDescriptionSection(
-                            episodeId: id,
-                            podcastId: podcastId,
-                            pubDate: switch (item.extras?['pubDateMs']) {
-                              final int ms =>
-                                DateTime.fromMillisecondsSinceEpoch(ms),
-                              _ => null,
-                            },
-                          ),
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  );
-                },
+                          if (item.extras?['episodeId'] case final int id)
+                            EpisodeDescriptionSection(
+                              episodeId: id,
+                              podcastId: podcastId,
+                              pubDate: switch (item.extras?['pubDateMs']) {
+                                final int ms =>
+                                  DateTime.fromMillisecondsSinceEpoch(ms),
+                                _ => null,
+                              },
+                            ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
+      ),
     );
   }
 }

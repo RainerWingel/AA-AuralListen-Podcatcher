@@ -63,6 +63,11 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 ## Player
 - **Mini-Player** (`lib/features/player/mini_player.dart`) über der Navigationsleiste, sobald etwas gespielt wurde:
   dünner Fortschrittsbalken, Cover, Titel, Podcast, Play/Pause (Kreisel beim Puffern). Tippen → Vollbild-Player.
+- **Vollbild-Player im Dunkel-Modus etwas heller** (Benutzerwunsch 2026-10-09, `lib/core/perceived_brightness.dart`):
+  Nach Weber–Fechner wird Helligkeit logarithmisch empfunden – gleich spürbare Schritte sind gleiche **Faktoren** der
+  Leuchtdichte. `playerTheme` hebt Primär-/Sekundärfarbe, Text- und Symbolfarben (onSurface, onSurfaceVariant, outline)
+  um Faktor **1,4** an (Mischung mit Weiß, gedeckelt); Hintergründe bleiben. Gilt für den ganzen Player inkl. Knöpfe,
+  Regler und Beschreibungs-Bereich; heller Modus unverändert.
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast (davor ✓-Download-Symbol „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist),
   Slider mit „verstrichen" / „-verbleibend" (Tippen auf die rechte Zeit wechselt zur Gesamtlänge und zurück, gemerkt in
   `settings['player.showTotalTime']`, Benutzerwunsch 2026-10-03; bei Tempo ≠ 1 zusätzlich „(-tatsächliche Restzeit)"),
