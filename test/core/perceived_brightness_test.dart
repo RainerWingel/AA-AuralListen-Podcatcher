@@ -34,5 +34,13 @@ void main() {
       greaterThan(dark.colorScheme.primary.computeLuminance()),
     );
     expect(lifted.colorScheme.surface, dark.colorScheme.surface);
+    // Accents get the smaller step.
+    expect(
+      lifted.colorScheme.primary.computeLuminance() /
+          dark.colorScheme.primary.computeLuminance(),
+      closeTo(playerAccentFactor, 0.01),
+    );
+    // The play button keeps its own icon color.
+    expect(lifted.iconTheme, dark.iconTheme);
   });
 }

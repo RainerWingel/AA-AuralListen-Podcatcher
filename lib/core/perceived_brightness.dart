@@ -6,6 +6,10 @@ import 'package:flutter/material.dart';
 /// factor (user wish 2026-10-09).
 const playerLuminanceFactor = 1.4;
 
+/// Smaller step for the accent colors (green buttons, slider): ×1.4 made
+/// them almost white and the play button's icon hard to see.
+const playerAccentFactor = 1.2;
+
 /// [color] mixed with white until its relative luminance is [factor] times
 /// as high (capped at white). Dark colors gain a lot, near-white ones little.
 Color perceivedBrighter(Color color, {double factor = playerLuminanceFactor}) {
@@ -30,19 +34,20 @@ ThemeData playerTheme(ThemeData theme) {
   if (theme.brightness != Brightness.dark) return theme;
   final c = theme.colorScheme;
   final lifted = c.copyWith(
-    primary: perceivedBrighter(c.primary),
-    secondary: perceivedBrighter(c.secondary),
-    tertiary: perceivedBrighter(c.tertiary),
+    primary: perceivedBrighter(c.primary, factor: playerAccentFactor),
+    secondary: perceivedBrighter(c.secondary, factor: playerAccentFactor),
+    tertiary: perceivedBrighter(c.tertiary, factor: playerAccentFactor),
     onSurface: perceivedBrighter(c.onSurface),
     onSurfaceVariant: perceivedBrighter(c.onSurfaceVariant),
     outline: perceivedBrighter(c.outline),
   );
+  // No iconTheme override: it would win over the filled play button's own
+  // (dark) icon color.
   return theme.copyWith(
     colorScheme: lifted,
     textTheme: theme.textTheme.apply(
       bodyColor: lifted.onSurface,
       displayColor: lifted.onSurface,
     ),
-    iconTheme: theme.iconTheme.copyWith(color: lifted.onSurfaceVariant),
   );
 }
