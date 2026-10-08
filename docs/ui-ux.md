@@ -23,7 +23,9 @@ Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-3
 2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen. Im Kopf des
    Podcast-Details unter der Beschreibung (falls im Feed) antippbare Links: 🌐 Website (angezeigt als Host ohne „www.",
    z. B. „freakshow.fm") und ♡ Unterstützen (Text aus `podcast:funding`, sonst „Unterstützen"); öffnen im Browser
-   (Benutzerwunsch 2026-10-03).
+   (Benutzerwunsch 2026-10-03). **Langes Drücken auf „XY Folgen"** zeigt als Tooltip die durchschnittliche Folgenlänge
+   („Ø 1 Std. 5 Min. pro Folge"; Benutzerwunsch 2026-10-08) – aus den gespeicherten Feed-Daten, ohne Netzzugriff, nur
+   Folgen mit bekannter Länge (`averageEpisodeLength`); sonst „Durchschnittliche Länge unbekannt".
    Rotes Zahlen-Abzeichen oben rechts = ungespielte Folgen (neu + angefangen), ab 100 „99+", bei 0 keins
    (`watchUnplayedCounts`: eine gruppierte Abfrage für alle Abos). Feed-Fehler: rotes Symbol oben links.
    **Bewertung & Reihenfolge** (Benutzerwunsch 2026-10-05): Im Menü beim langen Drücken auf eine Kachel stehen unter dem

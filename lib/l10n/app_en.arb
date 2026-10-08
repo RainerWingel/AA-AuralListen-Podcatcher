@@ -163,6 +163,8 @@
   "finishedRemovalNever": "Never",
   "autoMarkNewPlayed": "Mark new ones as played automatically",
   "chapterProgress": "{percent}%",
+  "averageEpisodeLength": "Ø {duration} per episode",
+  "averageEpisodeLengthUnknown": "Average length unknown",
   "playlistColor": "Color…",
   "playlistColorNone": "No color",
   "colorRed": "Red",

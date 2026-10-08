@@ -275,6 +275,10 @@ void main() {
       expect(find.text('Erste Folge'), findsOneWidget);
       expect(find.textContaining('1 Std. 5 Min.'), findsOneWidget);
       expect(find.widgetWithText(FilledButton, 'Abonnieren'), findsOneWidget);
+      // Long press on "1 Folge": average episode length (user wish).
+      await tester.longPress(find.text('1 Folge'));
+      await settle(tester);
+      expect(find.text('Ø 1 Std. 5 Min. pro Folge'), findsOneWidget);
       final podcast = await tester.runAsync(
         () => db.select(db.podcasts).getSingle(),
       );

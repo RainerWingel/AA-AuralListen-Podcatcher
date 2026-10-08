@@ -312,6 +312,9 @@
   "finishedRemovalNever": "Nie",
   "autoMarkNewPlayed": "Neue automatisch als gespielt markieren",
   "chapterProgress": "{percent} %",
+  "averageEpisodeLength": "Ø {duration} pro Folge",
+  "@averageEpisodeLength": {"placeholders": {"duration": {"type": "String"}}},
+  "averageEpisodeLengthUnknown": "Durchschnittliche Länge unbekannt",
   "@chapterProgress": {"placeholders": {"percent": {"type": "int"}}},
   "playlistColor": "Farbe…",
   "@playlistColor": {

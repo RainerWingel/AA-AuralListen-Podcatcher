@@ -1076,6 +1076,18 @@ abstract class AppLocalizations {
   /// **'{percent} %'**
   String chapterProgress(int percent);
 
+  /// No description provided for @averageEpisodeLength.
+  ///
+  /// In de, this message translates to:
+  /// **'Ø {duration} pro Folge'**
+  String averageEpisodeLength(String duration);
+
+  /// No description provided for @averageEpisodeLengthUnknown.
+  ///
+  /// In de, this message translates to:
+  /// **'Durchschnittliche Länge unbekannt'**
+  String get averageEpisodeLengthUnknown;
+
   /// Playlist menu: pick a category color (dialog title too).
   ///
   /// In de, this message translates to:

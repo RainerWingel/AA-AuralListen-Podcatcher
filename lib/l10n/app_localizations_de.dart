@@ -592,6 +592,14 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String averageEpisodeLength(String duration) {
+    return 'Ø $duration pro Folge';
+  }
+
+  @override
+  String get averageEpisodeLengthUnknown => 'Durchschnittliche Länge unbekannt';
+
+  @override
   String get playlistColor => 'Farbe…';
 
   @override

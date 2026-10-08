@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../core/app_platform.dart';
+import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
@@ -172,6 +173,7 @@ class _PodcastDetailScreenState extends ConsumerState<PodcastDetailScreen> {
                 0 => _Header(
                   podcast: podcast,
                   episodeCount: all.length,
+                  averageLength: averageEpisodeLength(all),
                   onUnsubscribe: () => _unsubscribe(context, ref, podcast),
                 ),
                 1 when extra == 2 => _SeasonChips(
@@ -248,11 +250,15 @@ class _Header extends ConsumerWidget {
   const _Header({
     required this.podcast,
     required this.episodeCount,
+    required this.averageLength,
     required this.onUnsubscribe,
   });
 
   final Podcast podcast;
   final int episodeCount;
+
+  /// Average length of the episodes with a known length (null = none).
+  final Duration? averageLength;
   final VoidCallback onUnsubscribe;
 
   @override
@@ -279,9 +285,20 @@ class _Header extends ConsumerWidget {
                       Text(author, style: theme.textTheme.bodyMedium),
                     ],
                     const SizedBox(height: 4),
-                    Text(
-                      l10n.episodeCount(episodeCount),
-                      style: theme.textTheme.bodySmall,
+                    // Long press: average episode length, from the feed data
+                    // already stored – no network (user wish 2026-10-08).
+                    Tooltip(
+                      triggerMode: TooltipTriggerMode.longPress,
+                      message: switch (averageLength) {
+                        final average? => l10n.averageEpisodeLength(
+                          formatEpisodeDuration(l10n, average),
+                        ),
+                        null => l10n.averageEpisodeLengthUnknown,
+                      },
+                      child: Text(
+                        l10n.episodeCount(episodeCount),
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ),
                     // "Abonnieren" (same as in the Abos menu) or, in the
                     // same place, "Deabonnieren" (user wish 2026-10-05).
@@ -379,4 +396,17 @@ class _PodcastLinks extends ConsumerWidget {
       ],
     );
   }
+}
+
+/// Average of the episodes whose length is known (feed or player); null if
+/// none is.
+Duration? averageEpisodeLength(List<Episode> episodes) {
+  final lengths = [
+    for (final e in episodes)
+      if (e.durationMs case final ms? when ms > 0) ms,
+  ];
+  if (lengths.isEmpty) return null;
+  return Duration(
+    milliseconds: lengths.reduce((a, b) => a + b) ~/ lengths.length,
+  );
 }
