@@ -51,6 +51,9 @@ v1.3.2; nach dem Merge findet der Bot v1.3.3 selbst (`UpdateCheckMode: Tags`). R
 umgestellt (vorher v1.3.2, F-Droid-signiert); Benutzer ersetzt die Datei im Fork.
 **2026-10-07/08:** MR-Pipeline mit `binary:` grün (F-Droid hat unsere APKs verifiziert). Zwischenstand des Prüfers:
 keine Beanstandung, offen ist nur noch sein Test auf einem Gerät.
+**MR-Checkliste (2026-10-08):** „Enable Reproducible Builds" abhaken (erfüllt). „External repos as git submodules"
+bleibt offen: Einziges externes Repo ist Flutter, und das kommt laut `templates/build-flutter.yml` (vom Prüfer
+verlangt) als srclib; sonst keine Submodule (SQLite liegt als Quellcode im Repo).
 **Offen: On-Device-Test durch F-Droid, dann Merge (Schritt 7).** Prüfer 2026-10-08: „Meantime if you release a new
 version please update this MR." → **Entscheidung 2026-10-08: bis zum Merge kein neues Release** (Begründung in den
 Fragen & Antworten unten).
