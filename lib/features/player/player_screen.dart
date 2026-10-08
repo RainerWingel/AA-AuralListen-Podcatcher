@@ -461,7 +461,7 @@ class _OnPlayerBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final background = playerControlBackground(theme);
-    final outline = playerSectionOutline(theme);
+    final outline = playerOutline(theme);
     if (background == null || outline == null) return child;
     return DecoratedBox(
       decoration: BoxDecoration(

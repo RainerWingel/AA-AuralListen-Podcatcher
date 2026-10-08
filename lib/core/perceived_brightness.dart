@@ -8,10 +8,10 @@ import 'package:flutter/material.dart';
 /// (user wish 2026-10-09).
 const playerButtonBackgroundFactor = 3.0;
 
-/// The description section's thin outline is this many times as luminous
-/// as its background (user wish 2026-10-09; 2× at one physical pixel was
+/// The thin outline of the description section and the −15/+30 buttons is
+/// this many times as luminous as their background (user wish 2026-10-09; 2× at one physical pixel was
 /// far too thin and dark).
-const playerSectionOutlineFactor = 5.0;
+const playerOutlineFactor = 5.0;
 
 /// [color] mixed with white until its relative luminance is [factor] times
 /// as high (capped at white).
@@ -41,13 +41,13 @@ Color? playerControlBackground(ThemeData theme) =>
       )
     : null;
 
-/// Thin outline of the player's description section in dark mode; null
-/// in light mode.
-Color? playerSectionOutline(ThemeData theme) =>
+/// Thin outline of the player's description section and −15/+30 buttons in
+/// dark mode; null in light mode.
+Color? playerOutline(ThemeData theme) =>
     switch (playerControlBackground(theme)) {
       final background? => perceivedBrighter(
         background,
-        factor: playerSectionOutlineFactor,
+        factor: playerOutlineFactor,
       ),
       null => null,
     };

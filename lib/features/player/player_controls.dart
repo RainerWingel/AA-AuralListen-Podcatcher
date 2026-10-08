@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../audio/audio_providers.dart';
+import '../../core/perceived_brightness.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Play/pause button that shows a spinner while loading or buffering.
@@ -80,9 +81,15 @@ class SkipButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final handler = ref.watch(audioHandlerProvider);
+    final outline = playerOutline(Theme.of(context));
     return IconButton(
       tooltip: forward ? l10n.playerForward : l10n.playerRewind,
       iconSize: 44,
+      // Dark mode: outlined like the description section (user wish
+      // 2026-10-09); the background comes from the player theme.
+      style: outline == null
+          ? null
+          : IconButton.styleFrom(side: BorderSide(color: outline)),
       onPressed: forward ? handler.fastForward : handler.rewind,
       icon: Stack(
         alignment: Alignment.center,
