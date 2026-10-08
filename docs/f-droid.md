@@ -49,7 +49,9 @@ Rezept im Fork ersetzt (2026-10-05, Inhalt mit dieser Datei identisch geprüft),
 v1.3.2; nach dem Merge findet der Bot v1.3.3 selbst (`UpdateCheckMode: Tags`). Rezept im MR nicht anfassen.
 **2026-10-07:** Prüfer verlangt reproduzierbare Builds → Rezept auf v1.3.3 mit `binary:` + `AllowedAPKSigningKeys`
 umgestellt (vorher v1.3.2, F-Droid-signiert); Benutzer ersetzt die Datei im Fork.
-**Offen: Prüfung durch F-Droid (Schritt 7).**
+**2026-10-07/08:** MR-Pipeline mit `binary:` grün (F-Droid hat unsere APKs verifiziert). Zwischenstand des Prüfers:
+keine Beanstandung, offen ist nur noch sein Test auf einem Gerät.
+**Offen: On-Device-Test durch F-Droid, dann Merge (Schritt 7).**
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
    getaggten Stand.
