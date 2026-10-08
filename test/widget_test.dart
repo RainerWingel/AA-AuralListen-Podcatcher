@@ -19,6 +19,7 @@ import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:aapodcastguru/features/episodes/episode_description.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
+import 'package:aapodcastguru/features/player/player_controls.dart';
 import 'package:aapodcastguru/features/player/player_screen.dart';
 import 'package:aapodcastguru/features/playlists/playlist_screen.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
@@ -2389,6 +2390,51 @@ void main() {
         lessThan(tester.getRect(find.byType(MiniPlayer)).top),
       );
       expect(find.text('Alte Folge 0'), findsNothing); // scrolled away
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'player: same visible gap between the control blocks',
+    timeout: timeout,
+    (tester) async {
+      // Wide enough that each button row stays one row in the test font.
+      tester.view
+        ..physicalSize = const Size(2400, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+
+      /// The visible pill of a text button (without its tap-target padding).
+      Rect pill(String label) => tester.getRect(
+        find
+            .descendant(
+              of: find.widgetWithText(TextButton, label),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      final play = tester.getRect(find.byType(PlayPauseButton).last);
+      final bookmark = pill('Lesezeichen setzen');
+      final boost = pill('Boost: Aus');
+      final description = tester.getRect(
+        find.byType(EpisodeDescriptionSection),
+      );
+      final rows = boost.top - bookmark.bottom;
+      expect(rows, 16);
+      expect(bookmark.top - play.bottom, rows);
+      expect(description.top - boost.bottom, rows);
 
       await disposeApp(tester);
     },

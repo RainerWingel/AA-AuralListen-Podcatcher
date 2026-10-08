@@ -50,6 +50,10 @@ class _DownloadedIcon extends ConsumerWidget {
   }
 }
 
+/// Gap above the button rows and above the description, so they are as far
+/// apart as the two button rows (see the comment at its first use).
+const double _controlGap = 12;
+
 /// Full-screen player (opened from the mini player).
 class PlayerScreen extends ConsumerWidget {
   const PlayerScreen({super.key});
@@ -144,6 +148,12 @@ class PlayerScreen extends ConsumerWidget {
                               SkipButton.forward(),
                             ],
                           ),
+                          // Same visible gap (16) everywhere between the
+                          // control blocks (user wish 2026-10-09): text
+                          // buttons carry 4 invisible tap-target padding on
+                          // each side, so 12 here + 4 = 16 = 8 + 4 + 4
+                          // between the two button rows.
+                          const SizedBox(height: _controlGap),
                           if (item.extras?['episodeId'] case final int id)
                             ChapterBookmarkButtons(
                               episodeId: id,
@@ -161,7 +171,8 @@ class PlayerScreen extends ConsumerWidget {
                               const _SpeedButton(),
                             ],
                           ),
-                          if (item.extras?['episodeId'] case final int id)
+                          if (item.extras?['episodeId'] case final int id) ...[
+                            const SizedBox(height: _controlGap),
                             _OnPlayerBackground(
                               child: EpisodeDescriptionSection(
                                 episodeId: id,
@@ -173,6 +184,7 @@ class PlayerScreen extends ConsumerWidget {
                                 },
                               ),
                             ),
+                          ],
                           const SizedBox(height: 16),
                         ],
                       ),

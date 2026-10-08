@@ -69,7 +69,9 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
   **3-fachen Leuchtdichte** des Seitenhintergrunds. Nach Weber–Fechner wird Helligkeit logarithmisch empfunden – vor fast
   Schwarz ist dieser kleine absolute Schritt deutlich sichtbar. Symbole/Texte behalten ihre Farbe; der Play-Knopf setzt
   seine Farben explizit (sonst überstimmte ihn das Theme). Heller Modus unverändert. (Ein erster Versuch hellte den
-  Vordergrund auf – verworfen.)
+  Vordergrund auf – verworfen.) **Abstände:** Play-Zeile → Knopfreihe 1 → Knopfreihe 2 → Beschreibung jeweils **16**
+  sichtbar (`_controlGap` = 12 + 4 unsichtbarer Tipp-Rand der Textknöpfe; zwischen den Reihen 8 + 4 + 4), ein
+  Widget-Test misst es nach.
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast (davor ✓-Download-Symbol „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist),
   Slider mit „verstrichen" / „-verbleibend" (Tippen auf die rechte Zeit wechselt zur Gesamtlänge und zurück, gemerkt in
   `settings['player.showTotalTime']`, Benutzerwunsch 2026-10-03; bei Tempo ≠ 1 zusätzlich „(-tatsächliche Restzeit)"),
