@@ -5,6 +5,7 @@ import '../../audio/audio_providers.dart';
 import '../../core/clock.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../core/widgets/episode_title.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/playback_repository.dart' show PlaybackRepository;
@@ -292,7 +293,11 @@ class EpisodeTile extends ConsumerWidget {
         ),
       ),
       title: dim(
-        Text(episode.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+        EpisodeTitle(
+          episode.title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       subtitle: dim(
         Column(

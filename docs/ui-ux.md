@@ -112,6 +112,10 @@ ausgegraut mit Hinweis. „Eigene Zählung" nummeriert auch Folgen ohne Feed-Num
   Staffel, dann Folgennummer, dann Datum (ohne Staffel/Nummer jeweils dahinter) – in der Podcast-Liste, bei „Alle
   ungespielten spielen" und beim Auto-Download (die nächsten statt der neuesten, `eviction.md`). Normale Podcasts
   (`episodic`, Standard) bleiben neueste zuerst. Code: `PodcastRepository.serialOrder`.
+**Lange Folgentitel** (≥ 60 Zeichen) stehen in **Listen** bei 65 % der normalen Schriftgröße (Benutzerwunsch
+2026-10-09, `EpisodeTitle`/`episodeTitleStyle` in `lib/core/widgets/episode_title.dart`): Folgenzeilen (Start, Podcast-Seite,
+Playlists, Abos-Suche), Downloads-Tab, Abspielverlauf, Lesezeichen-Liste. **Nicht** im Player, Mini-Player oder in
+Menüs/Detail-Fenstern.
 Vor dem Datum ein kleines Download-Symbol: ✓ heruntergeladen, 🕓 wartet (`Icons.schedule`, Tooltip „Wartet auf WLAN …"
 bzw. „Wartet …" – Benutzerwunsch 2026-10-05, vorher leere Lücke), Fortschrittskreis (mit blasser Spur, damit er auch bei
 0 % sichtbar ist; ohne Wert dreht er), ⚠ fehlgeschlagen. Daneben

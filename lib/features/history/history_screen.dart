@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/episode_title.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
@@ -85,7 +86,7 @@ class HistoryScreen extends ConsumerWidget {
                   final e = items[index];
                   return ListTile(
                     leading: CoverImage(url: e.imageUrl, size: 48),
-                    title: Text(
+                    title: EpisodeTitle(
                       e.episodeTitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

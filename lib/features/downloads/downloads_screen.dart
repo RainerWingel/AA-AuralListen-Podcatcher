@@ -6,6 +6,7 @@ import '../../core/formatting.dart';
 import '../../core/widgets/background_scaffold.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/episode_title.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../core/widgets/squares_background.dart';
 import '../../data/db/app_database.dart';
@@ -160,7 +161,7 @@ class _DownloadTile extends ConsumerWidget {
         url: item.episode.imageUrl ?? item.podcast.imageUrl,
         size: 56,
       ),
-      title: Text(
+      title: EpisodeTitle(
         item.episode.title,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,

@@ -8,6 +8,7 @@ import '../../audio/audio_providers.dart';
 import '../../audio/sleep_timer.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../core/widgets/episode_title.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../core/widgets/text_input_dialog.dart';
 import '../../data/chapters/chapter_service.dart';
@@ -555,7 +556,21 @@ class BookmarkTile extends ConsumerWidget {
     return ListTile(
       leading: leading ?? const Icon(Icons.bookmark_outline),
       title: Text(bookmark.note ?? time),
-      subtitle: Text([if (bookmark.note != null) time, ?subtitle].join(' · ')),
+      // The subtitle is the episode title (bookmarks list): smaller when
+      // long, like everywhere else.
+      subtitle: Builder(
+        builder: (context) => Text.rich(
+          TextSpan(
+            children: [
+              if (bookmark.note != null) TextSpan(text: time),
+              if (bookmark.note != null && subtitle != null)
+                const TextSpan(text: ' · '),
+              if (subtitle case final title?)
+                TextSpan(text: title, style: episodeTitleStyle(context, title)),
+            ],
+          ),
+        ),
+      ),
       onTap: onTap,
       onLongPress: () => _editNote(context, ref),
       trailing: IconButton(
