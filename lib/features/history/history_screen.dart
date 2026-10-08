@@ -91,11 +91,18 @@ class HistoryScreen extends ConsumerWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    subtitle: Text(
-                      '${e.podcastTitle}\n'
-                      '${when.format(e.playedAt.toLocal())}',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    // Podcast name on one line, so a long one never
+                    // pushes the date out (user report 2026-10-09).
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          e.podcastTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(when.format(e.playedAt.toLocal())),
+                      ],
                     ),
                     onTap: () => _play(context, ref, e),
                   );

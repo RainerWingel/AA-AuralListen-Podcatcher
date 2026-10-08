@@ -248,7 +248,8 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
 ## Abspielverlauf (Benutzerwunsch 2026-10-03)
 - Optionen → „Abspielverlauf" (`/einstellungen/verlauf`, `lib/features/history/history_screen.dart`): alle Folgen, die
   **bis zum Ende** gelaufen sind (Dateiende bzw. letztes Kapitel übersprungen – nicht manuelles „Als gespielt
-  markieren"), neueste zuerst: Cover, Titel, Podcast, Datum + Uhrzeit.
+  markieren"), neueste zuerst: Cover, Titel, Podcast (immer **einzeilig**, sonst verdrängte ein langer Name das Datum;
+  2026-10-09), Datum + Uhrzeit.
 - Höchstens die **100** neuesten (`HistoryRepository.maxEntries`); dieselbe Folge erneut zu Ende gehört → ihr Eintrag
   rutscht nach oben (Schlüssel Feed-Adresse + guid), kein Duplikat.
 - Eigene Tabelle `play_history` mit einer **Kopie** der Anzeigedaten, ohne Fremdschlüssel: **Abo kündigen löscht nichts**

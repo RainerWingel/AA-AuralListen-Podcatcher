@@ -2697,6 +2697,9 @@ void main() {
       );
       await settle(tester);
       expect(find.text('Erste Folge'), findsOneWidget);
+      // Podcast name on its own single line, the date below it.
+      final name = tester.widget<Text>(find.text('Widget-Podcast'));
+      expect(name.maxLines, 1);
 
       await tester.tap(find.text('Erste Folge'));
       await settle(tester);
