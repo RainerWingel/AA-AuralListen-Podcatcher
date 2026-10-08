@@ -450,7 +450,7 @@ class _PlaylistRow extends ConsumerWidget {
 }
 
 /// In dark mode the description section sits on the same slightly brighter
-/// background as the buttons, outlined by a slightly brighter hairline; in
+/// background as the buttons, outlined by a thin brighter line; in
 /// light mode nothing changes.
 class _OnPlayerBackground extends StatelessWidget {
   const _OnPlayerBackground({required this.child});
@@ -466,11 +466,7 @@ class _OnPlayerBackground extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: background,
-        // One physical pixel wide.
-        border: Border.all(
-          color: outline,
-          width: 1 / MediaQuery.devicePixelRatioOf(context),
-        ),
+        border: Border.all(color: outline),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(

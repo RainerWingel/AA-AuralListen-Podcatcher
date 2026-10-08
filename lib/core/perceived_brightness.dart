@@ -8,9 +8,10 @@ import 'package:flutter/material.dart';
 /// (user wish 2026-10-09).
 const playerButtonBackgroundFactor = 3.0;
 
-/// The description section's hairline outline is this many times as
-/// luminous as its background – a little brighter (user wish 2026-10-09).
-const playerSectionOutlineFactor = 2.0;
+/// The description section's thin outline is this many times as luminous
+/// as its background (user wish 2026-10-09; 2× at one physical pixel was
+/// far too thin and dark).
+const playerSectionOutlineFactor = 5.0;
 
 /// [color] mixed with white until its relative luminance is [factor] times
 /// as high (capped at white).
@@ -40,7 +41,7 @@ Color? playerControlBackground(ThemeData theme) =>
       )
     : null;
 
-/// Hairline outline of the player's description section in dark mode; null
+/// Thin outline of the player's description section in dark mode; null
 /// in light mode.
 Color? playerSectionOutline(ThemeData theme) =>
     switch (playerControlBackground(theme)) {

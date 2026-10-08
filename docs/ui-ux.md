@@ -70,8 +70,9 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
   **3-fachen Leuchtdichte** des Seitenhintergrunds. Nach Weber–Fechner wird Helligkeit logarithmisch empfunden – vor fast
   Schwarz ist dieser kleine absolute Schritt deutlich sichtbar. Symbole/Texte behalten ihre Farbe; der Play-Knopf setzt
   seine Farben explizit (sonst überstimmte ihn das Theme). Heller Modus unverändert. (Ein erster Versuch hellte den
-  Vordergrund auf – verworfen.) Der Beschreibungs-Bereich hat zusätzlich eine **Haarlinie** (1 physisches Pixel) als
-Rand, mit der 2-fachen Leuchtdichte seines Hintergrunds (Benutzerwunsch 2026-10-09). **Abstände:** Play-Zeile → Knopfreihe 1 → Knopfreihe 2 → Beschreibung jeweils **16**
+  Vordergrund auf – verworfen.) Der Beschreibungs-Bereich hat zusätzlich eine **dünne Randlinie** (1 dp) mit der
+**5-fachen Leuchtdichte** seines Hintergrunds (Benutzerwunsch 2026-10-09; 1 physisches Pixel mit 2-facher Leuchtdichte
+war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 → Knopfreihe 2 → Beschreibung jeweils **16**
   sichtbar (`_controlGap` = 12 + 4 unsichtbarer Tipp-Rand der Textknöpfe; zwischen den Reihen 8 + 4 + 4), ein
   Widget-Test misst es nach.
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast (davor ✓-Download-Symbol „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist),
