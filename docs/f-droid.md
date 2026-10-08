@@ -51,7 +51,9 @@ v1.3.2; nach dem Merge findet der Bot v1.3.3 selbst (`UpdateCheckMode: Tags`). R
 umgestellt (vorher v1.3.2, F-Droid-signiert); Benutzer ersetzt die Datei im Fork.
 **2026-10-07/08:** MR-Pipeline mit `binary:` grün (F-Droid hat unsere APKs verifiziert). Zwischenstand des Prüfers:
 keine Beanstandung, offen ist nur noch sein Test auf einem Gerät.
-**Offen: On-Device-Test durch F-Droid, dann Merge (Schritt 7).**
+**Offen: On-Device-Test durch F-Droid, dann Merge (Schritt 7).** Prüfer 2026-10-08: „Meantime if you release a new
+version please update this MR." → **Entscheidung 2026-10-08: bis zum Merge kein neues Release** (Begründung in den
+Fragen & Antworten unten).
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
    getaggten Stand.
@@ -65,7 +67,8 @@ keine Beanstandung, offen ist nur noch sein Test auf einem Gerät.
    Punkte ab (Lizenz, keine proprietären Teile, Tracker …) – alles erfüllt. F-Droid-CI baut die App testweise.
 7. Rückfragen der Prüfer beantworten (Claude hilft). Nach dem Merge erscheint die App meist nach wenigen Tagen.
    Spätere Versionen erkennt F-Droid selbst am Tag (`UpdateCheckMode: Tags`) – dann nur noch Version erhöhen,
-   Changelogs schreiben, taggen.
+   Changelogs schreiben, taggen, APKs per Skript bauen und ins GitHub-Release legen (Abschnitt „Reproduzierbare
+   Builds").
 
 ## Ablauf der Prüfung (Erfahrungen MR !51179)
 - **Codequalitäts-Scan** im MR („32 neue Funde"): listet nur die Berechtigungen je Build-Block (3 ABIs × Berechtigungen),
@@ -109,16 +112,30 @@ selbst gebaut und verglichen hat. Dafür müssen unsere Release-APKs bitgleich m
 
 ## Fragen & Antworten für den Benutzer
 
-### Muss ich warten, bis die App bei F-Droid gelistet ist, bevor ich neue Versionen veröffentliche?
-Nein. GitHub-Releases gehen jederzeit. Der Merge Request ist auf v1.3.2 festgelegt und wird nur damit geprüft – eine
-neuere Version während der Prüfung braucht **keine** Änderung am MR. Nach dem Merge findet F-Droid die neueste
-Version selbst (nächste Frage).
+### Kann ich während der Prüfung einfach ein neues GitHub-Release veröffentlichen?
+Technisch ja, aber es landet **nicht von selbst** im MR. Das Rezept im MR ist fest auf eine Version eingestellt
+(Stand: v1.3.3 – Commit, Codes 5011–5013, `binary:`-Links auf die 1.3.3-APKs); die Prüfer sehen nur diese. Der Prüfer
+bittet ausdrücklich (2026-10-08): „if you release a new version please update this MR". Ein Release mitten in der
+Prüfung heißt also:
+1. Version erhöhen (z. B. `1.3.4+502` → Codes 5021/5022/5023), Changelogs, Tag `v1.3.4`.
+2. APKs mit `tool/fdroid_release_build.sh <out> --sign` bauen – **nicht** mit `flutter build`, sonst nicht bitgleich
+   mit F-Droids Build.
+3. GitHub-Release mit den drei APKs veröffentlichen – **vor** dem MR-Update, weil die Pipeline sie über `binary:`
+   herunterlädt und vergleicht.
+4. Im Fork das Rezept ändern (neuer Build-Eintrag, `CurrentVersion`/`CurrentVersionCode`); die MR-Pipeline läuft neu.
+
+**Empfehlung (Entscheidung 2026-10-08): bis zum Merge warten**, außer bei einem dringenden Fehler. Jede MR-Änderung
+startet die Pipeline neu und kann den Geräte-Test des Prüfers verzögern; nach dem Merge holt der Bot neue Tags
+ohnehin selbst (nächste Frage). Obtainium-Nutzer (GitHub) bekämen ein Release sofort – für F-Droid bringt es während
+der Prüfung nichts.
 
 ### Wird automatisch bei F-Droid veröffentlicht, wenn ich ein GitHub-Release erzeuge? Und beim bloßen Pushen?
 - **Release (genauer: der Git-Tag `vX.Y.Z`) → ja**, sobald die App aufgenommen ist. Ein F-Droid-Bot schaut etwa täglich
   nach neuen Tags (`UpdateCheckMode: Tags ^v[0-9.]+$`), liest die Version aus `pubspec.yaml` am Tag und trägt den neuen
-  Build selbst in fdroiddata ein (`AutoUpdateMode: Version`). Danach baut und signiert der Buildserver. Bis die Version
-  bei den Nutzern ist: meist einige Tage bis etwa eine Woche.
+  Build selbst in fdroiddata ein (`AutoUpdateMode: Version`). Danach baut der Buildserver, vergleicht mit unseren
+  APKs aus dem GitHub-Release (`binary:`) und veröffentlicht bei Gleichheit **unsere** signierten APKs. Die APKs
+  müssen deshalb schon im Release liegen (per Skript gebaut), sonst schlägt der Build fehl. Bis die Version bei den
+  Nutzern ist: meist einige Tage bis etwa eine Woche.
 - **Nur pushen → nein.** Ohne neuen Tag passiert bei F-Droid nichts; Pushen ist also gefahrlos.
 - Vor jedem Tag muss stimmen (erledigt Claude beim „Release freigeben"): Versionsname **und** Build-Nummer in
   `pubspec.yaml` erhöht (Build-Nummer nur nach oben), Changelogs für alle drei Codes im Repo, `flutter-version:` in
@@ -193,5 +210,6 @@ Auf Android 7–9 ungetestet.
 ## Bekannte Punkte für die Prüfung
 - **NonFreeNet** (Anti-Feature, Hinweis – keine Ablehnung): Die Suche nutzt Apples iTunes Search API. Möglich, dass
   F-Droid das markiert; fyyd.de und RSS-Adressen funktionieren ohne Apple.
-- Unterschiedliche Signatur: Wer die GitHub-APK hat, kann nicht auf die F-Droid-Version aktualisieren (vorher Backup,
-  deinstallieren, F-Droid-Version installieren, Backup einspielen).
+- Signatur: Seit den reproduzierbaren Builds (ab v1.3.3) verteilt F-Droid **unsere** Signatur – GitHub- und
+  F-Droid-APKs sind austauschbar, Updates gehen in beide Richtungen. Nur wer noch eine F-Droid-signierte APK hätte
+  (gab es nie öffentlich), müsste neu installieren.
