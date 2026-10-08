@@ -51,6 +51,12 @@ class PlayPauseButton extends ConsumerWidget {
             tooltip: tooltip,
             iconSize: size,
             padding: EdgeInsets.all(size / 3),
+            // Explicit: the player theme gives icon buttons a background
+            // in dark mode, which would otherwise replace this one.
+            style: IconButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            ),
             onPressed: onPressed,
             icon: icon,
           )

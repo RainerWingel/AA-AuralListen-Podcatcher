@@ -63,12 +63,13 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 ## Player
 - **Mini-Player** (`lib/features/player/mini_player.dart`) über der Navigationsleiste, sobald etwas gespielt wurde:
   dünner Fortschrittsbalken, Cover, Titel, Podcast, Play/Pause (Kreisel beim Puffern). Tippen → Vollbild-Player.
-- **Vollbild-Player im Dunkel-Modus etwas heller** (Benutzerwunsch 2026-10-09, `lib/core/perceived_brightness.dart`):
-  Nach Weber–Fechner wird Helligkeit logarithmisch empfunden – gleich spürbare Schritte sind gleiche **Faktoren** der
-  Leuchtdichte. `playerTheme` hebt Text- und Symbolfarben (onSurface, onSurfaceVariant, outline) um Faktor **1,4**, die
-  grünen Akzentfarben (primary/secondary/tertiary: Textknöpfe, Regler, Play-Knopf) um **1,2** an (Mischung mit Weiß,
-  gedeckelt); Hintergründe bleiben. Kein `iconTheme`-Override (überstimmte sonst das dunkle Symbol im Play-Knopf). Gilt für den ganzen Player inkl. Knöpfe,
-  Regler und Beschreibungs-Bereich; heller Modus unverändert.
+- **Vollbild-Player im Dunkel-Modus: Knöpfe auf hellerem Grund** (Benutzerwunsch 2026-10-09,
+  `lib/core/perceived_brightness.dart`): Text- und Symbolknöpfe (−15/+30, Lesezeichen, Sleep-Timer, Boost, Tempo,
+  Playlist-Zeile, Schließen) und der Beschreibungs-Bereich (abgerundete Fläche) bekommen einen Hintergrund mit der
+  **3-fachen Leuchtdichte** des Seitenhintergrunds. Nach Weber–Fechner wird Helligkeit logarithmisch empfunden – vor fast
+  Schwarz ist dieser kleine absolute Schritt deutlich sichtbar. Symbole/Texte behalten ihre Farbe; der Play-Knopf setzt
+  seine Farben explizit (sonst überstimmte ihn das Theme). Heller Modus unverändert. (Ein erster Versuch hellte den
+  Vordergrund auf – verworfen.)
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast (davor ✓-Download-Symbol „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist),
   Slider mit „verstrichen" / „-verbleibend" (Tippen auf die rechte Zeit wechselt zur Gesamtlänge und zurück, gemerkt in
   `settings['player.showTotalTime']`, Benutzerwunsch 2026-10-03; bei Tempo ≠ 1 zusätzlich „(-tatsächliche Restzeit)"),

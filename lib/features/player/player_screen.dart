@@ -57,7 +57,7 @@ class PlayerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    // Dark mode: buttons, slider and description a bit brighter
+    // Dark mode: buttons and description on a slightly brighter background
     // (Weber–Fechner, perceived_brightness.dart).
     final theme = playerTheme(Theme.of(context));
     final item = ref.watch(mediaItemProvider).value?.mediaItem;
@@ -162,14 +162,16 @@ class PlayerScreen extends ConsumerWidget {
                             ],
                           ),
                           if (item.extras?['episodeId'] case final int id)
-                            EpisodeDescriptionSection(
-                              episodeId: id,
-                              podcastId: podcastId,
-                              pubDate: switch (item.extras?['pubDateMs']) {
-                                final int ms =>
-                                  DateTime.fromMillisecondsSinceEpoch(ms),
-                                _ => null,
-                              },
+                            _OnPlayerBackground(
+                              child: EpisodeDescriptionSection(
+                                episodeId: id,
+                                podcastId: podcastId,
+                                pubDate: switch (item.extras?['pubDateMs']) {
+                                  final int ms =>
+                                    DateTime.fromMillisecondsSinceEpoch(ms),
+                                  _ => null,
+                                },
+                              ),
                             ),
                           const SizedBox(height: 16),
                         ],
@@ -431,6 +433,30 @@ class _PlaylistRow extends ConsumerWidget {
               episodeId,
               DateTime.now().millisecondsSinceEpoch,
             ),
+    );
+  }
+}
+
+/// In dark mode the description section sits on the same slightly brighter
+/// background as the buttons; in light mode nothing changes.
+class _OnPlayerBackground extends StatelessWidget {
+  const _OnPlayerBackground({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final background = playerControlBackground(Theme.of(context));
+    if (background == null) return child;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: child,
+      ),
     );
   }
 }

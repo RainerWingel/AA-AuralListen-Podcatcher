@@ -3,44 +3,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('luminance grows by the same factor (Weber–Fechner)', () {
-    for (final c in [
-      const Color(0xFF555555),
-      const Color(0xFF8BC34A),
-      const Color(0xFFC3C8BB),
-    ]) {
-      final lifted = perceivedBrighter(c);
+  test('luminance grows by the given factor (Weber–Fechner)', () {
+    for (final c in [const Color(0xFF121412), const Color(0xFF555555)]) {
+      final lifted = perceivedBrighter(c, factor: 3);
       expect(
         lifted.computeLuminance() / c.computeLuminance(),
-        closeTo(playerLuminanceFactor, 0.01),
+        closeTo(3, 0.02),
         reason: '$c',
       );
     }
-    // Near white: capped at white, never darker.
-    expect(perceivedBrighter(const Color(0xFFF0F0F0)), Colors.white);
+    expect(perceivedBrighter(const Color(0xFFF0F0F0), factor: 3), Colors.white);
   });
 
-  test('only dark mode is lifted', () {
+  test('dark mode: buttons get a brighter background, colors stay', () {
     final light = ThemeData(brightness: Brightness.light);
     expect(playerTheme(light), same(light));
+    expect(playerControlBackground(light), isNull);
+
     final dark = ThemeData(brightness: Brightness.dark);
-    final lifted = playerTheme(dark);
+    final themed = playerTheme(dark);
+    final background = playerControlBackground(dark)!;
     expect(
-      lifted.colorScheme.onSurfaceVariant.computeLuminance(),
-      greaterThan(dark.colorScheme.onSurfaceVariant.computeLuminance()),
+      background.computeLuminance(),
+      closeTo(
+        dark.colorScheme.surface.computeLuminance() *
+            playerButtonBackgroundFactor,
+        0.001,
+      ),
     );
     expect(
-      lifted.colorScheme.primary.computeLuminance(),
-      greaterThan(dark.colorScheme.primary.computeLuminance()),
+      themed.textButtonTheme.style!.backgroundColor!.resolve({}),
+      background,
     );
-    expect(lifted.colorScheme.surface, dark.colorScheme.surface);
-    // Accents get the smaller step.
     expect(
-      lifted.colorScheme.primary.computeLuminance() /
-          dark.colorScheme.primary.computeLuminance(),
-      closeTo(playerAccentFactor, 0.01),
+      themed.iconButtonTheme.style!.backgroundColor!.resolve({}),
+      background,
     );
-    // The play button keeps its own icon color.
-    expect(lifted.iconTheme, dark.iconTheme);
+    // Symbols and texts keep their colors.
+    expect(themed.colorScheme, dark.colorScheme);
   });
 }
