@@ -19,7 +19,13 @@ transparente AppBar als „dunkel" wertet, setzt `BackgroundScaffold` die Status
 Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-30).
 
 ## Navigation (untere Leiste)
-1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh
+1. **Start** – neueste Folgen aller Abos, Pull-to-Refresh. **🔥 „Beliebt"** (Benutzerwunsch 2026-10-08, nur hier):
+   rechts bei noch nicht angefangenen Folgen eines Podcasts **oder Themas**, das du fast nie auslässt – knapp über dem
+   96-h-Punkt bzw. allein (`_NewMarks`, `Icons.local_fire_department`). Regel (`HotSources`): von den **10 neuesten**
+   Folgen, die **älter als 7 Tage** sind und nicht älter als die älteste je zu Ende gehörte, sind **≥ 80 %** gehört (zu
+   Ende = `episodes.finishedListening`, oder angefangen); mindestens 5 solcher Folgen. „Als gespielt markieren" zählt
+   als ausgelassen. Eine kleine beobachtete Abfrage (5 Spalten) wird im Speicher ausgewertet; die Oberfläche hört nur
+   von geändertem Ergebnis (`distinct`). Kein nachgeschobenes `asyncMap`-Query – das hing in Widget-Tests.
 2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen. Im Kopf des
    Podcast-Details unter der Beschreibung (falls im Feed) antippbare Links: 🌐 Website (angezeigt als Host ohne „www.",
    z. B. „freakshow.fm") und ♡ Unterstützen (Text aus `podcast:funding`, sonst „Unterstützen"); öffnen im Browser

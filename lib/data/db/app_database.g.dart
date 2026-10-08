@@ -1870,6 +1870,21 @@ class $EpisodesTable extends Episodes with TableInfo<$EpisodesTable, Episode> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _finishedListeningMeta = const VerificationMeta(
+    'finishedListening',
+  );
+  @override
+  late final GeneratedColumn<bool> finishedListening = GeneratedColumn<bool>(
+    'finished_listening',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("finished_listening" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _addedAtMeta = const VerificationMeta(
     'addedAt',
   );
@@ -1901,6 +1916,7 @@ class $EpisodesTable extends Episodes with TableInfo<$EpisodesTable, Episode> {
     status,
     positionMs,
     playedAt,
+    finishedListening,
     addedAt,
   ];
   @override
@@ -2037,6 +2053,15 @@ class $EpisodesTable extends Episodes with TableInfo<$EpisodesTable, Episode> {
         playedAt.isAcceptableOrUnknown(data['played_at']!, _playedAtMeta),
       );
     }
+    if (data.containsKey('finished_listening')) {
+      context.handle(
+        _finishedListeningMeta,
+        finishedListening.isAcceptableOrUnknown(
+          data['finished_listening']!,
+          _finishedListeningMeta,
+        ),
+      );
+    }
     if (data.containsKey('added_at')) {
       context.handle(
         _addedAtMeta,
@@ -2132,6 +2157,10 @@ class $EpisodesTable extends Episodes with TableInfo<$EpisodesTable, Episode> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}played_at'],
       ),
+      finishedListening: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}finished_listening'],
+      )!,
       addedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}added_at'],
@@ -2180,6 +2209,10 @@ class Episode extends DataClass implements Insertable<Episode> {
   final EpisodeStatus status;
   final int positionMs;
   final DateTime? playedAt;
+
+  /// Played to the end at least once (v26) – unlike "played", which a manual
+  /// "mark as played" also sets. Basis of the 🔥 on Start (docs/ui-ux.md).
+  final bool finishedListening;
   final DateTime addedAt;
   const Episode({
     required this.id,
@@ -2200,6 +2233,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     required this.status,
     required this.positionMs,
     this.playedAt,
+    required this.finishedListening,
     required this.addedAt,
   });
   @override
@@ -2249,6 +2283,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     if (!nullToAbsent || playedAt != null) {
       map['played_at'] = Variable<DateTime>(playedAt);
     }
+    map['finished_listening'] = Variable<bool>(finishedListening);
     map['added_at'] = Variable<DateTime>(addedAt);
     return map;
   }
@@ -2295,6 +2330,7 @@ class Episode extends DataClass implements Insertable<Episode> {
       playedAt: playedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(playedAt),
+      finishedListening: Value(finishedListening),
       addedAt: Value(addedAt),
     );
   }
@@ -2325,6 +2361,7 @@ class Episode extends DataClass implements Insertable<Episode> {
       ),
       positionMs: serializer.fromJson<int>(json['positionMs']),
       playedAt: serializer.fromJson<DateTime?>(json['playedAt']),
+      finishedListening: serializer.fromJson<bool>(json['finishedListening']),
       addedAt: serializer.fromJson<DateTime>(json['addedAt']),
     );
   }
@@ -2352,6 +2389,7 @@ class Episode extends DataClass implements Insertable<Episode> {
       ),
       'positionMs': serializer.toJson<int>(positionMs),
       'playedAt': serializer.toJson<DateTime?>(playedAt),
+      'finishedListening': serializer.toJson<bool>(finishedListening),
       'addedAt': serializer.toJson<DateTime>(addedAt),
     };
   }
@@ -2375,6 +2413,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     EpisodeStatus? status,
     int? positionMs,
     Value<DateTime?> playedAt = const Value.absent(),
+    bool? finishedListening,
     DateTime? addedAt,
   }) => Episode(
     id: id ?? this.id,
@@ -2401,6 +2440,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     status: status ?? this.status,
     positionMs: positionMs ?? this.positionMs,
     playedAt: playedAt.present ? playedAt.value : this.playedAt,
+    finishedListening: finishedListening ?? this.finishedListening,
     addedAt: addedAt ?? this.addedAt,
   );
   Episode copyWithCompanion(EpisodesCompanion data) {
@@ -2437,6 +2477,9 @@ class Episode extends DataClass implements Insertable<Episode> {
           ? data.positionMs.value
           : this.positionMs,
       playedAt: data.playedAt.present ? data.playedAt.value : this.playedAt,
+      finishedListening: data.finishedListening.present
+          ? data.finishedListening.value
+          : this.finishedListening,
       addedAt: data.addedAt.present ? data.addedAt.value : this.addedAt,
     );
   }
@@ -2462,6 +2505,7 @@ class Episode extends DataClass implements Insertable<Episode> {
           ..write('status: $status, ')
           ..write('positionMs: $positionMs, ')
           ..write('playedAt: $playedAt, ')
+          ..write('finishedListening: $finishedListening, ')
           ..write('addedAt: $addedAt')
           ..write(')'))
         .toString();
@@ -2487,6 +2531,7 @@ class Episode extends DataClass implements Insertable<Episode> {
     status,
     positionMs,
     playedAt,
+    finishedListening,
     addedAt,
   );
   @override
@@ -2511,6 +2556,7 @@ class Episode extends DataClass implements Insertable<Episode> {
           other.status == this.status &&
           other.positionMs == this.positionMs &&
           other.playedAt == this.playedAt &&
+          other.finishedListening == this.finishedListening &&
           other.addedAt == this.addedAt);
 }
 
@@ -2533,6 +2579,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
   final Value<EpisodeStatus> status;
   final Value<int> positionMs;
   final Value<DateTime?> playedAt;
+  final Value<bool> finishedListening;
   final Value<DateTime> addedAt;
   const EpisodesCompanion({
     this.id = const Value.absent(),
@@ -2553,6 +2600,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     this.status = const Value.absent(),
     this.positionMs = const Value.absent(),
     this.playedAt = const Value.absent(),
+    this.finishedListening = const Value.absent(),
     this.addedAt = const Value.absent(),
   });
   EpisodesCompanion.insert({
@@ -2574,6 +2622,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     this.status = const Value.absent(),
     this.positionMs = const Value.absent(),
     this.playedAt = const Value.absent(),
+    this.finishedListening = const Value.absent(),
     required DateTime addedAt,
   }) : podcastId = Value(podcastId),
        guid = Value(guid),
@@ -2599,6 +2648,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     Expression<String>? status,
     Expression<int>? positionMs,
     Expression<DateTime>? playedAt,
+    Expression<bool>? finishedListening,
     Expression<DateTime>? addedAt,
   }) {
     return RawValuesInsertable({
@@ -2620,6 +2670,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
       if (status != null) 'status': status,
       if (positionMs != null) 'position_ms': positionMs,
       if (playedAt != null) 'played_at': playedAt,
+      if (finishedListening != null) 'finished_listening': finishedListening,
       if (addedAt != null) 'added_at': addedAt,
     });
   }
@@ -2643,6 +2694,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     Value<EpisodeStatus>? status,
     Value<int>? positionMs,
     Value<DateTime?>? playedAt,
+    Value<bool>? finishedListening,
     Value<DateTime>? addedAt,
   }) {
     return EpisodesCompanion(
@@ -2664,6 +2716,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
       status: status ?? this.status,
       positionMs: positionMs ?? this.positionMs,
       playedAt: playedAt ?? this.playedAt,
+      finishedListening: finishedListening ?? this.finishedListening,
       addedAt: addedAt ?? this.addedAt,
     );
   }
@@ -2727,6 +2780,9 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
     if (playedAt.present) {
       map['played_at'] = Variable<DateTime>(playedAt.value);
     }
+    if (finishedListening.present) {
+      map['finished_listening'] = Variable<bool>(finishedListening.value);
+    }
     if (addedAt.present) {
       map['added_at'] = Variable<DateTime>(addedAt.value);
     }
@@ -2754,6 +2810,7 @@ class EpisodesCompanion extends UpdateCompanion<Episode> {
           ..write('status: $status, ')
           ..write('positionMs: $positionMs, ')
           ..write('playedAt: $playedAt, ')
+          ..write('finishedListening: $finishedListening, ')
           ..write('addedAt: $addedAt')
           ..write(')'))
         .toString();
@@ -6630,6 +6687,7 @@ typedef $$EpisodesTableCreateCompanionBuilder = EpisodesCompanion Function({
   Value<EpisodeStatus> status,
   Value<int> positionMs,
   Value<DateTime?> playedAt,
+  Value<bool> finishedListening,
   required DateTime addedAt,
 });
 typedef $$EpisodesTableUpdateCompanionBuilder = EpisodesCompanion Function({
@@ -6651,6 +6709,7 @@ typedef $$EpisodesTableUpdateCompanionBuilder = EpisodesCompanion Function({
   Value<EpisodeStatus> status,
   Value<int> positionMs,
   Value<DateTime?> playedAt,
+  Value<bool> finishedListening,
   Value<DateTime> addedAt,
 });
 
@@ -6859,6 +6918,11 @@ class $$EpisodesTableFilterComposer
 
   ColumnFilters<DateTime> get playedAt => $composableBuilder(
     column: $table.playedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get finishedListening => $composableBuilder(
+    column: $table.finishedListening,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7110,6 +7174,11 @@ class $$EpisodesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get finishedListening => $composableBuilder(
+    column: $table.finishedListening,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get addedAt => $composableBuilder(
     column: $table.addedAt,
     builder: (column) => ColumnOrderings(column),
@@ -7212,6 +7281,11 @@ class $$EpisodesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get playedAt =>
       $composableBuilder(column: $table.playedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get finishedListening => $composableBuilder(
+    column: $table.finishedListening,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get addedAt =>
       $composableBuilder(column: $table.addedAt, builder: (column) => column);
@@ -7418,6 +7492,7 @@ class $$EpisodesTableTableManager
                 Value<EpisodeStatus> status = const Value.absent(),
                 Value<int> positionMs = const Value.absent(),
                 Value<DateTime?> playedAt = const Value.absent(),
+                Value<bool> finishedListening = const Value.absent(),
                 Value<DateTime> addedAt = const Value.absent(),
               }) => EpisodesCompanion(
                 id: id,
@@ -7438,6 +7513,7 @@ class $$EpisodesTableTableManager
                 status: status,
                 positionMs: positionMs,
                 playedAt: playedAt,
+                finishedListening: finishedListening,
                 addedAt: addedAt,
               ),
           createCompanionCallback:
@@ -7460,6 +7536,7 @@ class $$EpisodesTableTableManager
                 Value<EpisodeStatus> status = const Value.absent(),
                 Value<int> positionMs = const Value.absent(),
                 Value<DateTime?> playedAt = const Value.absent(),
+                Value<bool> finishedListening = const Value.absent(),
                 required DateTime addedAt,
               }) => EpisodesCompanion.insert(
                 id: id,
@@ -7480,6 +7557,7 @@ class $$EpisodesTableTableManager
                 status: status,
                 positionMs: positionMs,
                 playedAt: playedAt,
+                finishedListening: finishedListening,
                 addedAt: addedAt,
               ),
           withReferenceMapper: (p0) => p0

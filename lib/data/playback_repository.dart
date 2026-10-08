@@ -86,6 +86,11 @@ class PlaybackRepository {
     bool keepInPlaylist = false,
   }) => _db.transaction(() async {
     await _setPlayed(episodeId);
+    // Heard to the end – kept even if marked unplayed later (🔥 on Start).
+    await _update(
+      episodeId,
+      const EpisodesCompanion(finishedListening: Value(true)),
+    );
     if (playlistId == null) return;
     final item = _db.playlistItems;
     Expression<bool> where($PlaylistItemsTable i) =>

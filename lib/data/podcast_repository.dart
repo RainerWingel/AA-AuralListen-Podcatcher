@@ -8,6 +8,7 @@ import 'db/app_database.dart';
 import 'episode_numbers.dart';
 import 'feed/feed_fetcher.dart';
 import 'feed/rss_parser.dart';
+import 'hot_sources.dart';
 import 'storage/cover_cache.dart';
 
 enum SubscribeError { invalidUrl, alreadySubscribed, network, notAFeed }
@@ -376,6 +377,41 @@ class PodcastRepository {
       episodeNumberOffset: Value.absentIfNull(offset?.clamp(-9999, 9999)),
     ),
   );
+
+  /// Podcasts and topics whose new episodes get a 🔥 on Start (HotSources).
+  /// One small query (five columns) evaluated in memory; listeners only
+  /// hear about a changed verdict (position saves while playing re-run the
+  /// query but change nothing).
+  Stream<HotSources> watchHotSources() {
+    final e = _db.episodes;
+    final query =
+        _db.selectOnly(e).join([
+            innerJoin(_db.podcasts, _db.podcasts.id.equalsExp(e.podcastId)),
+          ])
+          ..addColumns([
+            e.podcastId,
+            e.theme,
+            e.pubDate,
+            e.status,
+            e.finishedListening,
+          ])
+          ..where(_db.podcasts.provisional.equals(false));
+    return query
+        .watch()
+        .map(
+          (rows) => HotSources.compute([
+            for (final row in rows)
+              (
+                podcastId: row.read(e.podcastId)!,
+                theme: row.read(e.theme),
+                pubDate: row.read(e.pubDate),
+                status: e.status.converter.fromSql(row.read(e.status)!),
+                finishedListening: row.read(e.finishedListening)!,
+              ),
+          ], _clock()),
+        )
+        .distinct();
+  }
 
   /// Newest episodes across all subscriptions (home screen); provisional
   /// podcasts are not subscribed yet and stay out.

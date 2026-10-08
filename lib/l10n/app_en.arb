@@ -165,6 +165,7 @@
   "chapterProgress": "{percent}%",
   "averageEpisodeLength": "Ø {duration} per episode",
   "averageEpisodeLengthUnknown": "Average length unknown",
+  "episodeHot": "Popular: you almost always listen to this podcast",
   "playlistColor": "Color…",
   "playlistColorNone": "No color",
   "colorRed": "Red",

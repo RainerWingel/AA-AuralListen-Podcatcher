@@ -126,3 +126,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Ersetzt „F-Droid signiert selbst". Release-APKs entstehen im F-Droid-Image (`tool/fdroid_release_build.sh`, OrbStack),
   F-Droid veröffentlicht nach Vergleich unsere signierten APKs. Folge: überall eine Signatur (GitHub ↔ F-Droid
   updatefähig); der Keystore ist unersetzlich.
+- 2026-10-08 · **🔥 auf Start aus eigenem Merker statt nur aus dem Abspielverlauf** (Benutzer) · Der Verlauf (100 Folgen
+  über alle Podcasts, ohne Ausgelassene, ohne Unterschied „gehört"/„abgehakt") reicht nicht; neue Spalte
+  `episodes.finishedListening` (nur echtes Zu-Ende-Hören), einmalig aus dem Verlauf vorbefüllt. Regel: 10 neueste Folgen
+  älter als 7 Tage, ≥ 80 % gehört, min. 5; auch je Thema. Nur auf Start (nicht Podcast-Seite/Abos-Suche, Benutzer).

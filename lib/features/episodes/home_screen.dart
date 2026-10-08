@@ -6,6 +6,7 @@ import '../../app/routes.dart';
 import '../../core/widgets/arch_background.dart';
 import '../../core/widgets/background_scaffold.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../data/hot_sources.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../subscriptions/refresh_action.dart';
@@ -19,6 +20,9 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final episodes = ref.watch(latestEpisodesProvider);
+    // 🔥 for podcasts/topics that are (almost) never skipped (user wish
+    // 2026-10-08); only here on Start.
+    final hot = ref.watch(hotSourcesProvider).value ?? HotSources.empty;
 
     return BackgroundScaffold(
       background: const ArchBackground(),
@@ -48,6 +52,7 @@ class HomeScreen extends ConsumerWidget {
                     episode: items[index].episode,
                     podcast: items[index].podcast,
                     showPodcastTitle: true,
+                    hot: hot.contains(items[index].episode),
                   ),
                 ),
         ),

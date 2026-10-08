@@ -18,6 +18,7 @@ import 'db/app_database.dart';
 import 'directory/directory_search.dart';
 import 'feed/feed_fetcher.dart';
 import 'history_repository.dart';
+import 'hot_sources.dart';
 import 'opml_importer.dart';
 import 'playback_repository.dart';
 import 'playlist_repository.dart';
@@ -339,6 +340,11 @@ final seedColorProvider = Provider<Color>(
 );
 
 /// Player: total length instead of the remaining time (tap toggles it).
+/// Podcasts and topics whose new episodes get a 🔥 on Start.
+final hotSourcesProvider = StreamProvider.autoDispose<HotSources>(
+  (ref) => ref.watch(podcastRepositoryProvider).watchHotSources(),
+);
+
 /// Setting "Fertige Folgen aus Playlist entfernen" (default: after 10 min).
 final finishedRemovalProvider = StreamProvider.autoDispose<FinishedRemoval>(
   (ref) => ref

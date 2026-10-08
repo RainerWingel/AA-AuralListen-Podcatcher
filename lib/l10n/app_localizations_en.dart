@@ -599,6 +599,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get averageEpisodeLengthUnknown => 'Average length unknown';
 
   @override
+  String get episodeHot => 'Popular: you almost always listen to this podcast';
+
+  @override
   String get playlistColor => 'Color…';
 
   @override

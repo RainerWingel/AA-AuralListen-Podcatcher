@@ -22,6 +22,7 @@ class EpisodeTile extends ConsumerWidget {
     required this.podcast,
     this.showPodcastTitle = false,
     this.playlistId,
+    this.hot = false,
     super.key,
   });
 
@@ -31,6 +32,10 @@ class EpisodeTile extends ConsumerWidget {
 
   /// Set when shown inside a playlist: playing continues with the playlist.
   final int? playlistId;
+
+  /// Its podcast or topic is (almost) never skipped: a 🔥 while not started
+  /// yet (Start only, user wish 2026-10-08).
+  final bool hot;
 
   /// Played episodes: thumbnail and text half transparent (like Castbox).
   static const playedOpacity = 0.5;
@@ -334,16 +339,9 @@ class EpisodeTile extends ConsumerWidget {
               : switch (episode.status) {
                   // The dot marks only fresh episodes (like "Alle neuen
                   // Episoden spielen"), not everything never played.
-                  EpisodeStatus.newEpisode
-                      when !isFreshEpisode(episode, podcast, now) =>
-                    null,
-                  EpisodeStatus.newEpisode => Tooltip(
-                    message: l10n.episodeNew,
-                    child: Icon(
-                      Icons.circle,
-                      size: 10,
-                      color: theme.colorScheme.primary,
-                    ),
+                  EpisodeStatus.newEpisode => _NewMarks(
+                    fresh: isFreshEpisode(episode, podcast, now),
+                    hot: hot,
                   ),
                   EpisodeStatus.played => Tooltip(
                     message: l10n.episodePlayed,
@@ -353,6 +351,40 @@ class EpisodeTile extends ConsumerWidget {
                 },
         ),
       ),
+    );
+  }
+}
+
+/// Marks of an episode not started yet: 🔥 for a podcast/topic that is
+/// (almost) never skipped, just above the dot of a fresh one; nothing if
+/// neither applies.
+class _NewMarks extends StatelessWidget {
+  const _NewMarks({required this.fresh, required this.hot});
+
+  final bool fresh;
+  final bool hot;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final dot = Tooltip(
+      message: l10n.episodeNew,
+      child: Icon(Icons.circle, size: 10, color: colors.primary),
+    );
+    if (!hot) return fresh ? dot : const SizedBox.shrink();
+    final flame = Tooltip(
+      message: l10n.episodeHot,
+      child: Icon(
+        Icons.local_fire_department,
+        size: 18,
+        color: Colors.deepOrange.shade400,
+      ),
+    );
+    if (!fresh) return flame;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [flame, const SizedBox(height: 1), dot],
     );
   }
 }

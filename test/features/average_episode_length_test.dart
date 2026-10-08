@@ -13,6 +13,7 @@ void main() {
     pubDate: pubDate,
     positionMs: 0,
     status: EpisodeStatus.newEpisode,
+    finishedListening: false,
     addedAt: DateTime.utc(2026),
   );
 

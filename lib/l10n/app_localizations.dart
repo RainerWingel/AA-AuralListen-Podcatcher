@@ -1088,6 +1088,12 @@ abstract class AppLocalizations {
   /// **'Durchschnittliche Länge unbekannt'**
   String get averageEpisodeLengthUnknown;
 
+  /// No description provided for @episodeHot.
+  ///
+  /// In de, this message translates to:
+  /// **'Beliebt: diesen Podcast hörst du fast immer'**
+  String get episodeHot;
+
   /// Playlist menu: pick a category color (dialog title too).
   ///
   /// In de, this message translates to:

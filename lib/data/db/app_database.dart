@@ -41,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 25;
+  int get schemaVersion => 26;
 
   /// Oldest schema that is still migrated (app 1.3.1); see [migration].
   static const oldestMigratedSchema = 20;
@@ -90,6 +90,16 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 25) {
         await m.addColumn(podcasts, podcasts.autoPlayedThemes);
+      }
+      if (from < 26) {
+        await m.addColumn(episodes, episodes.finishedListening);
+        // Start from what the history knows was played to the end.
+        await customStatement(
+          'UPDATE episodes SET finished_listening = 1 WHERE EXISTS ('
+          'SELECT 1 FROM play_history h JOIN podcasts p '
+          'ON p.feed_url = h.feed_url '
+          'WHERE p.id = episodes.podcast_id AND h.guid = episodes.guid)',
+        );
       }
     },
     beforeOpen: (details) async {

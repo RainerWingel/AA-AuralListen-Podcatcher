@@ -315,6 +315,7 @@
   "averageEpisodeLength": "Ø {duration} pro Folge",
   "@averageEpisodeLength": {"placeholders": {"duration": {"type": "String"}}},
   "averageEpisodeLengthUnknown": "Durchschnittliche Länge unbekannt",
+  "episodeHot": "Beliebt: diesen Podcast hörst du fast immer",
   "@chapterProgress": {"placeholders": {"percent": {"type": "int"}}},
   "playlistColor": "Farbe…",
   "@playlistColor": {

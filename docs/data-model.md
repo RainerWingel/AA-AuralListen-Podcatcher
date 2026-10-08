@@ -2,7 +2,7 @@
 
 Code: `lib/data/db/tables.dart` (Tabellen), `lib/data/db/app_database.dart` (DB, `schemaVersion`).
 Aktuell **schemaVersion 23** (v20 = App 1.3.1/1.3.2; v21: `downloads.failedAttempts`; v22: `podcasts.rating`;
-v23: `podcasts.provisional`; v24: `playlist_items.finishedAt`; v25: `podcasts.autoPlayedThemes`).
+v23: `podcasts.provisional`; v24: `playlist_items.finishedAt`; v25: `podcasts.autoPlayedThemes`; v26: `episodes.finishedListening`, vorbefüllt aus `play_history`).
 **Migriert wird erst ab v20** (`AppDatabase.oldestMigratedSchema`, Benutzerentscheidung 2026-10-05): Die Schritte
 v1–v19 wurden gelöscht, weil keine älteren Installationen bekannt sind (GitHub-APKs nie heruntergeladen, F-Droid
 startet mit 1.3.2). Eine ältere Datenbank wird **leer neu angelegt** statt abzustürzen. Folge: Backups aus App-Versionen

@@ -691,6 +691,60 @@ void main() {
     },
   );
 
+  testWidgets(
+    '🔥 on Start for a podcast that is almost never skipped',
+    timeout: timeout,
+    (tester) async {
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+      expect(find.byIcon(Icons.local_fire_department), findsNothing);
+
+      // Nine older episodes heard to the end, "Erste Folge" (10 Jun 2025)
+      // still new: 9 of the 10 newest heard → 🔥.
+      final podcastId = (await tester.runAsync(
+        () => db.select(db.podcasts).getSingle(),
+      ))!.id;
+      await tester.runAsync(
+        () => db.batch(
+          (b) => b.insertAll(db.episodes, [
+            for (var i = 0; i < 9; i++)
+              EpisodesCompanion.insert(
+                podcastId: podcastId,
+                guid: 'alt-$i',
+                title: 'Gehörte Folge $i',
+                audioUrl: 'https://example.com/alt-$i.mp3',
+                pubDate: Value(DateTime.utc(2025, 5, 1 + i)),
+                status: const Value(EpisodeStatus.played),
+                finishedListening: const Value(true),
+                addedAt: DateTime.utc(2025, 6),
+              ),
+          ]),
+        ),
+      );
+      await settle(tester);
+      final flame = find.descendant(
+        of: find.ancestor(
+          of: find.text('Erste Folge'),
+          matching: find.byType(ListTile),
+        ),
+        matching: find.byIcon(Icons.local_fire_department),
+      );
+      expect(flame, findsOneWidget);
+      // Played episodes never show it.
+      expect(find.byIcon(Icons.local_fire_department), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('a playlist name can only exist once', timeout: timeout, (
     tester,
   ) async {

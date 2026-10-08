@@ -97,6 +97,39 @@ void main() {
     await db.close();
   });
 
+  test('upgrade v25 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(25);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v26: "played to the end" taken from the history', () async {
+    final schema = await verifier.schemaAt(25);
+    schema.rawDatabase
+      ..execute(
+        'INSERT INTO podcasts (feed_url, title, subscribed_at) '
+        "VALUES ('https://example.com/feed', 'P', 1767225600)",
+      )
+      ..execute(
+        'INSERT INTO episodes (podcast_id, guid, title, audio_url, added_at) '
+        "VALUES (1, 'heard', 'A', 'https://example.com/a.mp3', 1767225600),"
+        " (1, 'other', 'B', 'https://example.com/b.mp3', 1767225600)",
+      )
+      ..execute(
+        'INSERT INTO play_history (feed_url, guid, episode_title, '
+        'podcast_title, played_at) '
+        "VALUES ('https://example.com/feed', 'heard', 'A', 'P', 1767225600)",
+      );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    final episodes = {
+      for (final e in await db.select(db.episodes).get())
+        e.guid: e.finishedListening,
+    };
+    expect(episodes, {'heard': true, 'other': false});
+    await db.close();
+  });
+
   test(
     'a database older than 1.3.1 starts empty instead of crashing',
     () async {

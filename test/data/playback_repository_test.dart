@@ -130,6 +130,21 @@ void main() {
     });
   });
 
+  test('only played to the end counts as "finished listening"', () async {
+    final heard = await addEpisode('heard');
+    final marked = await addEpisode('marked');
+    await playback.markFinished(heard);
+    await playback.markPlayed(marked);
+    Future<bool> finished(int id) async => (await (db.select(
+      db.episodes,
+    )..where((e) => e.id.equals(id))).getSingle()).finishedListening;
+    expect(await finished(heard), isTrue);
+    expect(await finished(marked), isFalse);
+    // Kept when marked unplayed again: it was heard.
+    await playback.markUnplayed(heard);
+    expect(await finished(heard), isTrue);
+  });
+
   test('markAllPlayed / markAllUnplayed for a podcast or one theme', () async {
     Future<void> setTheme(int id, String theme) =>
         (db.update(db.episodes)..where((e) => e.id.equals(id))).write(

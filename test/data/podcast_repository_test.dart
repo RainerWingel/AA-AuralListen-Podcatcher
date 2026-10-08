@@ -711,6 +711,7 @@ void main() {
       audioUrl: 'https://example.com/a.mp3',
       positionMs: 0,
       status: EpisodeStatus.newEpisode,
+      finishedListening: false,
       addedAt: at,
     );
     final refreshAt = subscribed.add(const Duration(days: 3));
