@@ -858,6 +858,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarkDeleted => 'Bookmark deleted';
 
   @override
+  String get bookmarkDelete => 'Delete bookmark?';
+
+  @override
+  String bookmarkDeleteConfirm(String name) {
+    return 'Really delete “$name”?';
+  }
+
+  @override
   String get bookmarkEditNote => 'Edit note';
 
   @override

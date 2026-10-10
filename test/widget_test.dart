@@ -18,6 +18,7 @@ import 'package:aapodcastguru/data/providers.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:aapodcastguru/features/episodes/episode_description.dart';
+import 'package:aapodcastguru/features/player/chapters_and_bookmarks.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
 import 'package:aapodcastguru/features/player/player_controls.dart';
 import 'package:aapodcastguru/features/player/player_screen.dart';
@@ -1465,6 +1466,120 @@ void main() {
       await disposeApp(tester);
     },
   );
+
+  testWidgets(
+    'the chapter list scrolls to the playing chapter and follows it',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final episode = await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      );
+      // 40 more chapters after the two of the feed: far below the sheet.
+      await tester.runAsync(
+        () => db.batch(
+          (b) => b.insertAll(db.chapters, [
+            for (var i = 0; i < 40; i++)
+              ChaptersCompanion.insert(
+                episodeId: episode!.id,
+                startMs: (20 + i) * 60000,
+                title: 'Kap $i',
+              ),
+          ]),
+        ),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      engine.emitPosition(const Duration(minutes: 50, seconds: 10));
+      await settle(tester);
+
+      final screen = tester.view.physicalSize.height / 3;
+      bool onScreen(String title) {
+        final y = tester.getCenter(find.text(title)).dy;
+        return y > screen * 0.3 && y < screen;
+      }
+
+      // Opens on the chapter playing now (Kap 30), not at the top.
+      await tester.tap(find.byType(CurrentChapterLine));
+      await settle(tester);
+      expect(onScreen('Kap 30'), isTrue);
+      expect(find.text('Begrüßung').hitTestable(), findsNothing);
+
+      // The next chapters start by themselves: the list follows.
+      engine.emitPosition(const Duration(minutes: 58, seconds: 10));
+      await settle(tester);
+      await tester.pump(const Duration(seconds: 1));
+      expect(onScreen('Kap 38'), isTrue);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets('deleting a bookmark asks first', timeout: timeout, (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(NavigationBar)),
+    );
+    await tester.runAsync(
+      () => container
+          .read(podcastRepositoryProvider)
+          .subscribe('https://example.com/feed'),
+    );
+    final episode = await tester.runAsync(
+      () => db.select(db.episodes).getSingle(),
+    );
+    await tester.runAsync(
+      () => container
+          .read(bookmarkRepositoryProvider)
+          .add(episode!.id, const Duration(minutes: 3), note: 'Merken'),
+    );
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+    await settle(tester);
+    await tester.tap(find.text('Lesezeichen'));
+    await settle(tester);
+    expect(find.text('Merken'), findsOneWidget);
+
+    // Cancel: the bookmark stays.
+    await tester.tap(find.byTooltip('Löschen'));
+    await settle(tester);
+    expect(find.text('Lesezeichen löschen?'), findsOneWidget);
+    expect(find.text('„Merken“ wirklich löschen?'), findsOneWidget);
+    await tester.tap(find.text('Abbrechen'));
+    await settle(tester);
+    expect(find.text('Merken'), findsOneWidget);
+    expect(find.text('Lesezeichen gelöscht'), findsNothing);
+
+    // Confirm: gone.
+    await tester.tap(find.byTooltip('Löschen'));
+    await settle(tester);
+    await tester.tap(find.widgetWithText(FilledButton, 'Löschen'));
+    await settle(tester);
+    expect(find.text('Merken'), findsNothing);
+    expect(find.text('Lesezeichen gelöscht'), findsOneWidget);
+
+    await disposeApp(tester);
+  });
 
   testWidgets('marks all episodes up to a date as played', timeout: timeout, (
     tester,

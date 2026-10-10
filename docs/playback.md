@@ -220,6 +220,10 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
   Fortschrittsbalken über die ganze Textbreite bis vor den Skip-Chip (Benutzerwunsch 2026-10-06). Beides hängt am
   selben `positionProvider` wie der Slider im Player, aktualisiert sich also genauso oft. Ende des letzten Kapitels =
   Länge der Folge.
+- **Die Kapitel-Liste scrollt von selbst zum laufenden Kapitel** (Benutzerwunsch 2026-10-10): beim Öffnen sofort, danach
+  weich (300 ms), sobald das nächste Kapitel beginnt (`_ChaptersSheetState._scrollToCurrent`, `Scrollable.ensureVisible`
+  auf den Eintrag des laufenden Kapitels, mittig). Alle Zeilen werden gebaut (`scrollCacheExtent` groß, Kapitellisten sind kurz),
+  damit der Eintrag immer einen Context hat. Wer selbst scrollt, wird beim nächsten Kapitelwechsel wieder zurückgeholt.
 - Kapitel-Liste und Lesezeichen-Liste der Folge **schließen sich beim Folgenwechsel** (Folgenende, ⏭, ⏮ …;
   Benutzerwunsch 2026-10-06, `_closeOnEpisodeChange`), statt die Einträge der vorigen Folge weiter zu zeigen.
 - Werkzeug: `dart run tool/smoke_chapters.dart <Feed-URL>` prüft ID3-Kapitel echter Folgen.
@@ -241,7 +245,8 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
 - Vollbild-Player → „Lesezeichen setzen": merkt die Position **beim Tippen** (Wiedergabe läuft weiter), optional Notiz.
 - „Lesezeichen (n)" im Player: Liste der Folge, Tippen springt. Optionen → „Lesezeichen": alle, neueste zuerst;
   Tippen spielt die Folge **genau** ab dieser Stelle (`playEpisode(startAt:)`, auch wenn sie schon gespielt war).
-- Langes Drücken bearbeitet die Notiz, Papierkorb löscht (Infobox).
+- Langes Drücken bearbeitet die Notiz, Papierkorb löscht – **nach Rückfrage** „Lesezeichen löschen? „Notiz/Zeit“ wirklich
+  löschen?" (Benutzerwunsch 2026-10-10), danach Infobox. Gilt in der Folgen- und der globalen Liste (`BookmarkTile`).
 - Lesezeichen bleiben erhalten, wenn die Audiodatei per Eviction gelöscht wurde (dann wird gestreamt); beim Abo-Kündigen
   werden sie mit den Folgen gelöscht.
 

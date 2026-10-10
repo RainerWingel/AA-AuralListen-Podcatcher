@@ -78,12 +78,24 @@ class PlaybackRepository {
 
   /// Marked as played by the user: removes the episode from ALL playlists
   /// (docs/playlists.md). `playedAt` starts the 96 h eviction timer.
-  Future<void> markPlayed(int episodeId) => _db.transaction(() async {
-    await _setPlayed(episodeId);
-    await (_db.delete(
-      _db.playlistItems,
-    )..where((i) => i.episodeId.equals(episodeId))).go();
-  });
+  /// [keepInPlaylists] (setting "after 10 minutes" / "never", user wish
+  /// 2026-10-10): it stays there as finished instead, like an episode played
+  /// to the end; the playlist's clean-up removes it when its time is up.
+  Future<void> markPlayed(int episodeId, {bool keepInPlaylists = false}) =>
+      _db.transaction(() async {
+        await _setPlayed(episodeId);
+        final items = _db.playlistItems;
+        if (keepInPlaylists) {
+          await (_db.update(items)..where(
+                (i) => i.episodeId.equals(episodeId) & i.finishedAt.isNull(),
+              ))
+              .write(PlaylistItemsCompanion(finishedAt: Value(_clock())));
+        } else {
+          await (_db.delete(
+            items,
+          )..where((i) => i.episodeId.equals(episodeId))).go();
+        }
+      });
 
   /// Played to the end: leaves only [playlistId] – the playlist it was
   /// played from – and stays in all others (user wish 2026-10-03). Without

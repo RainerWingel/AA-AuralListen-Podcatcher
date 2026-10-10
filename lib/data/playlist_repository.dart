@@ -6,7 +6,8 @@ import 'db/app_database.dart';
 
 /// Setting "Fertige Folgen aus Playlist entfernen" (user wish 2026-10-06):
 /// when an episode played to the end leaves the playlist it was played
-/// from. Manual "mark as played" always removes it from all playlists.
+/// from. Marking one episode as played by hand follows it too (user wish
+/// 2026-10-10); the bulk markings ("all", "up to …") always remove at once.
 enum FinishedRemoval {
   now,
   after10Minutes,

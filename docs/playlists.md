@@ -132,12 +132,15 @@ gelesen, die neue Reihenfolge gilt also sofort.
   Gespielt-Markieren, das sie absichtlich aus allen Playlists nimmt) sofort beendet und in `dispose` freigegeben.
 - Überspringt der Benutzer eine Folge manuell („Weiter" ⏭ im Vollbild-Player bzw. in der Benachrichtigung), wird sie
   **nicht** als gespielt markiert und **bleibt** in der Playlist.
-- Manuelles „Als gespielt markieren" (auch „bis …") entfernt die Folge dagegen aus **allen** Playlists
-  (`PlaybackRepository.markPlayed`); das Ende der Wiedergabe nutzt `markFinished(id, playlistId: aktive)`.
+- Manuelles „Als gespielt markieren" **einer Folge** (Folgen-Menü) folgt seit 2026-10-10 derselben Einstellung wie das
+  Dateiende (siehe unten), nur in **allen** Playlists, in denen die Folge steht (`PodcastAudioHandler.markEpisodePlayed`
+  → `PlaybackRepository.markPlayed(keepInPlaylists:)`). „Alle als gespielt" und „bis …" entfernen dagegen weiterhin
+  sofort aus allen Playlists; das Ende der Wiedergabe nutzt `markFinished(id, playlistId: aktive)`.
 - **Optionen → Hören → „Fertige Folgen aus Playlist entfernen"** (Benutzerwunsch 2026-10-06, `FinishedRemoval`,
   `settings['playlists.removeFinished']`): **Sofort** (bis 2026-10-06 das Verhalten) · **Nach 10 Minuten** (**Standard**,
   `FinishedRemoval.standard`) · **Nie**. Gilt nur
-  für zu Ende gehörte Folgen; „Als gespielt markieren" entfernt immer sofort aus allen.
+  für zu Ende gehörte Folgen **und** das Gespielt-Markieren einer einzelnen Folge von Hand (Benutzerwunsch
+  2026-10-10, vorher entfernte es immer sofort); die Sammel-Markierungen („Alle", „bis …") entfernen immer sofort.
   - Statt Löschen bekommt der Eintrag `playlist_items.finishedAt` (v24). „Fertig" zählt nur, solange die Folge noch
     gespielt ist – jedes „als ungespielt markieren" hebt es also auf; erneutes Abspielen aus der Playlist löscht
     `finishedAt` (`clearFinished`).

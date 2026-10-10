@@ -1678,6 +1678,67 @@ void main() {
       expect(await itemsOf(other), isEmpty);
     });
 
+    group('marked played by hand follows "remove finished episodes"', () {
+      Future<List<int>> finishedMarks(int list, int id) async => [
+        for (final i
+            in await (db.select(db.playlistItems)..where(
+                  (i) => i.playlistId.equals(list) & i.episodeId.equals(id),
+                ))
+                .get())
+          if (i.finishedAt != null) i.episodeId,
+      ];
+
+      test('default (10 minutes): stays, finished in ALL playlists', () async {
+        await settings.remove(SettingsKeys.removeFinished);
+        final other = await playlists.create('Unterwegs');
+        await playlists.add(other, episodeId);
+        await handler.markEpisodePlayed(episodeId);
+        expect((await episode()).status, EpisodeStatus.played);
+        expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+        expect(await itemsOf(other), [episodeId]);
+        expect(await finishedMarks(playlistId, episodeId), hasLength(1));
+        expect(await finishedMarks(other, episodeId), hasLength(1));
+        // ⏭ skips it like any played one.
+        expect((await playlists.nextAfter(playlistId, -1))?.episodeId, ep2);
+      });
+
+      test('"never": stays for good', () async {
+        await settings.set(SettingsKeys.removeFinished, 'never');
+        await handler.markEpisodePlayed(episodeId);
+        await handler.cleanUpFinishedPlaylistItems();
+        expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+      });
+
+      test('"now": leaves ALL playlists at once', () async {
+        await settings.set(SettingsKeys.removeFinished, 'now');
+        final other = await playlists.create('Unterwegs');
+        await playlists.add(other, episodeId);
+        await handler.markEpisodePlayed(episodeId);
+        expect(await itemsOf(playlistId), [ep2, ep3]);
+        expect(await itemsOf(other), isEmpty);
+      });
+
+      test('after 10 minutes it is removed by the clean-up', () async {
+        await settings.remove(SettingsKeys.removeFinished);
+        final clock = [now];
+        await handler.dispose();
+        engine = FakePlayerEngine();
+        handler = PodcastAudioHandler(
+          engine: engine,
+          playback: PlaybackRepository(db, () => clock.first),
+          settings: settings,
+          playlists: PlaylistRepository(db, () => clock.first),
+        );
+        await handler.markEpisodePlayed(episodeId);
+        clock[0] = now.add(const Duration(minutes: 5));
+        await handler.cleanUpFinishedPlaylistItems();
+        expect(await itemsOf(playlistId), contains(episodeId));
+        clock[0] = now.add(const Duration(minutes: 11));
+        await handler.cleanUpFinishedPlaylistItems();
+        expect(await itemsOf(playlistId), [ep2, ep3]);
+      });
+    });
+
     test('"Resume" continues with the episode last played there', () async {
       Future<int?> resume() => playlists.resumeEpisode(playlistId);
       expect(await resume(), episodeId, reason: 'nothing played yet: top');

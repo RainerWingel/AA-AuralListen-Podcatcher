@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -320,19 +321,52 @@ Future<void> showChaptersSheet(BuildContext context, int episodeId) =>
       builder: (_) => _ChaptersSheet(episodeId: episodeId),
     );
 
-class _ChaptersSheet extends ConsumerWidget {
+class _ChaptersSheet extends ConsumerStatefulWidget {
   const _ChaptersSheet({required this.episodeId});
 
   final int episodeId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ChaptersSheet> createState() => _ChaptersSheetState();
+}
+
+class _ChaptersSheetState extends ConsumerState<_ChaptersSheet> {
+  /// Key of the chapter playing now (only one at a time carries it).
+  final _currentKey = GlobalKey();
+
+  /// Start of the chapter the list was last scrolled to; null = not yet.
+  int? _scrolledTo;
+
+  /// Brings the playing chapter into view: at once when the list opens, then
+  /// smoothly whenever the next chapter starts (user wish 2026-10-10).
+  void _scrollToCurrent(int? startMs) {
+    if (startMs == null || startMs == _scrolledTo) return;
+    final animate = _scrolledTo != null;
+    _scrolledTo = startMs;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final target = _currentKey.currentContext;
+      if (!mounted || target == null) return;
+      unawaited(
+        Scrollable.ensureVisible(
+          target,
+          alignment: 0.5,
+          duration: animate ? const Duration(milliseconds: 300) : Duration.zero,
+          curve: Curves.easeOut,
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final episodeId = widget.episodeId;
     _closeOnEpisodeChange(context, ref, episodeId);
     final l10n = AppLocalizations.of(context);
     final handler = ref.watch(audioHandlerProvider);
     final chapters = ref.watch(chaptersProvider(episodeId)).value ?? const [];
     final position = ref.watch(positionProvider).value ?? handler.position;
     final current = currentChapter(chapters, position);
+    _scrollToCurrent(current?.startMs);
     final skipped =
         ref.watch(skippedChaptersProvider(episodeId)).value ?? const {};
     final colors = Theme.of(context).colorScheme;
@@ -374,85 +408,97 @@ class _ChaptersSheet extends ConsumerWidget {
           children: [
             Text(l10n.chapters, style: Theme.of(context).textTheme.titleMedium),
             Flexible(
-              child: ListView.builder(
+              // All rows are built (a chapter list is short), so the
+              // playing one can always be scrolled to.
+              child: ListView(
                 shrinkWrap: true,
-                itemCount: chapters.length,
-                itemBuilder: (context, index) {
-                  final c = chapters[index];
-                  final isSkipped = skipped.contains(c.startMs);
-                  final start = Text(
-                    formatClock(Duration(milliseconds: c.startMs)),
-                  );
-                  // The chapter playing now: live percentage and a thick bar
-                  // across the whole text area, up to the Skip chip (user
-                  // wish 2026-10-06).
-                  final progress = c == current ? progressOf(index) : null;
-                  return ListTile(
-                    selected: c == current,
-                    selectedTileColor: colors.secondaryContainer,
-                    leading: c.imageUrl == null
-                        ? null
-                        : CoverImage(url: c.imageUrl, size: 40),
-                    title: Text(
-                      c.title,
-                      style: isSkipped
-                          ? TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: colors.onSurfaceVariant,
-                            )
-                          : null,
-                    ),
-                    subtitle: progress == null
-                        ? start
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Row(
-                                children: [
-                                  start,
-                                  const Spacer(),
-                                  Text(
-                                    l10n.chapterProgress(
-                                      (progress * 100).floor(),
-                                    ),
-                                    style: TextStyle(
-                                      color: colors.primary,
-                                      fontWeight: FontWeight.w600,
-                                      fontFeatures: const [
-                                        FontFeature.tabularFigures(),
+                scrollCacheExtent: const ScrollCacheExtent.pixels(100000),
+                children: [
+                  for (var index = 0; index < chapters.length; index++)
+                    Builder(
+                      builder: (context) {
+                        final c = chapters[index];
+                        final isSkipped = skipped.contains(c.startMs);
+                        final start = Text(
+                          formatClock(Duration(milliseconds: c.startMs)),
+                        );
+                        // The chapter playing now: live percentage and a thick bar
+                        // across the whole text area, up to the Skip chip (user
+                        // wish 2026-10-06).
+                        final progress = c == current
+                            ? progressOf(index)
+                            : null;
+                        return ListTile(
+                          key: c == current ? _currentKey : null,
+                          selected: c == current,
+                          selectedTileColor: colors.secondaryContainer,
+                          leading: c.imageUrl == null
+                              ? null
+                              : CoverImage(url: c.imageUrl, size: 40),
+                          title: Text(
+                            c.title,
+                            style: isSkipped
+                                ? TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: colors.onSurfaceVariant,
+                                  )
+                                : null,
+                          ),
+                          subtitle: progress == null
+                              ? start
+                              : Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        start,
+                                        const Spacer(),
+                                        Text(
+                                          l10n.chapterProgress(
+                                            (progress * 100).floor(),
+                                          ),
+                                          style: TextStyle(
+                                            color: colors.primary,
+                                            fontWeight: FontWeight.w600,
+                                            fontFeatures: const [
+                                              FontFeature.tabularFigures(),
+                                            ],
+                                          ),
+                                        ),
                                       ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: progress,
-                                  minHeight: 8,
-                                  backgroundColor: colors.primary.withValues(
-                                    alpha: 0.18,
-                                  ),
+                                    const SizedBox(height: 6),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: LinearProgressIndicator(
+                                        value: progress,
+                                        minHeight: 8,
+                                        backgroundColor: colors.primary
+                                            .withValues(alpha: 0.18),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                          trailing: FilterChip(
+                            label: Text(l10n.chapterSkip),
+                            tooltip: l10n.chapterSkipHint,
+                            selected: isSkipped,
+                            onSelected: (skip) =>
+                                unawaited(setSkipped(index, skip: skip)),
                           ),
-                    trailing: FilterChip(
-                      label: Text(l10n.chapterSkip),
-                      tooltip: l10n.chapterSkipHint,
-                      selected: isSkipped,
-                      onSelected: (skip) =>
-                          unawaited(setSkipped(index, skip: skip)),
+                          onTap: () async {
+                            Navigator.of(context).pop();
+                            // Choosing a chapter means: hear it after all.
+                            if (isSkipped) await setSkipped(index, skip: false);
+                            await handler.seek(
+                              Duration(milliseconds: c.startMs),
+                            );
+                          },
+                        );
+                      },
                     ),
-                    onTap: () async {
-                      Navigator.of(context).pop();
-                      // Choosing a chapter means: hear it after all.
-                      if (isSkipped) await setSkipped(index, skip: false);
-                      await handler.seek(Duration(milliseconds: c.startMs));
-                    },
-                  );
-                },
+                ],
               ),
             ),
           ],
@@ -588,6 +634,25 @@ class BookmarkTile extends ConsumerWidget {
         icon: const Icon(Icons.delete_outline),
         onPressed: () async {
           final messenger = ScaffoldMessenger.of(context);
+          // Ask first (user wish 2026-10-10).
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.bookmarkDelete),
+              content: Text(l10n.bookmarkDeleteConfirm(bookmark.note ?? time)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(l10n.delete),
+                ),
+              ],
+            ),
+          );
+          if (confirmed != true) return;
           await ref.read(bookmarkRepositoryProvider).delete(bookmark.id);
           showInfoSnackBar(messenger, l10n.bookmarkDeleted);
         },

@@ -227,7 +227,9 @@ class EpisodeTile extends ConsumerWidget {
                     Navigator.of(context).pop();
                     played
                         ? playback.markUnplayed(episode.id)
-                        : playback.markPlayed(episode.id);
+                        : ref
+                              .read(audioHandlerProvider)
+                              .markEpisodePlayed(episode.id);
                   },
                 ),
               ],

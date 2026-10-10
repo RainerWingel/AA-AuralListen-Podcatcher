@@ -235,6 +235,8 @@
   "historyEpisodeGone": "This episode is no longer in your subscriptions.",
   "bookmarksEmptyHint": "Tap “Add bookmark” in the player.",
   "bookmarkDeleted": "Bookmark deleted",
+  "bookmarkDelete": "Delete bookmark?",
+  "bookmarkDeleteConfirm": "Really delete “{name}”?",
   "bookmarkEditNote": "Edit note",
   "settingsSectionListening": "Listening",
   "markPlayedUntil": "Mark as played up to …",

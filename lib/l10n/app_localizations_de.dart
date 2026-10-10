@@ -860,6 +860,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookmarkDeleted => 'Lesezeichen gelöscht';
 
   @override
+  String get bookmarkDelete => 'Lesezeichen löschen?';
+
+  @override
+  String bookmarkDeleteConfirm(String name) {
+    return '„$name“ wirklich löschen?';
+  }
+
+  @override
   String get bookmarkEditNote => 'Notiz bearbeiten';
 
   @override

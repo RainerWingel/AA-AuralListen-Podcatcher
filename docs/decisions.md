@@ -136,3 +136,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   in die Playlist, ohne geladen zu werden. Kein neuer Schalter (keine DB-Änderung): Auto-Download „Aus" + gewählte
   Ziel-Playlist reicht. Nur beim Refresh neu hinzugekommene Folgen, einmalig – von Hand entfernte kommen nicht wieder
   (verworfen: Auffüllen auf N wie beim Download, das entfernte Folgen nachrückte).
+- 2026-10-10 · **Manuelles „Als gespielt" einer Folge folgt der Einstellung „Fertige Folgen aus Playlist entfernen"**
+  (Benutzer) · Sofort / nach 10 Min. / nie wie beim Dateiende, aber in allen Playlists der Folge. Sammel-Markierungen
+  („Alle", „bis …") bleiben beim sofortigen Entfernen. Dazu: Kapitel-Liste scrollt zum laufenden Kapitel, Lesezeichen
+  löschen fragt nach.

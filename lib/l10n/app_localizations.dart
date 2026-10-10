@@ -1508,6 +1508,18 @@ abstract class AppLocalizations {
   /// **'Lesezeichen gelöscht'**
   String get bookmarkDeleted;
 
+  /// No description provided for @bookmarkDelete.
+  ///
+  /// In de, this message translates to:
+  /// **'Lesezeichen löschen?'**
+  String get bookmarkDelete;
+
+  /// No description provided for @bookmarkDeleteConfirm.
+  ///
+  /// In de, this message translates to:
+  /// **'„{name}“ wirklich löschen?'**
+  String bookmarkDeleteConfirm(String name);
+
   /// No description provided for @bookmarkEditNote.
   ///
   /// In de, this message translates to:

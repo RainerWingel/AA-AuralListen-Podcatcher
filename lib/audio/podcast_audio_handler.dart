@@ -605,6 +605,20 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         await _settings.get(SettingsKeys.removeFinished),
       );
 
+  /// "Als gespielt markieren" by hand (menu on an episode): follows the
+  /// setting "Fertige Folgen aus Playlist entfernen" like an episode played
+  /// to the end – removed from the playlists at once, after 10 minutes or
+  /// never (user wish 2026-10-10).
+  Future<void> markEpisodePlayed(int episodeId) async {
+    final removal = await _finishedRemoval();
+    await _playback.markPlayed(
+      episodeId,
+      keepInPlaylists: removal != FinishedRemoval.now,
+    );
+    // Arms the timer for the item that just started waiting.
+    await cleanUpFinishedPlaylistItems();
+  }
+
   /// Applies "Fertige Folgen aus Playlist entfernen" to items finished
   /// earlier: at app start, on every episode change and after the setting
   /// changed. With "after 10 minutes" a timer is set for the next item that
