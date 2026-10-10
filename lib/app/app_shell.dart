@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../audio/audio_providers.dart';
 import '../audio/podcast_audio_handler.dart';
 import '../core/widgets/info_snack_bar.dart';
+import '../data/podcast_repository.dart' show RefreshProgress;
 import '../data/providers.dart';
 import '../features/player/mini_player.dart';
 import '../l10n/app_localizations.dart';
@@ -53,8 +54,22 @@ class AppShell extends ConsumerWidget {
         },
       );
     });
+    final progress = ref.watch(refreshProgressProvider).value;
     return Scaffold(
-      body: navigationShell,
+      body: Stack(
+        children: [
+          navigationShell,
+          // Floats over the bottom edge, so lists do not jump when it
+          // appears (user wish 2026-10-10).
+          if (progress != null)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: IgnorePointer(child: _RefreshStatus(progress)),
+            ),
+        ],
+      ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -94,6 +109,48 @@ class AppShell extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Thin status line while all feeds are refreshed: "2 von 11 · Freak Show".
+class _RefreshStatus extends StatelessWidget {
+  const _RefreshStatus(this.progress);
+
+  final RefreshProgress progress;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    return Material(
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Semantics(
+        liveRegion: true,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            LinearProgressIndicator(
+              value: (progress.current - 1) / progress.total,
+              minHeight: 2,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Text(
+                l10n.refreshProgress(
+                  progress.current,
+                  progress.total,
+                  progress.title,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -855,6 +855,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarksEmptyHint => 'Tap “Add bookmark” in the player.';
 
   @override
+  String refreshProgress(int current, int total, String title) {
+    return '$current of $total · $title';
+  }
+
+  @override
   String get bookmarkDeleted => 'Bookmark deleted';
 
   @override

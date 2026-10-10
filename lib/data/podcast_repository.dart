@@ -30,6 +30,11 @@ typedef RefreshSummary = ({int succeeded, int failed, int moved});
 
 enum RefreshOutcome { updated, moved, failed }
 
+/// Where "refresh all" stands: the [current]th of [total] podcasts has just
+/// been started, named [title] (up to [PodcastRepository.refreshConcurrency]
+/// run at once; this is the latest one).
+typedef RefreshProgress = ({int current, int total, String title});
+
 /// A feed that was fetched and parsed, with the address to store for it.
 typedef _LoadedFeed = ({String url, FeedFetched fetched, ParsedFeed feed});
 
@@ -100,6 +105,24 @@ class PodcastRepository {
   static const refreshConcurrency = 4;
 
   Future<RefreshSummary>? _runningRefresh;
+
+  RefreshProgress? _progress;
+  final _progressEvents = StreamController<RefreshProgress?>.broadcast();
+
+  /// Progress of the running "refresh all" (app start, pull-to-refresh);
+  /// null while none runs.
+  Stream<RefreshProgress?> watchRefreshProgress() async* {
+    yield _progress;
+    yield* _progressEvents.stream;
+  }
+
+  void _setProgress(RefreshProgress? progress) {
+    _progress = progress;
+    if (!_progressEvents.isClosed) _progressEvents.add(progress);
+  }
+
+  /// Ends the progress stream (provider disposal).
+  void dispose() => unawaited(_progressEvents.close());
 
   // ---------------------------------------------------------------- queries
 
@@ -661,9 +684,15 @@ class PodcastRepository {
     var succeeded = 0;
     var failed = 0;
     var moved = 0;
+    var started = 0;
 
     Future<void> worker() async {
       while (queue.moveNext()) {
+        _setProgress((
+          current: ++started,
+          total: podcasts.length,
+          title: queue.current.title,
+        ));
         switch (await refreshPodcast(queue.current)) {
           case RefreshOutcome.updated:
             succeeded++;
@@ -676,7 +705,13 @@ class PodcastRepository {
       }
     }
 
-    await Future.wait([for (var i = 0; i < refreshConcurrency; i++) worker()]);
+    try {
+      await Future.wait([
+        for (var i = 0; i < refreshConcurrency; i++) worker(),
+      ]);
+    } finally {
+      _setProgress(null);
+    }
     return (succeeded: succeeded, failed: failed, moved: moved);
   }
 

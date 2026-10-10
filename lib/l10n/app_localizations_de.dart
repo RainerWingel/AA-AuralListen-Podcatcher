@@ -857,6 +857,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookmarksEmptyHint => 'Im Player auf „Lesezeichen setzen“ tippen.';
 
   @override
+  String refreshProgress(int current, int total, String title) {
+    return '$current von $total · $title';
+  }
+
+  @override
   String get bookmarkDeleted => 'Lesezeichen gelöscht';
 
   @override

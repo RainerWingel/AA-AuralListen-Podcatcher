@@ -234,6 +234,7 @@
   "historyClearAction": "Clear",
   "historyEpisodeGone": "This episode is no longer in your subscriptions.",
   "bookmarksEmptyHint": "Tap “Add bookmark” in the player.",
+  "refreshProgress": "{current} of {total} · {title}",
   "bookmarkDeleted": "Bookmark deleted",
   "bookmarkDelete": "Delete bookmark?",
   "bookmarkDeleteConfirm": "Really delete “{name}”?",

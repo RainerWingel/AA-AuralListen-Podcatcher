@@ -48,15 +48,22 @@ final coverCacheProvider = Provider<CoverCache>(
   (ref) => const DefaultCoverCache(),
 );
 
-final podcastRepositoryProvider = Provider<PodcastRepository>(
-  (ref) => PodcastRepository(
+final podcastRepositoryProvider = Provider<PodcastRepository>((ref) {
+  final repository = PodcastRepository(
     db: ref.watch(databaseProvider),
     fetcher: FeedFetcher(ref.watch(httpClientProvider)),
     clock: ref.watch(clockProvider),
     coverCache: ref.watch(coverCacheProvider),
     filesCleaner: ref.watch(downloadServiceProvider),
     newEpisodePlaylister: ref.watch(downloadServiceProvider),
-  ),
+  );
+  ref.onDispose(repository.dispose);
+  return repository;
+});
+
+/// "2 of 11 · Podcast" while all feeds are refreshed; null otherwise.
+final refreshProgressProvider = StreamProvider<RefreshProgress?>(
+  (ref) => ref.watch(podcastRepositoryProvider).watchRefreshProgress(),
 );
 
 /// Native downloader; tests override it with a fake.

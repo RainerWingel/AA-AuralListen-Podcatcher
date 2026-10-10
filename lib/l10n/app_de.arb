@@ -515,6 +515,8 @@
   "historyClearAction": "Löschen",
   "historyEpisodeGone": "Diese Folge ist nicht mehr in deinen Abos.",
   "bookmarksEmptyHint": "Im Player auf „Lesezeichen setzen“ tippen.",
+  "refreshProgress": "{current} von {total} · {title}",
+  "@refreshProgress": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}, "title": {"type": "String"}}},
   "bookmarkDeleted": "Lesezeichen gelöscht",
   "bookmarkDelete": "Lesezeichen löschen?",
   "bookmarkDeleteConfirm": "„{name}“ wirklich löschen?",

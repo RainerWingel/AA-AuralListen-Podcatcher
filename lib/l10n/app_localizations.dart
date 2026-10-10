@@ -1502,6 +1502,12 @@ abstract class AppLocalizations {
   /// **'Im Player auf „Lesezeichen setzen“ tippen.'**
   String get bookmarksEmptyHint;
 
+  /// No description provided for @refreshProgress.
+  ///
+  /// In de, this message translates to:
+  /// **'{current} von {total} · {title}'**
+  String refreshProgress(int current, int total, String title);
+
   /// No description provided for @bookmarkDeleted.
   ///
   /// In de, this message translates to:

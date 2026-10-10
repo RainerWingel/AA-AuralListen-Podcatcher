@@ -14,6 +14,8 @@ import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/feed/opml.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
 import 'package:aapodcastguru/data/playlist_repository.dart';
+import 'package:aapodcastguru/data/podcast_repository.dart'
+    show RefreshProgress;
 import 'package:aapodcastguru/data/providers.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
@@ -31,6 +33,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -158,7 +161,11 @@ void main() {
   });
 
   /// [language]: stored UI language; null = first start (language picker).
-  Future<void> pumpApp(WidgetTester tester, {String? language = 'de'}) async {
+  Future<void> pumpApp(
+    WidgetTester tester, {
+    String? language = 'de',
+    List<Override> overrides = const [],
+  }) async {
     if (language != null) {
       await tester.runAsync(
         () => SettingsRepository(db).set(SettingsKeys.language, language),
@@ -167,6 +174,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          ...overrides,
           databaseProvider.overrideWithValue(db),
           audioHandlerProvider.overrideWithValue(handler),
           downloadEngineProvider.overrideWithValue(downloadEngine),
@@ -1584,6 +1592,30 @@ void main() {
     await settle(tester);
     expect(find.text('Merken'), findsNothing);
     expect(find.text('Lesezeichen gelöscht'), findsOneWidget);
+
+    await disposeApp(tester);
+  });
+
+  testWidgets('a status line shows which podcast is being refreshed', (
+    tester,
+  ) async {
+    final progress = StreamController<RefreshProgress?>();
+    addTearDown(progress.close);
+    await pumpApp(
+      tester,
+      overrides: [
+        refreshProgressProvider.overrideWith((ref) => progress.stream),
+      ],
+    );
+    expect(find.textContaining(' von '), findsNothing);
+
+    progress.add((current: 2, total: 11, title: 'Freak Show'));
+    await settle(tester);
+    expect(find.text('2 von 11 · Freak Show'), findsOneWidget);
+
+    progress.add(null);
+    await settle(tester);
+    expect(find.text('2 von 11 · Freak Show'), findsNothing);
 
     await disposeApp(tester);
   });

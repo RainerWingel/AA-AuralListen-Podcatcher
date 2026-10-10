@@ -200,6 +200,8 @@ Name, „N Folgen · zuletzt …"; Knöpfe „Alle" / „Keine". Die Liste ist a
 (erst Themen wählen, dann einschalten – sonst startet sofort alles). Das Blatt scrollt.
 Ganz unten „Feed-Adresse ändern" mit der aktuellen Adresse → Dialog (Hinweis, Textfeld mit alter Adresse, „Übernehmen");
 Fehler erscheinen im Textfeld, Erfolg als Infobox „Feed-Adresse geändert.".
+Beim Aktualisieren aller Podcasts (App-Start, Pull-to-Refresh) zeigt eine Statuszeile unten „2 von 11 · Name"
+(`feeds-and-directories.md`).
 Hat ein Pull-to-Refresh Umzüge erkannt, meldet eine Infobox „N Podcast(s) umgezogen – die Adresse wurde aktualisiert."
 
 ## Optionen

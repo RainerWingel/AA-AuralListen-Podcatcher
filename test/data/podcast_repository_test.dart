@@ -190,6 +190,39 @@ void main() {
       expect(ep2.positionMs, 60000);
     });
 
+    test('reports which podcast is being refreshed', () async {
+      for (final name in ['Eins', 'Zwei', 'Drei']) {
+        server['https://example.com/$name'] = () =>
+            http.Response(basicFeed.replaceFirst('Testpodcast', name), 200);
+        await repo.subscribe('https://example.com/$name');
+      }
+      final seen = <RefreshProgress?>[];
+      final sub = repo.watchRefreshProgress().listen(seen.add);
+      await pumpEventQueue();
+      expect(seen, [null]); // nothing running
+
+      await repo.refreshAll();
+      await pumpEventQueue();
+      await sub.cancel();
+
+      // Every podcast is announced as it starts; the line ends with null.
+      expect(seen.whereType<RefreshProgress>().map((p) => p.current), [
+        1,
+        2,
+        3,
+      ]);
+      expect(
+        seen.whereType<RefreshProgress>().every((p) => p.total == 3),
+        isTrue,
+      );
+      expect(seen.whereType<RefreshProgress>().map((p) => p.title).toSet(), {
+        'Eins',
+        'Zwei',
+        'Drei',
+      });
+      expect(seen.last, isNull);
+    });
+
     test('stores errors per podcast and clears them after success', () async {
       server['https://example.com/feed'] = () => http.Response(basicFeed, 200);
       final id = await repo.subscribe('https://example.com/feed');
