@@ -559,6 +559,45 @@ void main() {
       },
     );
 
+    test(
+      'streaming: new episodes only go to the playlist, no download',
+      () async {
+        final playlists = PlaylistRepository(db, () => now);
+        final target = await playlists.create('Morgens');
+        await setPodcast(
+          PodcastsCompanion(
+            autoPlaylistId: Value(target),
+            autoPlaylistName: const Value('Morgens'),
+          ),
+        );
+        final podcast = await (db.select(
+          db.podcasts,
+        )..where((p) => p.id.equals(podcastId))).getSingle();
+        final a = await addEpisode('a', pubDate: DateTime(2026, 9, 1));
+        final b = await addEpisode('b', pubDate: DateTime(2026, 9, 2));
+
+        await service.addNewToPlaylist(podcast, [a, b]);
+        await service.addNewToPlaylist(podcast, [a]); // already there
+        expect(
+          [for (final e in await playlists.entries(target)) e.episode.id],
+          [a, b],
+        );
+        expect(engine.active, isEmpty);
+        expect(await row(a), isNull);
+
+        // A deleted playlist is created again under the stored name.
+        await playlists.delete(target);
+        await service.addNewToPlaylist(podcast, [b]);
+        final recreated = (await playlists.playlists()).singleWhere(
+          (p) => p.name == 'Morgens',
+        );
+        expect(
+          [for (final e in await playlists.entries(recreated.id)) e.episode.id],
+          [b],
+        );
+      },
+    );
+
     test('only selected themes are auto-downloaded', () async {
       await setPodcast(
         const PodcastsCompanion(

@@ -851,7 +851,7 @@ abstract class AppLocalizations {
   /// No description provided for @autoDownloadPlaylist.
   ///
   /// In de, this message translates to:
-  /// **'Neue Downloads zur Playlist hinzufügen'**
+  /// **'Neue Folgen zur Playlist hinzufügen'**
   String get autoDownloadPlaylist;
 
   /// No description provided for @autoDownloadPlaylistNone.
@@ -863,7 +863,7 @@ abstract class AppLocalizations {
   /// No description provided for @autoDownloadPlaylistHint.
   ///
   /// In de, this message translates to:
-  /// **'Wurde die Playlist gelöscht, legt die App sie beim nächsten Download wieder an.'**
+  /// **'Ohne Auto-Download werden neue Folgen nur eingereiht und gestreamt. Wurde die Playlist gelöscht, legt die App sie beim nächsten Mal wieder an.'**
   String get autoDownloadPlaylistHint;
 
   /// No description provided for @episodeCounter.
@@ -1373,13 +1373,13 @@ abstract class AppLocalizations {
   /// No description provided for @autoDownloadThemes.
   ///
   /// In de, this message translates to:
-  /// **'Themen für automatische Downloads'**
+  /// **'Themen für Auto-Download und Playlist'**
   String get autoDownloadThemes;
 
   /// No description provided for @autoDownloadThemesHint.
   ///
   /// In de, this message translates to:
-  /// **'Nur angehakte Themen werden automatisch geladen. Neue Themen erst, wenn du sie hier anhakst.'**
+  /// **'Nur angehakte Themen werden automatisch geladen bzw. in die Playlist gelegt. Neue Themen erst, wenn du sie hier anhakst.'**
   String get autoDownloadThemesHint;
 
   /// No description provided for @themeSubtitle.

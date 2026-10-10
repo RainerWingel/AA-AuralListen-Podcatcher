@@ -456,14 +456,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'New episodes are downloaded until this many unplayed ones are on the phone. Nothing is deleted by this.';
 
   @override
-  String get autoDownloadPlaylist => 'Add new downloads to playlist';
+  String get autoDownloadPlaylist => 'Add new episodes to playlist';
 
   @override
   String get autoDownloadPlaylistNone => 'None';
 
   @override
   String get autoDownloadPlaylistHint =>
-      'If the playlist was deleted, the app creates it again with the next download.';
+      'Without auto-download, new episodes are only queued and streamed. If the playlist was deleted, the app creates it again next time.';
 
   @override
   String get episodeCounter => 'Episode number on the cover';
@@ -771,11 +771,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dragToReorder => 'Drag to reorder';
 
   @override
-  String get autoDownloadThemes => 'Topics for automatic downloads';
+  String get autoDownloadThemes => 'Topics for auto-download and playlist';
 
   @override
   String get autoDownloadThemesHint =>
-      'Only checked topics are downloaded automatically. New topics only once you check them here.';
+      'Only checked topics are downloaded or added to the playlist automatically. New topics only once you check them here.';
 
   @override
   String themeSubtitle(int count, String date) {

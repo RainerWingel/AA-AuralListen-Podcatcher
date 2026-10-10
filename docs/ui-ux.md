@@ -193,9 +193,9 @@ dagegen nur in eine Playlist (ohne Abspielen).
 ## Podcast-Einstellungen
 Podcast-Detail → ⋮ → „Podcast-Einstellungen" (Bottom-Sheet): Automatisch herunterladen (Aus / Nur WLAN / Immer),
 „Anzahl ungespielter Folgen auf dem Gerät" (1/2/3/5/10, auch bei „Aus" wählbar; Hinweis: lädt nach, löscht nichts;
-wirksam erst beim Schließen des Blatts), darunter „Neue Downloads zur Playlist hinzufügen" → Dialog Keine / Playlists
-(mit Farbverlauf) und Hinweis zur Neuanlage (`eviction.md`), Schalter „Gespielte Folgen löschen" (96 h nach „gespielt" = bis zum Ende gehört).
-Bei Netzwerk-Feeds mit ≥ 2 Themen darunter „Themen für automatische Downloads": je Thema Checkbox, Bild der neuesten Folge,
+wirksam erst beim Schließen des Blatts), darunter „Neue Folgen zur Playlist hinzufügen" → Dialog Keine / Playlists
+(mit Farbverlauf) und Hinweis zur Neuanlage und zum Streamen ohne Auto-Download (`eviction.md`), Schalter „Gespielte Folgen löschen" (96 h nach „gespielt" = bis zum Ende gehört).
+Bei Netzwerk-Feeds mit ≥ 2 Themen darunter „Themen für Auto-Download und Playlist": je Thema Checkbox, Bild der neuesten Folge,
 Name, „N Folgen · zuletzt …"; Knöpfe „Alle" / „Keine". Die Liste ist auch bei ausgeschaltetem Auto-Download bedienbar
 (erst Themen wählen, dann einschalten – sonst startet sofort alles). Das Blatt scrollt.
 Ganz unten „Feed-Adresse ändern" mit der aktuellen Adresse → Dialog (Hinweis, Textfeld mit alter Adresse, „Übernehmen");

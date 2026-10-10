@@ -62,7 +62,7 @@ class _PodcastSettingsSheet extends ConsumerWidget {
     // Downloads follow when the sheet is closed (showPodcastSettingsSheet).
   }
 
-  /// "Neue Downloads zur Playlist hinzufügen": none or one playlist.
+  /// "Neue Folgen zur Playlist hinzufügen": none or one playlist.
   Future<void> _chooseAutoPlaylist(
     BuildContext context,
     WidgetRef ref,

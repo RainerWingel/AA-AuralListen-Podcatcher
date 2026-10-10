@@ -7,7 +7,11 @@ import '../../core/clock.dart';
 import '../db/app_database.dart';
 import '../playlist_repository.dart';
 import '../podcast_repository.dart'
-    show PodcastFilesCleaner, PodcastRepository, autoDownloadThemesOf;
+    show
+        NewEpisodePlaylister,
+        PodcastFilesCleaner,
+        PodcastRepository,
+        autoDownloadThemesOf;
 import '../settings_keys.dart';
 import 'download_engine.dart';
 
@@ -22,7 +26,7 @@ typedef MaintenanceResult = ({int freedBytes, int queued});
 /// Invariants: the database is the only truth; every audio file in the
 /// episodes directory has a `downloads` row with state `done` and vice versa.
 /// Everything else is removed by [reconcile].
-class DownloadService implements PodcastFilesCleaner {
+class DownloadService implements PodcastFilesCleaner, NewEpisodePlaylister {
   DownloadService({
     required this._db,
     required this._engine,
@@ -433,6 +437,15 @@ class DownloadService implements PodcastFilesCleaner {
       }
     }
     return queued;
+  }
+
+  /// Streaming instead of downloading: episodes a refresh just fetched go to
+  /// the podcast's target playlist, no download (user wish 2026-10-10).
+  @override
+  Future<void> addNewToPlaylist(Podcast podcast, List<int> episodeIds) async {
+    if (await _targetPlaylist(podcast) case final playlistId?) {
+      await _playlists?.addAll(playlistId, episodeIds);
+    }
   }
 
   // --------------------------------------------------------------- internals

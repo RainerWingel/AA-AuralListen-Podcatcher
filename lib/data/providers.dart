@@ -55,6 +55,7 @@ final podcastRepositoryProvider = Provider<PodcastRepository>(
     clock: ref.watch(clockProvider),
     coverCache: ref.watch(coverCacheProvider),
     filesCleaner: ref.watch(downloadServiceProvider),
+    newEpisodePlaylister: ref.watch(downloadServiceProvider),
   ),
 );
 

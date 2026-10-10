@@ -69,6 +69,13 @@ abstract interface class PodcastFilesCleaner {
   Future<void> deleteForPodcast(int podcastId);
 }
 
+/// Appends episodes a refresh just fetched to the podcast's target playlist
+/// (implemented by the DownloadService, which resolves renamed and deleted
+/// playlists).
+abstract interface class NewEpisodePlaylister {
+  Future<void> addNewToPlaylist(Podcast podcast, List<int> episodeIds);
+}
+
 /// Subscriptions, feed refresh and episode queries.
 class PodcastRepository {
   PodcastRepository({
@@ -78,6 +85,7 @@ class PodcastRepository {
     required this._coverCache,
     this._parser = const RssParser(),
     this._filesCleaner,
+    this._newEpisodePlaylister,
   });
 
   final AppDatabase _db;
@@ -86,6 +94,7 @@ class PodcastRepository {
   final CoverCache _coverCache;
   final RssParser _parser;
   final PodcastFilesCleaner? _filesCleaner;
+  final NewEpisodePlaylister? _newEpisodePlaylister;
 
   /// Parallel feed downloads during a refresh.
   static const refreshConcurrency = 4;
@@ -714,6 +723,8 @@ class PodcastRepository {
           }
           final moved = loaded.url != podcast.feedUrl;
           await _storeFeed(podcast.id, loaded, now);
+          // A moved feed may carry new ids for old episodes: not now.
+          if (!moved) await _streamNewEpisodes(podcast.id, now);
           return moved ? RefreshOutcome.moved : RefreshOutcome.updated;
       }
     } on Exception catch (e) {
@@ -859,6 +870,52 @@ class PodcastRepository {
             playedAt: Value(now),
           ),
         );
+  }
+
+  /// Without auto-download, the episodes the refresh at [now] fetched go into
+  /// the podcast's target playlist and are streamed (user wish 2026-10-10).
+  /// Once, on arrival: one removed by hand does not come back. Only the
+  /// themes selected for auto-download; episodes just marked as played by
+  /// "Neue automatisch als gespielt markieren" stay out.
+  Future<void> _streamNewEpisodes(int podcastId, DateTime now) async {
+    final playlister = _newEpisodePlaylister;
+    if (playlister == null) return;
+    final podcast = await (_db.select(
+      _db.podcasts,
+    )..where((p) => p.id.equals(podcastId))).getSingleOrNull();
+    if (podcast == null ||
+        podcast.autoDownloadMode != AutoDownloadMode.off ||
+        podcast.autoPlaylistId == null) {
+      return;
+    }
+    final themes = autoDownloadThemesOf(podcast);
+    if (themes != null && themes.isEmpty) return;
+    final episodes =
+        await (_db.select(_db.episodes)
+              ..where(
+                (e) =>
+                    e.podcastId.equals(podcastId) &
+                    e.addedAt.equals(now) &
+                    e.status.equalsValue(EpisodeStatus.newEpisode) &
+                    (themes == null
+                        ? const Constant(true)
+                        : e.theme.isIn(themes)),
+              )
+              ..orderBy([
+                (e) => OrderingTerm(
+                  expression: e.pubDate,
+                  nulls: NullsOrder.first,
+                ),
+              ]))
+            .get();
+    if (episodes.isEmpty) return;
+    try {
+      await playlister.addNewToPlaylist(podcast, [
+        for (final e in episodes) e.id,
+      ]);
+    } on Exception {
+      // The feed itself was stored fine; do not report it as a refresh error.
+    }
   }
 
   /// Show notes go to their own table (episode lists never load them).

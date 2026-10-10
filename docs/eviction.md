@@ -57,10 +57,17 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 - **Themen-Filter** (Netzwerk-Feeds): Ist `autoDownloadThemes` gesetzt, zählen und laden nur Folgen dieser Themen
   (leere Liste = nichts). Folgen ohne Thema fallen bei gesetztem Filter heraus. Neue Themen sind nicht automatisch dabei.
 - Budget: Feed-Größenangabe (`audioSizeBytes`) gegen das Speicherlimit; reicht es nicht, wird gestoppt.
-- **Ziel-Playlist** (optional pro Podcast, „Neue Downloads zur Playlist hinzufügen"; Benutzerwunsch 2026-09-30): jede
+- **Ziel-Playlist** (optional pro Podcast, „Neue Folgen zur Playlist hinzufügen"; Benutzerwunsch 2026-09-30): jede
   automatisch eingereihte Folge wird auch ans Ende dieser Playlist gehängt (schon enthalten → übersprungen). Umbenannt →
   Name wird nachgeführt; gelöscht → beim nächsten Auto-Download unter dem gespeicherten Namen neu angelegt
   (`DownloadService._targetPlaylist`). Manuelle Downloads betrifft das nicht.
+- **Nur streamen** (Benutzerwunsch 2026-10-10): Ist Auto-Download **Aus** und eine Ziel-Playlist gewählt, hängt der
+  Refresh die neu hinzugekommenen Folgen (`addedAt` = Abruf, Status `neu`) **einmalig** ans Ende der Playlist – ohne
+  Download, ohne Budget (`PodcastRepository._streamNewEpisodes` → `DownloadService.addNewToPlaylist`, älteste zuerst).
+  Der Themen-Filter gilt auch hier (leere Auswahl = nichts); der Erst-Import beim Abonnieren, verschobene Feeds und
+  Folgen, die „Neue als gespielt markieren" schon erfasst hat, zählen nicht. Von Hand entfernte Folgen kommen nicht
+  wieder (kein Auffüllen auf N). Ältere Folgen: langes Drücken auf den Podcast bzw. das Thema („… in Playlist").
+  Ist Auto-Download an, bleibt es beim Verhalten oben.
 - Manuelle Downloads (langes Drücken → „Herunterladen") laufen über jedes Netz.
 - **Vorläufige Podcasts** (`podcasts.provisional`) werden nie heruntergeladen – weder automatisch noch von Hand
   (`DownloadService.download` lehnt ab); erst nach „Abonnieren".

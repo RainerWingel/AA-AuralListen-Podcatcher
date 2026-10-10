@@ -132,3 +132,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   älter als 7 Tage, ≥ 80 % gehört, min. 5; auch je Thema. Nur auf Start (nicht Podcast-Seite/Abos-Suche, Benutzer).
 - 2026-10-09 · **🔥-Merker „gehört" schon ab 90 % der Länge** (Benutzer) · Viele hören regelmäßig, aber ohne Outro.
   Nur der Merker `finishedListening` (Flamme); „gespielt" bleibt beim echten Ende (keine Rückkehr der 98-%-Regel).
+- 2026-10-10 · **Ziel-Playlist ohne Auto-Download = nur streamen, einmalig bei Ankunft** (Benutzer) · Neue Folgen sollen
+  in die Playlist, ohne geladen zu werden. Kein neuer Schalter (keine DB-Änderung): Auto-Download „Aus" + gewählte
+  Ziel-Playlist reicht. Nur beim Refresh neu hinzugekommene Folgen, einmalig – von Hand entfernte kommen nicht wieder
+  (verworfen: Auffüllen auf N wie beim Download, das entfernte Folgen nachrückte).

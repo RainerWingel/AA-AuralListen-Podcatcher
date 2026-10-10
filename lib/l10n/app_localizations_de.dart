@@ -456,14 +456,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Neue Folgen werden nachgeladen, bis so viele ungespielte heruntergeladen sind. Gelöscht wird dabei nichts.';
 
   @override
-  String get autoDownloadPlaylist => 'Neue Downloads zur Playlist hinzufügen';
+  String get autoDownloadPlaylist => 'Neue Folgen zur Playlist hinzufügen';
 
   @override
   String get autoDownloadPlaylistNone => 'Keine';
 
   @override
   String get autoDownloadPlaylistHint =>
-      'Wurde die Playlist gelöscht, legt die App sie beim nächsten Download wieder an.';
+      'Ohne Auto-Download werden neue Folgen nur eingereiht und gestreamt. Wurde die Playlist gelöscht, legt die App sie beim nächsten Mal wieder an.';
 
   @override
   String get episodeCounter => 'Folgennummer am Cover';
@@ -774,11 +774,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dragToReorder => 'Zum Verschieben ziehen';
 
   @override
-  String get autoDownloadThemes => 'Themen für automatische Downloads';
+  String get autoDownloadThemes => 'Themen für Auto-Download und Playlist';
 
   @override
   String get autoDownloadThemesHint =>
-      'Nur angehakte Themen werden automatisch geladen. Neue Themen erst, wenn du sie hier anhakst.';
+      'Nur angehakte Themen werden automatisch geladen bzw. in die Playlist gelegt. Neue Themen erst, wenn du sie hier anhakst.';
 
   @override
   String themeSubtitle(int count, String date) {

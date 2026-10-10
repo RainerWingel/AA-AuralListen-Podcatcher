@@ -271,9 +271,9 @@
   "autoDownloadAlways": "Immer",
   "autoDownloadMax": "Anzahl ungespielter Folgen auf dem Gerät",
   "autoDownloadMaxHint": "Neue Folgen werden nachgeladen, bis so viele ungespielte heruntergeladen sind. Gelöscht wird dabei nichts.",
-  "autoDownloadPlaylist": "Neue Downloads zur Playlist hinzufügen",
+  "autoDownloadPlaylist": "Neue Folgen zur Playlist hinzufügen",
   "autoDownloadPlaylistNone": "Keine",
-  "autoDownloadPlaylistHint": "Wurde die Playlist gelöscht, legt die App sie beim nächsten Download wieder an.",
+  "autoDownloadPlaylistHint": "Ohne Auto-Download werden neue Folgen nur eingereiht und gestreamt. Wurde die Playlist gelöscht, legt die App sie beim nächsten Mal wieder an.",
   "episodeCounter": "Folgennummer am Cover",
   "episodeCounterHint": "Schmaler Streifen am linken Rand der Cover in den Folgenlisten.",
   "episodeNumbering": "Nummerierung",
@@ -456,8 +456,8 @@
     }
   },
   "dragToReorder": "Zum Verschieben ziehen",
-  "autoDownloadThemes": "Themen für automatische Downloads",
-  "autoDownloadThemesHint": "Nur angehakte Themen werden automatisch geladen. Neue Themen erst, wenn du sie hier anhakst.",
+  "autoDownloadThemes": "Themen für Auto-Download und Playlist",
+  "autoDownloadThemesHint": "Nur angehakte Themen werden automatisch geladen bzw. in die Playlist gelegt. Neue Themen erst, wenn du sie hier anhakst.",
   "themeSubtitle": "{count, plural, =1{1 Folge} other{{count} Folgen}} · zuletzt {date}",
   "@themeSubtitle": {
     "placeholders": {

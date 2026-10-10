@@ -17,8 +17,17 @@ class _FakeCoverCache implements CoverCache {
   Future<void> evict(String url) async => evicted.add(url);
 }
 
+class _FakePlaylister implements NewEpisodePlaylister {
+  final calls = <List<int>>[];
+
+  @override
+  Future<void> addNewToPlaylist(Podcast podcast, List<int> episodeIds) async =>
+      calls.add(episodeIds);
+}
+
 void main() {
   late AppDatabase db;
+  late _FakePlaylister playlister;
   late _FakeCoverCache coverCache;
   late Map<String, http.Response Function()> server;
   late PodcastRepository repo;
@@ -31,6 +40,7 @@ void main() {
     clockNow = now;
     db = AppDatabase.forTesting(NativeDatabase.memory());
     coverCache = _FakeCoverCache();
+    playlister = _FakePlaylister();
     server = {};
     final client = MockClient((request) async {
       final handler = server[request.url.toString()];
@@ -41,6 +51,7 @@ void main() {
       fetcher: FeedFetcher(client),
       clock: () => clockNow,
       coverCache: coverCache,
+      newEpisodePlaylister: playlister,
     );
   });
 
@@ -816,6 +827,128 @@ void main() {
 
     await repo.setAutoPlayedTheme(id, 'zum-thema', enabled: false);
     expect(autoPlayedThemesOf((await repo.watchPodcast(id).first)!), isEmpty);
+  });
+
+  group('without auto-download, new episodes go to the playlist', () {
+    String item(String guid, String theme) =>
+        '<item><title>T$guid</title><guid>$guid</guid>'
+        '<link>https://wrint.network.podigee.io/podcast/1-$theme/$guid</link>'
+        '<enclosure url="https://example.com/$guid.mp3" type="audio/mpeg"/>'
+        '</item>';
+    var body = '';
+    void feed(List<String> items) => body =
+        '<rss><channel><title>WRINT</title>${items.join()}</channel></rss>';
+
+    Future<int> subscribed({
+      AutoDownloadMode mode = AutoDownloadMode.off,
+      bool withPlaylist = true,
+    }) async {
+      feed([item('1', 'zum-thema'), item('2', 'die-wrintheit')]);
+      server['https://example.com/wrint'] = () => http.Response(body, 200);
+      final id = await repo.subscribe('https://example.com/wrint');
+      await repo.updatePodcastSettings(id, autoDownloadMode: mode);
+      if (withPlaylist) {
+        await (db.update(db.podcasts)..where((p) => p.id.equals(id))).write(
+          const PodcastsCompanion(
+            autoPlaylistId: Value(1),
+            autoPlaylistName: Value('Wrint'),
+          ),
+        );
+      }
+      return id;
+    }
+
+    Future<void> refreshWith(int id, List<String> items) async {
+      feed(items);
+      clockNow = clockNow.add(const Duration(hours: 1));
+      await repo.refreshPodcast((await repo.watchPodcast(id).first)!);
+    }
+
+    Future<int> episodeId(String guid) async => (await (db.select(
+      db.episodes,
+    )..where((e) => e.guid.equals(guid))).getSingle()).id;
+
+    test('only what the refresh fetched, not the first import', () async {
+      final id = await subscribed();
+      expect(playlister.calls, isEmpty);
+
+      await refreshWith(id, [
+        item('3', 'zum-thema'),
+        item('1', 'zum-thema'),
+        item('2', 'die-wrintheit'),
+      ]);
+      expect(playlister.calls, [
+        [await episodeId('3')],
+      ]);
+
+      // Nothing new: nothing again (a removed one does not come back).
+      await refreshWith(id, [
+        item('3', 'zum-thema'),
+        item('1', 'zum-thema'),
+        item('2', 'die-wrintheit'),
+      ]);
+      expect(playlister.calls, hasLength(1));
+    });
+
+    test('only the selected topics', () async {
+      final id = await subscribed();
+      await repo.setAutoDownloadThemes(id, {'zum-thema'});
+      await refreshWith(id, [
+        item('4', 'zum-thema'),
+        item('3', 'die-wrintheit'),
+        item('1', 'zum-thema'),
+        item('2', 'die-wrintheit'),
+      ]);
+      expect(playlister.calls, [
+        [await episodeId('4')],
+      ]);
+
+      await repo.setAutoDownloadThemes(id, {});
+      await refreshWith(id, [
+        item('5', 'zum-thema'),
+        item('4', 'zum-thema'),
+        item('3', 'die-wrintheit'),
+        item('1', 'zum-thema'),
+        item('2', 'die-wrintheit'),
+      ]);
+      expect(playlister.calls, hasLength(1));
+    });
+
+    test(
+      'not with auto-download on, without playlist or when played',
+      () async {
+        final downloading = await subscribed(mode: AutoDownloadMode.always);
+        await refreshWith(downloading, [
+          item('3', 'x'),
+          item('1', 'zum-thema'),
+        ]);
+        expect(playlister.calls, isEmpty);
+
+        await repo.updatePodcastSettings(
+          downloading,
+          autoDownloadMode: AutoDownloadMode.off,
+        );
+        await (db.update(db.podcasts)..where((p) => p.id.equals(downloading)))
+            .write(const PodcastsCompanion(autoPlaylistId: Value(null)));
+        await refreshWith(downloading, [
+          item('4', 'x'),
+          item('3', 'x'),
+          item('1', 'zum-thema'),
+        ]);
+        expect(playlister.calls, isEmpty);
+
+        await (db.update(db.podcasts)..where((p) => p.id.equals(downloading)))
+            .write(const PodcastsCompanion(autoPlaylistId: Value(1)));
+        await repo.setAutoPlayedTheme(downloading, 'zum-thema', enabled: true);
+        await refreshWith(downloading, [
+          item('5', 'zum-thema'),
+          item('4', 'x'),
+          item('3', 'x'),
+          item('1', 'zum-thema'),
+        ]);
+        expect(playlister.calls, isEmpty); // marked as played on arrival
+      },
+    );
   });
 
   test('Podlove chapters from the feed are stored once', () async {

@@ -53,7 +53,10 @@ Ein Menü (`showPodcastPlayMenu` in `play_podcast_episodes.dart`) an drei Stelle
   abzuspielen (Benutzerwunsch 2026-10-03, `PodcastEpisodesAction.addToPlaylist`): „Alle neuen Episoden in Playlist",
   „Ungespielte Episoden seit … in Playlist", „Alle ungespielten Episoden in Playlist"; Infobox „n Folgen zu „X"
   hinzugefügt." bzw. „Alle Folgen waren schon in „X".".
-- **Thema** (Netzwerk-Feeds wie WRINT): Podcast-Einstellungen → „Themen für automatische Downloads" → langes Drücken
+- **Neue Folgen automatisch einreihen** (Benutzerwunsch 2026-10-10): Podcast-Einstellungen → „Neue Folgen zur Playlist
+  hinzufügen". Mit Auto-Download an kommen die geladenen Folgen in die Playlist, mit Auto-Download **Aus** neu
+  erschienene Folgen einmalig und ohne Download (gestreamt) – Details in `eviction.md`.
+- **Thema** (Netzwerk-Feeds wie WRINT): Podcast-Einstellungen → „Themen für Auto-Download und Playlist" → langes Drücken
   (Benutzerwunsch 2026-09-30) – nur Folgen dieses Themas (`unplayedEpisodes(theme: …)`), Titel „Podcast · Thema";
   packt wie die Abos-Übersicht **nur in eine Playlist** (Benutzerwunsch 2026-10-04).
 - **Staffel**: langes Drücken auf einen Staffel-Chip im Podcast-Detail – nur diese Staffel.

@@ -956,7 +956,7 @@ void main() {
     await tester.tap(find.text('Podcast-Einstellungen'));
     await settle(tester);
 
-    expect(find.text('Themen für automatische Downloads'), findsOneWidget);
+    expect(find.text('Themen für Auto-Download und Playlist'), findsOneWidget);
     expect(find.text('Zum Thema'), findsOneWidget);
     expect(find.text('Die Wrintheit'), findsOneWidget);
 
@@ -1012,7 +1012,7 @@ void main() {
     // Close with Android's back button.
     await tester.binding.handlePopRoute();
     await settle(tester);
-    expect(find.text('Themen für automatische Downloads'), findsNothing);
+    expect(find.text('Themen für Auto-Download und Playlist'), findsNothing);
     // Only the selected theme was queued.
     expect(downloadEngine.active, hasLength(1));
 
@@ -1167,7 +1167,7 @@ void main() {
 
       final row = find.widgetWithText(
         ListTile,
-        'Neue Downloads zur Playlist hinzufügen',
+        'Neue Folgen zur Playlist hinzufügen',
       );
       await tester.ensureVisible(row);
       await settle(tester);
