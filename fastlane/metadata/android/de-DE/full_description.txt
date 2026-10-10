@@ -28,7 +28,7 @@
 <ul>
 <li>Mehrere Playlists mit automatischem Weiterspielen, Farben, Sortieren und „Fortsetzen“</li>
 <li>„Als Nächstes spielen“ und „Ans Ende anfügen“ für die laufende Playlist; ⏮ ⏭ im Player und per Bluetooth</li>
-<li>Fertige Folgen verlassen die Playlist sofort, nach 10 Minuten oder nie – wie du willst</li>
+<li>Fertige Folgen verlassen die Playlist sofort, nach 5 Minuten oder nie – wie du willst</li>
 <li>Alle neuen oder ungespielten Folgen eines Podcasts, Themas oder einer Staffel in eine Playlist</li>
 <li>Symbol an jeder Folge, die in einer Playlist steht</li>
 </ul>

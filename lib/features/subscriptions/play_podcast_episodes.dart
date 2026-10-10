@@ -239,11 +239,9 @@ Future<void> _markAll(
   if (confirmed != true) return;
   final playback = ref.read(playbackRepositoryProvider);
   if (played) {
-    final marked = await playback.markAllPlayed(
-      podcast.id,
-      theme: theme,
-      season: season,
-    );
+    final marked = await ref
+        .read(audioHandlerProvider)
+        .markAllPlayed(podcast.id, theme: theme, season: season);
     showInfoSnackBar(messenger, l10n.markPlayedUntilDone(marked));
   } else {
     final marked = await playback.markAllUnplayed(

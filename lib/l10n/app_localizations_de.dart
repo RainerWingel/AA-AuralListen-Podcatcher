@@ -572,13 +572,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get finishedRemovalHint =>
-      'Gilt für bis zum Ende gehörte Folgen. „Als gespielt markieren“ entfernt immer sofort aus allen Playlists.';
+      'Gilt für bis zum Ende gehörte Folgen und für „Als gespielt markieren“ (auch „Alle“ und „bis …“).';
 
   @override
   String get finishedRemovalNow => 'Sofort';
 
   @override
-  String get finishedRemovalAfter10Minutes => 'Nach 10 Minuten';
+  String get finishedRemovalAfter5Minutes => 'Nach 5 Minuten';
 
   @override
   String get finishedRemovalNever => 'Nie';
@@ -892,7 +892,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get markPlayedUntilHint =>
-      'Sie verschwinden aus den Playlists; heruntergeladene Folgen werden nach 96 Stunden gelöscht.';
+      'Sie verlassen die Playlists (wann, steht in den Optionen unter „Fertige Folgen aus Playlist entfernen“); heruntergeladene Folgen werden nach 96 Stunden gelöscht.';
 
   @override
   String markPlayedUntilNone(String date) {

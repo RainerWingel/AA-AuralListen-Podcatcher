@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../audio/audio_providers.dart';
 import '../../core/clock.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
@@ -76,7 +77,9 @@ Future<void> markPlayedUntilFlow(
   );
   if (confirmed != true) return;
 
-  final marked = await playback.markPlayedUntil(podcast.id, until);
+  final marked = await ref
+      .read(audioHandlerProvider)
+      .markPlayedUntil(podcast.id, until);
   showInfoSnackBar(messenger, l10n.markPlayedUntilDone(marked));
 }
 

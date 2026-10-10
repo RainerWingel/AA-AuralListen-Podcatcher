@@ -78,29 +78,33 @@ class PlaybackRepository {
 
   /// Marked as played by the user: removes the episode from ALL playlists
   /// (docs/playlists.md). `playedAt` starts the 96 h eviction timer.
-  /// [keepInPlaylists] (setting "after 10 minutes" / "never", user wish
+  /// [keepInPlaylists] (setting "after 5 minutes" / "never", user wish
   /// 2026-10-10): it stays there as finished instead, like an episode played
   /// to the end; the playlist's clean-up removes it when its time is up.
+  /// The same goes for [markPlayedUntil] and [markAllPlayed].
   Future<void> markPlayed(int episodeId, {bool keepInPlaylists = false}) =>
       _db.transaction(() async {
         await _setPlayed(episodeId);
-        final items = _db.playlistItems;
-        if (keepInPlaylists) {
-          await (_db.update(items)..where(
-                (i) => i.episodeId.equals(episodeId) & i.finishedAt.isNull(),
-              ))
-              .write(PlaylistItemsCompanion(finishedAt: Value(_clock())));
-        } else {
-          await (_db.delete(
-            items,
-          )..where((i) => i.episodeId.equals(episodeId))).go();
-        }
+        await _leavePlaylists([episodeId], keep: keepInPlaylists);
       });
+
+  /// Marked as played by hand: the episodes leave all playlists, or – with
+  /// [keep] – stay there as finished until the clean-up removes them.
+  Future<void> _leavePlaylists(List<int> ids, {required bool keep}) async {
+    final items = _db.playlistItems;
+    if (keep) {
+      await (_db.update(items)
+            ..where((i) => i.episodeId.isIn(ids) & i.finishedAt.isNull()))
+          .write(PlaylistItemsCompanion(finishedAt: Value(_clock())));
+    } else {
+      await (_db.delete(items)..where((i) => i.episodeId.isIn(ids))).go();
+    }
+  }
 
   /// Played to the end: leaves only [playlistId] – the playlist it was
   /// played from – and stays in all others (user wish 2026-10-03). Without
   /// an active playlist it stays everywhere. [keepInPlaylist] (setting
-  /// "after 10 minutes" / "never"): marked as finished there instead.
+  /// "after 5 minutes" / "never"): marked as finished there instead.
   Future<void> markFinished(
     int episodeId, {
     int? playlistId,
@@ -158,27 +162,28 @@ class PlaybackRepository {
   /// as played – same rules as [markPlayed]: removed from all playlists,
   /// downloads are deleted 96 h later. Episodes without a date are skipped.
   /// Returns the number of episodes marked.
-  Future<int> markPlayedUntil(int podcastId, DateTime until) =>
-      _db.transaction(() async {
-        final ids =
-            await (_db.selectOnly(_db.episodes)
-                  ..addColumns([_db.episodes.id])
-                  ..where(_unplayedUntil(_db.episodes, podcastId, until)))
-                .map((r) => r.read(_db.episodes.id)!)
-                .get();
-        if (ids.isEmpty) return 0;
-        await (_db.update(_db.episodes)..where((e) => e.id.isIn(ids))).write(
-          EpisodesCompanion(
-            status: const Value(EpisodeStatus.played),
-            playedAt: Value(_clock()),
-            positionMs: const Value(0),
-          ),
-        );
-        await (_db.delete(
-          _db.playlistItems,
-        )..where((i) => i.episodeId.isIn(ids))).go();
-        return ids.length;
-      });
+  Future<int> markPlayedUntil(
+    int podcastId,
+    DateTime until, {
+    bool keepInPlaylists = false,
+  }) => _db.transaction(() async {
+    final ids =
+        await (_db.selectOnly(_db.episodes)
+              ..addColumns([_db.episodes.id])
+              ..where(_unplayedUntil(_db.episodes, podcastId, until)))
+            .map((r) => r.read(_db.episodes.id)!)
+            .get();
+    if (ids.isEmpty) return 0;
+    await (_db.update(_db.episodes)..where((e) => e.id.isIn(ids))).write(
+      EpisodesCompanion(
+        status: const Value(EpisodeStatus.played),
+        playedAt: Value(_clock()),
+        positionMs: const Value(0),
+      ),
+    );
+    await _leavePlaylists(ids, keep: keepInPlaylists);
+    return ids.length;
+  });
 
   Expression<bool> _playedSince(
     $EpisodesTable e,
@@ -239,32 +244,32 @@ class PlaybackRepository {
   /// "Alle als gespielt markieren" (whole podcast or one [theme]): like
   /// [markPlayedUntil], but for every not yet played episode, undated ones
   /// too. Returns the number of episodes marked.
-  Future<int> markAllPlayed(int podcastId, {String? theme, int? season}) =>
-      _db.transaction(() async {
-        final ids =
-            await (_db.selectOnly(_db.episodes)
-                  ..addColumns([_db.episodes.id])
-                  ..where(
-                    _ofPodcast(_db.episodes, podcastId, theme, season) &
-                        _db.episodes.status
-                            .equalsValue(EpisodeStatus.played)
-                            .not(),
-                  ))
-                .map((r) => r.read(_db.episodes.id)!)
-                .get();
-        if (ids.isEmpty) return 0;
-        await (_db.update(_db.episodes)..where((e) => e.id.isIn(ids))).write(
-          EpisodesCompanion(
-            status: const Value(EpisodeStatus.played),
-            playedAt: Value(_clock()),
-            positionMs: const Value(0),
-          ),
-        );
-        await (_db.delete(
-          _db.playlistItems,
-        )..where((i) => i.episodeId.isIn(ids))).go();
-        return ids.length;
-      });
+  Future<int> markAllPlayed(
+    int podcastId, {
+    String? theme,
+    int? season,
+    bool keepInPlaylists = false,
+  }) => _db.transaction(() async {
+    final ids =
+        await (_db.selectOnly(_db.episodes)
+              ..addColumns([_db.episodes.id])
+              ..where(
+                _ofPodcast(_db.episodes, podcastId, theme, season) &
+                    _db.episodes.status.equalsValue(EpisodeStatus.played).not(),
+              ))
+            .map((r) => r.read(_db.episodes.id)!)
+            .get();
+    if (ids.isEmpty) return 0;
+    await (_db.update(_db.episodes)..where((e) => e.id.isIn(ids))).write(
+      EpisodesCompanion(
+        status: const Value(EpisodeStatus.played),
+        playedAt: Value(_clock()),
+        positionMs: const Value(0),
+      ),
+    );
+    await _leavePlaylists(ids, keep: keepInPlaylists);
+    return ids.length;
+  });
 
   /// "Alle als ungespielt markieren": all played episodes of the podcast (or
   /// [theme]) become new again, like [markUnplayedSince]. Returns the count.

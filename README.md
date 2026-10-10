@@ -44,7 +44,7 @@ Gerät. Geschrieben in Flutter.
 - Folge woanders gestartet: ihre Playlist wird nur angeboten und erst nach Antippen fortgesetzt
 - „Als Nächstes spielen" und „Ans Ende der Playlist anfügen" für die laufende Playlist; ⏮ ⏭ im Player (auch per
   Bluetooth), „Playlist öffnen“ springt zur laufenden Folge
-- Fertige Folgen verlassen die Playlist sofort, nach 10 Minuten (Standard) oder nie
+- Fertige Folgen verlassen die Playlist sofort, nach 5 Minuten (Standard) oder nie
 - „Fortsetzen" mit der zuletzt gespielten Folge jeder Playlist, Sortieren nach Datum oder Namen, „Alles downloaden"
 - Aus dem Abo-Menü: alle neuen, alle ungespielten oder alle ungespielten seit einem Datum in eine Playlist; über die
   Podcast-Seite gleich abspielen

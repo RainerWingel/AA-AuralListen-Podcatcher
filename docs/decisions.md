@@ -140,3 +140,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   (Benutzer) · Sofort / nach 10 Min. / nie wie beim Dateiende, aber in allen Playlists der Folge. Sammel-Markierungen
   („Alle", „bis …") bleiben beim sofortigen Entfernen. Dazu: Kapitel-Liste scrollt zum laufenden Kapitel, Lesezeichen
   löschen fragt nach.
+- 2026-10-10 · **„Fertige Folgen entfernen": Standard „Nach 5 Minuten" statt 10; auch „Alle"/„bis …" folgen der
+  Einstellung** (Benutzer) · Enum-Wert `after10Minutes` → `after5Minutes`; ein gespeicherter alter Wert fällt auf den
+  Standard zurück (kein Migrationsschritt nötig).

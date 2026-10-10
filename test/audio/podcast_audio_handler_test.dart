@@ -1294,11 +1294,11 @@ void main() {
         await playlists.add(playlistId, id);
       }
       // These tests check the leaving itself: "Sofort". The default (after
-      // 10 minutes) has its own test below.
+      // 5 minutes) has its own test below.
       await settings.set(SettingsKeys.removeFinished, 'now');
     });
 
-    test('default: a finished episode stays 10 minutes, next starts', () async {
+    test('default: a finished episode stays 5 minutes, next starts', () async {
       await settings.remove(SettingsKeys.removeFinished);
       await handler.playEpisode(episodeId, playlistId: playlistId);
       engine.complete();
@@ -1548,7 +1548,7 @@ void main() {
           expect(handler.position, const Duration(minutes: 10));
           expect(handler.currentEpisodeId, episodeId);
           expect(handler.playbackState.value.playing, isFalse);
-          // Default "after 10 minutes": still in the playlist for now.
+          // Default "after 5 minutes": still in the playlist for now.
           expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
         },
       );
@@ -1610,7 +1610,7 @@ void main() {
     test(
       'a due finished item stays while its episode is in the player',
       () async {
-        await settings.remove(SettingsKeys.removeFinished); // 10 minutes
+        await settings.remove(SettingsKeys.removeFinished); // 5 minutes
         final clock = [now];
         final timedPlaylists = PlaylistRepository(db, () => clock.first);
         await handler.dispose();
@@ -1638,7 +1638,7 @@ void main() {
     );
 
     test('setting "now" again removes earlier finished items', () async {
-      await settings.set(SettingsKeys.removeFinished, 'after10Minutes');
+      await settings.set(SettingsKeys.removeFinished, 'after5Minutes');
       await handler.playEpisode(episodeId, playlistId: playlistId);
       engine.complete();
       await pumpEventQueue();
@@ -1688,7 +1688,7 @@ void main() {
           if (i.finishedAt != null) i.episodeId,
       ];
 
-      test('default (10 minutes): stays, finished in ALL playlists', () async {
+      test('default (5 minutes): stays, finished in ALL playlists', () async {
         await settings.remove(SettingsKeys.removeFinished);
         final other = await playlists.create('Unterwegs');
         await playlists.add(other, episodeId);
@@ -1718,7 +1718,7 @@ void main() {
         expect(await itemsOf(other), isEmpty);
       });
 
-      test('after 10 minutes it is removed by the clean-up', () async {
+      test('after 5 minutes it is removed by the clean-up', () async {
         await settings.remove(SettingsKeys.removeFinished);
         final clock = [now];
         await handler.dispose();
@@ -1730,12 +1730,30 @@ void main() {
           playlists: PlaylistRepository(db, () => clock.first),
         );
         await handler.markEpisodePlayed(episodeId);
-        clock[0] = now.add(const Duration(minutes: 5));
+        clock[0] = now.add(const Duration(minutes: 4));
         await handler.cleanUpFinishedPlaylistItems();
         expect(await itemsOf(playlistId), contains(episodeId));
-        clock[0] = now.add(const Duration(minutes: 11));
+        clock[0] = now.add(const Duration(minutes: 6));
         await handler.cleanUpFinishedPlaylistItems();
         expect(await itemsOf(playlistId), [ep2, ep3]);
+      });
+
+      test('"all" and "up to …" follow the setting too', () async {
+        await settings.remove(SettingsKeys.removeFinished);
+        final podcastId = (await episode()).podcastId;
+        expect(await handler.markAllPlayed(podcastId), greaterThan(0));
+        expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
+
+        await settings.set(SettingsKeys.removeFinished, 'now');
+        await PlaybackRepository(db, () => now).markAllUnplayed(podcastId);
+        // "Up to …" skips undated episodes.
+        await (db.update(db.episodes))
+            .write(EpisodesCompanion(pubDate: Value(DateTime.utc(2026))));
+        expect(
+          await handler.markPlayedUntil(podcastId, DateTime.utc(2100)),
+          greaterThan(0),
+        );
+        expect(await itemsOf(playlistId), isEmpty);
       });
     });
 

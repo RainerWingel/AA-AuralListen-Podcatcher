@@ -1043,7 +1043,7 @@ abstract class AppLocalizations {
   /// No description provided for @finishedRemovalHint.
   ///
   /// In de, this message translates to:
-  /// **'Gilt für bis zum Ende gehörte Folgen. „Als gespielt markieren“ entfernt immer sofort aus allen Playlists.'**
+  /// **'Gilt für bis zum Ende gehörte Folgen und für „Als gespielt markieren“ (auch „Alle“ und „bis …“).'**
   String get finishedRemovalHint;
 
   /// No description provided for @finishedRemovalNow.
@@ -1052,11 +1052,11 @@ abstract class AppLocalizations {
   /// **'Sofort'**
   String get finishedRemovalNow;
 
-  /// No description provided for @finishedRemovalAfter10Minutes.
+  /// No description provided for @finishedRemovalAfter5Minutes.
   ///
   /// In de, this message translates to:
-  /// **'Nach 10 Minuten'**
-  String get finishedRemovalAfter10Minutes;
+  /// **'Nach 5 Minuten'**
+  String get finishedRemovalAfter5Minutes;
 
   /// No description provided for @finishedRemovalNever.
   ///
@@ -1553,7 +1553,7 @@ abstract class AppLocalizations {
   /// No description provided for @markPlayedUntilHint.
   ///
   /// In de, this message translates to:
-  /// **'Sie verschwinden aus den Playlists; heruntergeladene Folgen werden nach 96 Stunden gelöscht.'**
+  /// **'Sie verlassen die Playlists (wann, steht in den Optionen unter „Fertige Folgen aus Playlist entfernen“); heruntergeladene Folgen werden nach 96 Stunden gelöscht.'**
   String get markPlayedUntilHint;
 
   /// No description provided for @markPlayedUntilNone.

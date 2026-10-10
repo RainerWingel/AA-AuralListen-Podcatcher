@@ -262,7 +262,7 @@ class _FinishedRemovalTile extends ConsumerWidget {
   static String label(AppLocalizations l10n, FinishedRemoval value) =>
       switch (value) {
         FinishedRemoval.now => l10n.finishedRemovalNow,
-        FinishedRemoval.after10Minutes => l10n.finishedRemovalAfter10Minutes,
+        FinishedRemoval.after5Minutes => l10n.finishedRemovalAfter5Minutes,
         FinishedRemoval.never => l10n.finishedRemovalNever,
       };
 

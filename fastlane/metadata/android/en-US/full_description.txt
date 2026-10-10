@@ -28,7 +28,7 @@
 <ul>
 <li>Several playlists that continue automatically, with colors, sorting and "Resume"</li>
 <li>"Play next" and "Add to the end" for the playlist that is playing; ⏮ ⏭ in the player and via Bluetooth</li>
-<li>Finished episodes leave the playlist at once, after 10 minutes or never – your choice</li>
+<li>Finished episodes leave the playlist at once, after 5 minutes or never – your choice</li>
 <li>All new or unplayed episodes of a podcast, topic or season into a playlist</li>
 <li>A symbol on every episode that is in a playlist</li>
 </ul>

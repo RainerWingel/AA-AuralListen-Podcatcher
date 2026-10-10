@@ -673,7 +673,7 @@ void main() {
       expect(
         find.descendant(
           of: find.ancestor(of: tile, matching: find.byType(ListTile)),
-          matching: find.text('Nach 10 Minuten'),
+          matching: find.text('Nach 5 Minuten'),
         ),
         findsOneWidget,
       );
@@ -1287,6 +1287,11 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Markieren'));
       await settle(tester);
       expect(find.text('1 Folge als gespielt markiert'), findsOneWidget);
+      // Default "after 5 minutes": it stays in the playlist for now.
+      final kept = await tester.runAsync(
+        () => container.read(playlistRepositoryProvider).entries(playlistId),
+      );
+      expect(kept, hasLength(1));
       await openTopicMenu();
       expect(find.text('Alle als ungespielt markieren'), findsOneWidget);
       expect(find.text('Alle als gespielt markieren'), findsNothing);
@@ -1300,6 +1305,8 @@ void main() {
       expect(find.text('Alle als gespielt markieren'), findsOneWidget);
 
       await disposeApp(tester);
+      // The 5-minute clean-up timer of the kept item must not outlive the test.
+      await tester.runAsync(handler.dispose);
     },
   );
 

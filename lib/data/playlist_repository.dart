@@ -10,18 +10,18 @@ import 'db/app_database.dart';
 /// 2026-10-10); the bulk markings ("all", "up to …") always remove at once.
 enum FinishedRemoval {
   now,
-  after10Minutes,
+  after5Minutes,
   never;
 
   /// How long a finished episode stays (null = for good).
   Duration? get delay => switch (this) {
     now => Duration.zero,
-    after10Minutes => const Duration(minutes: 10),
+    after5Minutes => const Duration(minutes: 5),
     never => null,
   };
 
   /// Default: after 10 minutes (user wish 2026-10-06).
-  static const standard = after10Minutes;
+  static const standard = after5Minutes;
 
   static FinishedRemoval fromSetting(String? value) =>
       values.where((v) => v.name == value).firstOrNull ?? standard;

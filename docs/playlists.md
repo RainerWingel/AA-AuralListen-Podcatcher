@@ -134,13 +134,14 @@ gelesen, die neue Reihenfolge gilt also sofort.
   **nicht** als gespielt markiert und **bleibt** in der Playlist.
 - Manuelles „Als gespielt markieren" **einer Folge** (Folgen-Menü) folgt seit 2026-10-10 derselben Einstellung wie das
   Dateiende (siehe unten), nur in **allen** Playlists, in denen die Folge steht (`PodcastAudioHandler.markEpisodePlayed`
-  → `PlaybackRepository.markPlayed(keepInPlaylists:)`). „Alle als gespielt" und „bis …" entfernen dagegen weiterhin
-  sofort aus allen Playlists; das Ende der Wiedergabe nutzt `markFinished(id, playlistId: aktive)`.
+  → `PlaybackRepository.markPlayed(keepInPlaylists:)`). Ebenso „Alle als gespielt markieren" und „bis …"
+  (`markAllPlayed`/`markPlayedUntil`, Benutzerwunsch 2026-10-10); das Ende der Wiedergabe nutzt
+  `markFinished(id, playlistId: aktive)`.
 - **Optionen → Hören → „Fertige Folgen aus Playlist entfernen"** (Benutzerwunsch 2026-10-06, `FinishedRemoval`,
-  `settings['playlists.removeFinished']`): **Sofort** (bis 2026-10-06 das Verhalten) · **Nach 10 Minuten** (**Standard**,
-  `FinishedRemoval.standard`) · **Nie**. Gilt nur
-  für zu Ende gehörte Folgen **und** das Gespielt-Markieren einer einzelnen Folge von Hand (Benutzerwunsch
-  2026-10-10, vorher entfernte es immer sofort); die Sammel-Markierungen („Alle", „bis …") entfernen immer sofort.
+  `settings['playlists.removeFinished']`): **Sofort** (bis 2026-10-06 das Verhalten) · **Nach 5 Minuten** (**Standard**,
+  `FinishedRemoval.standard`; bis 2026-10-10 waren es 10 Minuten – ein gespeicherter alter Wert `after10Minutes` fällt
+  auf den Standard zurück) · **Nie**. Gilt für zu Ende gehörte Folgen **und** jedes Gespielt-Markieren von Hand
+  (einzeln, „Alle", „bis …"; Benutzerwunsch 2026-10-10, vorher entfernte es immer sofort).
   - Statt Löschen bekommt der Eintrag `playlist_items.finishedAt` (v24). „Fertig" zählt nur, solange die Folge noch
     gespielt ist – jedes „als ungespielt markieren" hebt es also auf; erneutes Abspielen aus der Playlist löscht
     `finishedAt` (`clearFinished`).
@@ -150,7 +151,7 @@ gelesen, die neue Reihenfolge gilt also sofort.
   dieser Playlist fertig gehörten, auch solche, die woanders gehört oder schon gespielt hinzugefügt wurden. Gilt für
   automatisches Weiterspielen, ⏭ (im Player ausgegraut, wenn danach nur noch gespielte kommen) und „Fortsetzen".
   ⏮ und Antippen spielen auch gespielte Folgen.
-  - „Nach 10 Minuten": Timer im Handler (10 min + 5 s, in `dispose` beendet); zusätzlich räumt
+  - „Nach 5 Minuten": Timer im Handler (5 min + 1 s, in `dispose` beendet); zusätzlich räumt
     `cleanUpFinishedPlaylistItems` beim App-Start und nach einer Änderung der Einstellung auf (nach „Sofort"
     verschwinden alle fertigen sofort).
   - Downloads: Ein fertiger Eintrag **schützt den Download nicht** vor der 96-h-Löschung (`eviction.md`).

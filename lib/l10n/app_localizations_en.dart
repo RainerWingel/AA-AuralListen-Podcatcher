@@ -571,13 +571,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get finishedRemovalHint =>
-      'Applies to episodes played to the end. “Mark as played” always removes from all playlists at once.';
+      'Applies to episodes played to the end and to “Mark as played” (also “All” and “up to …”).';
 
   @override
   String get finishedRemovalNow => 'Immediately';
 
   @override
-  String get finishedRemovalAfter10Minutes => 'After 10 minutes';
+  String get finishedRemovalAfter5Minutes => 'After 5 minutes';
 
   @override
   String get finishedRemovalNever => 'Never';
@@ -890,7 +890,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get markPlayedUntilHint =>
-      'They leave the playlists; downloaded episodes are deleted after 96 hours.';
+      'They leave the playlists (when: see “Remove finished episodes from playlist” in the options); downloaded episodes are deleted after 96 hours.';
 
   @override
   String markPlayedUntilNone(String date) {

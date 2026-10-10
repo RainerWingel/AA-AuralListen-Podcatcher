@@ -34,7 +34,7 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 - **Nicht gespielte** Folgen werden **nie** automatisch gelöscht.
 - Gespielte Folgen, die **noch in einer Playlist** stehen (zu Ende gehört aus einer anderen Playlist, `playlists.md`),
   werden ebenfalls nicht gelöscht – weder nach 96 h noch bei vollem Speicher (`DownloadService._notInAnyPlaylist`).
-  Ausnahme: Einträge, die nur als **fertig** in ihrer Playlist stehen bleiben (Einstellung „Nach 10 Minuten"/„Nie",
+  Ausnahme: Einträge, die nur als **fertig** in ihrer Playlist stehen bleiben (Einstellung „Nach 5 Minuten"/„Nie",
   `playlist_items.finishedAt`), schützen nicht (Benutzerentscheidung 2026-10-06) – sonst würde bei „Nie" nie gelöscht.
 - Die Folge im Player wird nie automatisch gelöscht.
 - Wird eine Folge wieder „ungespielt" markiert oder erneut abgespielt, entfällt die Löschung (`playedAt` = null).

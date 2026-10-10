@@ -232,10 +232,10 @@ void main() {
     test('removed by mode and age; "never" keeps it', () async {
       await playback.markFinished(a, playlistId: list, keepInPlaylist: true);
       expect(await repo.removeFinished(FinishedRemoval.never), 0);
-      clock = clock.add(const Duration(minutes: 9));
-      expect(await repo.removeFinished(FinishedRemoval.after10Minutes), 0);
+      clock = clock.add(const Duration(minutes: 4));
+      expect(await repo.removeFinished(FinishedRemoval.after5Minutes), 0);
       clock = clock.add(const Duration(minutes: 1));
-      expect(await repo.removeFinished(FinishedRemoval.after10Minutes), 1);
+      expect(await repo.removeFinished(FinishedRemoval.after5Minutes), 1);
       expect(await titles(list), ['B', 'C']);
 
       await playback.markFinished(b, playlistId: list, keepInPlaylist: true);
@@ -248,12 +248,12 @@ void main() {
       clock = clock.add(const Duration(minutes: 11));
       expect(
         await repo.removeFinished(
-          FinishedRemoval.after10Minutes,
+          FinishedRemoval.after5Minutes,
           keepEpisodeId: a,
         ),
         0,
       );
-      expect(await repo.removeFinished(FinishedRemoval.after10Minutes), 1);
+      expect(await repo.removeFinished(FinishedRemoval.after5Minutes), 1);
     });
 
     test('"mark as unplayed" or a replay from the list un-finishes', () async {
@@ -271,8 +271,13 @@ void main() {
     test('without keeping, the item leaves at once ("Sofort")', () async {
       await playback.markFinished(a, playlistId: list);
       expect(await titles(list), ['B', 'C']);
-      // Default (user wish 2026-10-06): after 10 minutes.
-      expect(FinishedRemoval.fromSetting(null), FinishedRemoval.after10Minutes);
+      // Default (user wish 2026-10-06; 5 instead of 10 minutes since
+      // 2026-10-10): after 5 minutes. A stored old value falls back to it.
+      expect(
+        FinishedRemoval.fromSetting('after10Minutes'),
+        FinishedRemoval.standard,
+      );
+      expect(FinishedRemoval.fromSetting(null), FinishedRemoval.after5Minutes);
       expect(FinishedRemoval.fromSetting('never'), FinishedRemoval.never);
     });
   });

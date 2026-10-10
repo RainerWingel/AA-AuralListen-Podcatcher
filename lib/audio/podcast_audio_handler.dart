@@ -162,7 +162,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// menu, "Alle als gespielt markieren" …) it stops playback at the end.
   StreamSubscription<DateTime?>? _playedMark;
 
-  /// Removes finished playlist items 10 minutes after their end (setting).
+  /// Removes finished playlist items 5 minutes after their end (setting).
   Timer? _finishedCleanUp;
   Timer? _pauseTimer;
 
@@ -607,21 +607,44 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// "Als gespielt markieren" by hand (menu on an episode): follows the
   /// setting "Fertige Folgen aus Playlist entfernen" like an episode played
-  /// to the end – removed from the playlists at once, after 10 minutes or
+  /// to the end – removed from the playlists at once, after 5 minutes or
   /// never (user wish 2026-10-10).
-  Future<void> markEpisodePlayed(int episodeId) async {
+  Future<void> markEpisodePlayed(int episodeId) => _markPlayedByHand(
+    (keep) => _playback.markPlayed(episodeId, keepInPlaylists: keep),
+  );
+
+  /// "Als gespielt markieren bis …": same rule for many episodes. Returns the
+  /// number marked.
+  Future<int> markPlayedUntil(int podcastId, DateTime until) =>
+      _markPlayedByHand(
+        (keep) =>
+            _playback.markPlayedUntil(podcastId, until, keepInPlaylists: keep),
+      );
+
+  /// "Alle als gespielt markieren" (podcast, topic or season).
+  Future<int> markAllPlayed(int podcastId, {String? theme, int? season}) =>
+      _markPlayedByHand(
+        (keep) => _playback.markAllPlayed(
+          podcastId,
+          theme: theme,
+          season: season,
+          keepInPlaylists: keep,
+        ),
+      );
+
+  Future<T> _markPlayedByHand<T>(
+    Future<T> Function(bool keepInPlaylists) mark,
+  ) async {
     final removal = await _finishedRemoval();
-    await _playback.markPlayed(
-      episodeId,
-      keepInPlaylists: removal != FinishedRemoval.now,
-    );
-    // Arms the timer for the item that just started waiting.
+    final result = await mark(removal != FinishedRemoval.now);
+    // Arms the timer for the items that just started waiting.
     await cleanUpFinishedPlaylistItems();
+    return result;
   }
 
   /// Applies "Fertige Folgen aus Playlist entfernen" to items finished
   /// earlier: at app start, on every episode change and after the setting
-  /// changed. With "after 10 minutes" a timer is set for the next item that
+  /// changed. With "after 5 minutes" a timer is set for the next item that
   /// becomes due – only if one is waiting (the one in the player never is).
   Future<void> cleanUpFinishedPlaylistItems() async {
     _finishedCleanUp?.cancel();
