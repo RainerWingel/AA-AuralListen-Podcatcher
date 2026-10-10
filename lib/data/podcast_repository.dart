@@ -30,9 +30,11 @@ typedef RefreshSummary = ({int succeeded, int failed, int moved});
 
 enum RefreshOutcome { updated, moved, failed }
 
-/// Where "refresh all" stands: the [current]th of [total] podcasts has just
-/// been started, named [title] (up to [PodcastRepository.refreshConcurrency]
-/// run at once; this is the latest one).
+/// Where "refresh all" stands: the [current]th of [total] podcasts, named
+/// [title], is the oldest one still being refreshed (up to
+/// [PodcastRepository.refreshConcurrency] run at once). Moves on whenever it
+/// is done – with the newest one instead, the line would jump to "8 of 8"
+/// at once, as all of them start within moments.
 typedef RefreshProgress = ({int current, int total, String title});
 
 /// A feed that was fetched and parsed, with the address to store for it.
@@ -685,15 +687,28 @@ class PodcastRepository {
     var failed = 0;
     var moved = 0;
     var started = 0;
+    // Running refreshes by start number (1-based), oldest first.
+    final running = <int, String>{};
+
+    void showOldestRunning() {
+      if (running.isEmpty) return;
+      final oldest = running.entries.first;
+      _setProgress((
+        current: oldest.key,
+        total: podcasts.length,
+        title: oldest.value,
+      ));
+    }
 
     Future<void> worker() async {
       while (queue.moveNext()) {
-        _setProgress((
-          current: ++started,
-          total: podcasts.length,
-          title: queue.current.title,
-        ));
-        switch (await refreshPodcast(queue.current)) {
+        final number = ++started;
+        running[number] = queue.current.title;
+        showOldestRunning();
+        final outcome = await refreshPodcast(queue.current);
+        running.remove(number);
+        showOldestRunning();
+        switch (outcome) {
           case RefreshOutcome.updated:
             succeeded++;
           case RefreshOutcome.moved:

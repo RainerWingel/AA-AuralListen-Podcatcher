@@ -205,21 +205,14 @@ void main() {
       await pumpEventQueue();
       await sub.cancel();
 
-      // Every podcast is announced as it starts; the line ends with null.
-      expect(seen.whereType<RefreshProgress>().map((p) => p.current), [
-        1,
-        2,
-        3,
-      ]);
-      expect(
-        seen.whereType<RefreshProgress>().every((p) => p.total == 3),
-        isTrue,
-      );
-      expect(seen.whereType<RefreshProgress>().map((p) => p.title).toSet(), {
-        'Eins',
-        'Zwei',
-        'Drei',
-      });
+      // The oldest podcast still running is shown: the number only goes up
+      // (a quick one may never be the oldest) and the line ends with null.
+      final shown = seen.whereType<RefreshProgress>().toList();
+      final numbers = shown.map((p) => p.current).toList();
+      expect(numbers, orderedEquals([...numbers]..sort()));
+      expect(numbers.first, 1);
+      expect(shown.every((p) => p.total == 3), isTrue);
+      expect(shown.first.title, anyOf('Eins', 'Zwei', 'Drei'));
       expect(seen.last, isNull);
     });
 

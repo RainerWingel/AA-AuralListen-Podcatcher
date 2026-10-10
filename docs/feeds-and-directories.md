@@ -57,8 +57,9 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
 - Eingabe-URLs werden normalisiert: `https://` wird ergänzt, `feed://`/`itpc://`/`pcast://` → `https://`.
 - Aktualisierung nur beim App-Start (`main.dart`) und per Pull-to-Refresh, max. 4 Feeds parallel.
 - **Statuszeile** (Benutzerwunsch 2026-10-10): Solange „alle aktualisieren" läuft (Start und Pull-to-Refresh), steht
-  unten über dem Mini-Player eine dünne Zeile „2 von 11 · Freak Show" mit schmalem Fortschrittsbalken – der zuletzt
-  gestartete Podcast (bei 4 parallelen der jüngste). Sie schwebt über dem Inhalt (Listen springen nicht) und
+  unten über dem Mini-Player eine dünne Zeile „2 von 11 · Freak Show" mit schmalem Fortschrittsbalken – der **älteste noch laufende**
+  Podcast (bei 4 parallelen; der jüngste wäre sofort „11 von 11", weil alle binnen Momenten starten – Benutzerbericht
+  2026-10-10). Sie schwebt über dem Inhalt (Listen springen nicht) und
   verschwindet am Ende. `PodcastRepository.watchRefreshProgress` → `refreshProgressProvider` → `AppShell`.
   Gleichzeitige Aufrufe teilen sich einen Lauf.
 - Fehlerhafte Feeds brechen den Refresh der anderen nicht ab; Fehler landen in `podcasts.lastError` und werden
