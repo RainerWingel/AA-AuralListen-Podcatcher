@@ -17,7 +17,7 @@ int? id3TagLength(Uint8List header) {
 }
 
 /// Reads ID3v2.3/2.4 chapter frames (CHAP with TIT2 title, optional WXXX
-/// link). Returns an empty list for anything it does not understand – a
+/// link and APIC picture). Returns an empty list for anything it does not understand – a
 /// broken tag must never break playback.
 List<ParsedChapter> parseId3Chapters(Uint8List tag) {
   try {
@@ -77,11 +77,14 @@ ParsedChapter? _parseChap(Uint8List b, int start, int end, int major) {
 
   String? title;
   String? url;
+  _Picture? picture;
   for (final sub in _frames(b, pos, end, major)) {
     if (sub.id == 'TIT2') {
       title = _text(b, sub.start, sub.end);
     } else if (sub.id == 'WXXX') {
       url = _wxxxUrl(b, sub.start, sub.end);
+    } else if (sub.id == 'APIC') {
+      picture ??= _picture(b, sub.start, sub.end);
     }
   }
   if (title == null || title.isEmpty) return null;
@@ -89,7 +92,75 @@ ParsedChapter? _parseChap(Uint8List b, int start, int end, int major) {
     start: Duration(milliseconds: startMs),
     title: title,
     url: url,
+    imageUrl: picture?.link,
+    imageBytes: picture?.bytes,
+    imageExtension: picture?.extension,
   );
+}
+
+/// A chapter's picture: embedded bytes, or – MIME type "-->" – a link.
+typedef _Picture = ({Uint8List? bytes, String? extension, String? link});
+
+/// APIC: encoding, MIME type (terminated, ISO-8859-1), picture type,
+/// description (terminated, in the frame's encoding), then the picture.
+_Picture? _picture(Uint8List b, int start, int end) {
+  if (start + 4 >= end) return null;
+  final encoding = b[start];
+  var pos = start + 1;
+  final mimeStart = pos;
+  while (pos < end && b[pos] != 0) {
+    pos++;
+  }
+  final mime = latin1.decode(b.sublist(mimeStart, pos)).trim().toLowerCase();
+  pos += 2; // MIME terminator, picture type
+  // Description: one 0 byte, or two for UTF-16 (on an even offset).
+  final wide = encoding == 1 || encoding == 2;
+  while (pos < end) {
+    if (!wide && b[pos] == 0) {
+      pos += 1;
+      break;
+    }
+    if (wide && pos + 1 < end && b[pos] == 0 && b[pos + 1] == 0) {
+      pos += 2;
+      break;
+    }
+    pos += wide ? 2 : 1;
+  }
+  if (pos >= end) return null;
+  final data = Uint8List.sublistView(b, pos, end);
+  if (mime == '-->') {
+    final link = latin1.decode(data).replaceAll('\u0000', '').trim();
+    return link.startsWith('http')
+        ? (bytes: null, extension: null, link: link)
+        : null;
+  }
+  final extension = _imageExtension(data);
+  // Not a picture we can show (some tools write junk or other formats).
+  return extension == null
+      ? null
+      : (bytes: data, extension: extension, link: null);
+}
+
+/// File extension from the picture's first bytes; null if it is none of
+/// JPEG, PNG, WebP or GIF (the MIME type in the tag is often wrong).
+String? _imageExtension(Uint8List d) {
+  if (d.length < 12) return null;
+  if (d[0] == 0xFF && d[1] == 0xD8) return 'jpg';
+  if (d[0] == 0x89 && d[1] == 0x50 && d[2] == 0x4E && d[3] == 0x47) {
+    return 'png';
+  }
+  if (d[0] == 0x47 && d[1] == 0x49 && d[2] == 0x46) return 'gif';
+  if (d[0] == 0x52 &&
+      d[1] == 0x49 &&
+      d[2] == 0x46 &&
+      d[3] == 0x46 &&
+      d[8] == 0x57 &&
+      d[9] == 0x45 &&
+      d[10] == 0x42 &&
+      d[11] == 0x50) {
+    return 'webp';
+  }
+  return null;
 }
 
 /// Text frame: first byte is the encoding.

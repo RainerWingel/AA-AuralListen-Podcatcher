@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:http/http.dart' as http;
 
 import '../db/app_database.dart';
+import 'chapter_image_store.dart';
 import 'id3_chapters.dart';
 import 'json_chapters.dart';
 import 'parsed_chapter.dart';
@@ -16,16 +17,22 @@ import 'remote_id3.dart';
 /// 2. Podcasting 2.0 JSON file (`chaptersUrl`).
 /// 3. ID3 CHAP frames of the MP3 – from the downloaded file, otherwise only
 ///    the tag at the start of the remote file (HTTP range request).
+///
+/// Chapter pictures: a web address (JSON `img`, linked APIC frame) is stored
+/// as it is; a picture embedded in the MP3 goes to the [ChapterImageStore]
+/// and the chapter keeps its reference.
 class ChapterService {
   ChapterService({
     required this._db,
     required this._client,
     required this._localFile,
+    required this._images,
   });
 
   final AppDatabase _db;
   final http.Client _client;
   final Future<File?> Function(int episodeId) _localFile;
+  final ChapterImageStore _images;
 
   static const _maxJsonBytes = 1024 * 1024;
 
@@ -42,14 +49,12 @@ class ChapterService {
   /// Loads chapters from the JSON file or the MP3 if none are stored yet.
   Future<void> ensureLoaded(int episodeId) async {
     if (!_attempted.add(episodeId)) return;
-    final count = _db.chapters.startMs.count();
-    final stored =
-        await (_db.selectOnly(_db.chapters)
-              ..addColumns([count])
-              ..where(_db.chapters.episodeId.equals(episodeId)))
-            .map((r) => r.read(count))
-            .getSingle();
-    if ((stored ?? 0) > 0) return;
+    final stored = await (_db.select(
+      _db.chapters,
+    )..where((c) => c.episodeId.equals(episodeId))).get();
+    // Chapters are there – unless their pictures were cleaned up since:
+    // then they are read again, with the pictures.
+    if (stored.isNotEmpty && !await _picturesMissing(stored)) return;
 
     final episode = await (_db.select(
       _db.episodes,
@@ -60,18 +65,76 @@ class ChapterService {
     if (chapters.isEmpty) chapters = await _fromId3(episode);
     if (chapters.isEmpty) return;
 
-    await _db.batch(
-      (batch) => batch.insertAll(_db.chapters, [
-        for (final c in chapters)
-          ChaptersCompanion.insert(
-            episodeId: episodeId,
-            startMs: c.start.inMilliseconds,
-            title: c.title,
-            url: Value(c.url),
-            imageUrl: Value(c.imageUrl),
-          ),
-      ], mode: InsertMode.insertOrIgnore),
-    );
+    if (stored.isNotEmpty) await _images.deleteEpisode(episodeId);
+    final rows = [
+      for (final c in chapters)
+        ChaptersCompanion.insert(
+          episodeId: episodeId,
+          startMs: c.start.inMilliseconds,
+          title: c.title,
+          url: Value(c.url),
+          imageUrl: Value(await _imageReference(episodeId, c)),
+        ),
+    ];
+    await _db.transaction(() async {
+      if (stored.isNotEmpty) {
+        await (_db.delete(
+          _db.chapters,
+        )..where((c) => c.episodeId.equals(episodeId))).go();
+      }
+      await _db.batch(
+        (batch) => batch.insertAll(
+          _db.chapters,
+          rows,
+          mode: InsertMode.insertOrIgnore,
+        ),
+      );
+    });
+  }
+
+  /// What the chapter stores as its picture: a web address, a reference to
+  /// the file written for an embedded picture, or null.
+  Future<String?> _imageReference(int episodeId, ParsedChapter c) async {
+    final bytes = c.imageBytes;
+    final extension = c.imageExtension;
+    if (bytes == null || extension == null) return c.imageUrl;
+    try {
+      return await _images.save(
+        episodeId,
+        c.start.inMilliseconds,
+        bytes,
+        extension,
+      );
+    } on FileSystemException {
+      return c.imageUrl; // no room or no access: chapter without picture
+    }
+  }
+
+  Future<bool> _picturesMissing(List<Chapter> chapters) async {
+    for (final c in chapters) {
+      final reference = c.imageUrl;
+      if (ChapterImageStore.isLocal(reference) &&
+          await _images.file(reference!) == null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Deletes chapter pictures of episodes that are gone and keeps the rest
+  /// within the size limit (app start, docs/eviction.md).
+  Future<void> cleanUpImages() async {
+    final id = _db.chapters.episodeId;
+    final withPictures =
+        (await (_db.selectOnly(_db.chapters, distinct: true)
+                  ..addColumns([id])
+                  ..where(
+                    _db.chapters.imageUrl.like('${ChapterImageStore.prefix}%'),
+                  ))
+                .map((r) => r.read(id)!)
+                .get())
+            .toSet();
+    await _images.cleanUp(withPictures);
   }
 
   Future<List<ParsedChapter>> _fromJson(String? url) async {

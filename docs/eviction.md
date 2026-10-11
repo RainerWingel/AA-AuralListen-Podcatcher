@@ -94,6 +94,10 @@ Kein Hintergrund-Job. Gleichzeitige Aufrufe teilen sich einen Lauf.
 - Cover-Bilder: `CoverCacheManager` (`lib/data/storage/cover_cache.dart`) mit fester Obergrenze: 300 Objekte, 30 Tage. ✅
   Dekodiert wird nur in Anzeigegröße (`CoverImage`, `memCacheWidth`). ✅
   Beim Abo-Kündigen werden Podcast- und Folgen-Cover aus dem Cache entfernt. ✅
+- **Kapitelbilder** (aus MP3-Tags): Dateien in `chapter_images/` (`ChapterImageStore`), insgesamt max. 60 MB; beim
+  App-Start werden die Bilder nicht mehr vorhandener Folgen gelöscht, danach die ältesten Folgen, bis das Limit
+  eingehalten ist. Dekodiert wird nur in Anzeigegröße (`cacheWidth`). Web-Adressen (JSON-`img`) laufen über den
+  `CoverCacheManager`. ✅
 - HTTP-Antworten werden mit Größenlimit gelesen (30 MB), Feed-XML nach dem Parsen verworfen. ✅
 - Temporäre Dateien (Backup-ZIP, OPML-Export) nach dem Teilen löschen.
 - Kopien des Datei-Pickers (OPML-Import, Backup-Wiederherstellung) werden direkt nach dem Einlesen gelöscht. ✅

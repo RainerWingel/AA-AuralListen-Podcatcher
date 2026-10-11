@@ -13,6 +13,7 @@ import '../core/app_language.dart';
 import '../core/clock.dart';
 import 'backup/backup_service.dart';
 import 'bookmark_repository.dart';
+import 'chapters/chapter_image_store.dart';
 import 'chapters/chapter_service.dart';
 import 'db/app_database.dart';
 import 'directory/directory_search.dart';
@@ -241,11 +242,31 @@ final podcastThemesProvider = StreamProvider.autoDispose
           ref.watch(podcastRepositoryProvider).watchThemes(podcastId),
     );
 
+/// Where pictures embedded in MP3 chapters are kept (app-private).
+Future<Directory> defaultChapterImagesDirectory() async => Directory(
+  '${(await getApplicationSupportDirectory()).path}/chapter_images',
+);
+
+final chapterImagesDirectoryProvider = Provider<Future<Directory> Function()>(
+  (ref) => defaultChapterImagesDirectory,
+);
+
+final chapterImageStoreProvider = Provider<ChapterImageStore>(
+  (ref) => ChapterImageStore(ref.watch(chapterImagesDirectoryProvider)),
+);
+
+/// The file of a chapter picture stored locally (null: gone).
+final chapterImageFileProvider = FutureProvider.autoDispose
+    .family<File?, String>(
+      (ref, reference) => ref.watch(chapterImageStoreProvider).file(reference),
+    );
+
 final chapterServiceProvider = Provider<ChapterService>(
   (ref) => ChapterService(
     db: ref.watch(databaseProvider),
     client: ref.watch(httpClientProvider),
     localFile: (id) => ref.read(downloadServiceProvider).localFile(id),
+    images: ref.watch(chapterImageStoreProvider),
   ),
 );
 

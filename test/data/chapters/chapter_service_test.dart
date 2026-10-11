@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:aapodcastguru/data/chapters/chapter_image_store.dart';
 import 'package:aapodcastguru/data/chapters/chapter_service.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -16,6 +17,8 @@ void main() {
   late List<String> requests;
   late Map<String, http.Response Function(http.Request)> server;
   File? localFile;
+  late Directory imagesDir;
+  late ChapterImageStore store;
   final now = DateTime.utc(2026, 9, 27);
 
   Uint8List mp3WithChapters() {
@@ -47,6 +50,7 @@ void main() {
       return handler == null ? http.Response('', 404) : handler(request);
     }),
     localFile: (id) async => localFile,
+    images: store,
   );
 
   Future<int> addEpisode({String? chaptersUrl}) => db
@@ -67,6 +71,8 @@ void main() {
     requests = [];
     server = {};
     localFile = null;
+    imagesDir = Directory.systemTemp.createTempSync('chapter_images_');
+    store = ChapterImageStore(() async => imagesDir);
     podcastId = await db
         .into(db.podcasts)
         .insert(
@@ -78,7 +84,10 @@ void main() {
         );
   });
 
-  tearDown(() => db.close());
+  tearDown(() async {
+    await db.close();
+    if (imagesDir.existsSync()) imagesDir.deleteSync(recursive: true);
+  });
 
   test('JSON chapters file is used first', () async {
     final id = await addEpisode(chaptersUrl: 'https://example.com/c.json');
@@ -170,5 +179,108 @@ void main() {
     );
     expect(currentChapter(chapters, const Duration(hours: 1))!.startMs, 120000);
     expect(currentChapter(const [], Duration.zero), isNull);
+  });
+
+  group('chapter pictures', () {
+    Uint8List mp3WithPictures() {
+      final b = Id3Builder(3);
+      final tag = b.tag([
+        b.chap('c1', 0, [b.tit2('Eruption'), b.apic(Id3Builder.jpegBytes)]),
+        b.chap('c2', 1255000, [b.tit2('SoFi'), b.apic(Id3Builder.pngBytes)]),
+        b.chap('c3', 1900000, [b.tit2('Ohne Bild')]),
+      ]);
+      return Uint8List.fromList([...tag, ...List.filled(5000, 0xFF)]);
+    }
+
+    Future<int> episodeWithPictures() async {
+      final id = await addEpisode();
+      final mp3 = mp3WithPictures();
+      server['https://cdn.example.com/folge.mp3'] = (r) => ranged(mp3, r);
+      return id;
+    }
+
+    test(
+      'embedded pictures become files, the chapter keeps a reference',
+      () async {
+        final id = await episodeWithPictures();
+        final s = service();
+        await s.ensureLoaded(id);
+        final chapters = await s.watch(id).first;
+        expect(chapters.map((c) => c.imageUrl), [
+          'chapter:$id/0.jpg',
+          'chapter:$id/1255000.png',
+          null,
+        ]);
+        final file = await store.file(chapters[1].imageUrl!);
+        expect(file!.readAsBytesSync(), Id3Builder.pngBytes);
+      },
+    );
+
+    test(
+      'pictures that were cleaned up are read again, chapters stay',
+      () async {
+        final id = await episodeWithPictures();
+        final s = service();
+        await s.ensureLoaded(id);
+        await store.deleteEpisode(id);
+        expect(await store.file('chapter:$id/0.jpg'), isNull);
+
+        // A new session: the lookup runs again and brings the files back.
+        final again = service();
+        await again.ensureLoaded(id);
+        expect(await store.file('chapter:$id/0.jpg'), isNotNull);
+        expect(await again.watch(id).first, hasLength(3));
+      },
+    );
+
+    test('offline: chapters stay although their pictures are gone', () async {
+      final id = await episodeWithPictures();
+      await service().ensureLoaded(id);
+      await store.deleteEpisode(id);
+      server.clear(); // nothing answers any more
+      final again = service();
+      await again.ensureLoaded(id);
+      expect(await again.watch(id).first, hasLength(3));
+    });
+
+    test('clean-up: pictures of gone episodes and above the limit', () async {
+      final id = await episodeWithPictures();
+      await service().ensureLoaded(id);
+      // A folder of an episode that no longer exists.
+      await store.save(
+        9999,
+        0,
+        Uint8List.fromList(Id3Builder.jpegBytes),
+        'jpg',
+      );
+      expect(imagesDir.listSync(), hasLength(2));
+
+      await service().cleanUpImages();
+      expect(
+        imagesDir.listSync().map(
+          (e) => e.uri.pathSegments[e.uri.pathSegments.length - 2],
+        ),
+        ['$id'],
+      );
+
+      // Over the limit: the oldest whole episode goes.
+      expect(await store.cleanUp({id}, limit: 1), 1);
+      expect(imagesDir.listSync(), isEmpty);
+    });
+
+    test('references from a JSON file stay web addresses', () async {
+      final id = await addEpisode(chaptersUrl: 'https://example.com/c.json');
+      server['https://example.com/c.json'] = (_) => http.Response(
+        '{"chapters":[{"startTime":0,"title":"A","img":"https://example.com/a.jpg"}]}',
+        200,
+      );
+      final s = service();
+      await s.ensureLoaded(id);
+      expect(
+        (await s.watch(id).first).single.imageUrl,
+        'https://example.com/a.jpg',
+      );
+      expect(ChapterImageStore.isLocal('https://example.com/a.jpg'), isFalse);
+    });
   });
 }

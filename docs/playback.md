@@ -208,10 +208,27 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
    Kapitel hat, damit Refreshes nichts umschreiben). Zeitformat `HH:MM:SS.mmm`, `MM:SS` oder Sekunden.
 2. **Podcasting 2.0 JSON** (`<podcast:chapters url=…>`; Podigee schreibt `href=…`, beides wird gelesen).
    `"toc": false`-Einträge werden übersprungen. Bei WRINT liefern diese Links **404** (HTML-Seite) → nächste Quelle.
-3. **ID3-CHAP im MP3** (v2.3/v2.4, Titel aus `TIT2`, Link aus `WXXX`): heruntergeladene Datei lokal lesen, sonst per
+3. **ID3-CHAP im MP3** (v2.3/v2.4, Titel aus `TIT2`, Link aus `WXXX`, **Bild aus `APIC`**): heruntergeladene Datei lokal lesen, sonst per
    HTTP-Range nur den Tag holen (erst 10 Byte Header, dann genau die Tag-Länge, max. 4 MB) – nie die Audiodaten.
    Ignoriert der Server die Range, wird nach der Tag-Länge abgebrochen. Kaputte Tags → keine Kapitel, nie ein Fehler.
    (M4A/AAC-Kapitel werden nicht gelesen.)
+- **Kapitelbilder** (Benutzerwunsch 2026-10-11, Beispiel WRINT „Brügge sehen und Toby": CHAP-Frames mit eingebettetem
+  JPEG, bis knapp 1 MB je Bild, Tag insgesamt ~1,2 MB): Bild aus dem `APIC`-Frame des Kapitels (Dateityp wird an den
+  Bytes erkannt, nicht am MIME-Typ; MIME `-->` = Link). JSON-Kapitel liefern `img` als Web-Adresse.
+  - Eingebettete Bilder liegen als **Dateien** in `<AppSupport>/chapter_images/<Folge>/<startMs>.<ext>`
+    (`ChapterImageStore`), **nicht** in der DB; `chapters.imageUrl` hält `chapter:<Folge>/<startMs>.<ext>`
+    (Web-Adressen bleiben Web-Adressen). Fehlt eine Datei (aufgeräumt), liest `ensureLoaded` die Kapitel erneut und
+    stellt sie wieder her; offline bleiben die Kapitel stehen.
+  - **Anzeige im Vollbild-Player** (`PlayerCover`, `chapter_cover.dart`): Anstelle des Folgen-Covers, **sobald
+    Play gedrückt wurde** und die Position in einem Kapitel **mit Bild** liegt (letztes begonnenes Kapitel;
+    ohne Bild → Folgen-Cover). Pause: das Bild bleibt **2 Minuten**, dann kommt das Folgen-Cover zurück
+    (`chapterPicturePauseDelay`); Play schaltet die Kapitelbilder wieder ein. Ganzes Bild (`BoxFit.contain` im
+    quadratischen Rahmen), weicher Wechsel (250 ms). Auch in der Kapitel-Liste als Vorschau (40 px).
+    Mini-Player und Benachrichtigung zeigen weiter das Folgen-Cover.
+  - Speicher: dekodiert nur in Anzeigegröße; Dateien insgesamt max. **60 MB** (älteste Folge zuerst), Bilder
+    verschwundener Folgen werden beim App-Start gelöscht (`ChapterService.cleanUpImages`).
+  - Schema **v28** (nur Daten): `DELETE FROM chapters` – bis dahin gespeicherte Kapitel hatten keine Bilder; sie werden
+    neu gelesen (Feed beim nächsten Refresh, JSON/ID3 beim Öffnen).
 - Geladen wird erst, wenn der Vollbild-Player die Folge zeigt (`chaptersProvider` → `ensureLoaded`), pro App-Sitzung
   höchstens ein Versuch pro Folge (auch ohne Ergebnis).
 - Anzeige: unter dem Slider „Kapitel 3/7: Titel" (einziger Zugang, tippen → Liste mit Startzeit,

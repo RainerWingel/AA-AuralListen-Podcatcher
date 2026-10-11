@@ -163,6 +163,37 @@ void main() {
   });
 
   test(
+    'upgrade to v28: stored chapters are read again with pictures',
+    () async {
+      final schema = await verifier.schemaAt(27);
+      schema.rawDatabase
+        ..execute(
+          'INSERT INTO podcasts (feed_url, title, subscribed_at) '
+          "VALUES ('https://example.com/feed', 'P', 1767225600)",
+        )
+        ..execute(
+          'INSERT INTO episodes (podcast_id, guid, title, audio_url, added_at) '
+          "VALUES (1, 'a', 'A', 'https://e.com/a.mp3', 1767225600)",
+        )
+        ..execute(
+          'INSERT INTO chapters (episode_id, start_ms, title) '
+          "VALUES (1, 0, 'Eins'), (1, 60000, 'Zwei')",
+        );
+      final db = AppDatabase.forTesting(schema.newConnection());
+      expect(await db.select(db.chapters).get(), isEmpty);
+      expect(await db.select(db.episodes).get(), hasLength(1)); // untouched
+      await db.close();
+    },
+  );
+
+  test('upgrade v27 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(27);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test(
     'a database older than 1.3.1 starts empty instead of crashing',
     () async {
       expect(AppDatabase.oldestMigratedSchema, 20);

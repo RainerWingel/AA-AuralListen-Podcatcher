@@ -86,6 +86,8 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
   `mediaItem.extras['pubDateMs']` (Benutzerwunsch 2026-10-04); der Bereich erscheint auch ohne Shownotes, wenn es
   Nummer oder Datum gibt.
   Kapitel-Liste: Titel, darunter Startzeit, rechts Chip „Skip" (übersprungen = durchgestrichen) → `playback.md`.
+  **Kapitelbilder:** Das große Cover wird beim Abspielen durch das Bild des laufenden Kapitels ersetzt, 2 Minuten nach
+  Pause kommt das Folgen-Cover zurück (`playback.md`).
 - **Boost-Auswahl** (Bottom-Sheet): Aus / +3 / +6 / +9 / +12 dB, Schalter „Nur für diesen Podcast".
 
 ## Folgen-Elemente

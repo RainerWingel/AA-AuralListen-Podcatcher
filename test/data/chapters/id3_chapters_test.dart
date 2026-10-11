@@ -57,4 +57,50 @@ void main() {
     final v22 = Uint8List.fromList(tag)..[3] = 2;
     expect(parseId3Chapters(v22), isEmpty);
   });
+
+  group('chapter pictures (APIC)', () {
+    test('embedded JPEG and PNG, also with a UTF-16 description', () {
+      final b = Id3Builder(3);
+      final tag = b.tag([
+        b.chap('a', 0, [
+          b.tit2('Eruption'),
+          b.apic(Id3Builder.jpegBytes, description: 'Sonne'),
+        ]),
+        b.chap('b', 5000, [
+          b.tit2('SoFi'),
+          // The MIME type in the tag may be wrong: the bytes decide.
+          b.apic(
+            Id3Builder.pngBytes,
+            mime: 'image/jpeg',
+            encoding: 1,
+            description: 'Über',
+          ),
+        ]),
+        b.chap('c', 9000, [b.tit2('Ohne Bild')]),
+      ]);
+      final chapters = parseId3Chapters(tag);
+      expect(chapters[0].imageBytes, Id3Builder.jpegBytes);
+      expect(chapters[0].imageExtension, 'jpg');
+      expect(chapters[1].imageBytes, Id3Builder.pngBytes);
+      expect(chapters[1].imageExtension, 'png');
+      expect(chapters[2].imageBytes, isNull);
+      expect(chapters[2].imageUrl, isNull);
+    });
+
+    test('MIME "-->" links to the picture; junk is ignored', () {
+      final b = Id3Builder(4);
+      final tag = b.tag([
+        b.chap('a', 0, [
+          b.tit2('Link'),
+          b.apic(latin1.encode('https://example.com/a.jpg'), mime: '-->'),
+        ]),
+        b.chap('b', 5000, [b.tit2('Müll'), b.apic(List.filled(30, 7))]),
+      ]);
+      final chapters = parseId3Chapters(tag);
+      expect(chapters[0].imageUrl, 'https://example.com/a.jpg');
+      expect(chapters[0].imageBytes, isNull);
+      expect(chapters[1].imageBytes, isNull);
+      expect(chapters[1].imageUrl, isNull);
+    });
+  });
 }

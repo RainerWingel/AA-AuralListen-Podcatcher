@@ -15,7 +15,8 @@ Optionen → Sicherung → „Backup erstellen" → Speichern-Dialog (`AA-AuralL
 - Die Datenbank wird mit `VACUUM INTO` als konsistenter, kompakter Schnappschuss kopiert (temporäre Datei im
   App-Cache, wird sofort gelöscht).
 - Enthalten: Abos inkl. Einstellungen, Folgen mit Hörstand, Shownotes (`episode_notes`), Kapitel, Lesezeichen, Playlists, Abspielverlauf (`play_history`), App-Einstellungen.
-- **Nicht** enthalten: Audiodateien (Downloads).
+- **Nicht** enthalten: Audiodateien (Downloads) und die Kapitelbilder aus MP3-Tags (`chapter_images/`) – sie werden beim
+  Öffnen der Kapitel automatisch neu gelesen (`playback.md`).
 - Sprache: Enthält das Backup `ui.language`, wird sie übernommen; ältere Backups ohne Sprache behalten die aktuelle
   (sonst käme die Sprachabfrage des ersten Starts zurück).
 

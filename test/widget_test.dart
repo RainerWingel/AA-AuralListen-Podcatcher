@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:aapodcastguru/app/app.dart';
 import 'package:aapodcastguru/app/router.dart';
@@ -20,6 +21,7 @@ import 'package:aapodcastguru/data/providers.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
 import 'package:aapodcastguru/features/episodes/episode_description.dart';
+import 'package:aapodcastguru/features/player/chapter_cover.dart';
 import 'package:aapodcastguru/features/player/chapters_and_bookmarks.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
 import 'package:aapodcastguru/features/player/player_controls.dart';
@@ -42,6 +44,7 @@ import 'support/fake_app_platform.dart';
 import 'support/fake_battery_optimization.dart';
 import 'support/fake_download_engine.dart';
 import 'support/fake_player_engine.dart';
+import 'support/id3_builder.dart';
 
 // Feed without images, so no network image loading happens in widget tests.
 const _feed = '''
@@ -1595,6 +1598,81 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets(
+    'the player shows the chapter picture while playing, the cover after '
+    '2 minutes of pause',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final pictures = Directory.systemTemp.createTempSync('chapter_pics_');
+      addTearDown(() => pictures.deleteSync(recursive: true));
+      await pumpApp(
+        tester,
+        overrides: [
+          chapterImagesDirectoryProvider.overrideWithValue(
+            () async => pictures,
+          ),
+        ],
+      );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      // Chapter 1 (from 0:00) has a picture, chapter 2 (10:00) has none.
+      final episode = await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      );
+      await tester.runAsync(() async {
+        final store = container.read(chapterImageStoreProvider);
+        final reference = await store.save(
+          episode!.id,
+          0,
+          Uint8List.fromList(Id3Builder.pngBytes),
+          'png',
+        );
+        await (db.update(db.chapters)..where((c) => c.startMs.equals(0))).write(
+          ChaptersCompanion(imageUrl: Value(reference)),
+        );
+      });
+      await settle(tester);
+
+      // Not played yet (opened from the list: it plays at once).
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      expect(find.byType(ChapterPicture), findsOneWidget);
+
+      // Pause: the picture stays for 2 minutes, then the cover returns.
+      await tester.runAsync(handler.pause);
+      await tester.pump(const Duration(minutes: 1, seconds: 59));
+      expect(find.byType(ChapterPicture), findsOneWidget);
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byType(ChapterPicture), findsNothing);
+
+      // Play again: the picture is back.
+      await tester.runAsync(handler.play);
+      await settle(tester);
+      expect(find.byType(ChapterPicture), findsOneWidget);
+
+      // A chapter without picture: the cover.
+      await handlerSeek(tester, handler, const Duration(minutes: 11));
+      await settle(tester);
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byType(ChapterPicture), findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
 
   testWidgets('a status line shows which podcast is being refreshed', (
     tester,

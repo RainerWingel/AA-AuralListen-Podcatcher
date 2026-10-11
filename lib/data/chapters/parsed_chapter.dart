@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 /// A chapter as read from a feed, a JSON file or an MP3 – before storing.
 class ParsedChapter {
   const ParsedChapter({
@@ -5,12 +7,22 @@ class ParsedChapter {
     required this.title,
     this.url,
     this.imageUrl,
+    this.imageBytes,
+    this.imageExtension,
   });
 
   final Duration start;
   final String title;
   final String? url;
+
+  /// Web address of the chapter picture (JSON `img`, or an ID3 picture frame
+  /// that only links to it).
   final String? imageUrl;
+
+  /// Picture embedded in the MP3 (ID3 APIC frame of the chapter), with its
+  /// file extension (`jpg`, `png` …). Stored as a file, not in the database.
+  final Uint8List? imageBytes;
+  final String? imageExtension;
 
   @override
   String toString() => 'ParsedChapter($start, $title)';

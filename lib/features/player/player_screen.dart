@@ -8,7 +8,6 @@ import '../../app/routes.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
 import '../../core/perceived_brightness.dart';
-import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart' show DownloadState, EpisodeStatus;
 import '../../data/playlist_repository.dart' show PlaylistEntry;
@@ -17,6 +16,7 @@ import '../../data/settings_keys.dart';
 import '../../l10n/app_localizations.dart';
 import '../episodes/episode_description.dart';
 import 'boost_sheet.dart';
+import 'chapter_cover.dart';
 import 'chapters_and_bookmarks.dart';
 import 'player_controls.dart';
 import 'speed_sheet.dart';
@@ -99,8 +99,9 @@ class PlayerScreen extends ConsumerWidget {
                       child: Column(
                         children: [
                           const SizedBox(height: 16),
-                          CoverImage(
-                            url: item.artUri?.toString(),
+                          PlayerCover(
+                            episodeId: item.extras?['episodeId'] as int?,
+                            coverUrl: item.artUri?.toString(),
                             size: coverSize,
                           ),
                           const SizedBox(height: 24),

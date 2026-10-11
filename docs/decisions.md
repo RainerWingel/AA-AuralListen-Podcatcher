@@ -143,3 +143,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-10 · **„Fertige Folgen entfernen": Standard „Nach 5 Minuten" statt 10; auch „Alle"/„bis …" folgen der
   Einstellung** (Benutzer) · Enum-Wert `after10Minutes` → `after5Minutes`; ein gespeicherter alter Wert fällt auf den
   Standard zurück (kein Migrationsschritt nötig).
+- 2026-10-11 · **Kapitelbilder im Vollbild-Player** (Benutzer, Vorbild Konkurrenz-App) · Bilder aus ID3-`APIC` (eingebettet)
+  und JSON-`img`; eingebettete als Dateien in `chapter_images/` statt in der DB (bis ~1 MB je Bild), max. 60 MB, kein
+  neues Paket. Anzeige nur nach Play und im Kapitel mit Bild, 2 Minuten nach Pause wieder das Folgen-Cover.
+  Schema v28 (nur Daten: Kapitel einmal neu lesen). Nicht im Mini-Player/Benachrichtigung (Entscheidung offen).

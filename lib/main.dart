@@ -101,6 +101,8 @@ Future<void> main() async {
 Future<void> _startup(ProviderContainer container) async {
   final downloads = container.read(downloadServiceProvider);
   await downloads.start();
+  // Chapter pictures of gone episodes / above the size limit.
+  await container.read(chapterServiceProvider).cleanUpImages();
   await container.read(podcastRepositoryProvider).refreshAll();
   await downloads.runMaintenance();
 }

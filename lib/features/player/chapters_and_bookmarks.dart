@@ -16,6 +16,7 @@ import '../../data/chapters/chapter_service.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import 'chapter_cover.dart';
 
 /// Current chapter under the seek bar; tap opens the chapter list.
 class CurrentChapterLine extends ConsumerWidget {
@@ -432,9 +433,14 @@ class _ChaptersSheetState extends ConsumerState<_ChaptersSheet> {
                           key: c == current ? _currentKey : null,
                           selected: c == current,
                           selectedTileColor: colors.secondaryContainer,
-                          leading: c.imageUrl == null
-                              ? null
-                              : CoverImage(url: c.imageUrl, size: 40),
+                          leading: switch (c.imageUrl) {
+                            final picture? => ChapterPicture(
+                              reference: picture,
+                              size: 40,
+                              fallback: const CoverImage(url: null, size: 40),
+                            ),
+                            null => null,
+                          },
                           title: Text(
                             c.title,
                             style: isSkipped
