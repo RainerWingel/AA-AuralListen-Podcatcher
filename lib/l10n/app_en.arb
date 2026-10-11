@@ -218,6 +218,7 @@
   "selectAll": "All",
   "selectNone": "None",
   "chapters": "Chapters",
+  "chaptersCount": "Chapters ({count})",
   "chapterCurrent": "Chapter {index}/{count}: {title}",
   "bookmarkAdd": "Add bookmark",
   "bookmarkNote": "Note (optional)",

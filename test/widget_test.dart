@@ -1674,6 +1674,42 @@ void main() {
     },
   );
 
+  testWidgets(
+    'the chapter list is reachable before the first chapter starts',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      // The first chapter starts at 5:00 (like WRINT at 18:00).
+      await tester.runAsync(
+        () => (db.update(db.chapters)..where((c) => c.startMs.equals(0))).write(
+          const ChaptersCompanion(startMs: Value(300000)),
+        ),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+
+      expect(find.text('Kapitel (2)'), findsOneWidget);
+      await tester.tap(find.text('Kapitel (2)'));
+      await settle(tester);
+      expect(find.text('Begrüßung'), findsOneWidget);
+      expect(find.text('Hauptteil'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('a status line shows which podcast is being refreshed', (
     tester,
   ) async {

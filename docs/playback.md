@@ -229,6 +229,9 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
     verschwundener Folgen werden beim App-Start gelöscht (`ChapterService.cleanUpImages`).
   - Schema **v28** (nur Daten): `DELETE FROM chapters` – bis dahin gespeicherte Kapitel hatten keine Bilder; sie werden
     neu gelesen (Feed beim nächsten Refresh, JSON/ID3 beim Öffnen).
+- **Vor dem ersten Kapitel** (z. B. WRINT „Brügge sehen und Toby": erstes Kapitel bei 18:00) zeigt der Knopf unter dem
+  Schieber „Kapitel (n)" und öffnet die Liste trotzdem (Benutzerhinweis 2026-10-11); ab dem ersten Kapitel wie gewohnt
+  „Kapitel x/n: Titel".
 - Geladen wird erst, wenn der Vollbild-Player die Folge zeigt (`chaptersProvider` → `ensureLoaded`), pro App-Sitzung
   höchstens ein Versuch pro Folge (auch ohne Ergebnis).
 - Anzeige: unter dem Slider „Kapitel 3/7: Titel" (einziger Zugang, tippen → Liste mit Startzeit,

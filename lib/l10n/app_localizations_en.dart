@@ -798,6 +798,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chapters => 'Chapters';
 
   @override
+  String chaptersCount(int count) {
+    return 'Chapters ($count)';
+  }
+
+  @override
   String chapterCurrent(int index, int count, String title) {
     return 'Chapter $index/$count: $title';
   }

@@ -1406,6 +1406,12 @@ abstract class AppLocalizations {
   /// **'Kapitel'**
   String get chapters;
 
+  /// No description provided for @chaptersCount.
+  ///
+  /// In de, this message translates to:
+  /// **'Kapitel ({count})'**
+  String chaptersCount(int count);
+
   /// No description provided for @chapterCurrent.
   ///
   /// In de, this message translates to:

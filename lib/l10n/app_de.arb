@@ -472,6 +472,8 @@
   "selectAll": "Alle",
   "selectNone": "Keine",
   "chapters": "Kapitel",
+  "chaptersCount": "Kapitel ({count})",
+  "@chaptersCount": {"placeholders": {"count": {"type": "int"}}},
   "chapterCurrent": "Kapitel {index}/{count}: {title}",
   "@chapterCurrent": {
     "placeholders": {

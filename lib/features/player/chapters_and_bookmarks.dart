@@ -32,14 +32,20 @@ class CurrentChapterLine extends ConsumerWidget {
         ref.watch(positionProvider).value ??
         ref.read(audioHandlerProvider).position;
     final current = currentChapter(chapters, position);
-    if (current == null) return const SizedBox(height: 8);
-    final index = chapters.indexOf(current) + 1;
+    final l10n = AppLocalizations.of(context);
     return TextButton.icon(
       onPressed: () => showChaptersSheet(context, episodeId),
       icon: const Icon(Icons.format_list_numbered, size: 18),
       label: Text(
-        AppLocalizations.of(context)
-            .chapterCurrent(index, chapters.length, current.title),
+        // Before the first chapter starts (e.g. WRINT: 18:00) the list is
+        // there all the same (user remark 2026-10-11).
+        current == null
+            ? l10n.chaptersCount(chapters.length)
+            : l10n.chapterCurrent(
+                chapters.indexOf(current) + 1,
+                chapters.length,
+                current.title,
+              ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
