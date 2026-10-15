@@ -1,0 +1,8 @@
+• Player: Bedienelemente fest unten, geblurrtes Bild als Hintergrund, eigene Ansicht im Querformat
+• Kapitelbilder aus MP3 und Feed, Kapitelliste scrollt mit
+• Neue Folgen ohne Download in die Playlist (gestreamt)
+• „Als gespielt“ folgt der Playlist-Einstellung (Standard: 5 Min.)
+• Start: 🔥 für selten übersprungene Podcasts
+• Aktualisieren zeigt je Podcast eine Statuszeile
+• Podcast-Beschreibung aufklappbar, Lesezeichen mit Rückfrage
+• Viele Korrekturen

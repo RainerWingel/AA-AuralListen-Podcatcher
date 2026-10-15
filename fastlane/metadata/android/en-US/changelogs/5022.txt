@@ -1,0 +1,8 @@
+• Player: controls pinned at the bottom, blurred picture as background, own landscape layout
+• Chapter pictures from MP3s and feeds, chapter list follows playback
+• New episodes go into a playlist without downloading (streamed)
+• "Mark as played" follows the playlist setting (default: 5 min)
+• Home: 🔥 for podcasts you rarely skip
+• Refreshing shows a status line per podcast
+• Podcast description unfolds, bookmark deletion asks first
+• Many fixes
