@@ -98,7 +98,8 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
     (Tooltip nennt die Anzahl). Boost/Tempo öffnen je eine Auswahl (`playback.md`). Pfeil nach unten schließt.
   - **Geblurrter Hintergrund** (Benutzerwunsch 2026-10-17, `player_backdrop.dart`): Hinter dem scrollbaren Bereich liegt das
     gerade gezeigte Bild (Kapitelbild oder Folgen-Cover) stark geblurrt (kleine Dekodierung, hochskaliert, Blur σ 24,
-    eigene Repaint-Boundary, 0,4 s Überblendung beim Bildwechsel) mit leichtem Schleier. Die **Vordergrundfarben dieses
+    eigene Repaint-Boundary, 0,4 s Überblendung beim Bildwechsel) mit Schleier (dunkles Bild 50 % schwarz darüber, helles 46 % weiß – Benutzerwunsch 2026-10-18: mittlere Farben
+    sollen nicht dazwischenfunken). Die **Vordergrundfarben dieses
     Bereichs passen sich der Bildhelligkeit an** (mittlere Leuchtdichte eines 16-px-Abbilds, `averageLuminance`): über
     0,2 dunkle Schrift (#14141A), sonst helle (#F5F5F7) – Texte, Symbole, Textknöpfe (Kapitel-Knopf mit
     durchscheinender Fläche), Beschreibung als durchscheinende Platte mit Haarlinie (ersetzt die Dunkel-Modus-Fläche

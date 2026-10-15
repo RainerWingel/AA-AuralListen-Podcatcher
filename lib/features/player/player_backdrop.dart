@@ -14,6 +14,12 @@ import 'chapter_cover.dart';
 /// (black text and white text have the same contrast at about 0.18).
 const backdropLightThreshold = 0.2;
 
+/// How strongly the blurred picture is pushed toward the text's opposite
+/// (user wish 2026-10-18): a dark picture gets darker, a light one lighter,
+/// so medium colors do not interfere with the text.
+const backdropDarkVeil = 0.5;
+const backdropLightVeil = 0.46;
+
 /// The foreground color for a backdrop of the given average [luminance]:
 /// dark on a light picture, light on a dark one.
 Color backdropForeground(double luminance) => luminance > backdropLightThreshold
@@ -148,12 +154,13 @@ class _PlayerBackdropState extends ConsumerState<PlayerBackdrop> {
                             const SizedBox.shrink(),
                       ),
                     ),
-                    // A veil toward the text color's opposite, so even a
-                    // medium picture keeps the text readable.
+                    // A veil toward the text color's opposite (see the
+                    // constants above), so even a medium picture keeps the
+                    // text readable.
                     ColoredBox(
-                      color: (light ? Colors.white : Colors.black).withValues(
-                        alpha: 0.32,
-                      ),
+                      color: light
+                          ? Colors.white.withValues(alpha: backdropLightVeil)
+                          : Colors.black.withValues(alpha: backdropDarkVeil),
                     ),
                   ],
                 ),
