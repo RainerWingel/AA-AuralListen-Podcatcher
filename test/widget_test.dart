@@ -1800,6 +1800,19 @@ void main() {
       await settle(tester);
 
       expect(find.byType(ImageFiltered), findsWidgets);
+      // The panel keeps its own text color: plain Text there (the time
+      // marks) must not take the picture's color (white on white).
+      final timeMark = find.descendant(
+        of: find.byType(PlayerScreen),
+        matching: find.text('0:00'),
+      );
+      expect(timeMark, findsWidgets);
+      final element = tester.element(timeMark.first);
+      expect(
+        DefaultTextStyle.of(element).style.color,
+        Theme.of(element).textTheme.bodyMedium?.color,
+      );
+      expect(DefaultTextStyle.of(element).style.color, isNot(Color(expected)));
       final title = tester.widget<Text>(
         find.descendant(
           of: find.byType(PlayerScreen),

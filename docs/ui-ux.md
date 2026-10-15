@@ -104,7 +104,8 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
     durchscheinender Fläche), Beschreibung als durchscheinende Platte mit Haarlinie (ersetzt die Dunkel-Modus-Fläche
     des 2026-10-09 an dieser Stelle). Ohne Bild bleibt das normale Theme. Das **Bedienfeld** (Slider, Play-Reihe, vier
     Knöpfe) hat die Flächenfarbe des Themes und wirft einen **Schatten** auf den Bildbereich (nach oben bzw. im
-    Querformat nach links), wirkt also darüber liegend. **Ab 2026-10-17 reicht das Bild auch hinter die Titelleiste**
+    Querformat nach links), wirkt also darüber liegend (eigenes `Material`, damit schlichter `Text` wie die Zeitmarken die
+    Themefarbe behält und nicht die Bildfarbe – Fehler 2026-10-17: weiß auf weiß im hellen Design bei dunklem Bild). **Ab 2026-10-17 reicht das Bild auch hinter die Titelleiste**
     (transparente AppBar, `extendBodyBehindAppBar`; Titel, Pfeil und Statusleisten-Symbole folgen der Bildhelligkeit).
     **Hochformat:** Das Bedienfeld ist eine **Karte**, rundherum 12 dp nach innen eingerückt (Ecken 24), mit **Schatten
     an allen vier Kanten** (kräftiger: 50 %/35 % schwarz); Querformat: Fläche rechts mit Schatten nach links (55 %).

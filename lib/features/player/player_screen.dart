@@ -129,23 +129,25 @@ class PlayerScreen extends ConsumerWidget {
                         child: Theme(
                           data: theme,
                           child: Builder(
-                            builder: (context) => DecoratedBox(
-                              decoration: _panelDecoration(
-                                context,
-                                const Offset(-6, 0),
-                              ),
-                              child: Center(
-                                child: SingleChildScrollView(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    8,
-                                    8,
-                                    24,
-                                    8,
-                                  ),
-                                  child: _PlayerControls(
-                                    item: item,
-                                    podcastId: podcastId,
-                                    provisional: provisional,
+                            builder: (context) => _PanelMaterial(
+                              child: DecoratedBox(
+                                decoration: _panelDecoration(
+                                  context,
+                                  const Offset(-6, 0),
+                                ),
+                                child: Center(
+                                  child: SingleChildScrollView(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      8,
+                                      8,
+                                      24,
+                                      8,
+                                    ),
+                                    child: _PlayerControls(
+                                      item: item,
+                                      podcastId: podcastId,
+                                      provisional: provisional,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -179,14 +181,16 @@ class PlayerScreen extends ConsumerWidget {
                       top: false,
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                        child: DecoratedBox(
-                          decoration: _cardDecoration(context),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                            child: _PlayerControls(
-                              item: item,
-                              podcastId: podcastId,
-                              provisional: provisional,
+                        child: _PanelMaterial(
+                          child: DecoratedBox(
+                            decoration: _cardDecoration(context),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                              child: _PlayerControls(
+                                item: item,
+                                podcastId: podcastId,
+                                provisional: provisional,
+                              ),
                             ),
                           ),
                         ),
@@ -239,6 +243,20 @@ class PlayerScreen extends ConsumerWidget {
     final size = MediaQuery.sizeOf(context);
     return size.width > size.height && size.height < 500;
   }
+}
+
+/// Resets the default text style for the control panel: the Scaffold's
+/// Material sits inside the picture-adapted theme, so plain `Text` (the time
+/// marks) would otherwise take the picture's text color – white on the
+/// panel's light surface in light mode.
+class _PanelMaterial extends StatelessWidget {
+  const _PanelMaterial({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      Material(type: MaterialType.transparency, child: child);
 }
 
 /// The scrolling info part: cover (never taller than the visible area), title,
