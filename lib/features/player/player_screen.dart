@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:audio_service/audio_service.dart' show MediaItem;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -75,48 +76,113 @@ class PlayerScreen extends ConsumerWidget {
       null => false,
     };
 
+    // The blurred picture lies behind everything, also behind the app bar;
+    // the Scaffold on top is transparent, its colors follow the picture
+    // (user wishes 2026-10-17). The control panel keeps the normal theme.
     return Theme(
       data: theme,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            tooltip: l10n.playerClose,
-            icon: const Icon(Icons.keyboard_arrow_down),
-            onPressed: () => Navigator.of(context).maybePop(),
+      child: PlayerBackdrop(
+        episodeId: episodeId,
+        coverUrl: item?.artUri?.toString(),
+        builder: (context, adapted) => Scaffold(
+          backgroundColor: Colors.transparent,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            // Status bar icons dark on a light picture, light on a dark one.
+            systemOverlayStyle:
+                adapted.colorScheme.onSurface.computeLuminance() > 0.5
+                ? SystemUiOverlayStyle.light.copyWith(
+                    statusBarColor: Colors.transparent,
+                  )
+                : SystemUiOverlayStyle.dark.copyWith(
+                    statusBarColor: Colors.transparent,
+                  ),
+            leading: IconButton(
+              tooltip: l10n.playerClose,
+              icon: const Icon(Icons.keyboard_arrow_down),
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+            title: Text(l10n.nowPlaying),
           ),
-          title: Text(l10n.nowPlaying),
-        ),
-        body: item == null
-            ? const SizedBox.shrink()
-            : _isLandscape(context)
-            // Landscape phone: info on the left, controls on the right – the
-            // height is too short for pinned controls below (user wish
-            // 2026-10-16).
-            ? SafeArea(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: PlayerBackdrop(
-                        episodeId: episodeId,
-                        coverUrl: item.artUri?.toString(),
-                        builder: (context, adapted) => _InfoArea(
+          body: item == null
+              ? const SizedBox.shrink()
+              : _isLandscape(context)
+              // Landscape phone: info on the left, controls on the right –
+              // the height is too short for pinned controls below (user wish
+              // 2026-10-16).
+              ? SafeArea(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _InfoArea(
                           item: item,
                           theme: adapted,
                           provisional: provisional,
                         ),
                       ),
-                    ),
-                    // The control panel lies above the picture and casts a
-                    // shadow onto it (user wish 2026-10-17).
-                    Expanded(
-                      child: DecoratedBox(
-                        decoration: _panelDecoration(
-                          context,
-                          const Offset(-6, 0),
+                      // The control panel lies above the picture and casts a
+                      // shadow onto it (user wish 2026-10-17).
+                      Expanded(
+                        child: Theme(
+                          data: theme,
+                          child: Builder(
+                            builder: (context) => DecoratedBox(
+                              decoration: _panelDecoration(
+                                context,
+                                const Offset(-6, 0),
+                              ),
+                              child: Center(
+                                child: SingleChildScrollView(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    8,
+                                    8,
+                                    24,
+                                    8,
+                                  ),
+                                  child: _PlayerControls(
+                                    item: item,
+                                    podcastId: podcastId,
+                                    provisional: provisional,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        child: Center(
-                          child: SingleChildScrollView(
-                            padding: const EdgeInsets.fromLTRB(8, 8, 24, 8),
+                      ),
+                    ],
+                  ),
+                )
+              // Portrait: the info scrolls, the controls stay pinned below
+              // (user wish 2026-10-16).
+              : SafeArea(
+                  bottom: false,
+                  child: _InfoArea(
+                    item: item,
+                    theme: adapted,
+                    provisional: provisional,
+                  ),
+                ),
+          // As the bottom bar of the scaffold, so info boxes float above the
+          // pinned buttons instead of covering them.
+          bottomNavigationBar: item == null || _isLandscape(context)
+              ? null
+              // A card inset from all edges, lying above the picture with a
+              // shadow on all four sides (user wish 2026-10-17).
+              : Theme(
+                  data: theme,
+                  child: Builder(
+                    builder: (context) => SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                        child: DecoratedBox(
+                          decoration: _cardDecoration(context),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                             child: _PlayerControls(
                               item: item,
                               podcastId: podcastId,
@@ -126,57 +192,43 @@ class PlayerScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  ],
-                ),
-              )
-            // Portrait: the info scrolls, the controls stay pinned below
-            // (user wish 2026-10-16).
-            : PlayerBackdrop(
-                episodeId: episodeId,
-                coverUrl: item.artUri?.toString(),
-                builder: (context, adapted) => SafeArea(
-                  bottom: false,
-                  child: _InfoArea(
-                    item: item,
-                    theme: adapted,
-                    provisional: provisional,
                   ),
                 ),
-              ),
-        // As the bottom bar of the scaffold, so info boxes float above the
-        // pinned buttons instead of covering them.
-        bottomNavigationBar: item == null || _isLandscape(context)
-            ? null
-            // The panel lies above the picture and casts a shadow onto it
-            // (user wish 2026-10-17).
-            : DecoratedBox(
-                decoration: _panelDecoration(context, const Offset(0, -6)),
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-                    child: _PlayerControls(
-                      item: item,
-                      podcastId: podcastId,
-                      provisional: provisional,
-                    ),
-                  ),
-                ),
-              ),
+        ),
       ),
     );
   }
 
-  /// The control panel: its own surface color and a shadow toward the
-  /// picture, so it looks like lying above it.
+  /// The portrait control card: rounded, its own surface color and a shadow
+  /// on every side.
+  static BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
+    color: Theme.of(context).colorScheme.surface,
+    borderRadius: BorderRadius.circular(24),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.5),
+        blurRadius: 24,
+        spreadRadius: 2,
+      ),
+      // More weight toward the picture above.
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.35),
+        blurRadius: 16,
+        offset: const Offset(0, -6),
+      ),
+    ],
+  );
+
+  /// The landscape control panel: its own surface color and a shadow toward
+  /// the picture, so it looks like lying above it.
   static BoxDecoration _panelDecoration(BuildContext context, Offset toward) =>
       BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 20,
-            spreadRadius: 2,
+            color: Colors.black.withValues(alpha: 0.55),
+            blurRadius: 24,
+            spreadRadius: 3,
             offset: toward,
           ),
         ],

@@ -160,3 +160,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   aktuelles Bild (Kapitelbild/Cover), Schrift hell/dunkel nach gemessener Bildhelligkeit (Schwelle 0,2 =
   gleicher Kontrast für Schwarz und Weiß), kein neues Paket (eigene 16-px-Messung). Kosten: ein kleines
   Bild wird zusätzlich dekodiert und einmal geblurrt (Repaint-Boundary); AppBar bleibt außerhalb.
+- 2026-10-17 · **Player: Bild auch hinter der Titelleiste, Bedienfeld als eingerückte Karte mit Rundum-Schatten** (Benutzer) ·
+  Scaffold transparent über dem Hintergrund; das Bedienfeld behält das normale Theme.

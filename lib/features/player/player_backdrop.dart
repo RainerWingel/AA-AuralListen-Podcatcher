@@ -37,6 +37,12 @@ ThemeData backdropTheme(ThemeData theme, Color foreground) {
       displayColor: foreground,
     ),
     iconTheme: theme.iconTheme.copyWith(color: foreground),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(
+        foregroundColor: foreground,
+        backgroundColor: foreground.withValues(alpha: 0.12),
+      ),
+    ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: foreground,
@@ -115,6 +121,8 @@ class _PlayerBackdropState extends ConsumerState<PlayerBackdrop> {
     return Stack(
       fit: StackFit.expand,
       children: [
+        // Plain surface under everything (no picture, or while it loads).
+        ColoredBox(color: base.colorScheme.surface),
         if (provider != null)
           // Painted once (repaint boundary), a small decode scaled up and
           // blurred: cheap on weak phones, nothing to do while scrolling.

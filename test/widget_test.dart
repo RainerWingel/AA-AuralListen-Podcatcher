@@ -2752,6 +2752,7 @@ void main() {
 
       // Active: the playlist symbol closes the player and shows the
       // playlist, scrolled to this episode (user wish 2026-10-06).
+      await tester.ensureVisible(find.byTooltip('Playlist öffnen'));
       await tester.tap(find.byTooltip('Playlist öffnen'));
       await settle(tester);
       expect(find.byType(PlayerScreen), findsNothing);
@@ -2964,27 +2965,33 @@ void main() {
   );
 
   testWidgets(
-    'player: the control panel lies above the picture and casts a shadow',
+    'player: the control panel is a card inset from the edges, with a '
+    'shadow on all sides',
     timeout: timeout,
     (tester) async {
       await openPlayerAt(tester, const Size(1080, 2340));
-      final panel = find.byWidgetPredicate(
+      final card = find.byWidgetPredicate(
         (w) =>
             w is DecoratedBox &&
             w.decoration is BoxDecoration &&
             ((w.decoration as BoxDecoration).boxShadow?.isNotEmpty ?? false),
       );
-      expect(panel, findsOneWidget);
-      final shadow =
-          ((tester.widget<DecoratedBox>(panel).decoration) as BoxDecoration)
-              .boxShadow!
-              .single;
-      // Cast upward, onto the scrolling picture area.
-      expect(shadow.offset.dy, lessThan(0));
-      // The panel holds seek bar, play row and the four buttons.
-      final rect = tester.getRect(panel);
+      expect(card, findsOneWidget);
+      final decoration =
+          tester.widget<DecoratedBox>(card).decoration as BoxDecoration;
+      // A shadow around (no offset) and one more toward the picture above.
+      expect(decoration.boxShadow!.any((s) => s.offset == Offset.zero), isTrue);
+      expect(decoration.boxShadow!.any((s) => s.offset.dy < 0), isTrue);
+      expect(decoration.borderRadius, isNotNull);
+
+      // Inset: 12 from the left, right and bottom edge.
+      final rect = tester.getRect(card);
+      final screen = tester.view.physicalSize / 3;
+      expect(rect.left, 12);
+      expect(rect.right, screen.width - 12);
+      expect(rect.bottom, screen.height - 12);
+      // It holds seek bar, play row and the four buttons.
       expect(rect.top, lessThan(tester.getRect(find.byType(Slider)).top));
-      expect(rect.bottom, tester.view.physicalSize.height / 3);
 
       await disposeApp(tester);
     },
