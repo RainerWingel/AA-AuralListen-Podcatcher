@@ -6,6 +6,7 @@ import '../../app/routes.dart';
 import '../../core/app_platform.dart';
 import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
+import '../../core/widgets/episode_title.dart' show textOverflows;
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
@@ -336,10 +337,8 @@ class _Header extends ConsumerWidget {
           ],
           if (podcast.description case final description?) ...[
             const SizedBox(height: 12),
-            Text(
+            _ExpandableDescription(
               description,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium,
             ),
           ],
@@ -349,6 +348,73 @@ class _Header extends ConsumerWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// The podcast's description: [collapsedLines] lines, "Weiterlesen" shows all
+/// of it, "Weniger anzeigen" folds it again (user wish 2026-10-19). The
+/// toggle only appears when the text is longer than the folded height.
+class _ExpandableDescription extends StatefulWidget {
+  const _ExpandableDescription(this.text, {this.style});
+
+  final String text;
+  final TextStyle? style;
+
+  static const collapsedLines = 4;
+
+  @override
+  State<_ExpandableDescription> createState() => _ExpandableDescriptionState();
+}
+
+class _ExpandableDescriptionState extends State<_ExpandableDescription> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final style = widget.style ?? DefaultTextStyle.of(context).style;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final needsToggle = textOverflows(
+          context,
+          TextSpan(text: widget.text, style: style),
+          maxWidth: constraints.maxWidth,
+          maxLines: _ExpandableDescription.collapsedLines,
+        );
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              alignment: Alignment.topCenter,
+              child: Text(
+                widget.text,
+                maxLines: _expanded
+                    ? null
+                    : _ExpandableDescription.collapsedLines,
+                overflow: _expanded
+                    ? TextOverflow.visible
+                    : TextOverflow.ellipsis,
+                style: style,
+              ),
+            ),
+            if (needsToggle)
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: const Size(48, 36),
+                  alignment: Alignment.centerLeft,
+                  backgroundColor: Colors.transparent,
+                ),
+                onPressed: () => setState(() => _expanded = !_expanded),
+                child: Text(
+                  _expanded ? l10n.descriptionLess : l10n.descriptionMore,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

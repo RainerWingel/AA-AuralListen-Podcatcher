@@ -220,6 +220,8 @@
   "chapters": "Chapters",
   "chaptersCount": "Chapters ({count})",
   "chapterCurrent": "Chapter {index}/{count}: {title}",
+  "descriptionMore": "Read more",
+  "descriptionLess": "Show less",
   "bookmarkAdd": "Add bookmark",
   "bookmarkListHint": "Long press: list of bookmarks ({count})",
   "bookmarkNote": "Note (optional)",

@@ -162,3 +162,4 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Bild wird zusätzlich dekodiert und einmal geblurrt (Repaint-Boundary); AppBar bleibt außerhalb.
 - 2026-10-17 · **Player: Bild auch hinter der Titelleiste, Bedienfeld als eingerückte Karte mit Rundum-Schatten** (Benutzer) ·
   Scaffold transparent über dem Hintergrund; das Bedienfeld behält das normale Theme.
+- 2026-10-19 · **Podcast-Beschreibung aufklappbar** (Benutzer) · 4 Zeilen, „Weiterlesen"/„Weniger anzeigen" nur bei längerem Text.

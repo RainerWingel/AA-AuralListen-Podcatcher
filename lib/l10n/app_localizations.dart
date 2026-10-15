@@ -1418,6 +1418,18 @@ abstract class AppLocalizations {
   /// **'Kapitel {index}/{count}: {title}'**
   String chapterCurrent(int index, int count, String title);
 
+  /// No description provided for @descriptionMore.
+  ///
+  /// In de, this message translates to:
+  /// **'Weiterlesen'**
+  String get descriptionMore;
+
+  /// No description provided for @descriptionLess.
+  ///
+  /// In de, this message translates to:
+  /// **'Weniger anzeigen'**
+  String get descriptionLess;
+
   /// No description provided for @bookmarkAdd.
   ///
   /// In de, this message translates to:

@@ -811,6 +811,12 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get descriptionMore => 'Weiterlesen';
+
+  @override
+  String get descriptionLess => 'Weniger anzeigen';
+
+  @override
   String get bookmarkAdd => 'Lesezeichen setzen';
 
   @override

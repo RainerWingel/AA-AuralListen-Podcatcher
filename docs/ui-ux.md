@@ -28,7 +28,9 @@ Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-3
    als ausgelassen. Eine kleine beobachtete Abfrage (5 Spalten) wird im Speicher ausgewertet; die Oberfläche hört nur
    von geändertem Ergebnis (`distinct`). Kein nachgeschobenes `asyncMap`-Query – das hing in Widget-Tests.
 2. **Abos** – Raster mit Covern; Tippen → Podcast-Detail mit Folgenliste und Podcast-Einstellungen. Im Kopf des
-   Podcast-Details unter der Beschreibung (falls im Feed) antippbare Links: 🌐 Website (angezeigt als Host ohne „www.",
+   Podcast-Details steht die Beschreibung (falls im Feed) auf **4 Zeilen gekürzt**; ist sie länger, klappt „Weiterlesen" sie
+   ganz auf, „Weniger anzeigen" faltet sie wieder (Benutzerwunsch 2026-10-19, `_ExpandableDescription`). Darunter
+   (falls im Feed) antippbare Links: 🌐 Website (angezeigt als Host ohne „www.",
    z. B. „freakshow.fm") und ♡ Unterstützen (Text aus `podcast:funding`, sonst „Unterstützen"); öffnen im Browser
    (Benutzerwunsch 2026-10-03). **Langes Drücken auf „XY Folgen"** zeigt als Tooltip die durchschnittliche Folgenlänge
    („Ø 1 Std. 5 Min. pro Folge"; Benutzerwunsch 2026-10-08) – aus den gespeicherten Feed-Daten, ohne Netzzugriff,

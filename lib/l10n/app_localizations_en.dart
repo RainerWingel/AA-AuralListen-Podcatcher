@@ -808,6 +808,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get descriptionMore => 'Read more';
+
+  @override
+  String get descriptionLess => 'Show less';
+
+  @override
   String get bookmarkAdd => 'Add bookmark';
 
   @override

@@ -488,6 +488,8 @@
       }
     }
   },
+  "descriptionMore": "Weiterlesen",
+  "descriptionLess": "Weniger anzeigen",
   "bookmarkAdd": "Lesezeichen setzen",
   "bookmarkListHint": "Lang drücken: Liste der Lesezeichen ({count})",
   "@bookmarkListHint": {"placeholders": {"count": {"type": "int"}}},

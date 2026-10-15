@@ -1826,6 +1826,66 @@ void main() {
     });
   }
 
+  testWidgets(
+    'podcast page: a long description unfolds with "Weiterlesen" and folds '
+    'again',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      final long = List.filled(
+        60,
+        'Viele Worte über Technik und Kultur.',
+      ).join(' ');
+      await tester.runAsync(
+        () => db
+            .update(db.podcasts)
+            .write(PodcastsCompanion(description: Value(long))),
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Abos'));
+      await settle(tester);
+      await tester.tap(find.text('Widget-Podcast'));
+      await settle(tester);
+
+      Text description() => tester.widget<Text>(find.text(long));
+      expect(find.text('Weiterlesen'), findsOneWidget);
+      expect(description().maxLines, 4);
+
+      await tester.tap(find.text('Weiterlesen'));
+      await settle(tester);
+      expect(description().maxLines, isNull);
+      expect(find.text('Weiterlesen'), findsNothing);
+
+      // The unfolded text is taller than the screen in the test font.
+      await tester.drag(find.byType(ListView).first, const Offset(0, -2500));
+      await settle(tester);
+      await tester.tap(find.text('Weniger anzeigen'));
+      await settle(tester);
+      expect(description().maxLines, 4);
+      expect(find.text('Weiterlesen'), findsOneWidget);
+
+      // A short description needs no toggle.
+      await tester.runAsync(
+        () => db
+            .update(db.podcasts)
+            .write(const PodcastsCompanion(description: Value('Kurz.'))),
+      );
+      await settle(tester);
+      expect(find.text('Kurz.'), findsOneWidget);
+      expect(find.text('Weiterlesen'), findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
+
   testWidgets('a status line shows which podcast is being refreshed', (
     tester,
   ) async {
