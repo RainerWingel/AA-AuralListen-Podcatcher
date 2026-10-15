@@ -233,6 +233,44 @@ void main() {
       expect(engine.loadedAt, const Duration(minutes: 9, seconds: 57));
     });
 
+    test('feed length out of date (file replaced): the real length counts, '
+        'a file without VBR header is loaded normally again', () async {
+      // Real case 2026-10-15 (Sternenkraft): the podcaster replaced the file
+      // (83 min) but the feed still says 13:17. Normal load: right length;
+      // exact load: no length at all.
+      await setFeed(const Duration(minutes: 13, seconds: 17));
+      engine
+        ..estimatedDuration = const Duration(minutes: 83, seconds: 45)
+        ..exactLoadsHaveNoDuration = true;
+      final durations = <Duration?>[];
+      final sub = handler.mediaItem.listen((i) => durations.add(i?.duration));
+      addTearDown(sub.cancel);
+
+      await handler.playEpisode(episodeId);
+      expect(engine.exactLoads, [false, true, false]);
+      expect(
+        (await episode()).durationMs,
+        const Duration(minutes: 83, seconds: 45).inMilliseconds,
+      );
+      expect(durations.last, const Duration(minutes: 83, seconds: 45));
+      // Position beyond the old feed length is shown as it is.
+      engine.emitPosition(const Duration(minutes: 14));
+      expect(handler.position, const Duration(minutes: 14));
+    });
+
+    test('exact load that differs from the feed: the feed is wrong', () async {
+      await setFeed(const Duration(minutes: 13, seconds: 17));
+      engine
+        ..fakeDuration = const Duration(minutes: 20)
+        ..estimatedDuration = const Duration(minutes: 46);
+      await handler.playEpisode(episodeId);
+      expect(engine.exactLoads, [false, true]);
+      expect(
+        (await episode()).durationMs,
+        const Duration(minutes: 20).inMilliseconds,
+      );
+    });
+
     test(
       'small differences (e.g. inserted ads) keep the normal load',
       () async {

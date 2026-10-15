@@ -147,3 +147,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   und JSON-`img`; eingebettete als Dateien in `chapter_images/` statt in der DB (bis ~1 MB je Bild), max. 60 MB, kein
   neues Paket. Anzeige nur nach Play und im Kapitel mit Bild, 2 Minuten nach Pause wieder das Folgen-Cover.
   Schema v28 (nur Daten: Kapitel einmal neu lesen). Nicht im Mini-Player/Benachrichtigung (Entscheidung offen).
+- 2026-10-15 · **Player-Dauer schlägt veralteten Feed (VBR-Erkennung verfeinert)** (Benutzermeldung Sternenkraft) · Nach dem
+  exakten Laden zählt die gemeldete Dauer; ohne Dauer wird normal neu geladen. Vorher blieb die Anzeige bei der
+  Feed-Dauer hängen, wenn die Datei unter alter Adresse ersetzt wurde.

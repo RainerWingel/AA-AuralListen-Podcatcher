@@ -163,6 +163,13 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
   vergleichen (nur MP3 bzw. MIME unbekannt). Abweichung > max(1 min, 10 %) → sofort erneut laden mit
   `exactMp3Seeking` (`AndroidExtractorOptions.flagMp3EnableIndexSeeking`): Dauer aus dem Xing-Kopf, Sprünge exakt.
   Kosten: Ein Sprung nach vorn liest (streamt) die Datei bis zum Ziel – deshalb nur für solche Dateien.
+- **Veralteter Feed (Fall 2026-10-15, Sternenkraft):** Die Podcasterin ersetzte die Datei einer Folge (jetzt 83 min) unter
+  derselben Adresse, der Feed nannte weiter 13:17. Gemessen auf dem A05s: normales Laden meldet 1:23:45 (CBR-Schätzung,
+  stimmt), das exakte Laden (Index-Seeking) meldet **gar keine Dauer** (Datei ohne Xing-Kopf). Früher galt 1:23:45 als
+  „geschätzt" und wurde verworfen, die Anzeige hing bei 13:17, das Audio lief weiter. Jetzt: Nach dem exakten Laden zählt
+  der Wert des Players (`_durationDecided`) – auch wenn er vom Feed abweicht (dann ist der Feed veraltet); meldet das
+  exakte Laden nichts, wird **normal neu geladen** (CBR-Springen ist dort exakt) und dessen Dauer gespeichert. Jeder
+  Feed-Abruf schreibt die Feed-Dauer wieder in die DB; beim nächsten Abspielen wiederholt sich das (ein Laden mehr).
 - Die geschätzte Dauer wird weder gespeichert noch angezeigt (sonst fehlt beim nächsten Mal der Vergleichswert).
   Migration v15 liest alle Feeds einmal neu und repariert so schon überschriebene Dauern.
 - Grenzen: Ohne Feed-Dauer keine Erkennung. Kleine Abweichungen (eingefügte Werbung) bleiben beim normalen Laden.

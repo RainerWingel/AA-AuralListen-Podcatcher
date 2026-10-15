@@ -203,6 +203,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Episode row as it was before the current load (feed duration).
   Episode? _loadingEpisode;
 
+  /// The load has settled which duration counts (after the exact reload of
+  /// an MP3 that looked estimated): from then on the player's value is
+  /// stored and shown even if it differs from the feed's.
+  bool _durationDecided = false;
+
   /// Streamed episodes: duration of their first load in this app session,
   /// to notice a server that builds the file anew per request (ads).
   /// Bounded like everything kept in memory (docs/eviction.md).
@@ -812,6 +817,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     // Feed length of this episode, read before the player can report its
     // own (an estimate must neither be stored nor compared with itself).
     _loadingEpisode = episode;
+    _durationDecided = false;
     final reported = await _engine.load(source, initialPosition: start);
     var duration = reported;
     if (_durationLooksEstimated(reported, episode)) {
@@ -823,6 +829,15 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         initialPosition: start,
         exactMp3Seeking: true,
       );
+      // From here on the player's value counts, not the feed's: if the
+      // exact load still differs from the feed, the feed is out of date.
+      _durationDecided = true;
+      // A file without any VBR header (plain constant bitrate, e.g. a
+      // replaced file under the old feed length): index seeking cannot tell
+      // its length, the first (normal) load could – and its constant-bitrate
+      // seeking is exact for such a file.
+      duration ??= await _engine.load(source, initialPosition: start);
+      if (duration != null) await _onDuration(duration);
     }
     if (!_sourceIsLocal) await _checkStreamVaries(id, row.podcast, duration);
     _knownPosition = start;
@@ -983,7 +998,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     // A wrong estimate (VBR MP3) is replaced by the exact load right after;
     // storing it would also hide the mismatch next time.
     if (_loadingEpisode case final episode? when episode.id == id) {
-      if (_durationLooksEstimated(duration, episode)) return;
+      if (!_durationDecided && _durationLooksEstimated(duration, episode)) {
+        return;
+      }
     }
     if (item != null && item.duration != duration) {
       mediaItem.add(item.copyWith(duration: duration));

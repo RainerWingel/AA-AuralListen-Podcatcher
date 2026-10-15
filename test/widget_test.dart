@@ -2716,6 +2716,9 @@ void main() {
         ..physicalSize = const Size(1080, 2340)
         ..devicePixelRatio = 3;
       addTearDown(tester.view.reset);
+      // The player agrees with the feed (a differing length would count as
+      // the real one, docs/playback.md).
+      engine.fakeDuration = const Duration(minutes: 65);
       await pumpApp(tester);
       await tester.runAsync(
         () => ProviderScope.containerOf(
@@ -2737,7 +2740,7 @@ void main() {
 
       await tester.tap(remaining);
       await settle(tester);
-      // Feed length (the fake player's 10 min count as a wrong estimate).
+      // The episode's length: feed and player agree (65 min).
       expect(remaining, findsNothing);
       expect(find.text('1:05:00'), findsOneWidget);
       expect(await stored(), 'true');
@@ -2759,6 +2762,9 @@ void main() {
         ..physicalSize = const Size(1080, 2340)
         ..devicePixelRatio = 3;
       addTearDown(tester.view.reset);
+      // The player agrees with the feed (a differing length would count as
+      // the real one, docs/playback.md).
+      engine.fakeDuration = const Duration(minutes: 65);
       await pumpApp(tester);
       await tester.runAsync(
         () => ProviderScope.containerOf(

@@ -23,6 +23,10 @@ class FakePlayerEngine implements PlayerEngine {
   /// [fakeDuration]) – simulates ExoPlayer's estimate for VBR files.
   Duration? estimatedDuration;
 
+  /// Loads with exact MP3 seeking report no duration (a constant-bitrate
+  /// file without Xing header: the index seeker cannot know its length).
+  bool exactLoadsHaveNoDuration = false;
+
   /// [load]'s exactMp3Seeking flag of every load, in order.
   final exactLoads = <bool>[];
 
@@ -112,8 +116,8 @@ class FakePlayerEngine implements PlayerEngine {
     loadedUri = uri;
     loadedAt = initialPosition;
     _pos = initialPosition;
-    final duration = exactMp3Seeking
-        ? fakeDuration
+    final Duration? duration = exactMp3Seeking
+        ? (exactLoadsHaveNoDuration ? null : fakeDuration)
         : estimatedDuration ?? fakeDuration;
     _dur = duration;
     _setState(_current.playing, EngineProcessing.ready);
