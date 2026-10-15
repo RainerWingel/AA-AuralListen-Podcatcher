@@ -2788,6 +2788,36 @@ void main() {
   );
 
   testWidgets(
+    'player in landscape: info on the left, controls on the right',
+    timeout: timeout,
+    (tester) async {
+      // A phone turned sideways: 800 x 360 dp.
+      await openPlayerAt(tester, const Size(2400, 1080));
+      Rect rect(Finder f) => tester.getRect(f.first);
+      final half = tester.view.physicalSize.width / 3 / 2;
+      final cover = rect(find.byType(PlayerCover));
+      final seek = rect(find.byType(Slider));
+      final play = rect(find.byType(PlayPauseButton));
+      final speed = rect(find.byKey(PlayerActionBar.speedKey));
+      final bookmark = rect(find.byKey(PlayerActionBar.bookmarkKey));
+
+      // Cover and title left, all controls right of the middle.
+      expect(cover.right, lessThanOrEqualTo(half));
+      expect(find.text('Erste Folge').evaluate(), isNotEmpty);
+      expect(seek.left, greaterThanOrEqualTo(half));
+      expect(play.left, greaterThanOrEqualTo(half));
+      expect(bookmark.left, greaterThanOrEqualTo(half));
+      // Still seek bar above the play row above the four buttons.
+      expect(seek.bottom, lessThan(play.top));
+      expect(play.bottom, lessThan(bookmark.top));
+      // Everything on screen (no overflow below the edge).
+      expect(speed.bottom, lessThanOrEqualTo(360));
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'player: the four buttons are labelled when wide, short in portrait, '
     'icons only when narrow',
     timeout: timeout,

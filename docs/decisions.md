@@ -154,3 +154,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Knöpfe (Lesezeichen, Sleep-Timer, Boost, Tempo) in einer Reihe sind angeheftet; die Reihe zeigt je nach Breite Text,
   Symbole mit Wert oder nur Symbole. „Lesezeichen (n)" entfällt (Langdruck auf „Lesezeichen setzen"), die Beschreibung
   steht unter dem Kapitel-Knopf im scrollbaren Teil. Slider in eigener Semantik-Gruppe (Flutter-Assertion sonst).
+- 2026-10-16 · **Player im Querformat am Handy: Info links, Bedienelemente rechts** (Benutzer) · Angeheftet unten bliebe
+  nur ca. 100 dp für das Scrollende. Regel: breiter als hoch und unter 500 dp hoch.

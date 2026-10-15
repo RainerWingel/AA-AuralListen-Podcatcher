@@ -67,7 +67,6 @@ class PlayerScreen extends ConsumerWidget {
     final theme = playerTheme(Theme.of(context));
     final item = ref.watch(mediaItemProvider).value?.mediaItem;
     final podcastId = item?.extras?['podcastId'] as int?;
-    final episodeId = item?.extras?['episodeId'] as int?;
     // Live, so "Abonnieren" during playback shows them at once.
     final provisional = switch (podcastId) {
       final id? => ref.watch(podcastProvider(id)).value?.provisional ?? false,
@@ -87,77 +86,151 @@ class PlayerScreen extends ConsumerWidget {
         ),
         body: item == null
             ? const SizedBox.shrink()
-            // Scrolls: cover, title, playlist, chapters and the description.
-            // The controls stay pinned below (user wish 2026-10-16).
-            : LayoutBuilder(
-                builder: (context, constraints) {
-                  // The cover never grows over the visible area (landscape):
-                  // it would only scroll away.
-                  final coverSize = max(
-                    72.0,
-                    min(
-                      constraints.maxWidth - 64,
-                      min(360.0, constraints.maxHeight - 32),
-                    ),
-                  );
-                  return SafeArea(
-                    bottom: false,
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: _PlayerInfo(
+            : _isLandscape(context)
+            // Landscape phone: info on the left, controls on the right – the
+            // height is too short for pinned controls below (user wish
+            // 2026-10-16).
+            ? SafeArea(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _InfoArea(
                         item: item,
-                        coverSize: coverSize,
                         theme: theme,
                         provisional: provisional,
                       ),
                     ),
-                  );
-                },
+                    Expanded(
+                      child: Center(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(8, 8, 24, 8),
+                          child: _PlayerControls(
+                            item: item,
+                            podcastId: podcastId,
+                            provisional: provisional,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            // Portrait: the info scrolls, the controls stay pinned below
+            // (user wish 2026-10-16).
+            : SafeArea(
+                bottom: false,
+                child: _InfoArea(
+                  item: item,
+                  theme: theme,
+                  provisional: provisional,
+                ),
               ),
         // As the bottom bar of the scaffold, so info boxes float above the
         // pinned buttons instead of covering them.
-        bottomNavigationBar: item == null
+        bottomNavigationBar: item == null || _isLandscape(context)
             ? null
             : SafeArea(
                 top: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Own semantics group: the slider below the scrolling area
-                      // otherwise trips a Flutter semantics assertion when
-                      // the episode changes under an open sheet (tests).
-                      Semantics(
-                        container: true,
-                        explicitChildNodes: true,
-                        child: _SeekBar(total: item.duration),
-                      ),
-                      const SizedBox(height: 8),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          SkipButton.back(),
-                          PlayPauseButton(size: 48, filled: true),
-                          SkipButton.forward(),
-                        ],
-                      ),
-                      // Same visible gap (16) between the control blocks
-                      // (user wish 2026-10-09): text buttons carry 4
-                      // invisible tap-target padding on each side, so
-                      // 12 here + 4 = 16.
-                      const SizedBox(height: _controlGap),
-                      if (episodeId != null)
-                        PlayerActionBar(
-                          episodeId: episodeId,
-                          podcastId: podcastId,
-                          bookmarks: !provisional,
-                        ),
-                    ],
+                  child: _PlayerControls(
+                    item: item,
+                    podcastId: podcastId,
+                    provisional: provisional,
                   ),
                 ),
               ),
       ),
+    );
+  }
+
+  /// A short, wide screen (phone turned sideways).
+  static bool _isLandscape(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return size.width > size.height && size.height < 500;
+  }
+}
+
+/// The scrolling info part: cover (never taller than the visible area), title,
+/// chapters and description.
+class _InfoArea extends StatelessWidget {
+  const _InfoArea({
+    required this.item,
+    required this.theme,
+    required this.provisional,
+  });
+
+  final MediaItem item;
+  final ThemeData theme;
+  final bool provisional;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final coverSize = max(
+        72.0,
+        min(constraints.maxWidth - 64, min(360.0, constraints.maxHeight - 32)),
+      );
+      return SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: _PlayerInfo(
+          item: item,
+          coverSize: coverSize,
+          theme: theme,
+          provisional: provisional,
+        ),
+      );
+    },
+  );
+}
+
+/// Seek bar, play row and the four buttons – pinned below in portrait, in the
+/// right half in landscape.
+class _PlayerControls extends StatelessWidget {
+  const _PlayerControls({
+    required this.item,
+    required this.podcastId,
+    required this.provisional,
+  });
+
+  final MediaItem item;
+  final int? podcastId;
+  final bool provisional;
+
+  @override
+  Widget build(BuildContext context) {
+    final episodeId = item.extras?['episodeId'] as int?;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Own semantics group: the slider below the scrolling area otherwise
+        // trips a Flutter semantics assertion when the episode changes under
+        // an open sheet (tests).
+        Semantics(
+          container: true,
+          explicitChildNodes: true,
+          child: _SeekBar(total: item.duration),
+        ),
+        const SizedBox(height: 8),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SkipButton.back(),
+            PlayPauseButton(size: 48, filled: true),
+            SkipButton.forward(),
+          ],
+        ),
+        // Same visible gap (16) between the control blocks (user wish
+        // 2026-10-09): text buttons carry 4 invisible tap-target padding on
+        // each side, so 12 here + 4 = 16.
+        const SizedBox(height: _controlGap),
+        if (episodeId != null)
+          PlayerActionBar(
+            episodeId: episodeId,
+            podcastId: podcastId,
+            bookmarks: !provisional,
+          ),
+      ],
     );
   }
 }
