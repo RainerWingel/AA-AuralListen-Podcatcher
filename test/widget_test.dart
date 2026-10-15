@@ -1718,6 +1718,22 @@ void main() {
     },
   );
 
+  testWidgets('the app stays beside the Android buttons (landscape)', (
+    tester,
+  ) async {
+    // 800 x 360 dp with the three-button bar on the left, 48 dp wide.
+    tester.view
+      ..physicalSize = const Size(2400, 1080)
+      ..devicePixelRatio = 3
+      ..padding = const FakeViewPadding(left: 144)
+      ..viewPadding = const FakeViewPadding(left: 144);
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    expect(tester.getRect(find.byType(NavigationBar)).left, 48);
+    expect(tester.getRect(find.byType(AppBar)).left, 48);
+    await disposeApp(tester);
+  });
+
   testWidgets('a status line shows which podcast is being refreshed', (
     tester,
   ) async {

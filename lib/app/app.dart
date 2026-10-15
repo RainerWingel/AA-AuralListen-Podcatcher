@@ -43,7 +43,13 @@ class AuralListenApp extends ConsumerWidget {
         if (!language.hasError && language.value == null) {
           return const LanguagePickerScreen();
         }
-        return child!;
+        // Turned sideways the Android buttons (or a display cutout) sit at
+        // the edge: the app stays beside them instead of under them (user
+        // wish 2026-10-16). Top and bottom are handled by the screens.
+        return ColoredBox(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: SafeArea(top: false, bottom: false, child: child!),
+        );
       },
     );
   }

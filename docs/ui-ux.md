@@ -75,6 +75,9 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 → Knopfreihe 2 → Beschreibung jeweils **16**
   sichtbar (`_controlGap` = 12 + 4 unsichtbarer Tipp-Rand der Textknöpfe; zwischen den Reihen 8 + 4 + 4), ein
   Widget-Test misst es nach.
+- **Seitliche Ränder** (Benutzerwunsch 2026-10-16): Im Querformat liegen die Android-Tasten (oder ein Display-Ausschnitt) am
+  Rand; die ganze App bleibt daneben statt darunter (`SafeArea` links/rechts im `MaterialApp.builder`, `app.dart`).
+  Oben/unten kümmern sich die Seiten selbst (AppBar, Navigationsleiste, Player).
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation), **zwei Bereiche** (Benutzerwunsch 2026-10-16):
   - **Oben, scrollbar:** großes Cover (nie höher als der sichtbare Bereich), Titel, Podcast (davor ✓-Download-Symbol
     „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist), Playlist-Zeile, darunter „Kapitel x/n: Titel" (bzw.
