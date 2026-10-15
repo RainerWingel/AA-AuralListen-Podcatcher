@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:aapodcastguru/app/app.dart';
 import 'package:aapodcastguru/app/router.dart';
@@ -222,6 +223,11 @@ void main() {
     await tester.runAsync(handler.stop);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(milliseconds: 10));
+    // Pictures still being decoded (the player's blurred backdrop, its
+    // brightness measurement) finish and are released.
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 100)),
+    );
     // Images (e.g. the icon on the info page) stay in Flutter's global,
     // size-limited image cache; empty it so the leak check sees them freed.
     PaintingBinding.instance.imageCache.clear();
@@ -1734,6 +1740,78 @@ void main() {
     await disposeApp(tester);
   });
 
+  for (final (name, color, expected) in [
+    ('light picture → dark texts', const Color(0xFFF2F2F2), 0xFF14141A),
+    ('dark picture → light texts', const Color(0xFF101018), 0xFFF5F5F7),
+  ]) {
+    testWidgets('player backdrop: $name', timeout: timeout, (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final pictures = Directory.systemTemp.createTempSync('backdrop_');
+      addTearDown(() => pictures.deleteSync(recursive: true));
+      await pumpApp(
+        tester,
+        overrides: [
+          chapterImagesDirectoryProvider.overrideWithValue(
+            () async => pictures,
+          ),
+        ],
+      );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final episode = await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      );
+      // A solid-color PNG as the picture of the first chapter.
+      await tester.runAsync(() async {
+        final recorder = ui.PictureRecorder();
+        Canvas(
+          recorder,
+        ).drawRect(const Rect.fromLTWH(0, 0, 32, 32), Paint()..color = color);
+        final picture = recorder.endRecording();
+        final image = await picture.toImage(32, 32);
+        picture.dispose();
+        final png = (await image.toByteData(format: ui.ImageByteFormat.png))!;
+        image.dispose();
+        final reference = await container
+            .read(chapterImageStoreProvider)
+            .save(episode!.id, 0, png.buffer.asUint8List(), 'png');
+        await (db.update(db.chapters)..where((c) => c.startMs.equals(0))).write(
+          ChaptersCompanion(imageUrl: Value(reference)),
+        );
+      });
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      // The brightness is measured on the decoded picture (real time).
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 400)),
+      );
+      await settle(tester);
+
+      expect(find.byType(ImageFiltered), findsWidgets);
+      final title = tester.widget<Text>(
+        find.descendant(
+          of: find.byType(PlayerScreen),
+          matching: find.text('Erste Folge'),
+        ),
+      );
+      expect(title.style?.color, Color(expected));
+
+      await disposeApp(tester);
+    });
+  }
+
   testWidgets('a status line shows which podcast is being refreshed', (
     tester,
   ) async {
@@ -2880,6 +2958,33 @@ void main() {
       }
       expect(find.byTooltip('Tempo: Aus'), findsOneWidget);
       expect(find.byTooltip('Boost: Aus'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'player: the control panel lies above the picture and casts a shadow',
+    timeout: timeout,
+    (tester) async {
+      await openPlayerAt(tester, const Size(1080, 2340));
+      final panel = find.byWidgetPredicate(
+        (w) =>
+            w is DecoratedBox &&
+            w.decoration is BoxDecoration &&
+            ((w.decoration as BoxDecoration).boxShadow?.isNotEmpty ?? false),
+      );
+      expect(panel, findsOneWidget);
+      final shadow =
+          ((tester.widget<DecoratedBox>(panel).decoration) as BoxDecoration)
+              .boxShadow!
+              .single;
+      // Cast upward, onto the scrolling picture area.
+      expect(shadow.offset.dy, lessThan(0));
+      // The panel holds seek bar, play row and the four buttons.
+      final rect = tester.getRect(panel);
+      expect(rect.top, lessThan(tester.getRect(find.byType(Slider)).top));
+      expect(rect.bottom, tester.view.physicalSize.height / 3);
 
       await disposeApp(tester);
     },

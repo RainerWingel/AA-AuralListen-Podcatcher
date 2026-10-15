@@ -20,6 +20,7 @@ import '../episodes/episode_description.dart';
 import 'chapter_cover.dart';
 import 'chapters_and_bookmarks.dart';
 import 'player_action_bar.dart';
+import 'player_backdrop.dart';
 import 'player_controls.dart';
 
 /// "Downloaded" mark in front of the podcast name – only when the file is
@@ -67,6 +68,7 @@ class PlayerScreen extends ConsumerWidget {
     final theme = playerTheme(Theme.of(context));
     final item = ref.watch(mediaItemProvider).value?.mediaItem;
     final podcastId = item?.extras?['podcastId'] as int?;
+    final episodeId = item?.extras?['episodeId'] as int?;
     // Live, so "Abonnieren" during playback shows them at once.
     final provisional = switch (podcastId) {
       final id? => ref.watch(podcastProvider(id)).value?.provisional ?? false,
@@ -94,20 +96,32 @@ class PlayerScreen extends ConsumerWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: _InfoArea(
-                        item: item,
-                        theme: theme,
-                        provisional: provisional,
+                      child: PlayerBackdrop(
+                        episodeId: episodeId,
+                        coverUrl: item.artUri?.toString(),
+                        builder: (context, adapted) => _InfoArea(
+                          item: item,
+                          theme: adapted,
+                          provisional: provisional,
+                        ),
                       ),
                     ),
+                    // The control panel lies above the picture and casts a
+                    // shadow onto it (user wish 2026-10-17).
                     Expanded(
-                      child: Center(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 24, 8),
-                          child: _PlayerControls(
-                            item: item,
-                            podcastId: podcastId,
-                            provisional: provisional,
+                      child: DecoratedBox(
+                        decoration: _panelDecoration(
+                          context,
+                          const Offset(-6, 0),
+                        ),
+                        child: Center(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(8, 8, 24, 8),
+                            child: _PlayerControls(
+                              item: item,
+                              podcastId: podcastId,
+                              provisional: provisional,
+                            ),
                           ),
                         ),
                       ),
@@ -117,32 +131,56 @@ class PlayerScreen extends ConsumerWidget {
               )
             // Portrait: the info scrolls, the controls stay pinned below
             // (user wish 2026-10-16).
-            : SafeArea(
-                bottom: false,
-                child: _InfoArea(
-                  item: item,
-                  theme: theme,
-                  provisional: provisional,
+            : PlayerBackdrop(
+                episodeId: episodeId,
+                coverUrl: item.artUri?.toString(),
+                builder: (context, adapted) => SafeArea(
+                  bottom: false,
+                  child: _InfoArea(
+                    item: item,
+                    theme: adapted,
+                    provisional: provisional,
+                  ),
                 ),
               ),
         // As the bottom bar of the scaffold, so info boxes float above the
         // pinned buttons instead of covering them.
         bottomNavigationBar: item == null || _isLandscape(context)
             ? null
-            : SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-                  child: _PlayerControls(
-                    item: item,
-                    podcastId: podcastId,
-                    provisional: provisional,
+            // The panel lies above the picture and casts a shadow onto it
+            // (user wish 2026-10-17).
+            : DecoratedBox(
+                decoration: _panelDecoration(context, const Offset(0, -6)),
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
+                    child: _PlayerControls(
+                      item: item,
+                      podcastId: podcastId,
+                      provisional: provisional,
+                    ),
                   ),
                 ),
               ),
       ),
     );
   }
+
+  /// The control panel: its own surface color and a shadow toward the
+  /// picture, so it looks like lying above it.
+  static BoxDecoration _panelDecoration(BuildContext context, Offset toward) =>
+      BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.4),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: toward,
+          ),
+        ],
+      );
 
   /// A short, wide screen (phone turned sideways).
   static bool _isLandscape(BuildContext context) {
@@ -528,9 +566,9 @@ class _PlaylistRow extends ConsumerWidget {
   }
 }
 
-/// In dark mode the description section sits on the same slightly brighter
-/// background as the buttons, outlined by a thin brighter line; in
-/// light mode nothing changes.
+/// The description section lies on the blurred picture as a translucent
+/// plate in the text color, outlined by a thin line (user wishes 2026-10-09
+/// and 2026-10-17).
 class _OnPlayerBackground extends StatelessWidget {
   const _OnPlayerBackground({required this.child});
 
@@ -538,14 +576,11 @@ class _OnPlayerBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final background = playerControlBackground(theme);
-    final outline = playerOutline(theme);
-    if (background == null || outline == null) return child;
+    final ink = Theme.of(context).colorScheme.onSurface;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: background,
-        border: Border.all(color: outline),
+        color: ink.withValues(alpha: 0.12),
+        border: Border.all(color: ink.withValues(alpha: 0.4)),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(

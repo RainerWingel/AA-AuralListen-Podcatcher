@@ -156,3 +156,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   steht unter dem Kapitel-Knopf im scrollbaren Teil. Slider in eigener Semantik-Gruppe (Flutter-Assertion sonst).
 - 2026-10-16 · **Player im Querformat am Handy: Info links, Bedienelemente rechts** (Benutzer) · Angeheftet unten bliebe
   nur ca. 100 dp für das Scrollende. Regel: breiter als hoch und unter 500 dp hoch.
+- 2026-10-17 · **Player: geblurrter Bildhintergrund mit angepasster Schriftfarbe, Bedienfeld mit Schatten** (Benutzer) · Hintergrund =
+  aktuelles Bild (Kapitelbild/Cover), Schrift hell/dunkel nach gemessener Bildhelligkeit (Schwelle 0,2 =
+  gleicher Kontrast für Schwarz und Weiß), kein neues Paket (eigene 16-px-Messung). Kosten: ein kleines
+  Bild wird zusätzlich dekodiert und einmal geblurrt (Repaint-Boundary); AppBar bleibt außerhalb.

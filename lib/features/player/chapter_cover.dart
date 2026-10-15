@@ -80,10 +80,54 @@ class ChapterPicture extends ConsumerWidget {
   }
 }
 
+/// Whether the player shows chapter pictures right now: from the moment play
+/// was pressed until [chapterPicturePauseDelay] after a pause. Lives while
+/// the player is open (the backdrop and the cover share it).
+final chapterPicturesOnProvider =
+    NotifierProvider.autoDispose<_ChapterPicturesOn, bool>(
+      _ChapterPicturesOn.new,
+    );
+
+class _ChapterPicturesOn extends Notifier<bool> {
+  Timer? _pauseTimer;
+
+  @override
+  bool build() {
+    ref.onDispose(() => _pauseTimer?.cancel());
+    ref.listen(
+      playbackStateProvider.select((s) => s.value?.playing ?? false),
+      (_, playing) => _onPlaying(playing),
+    );
+    return ref.read(playbackStateProvider).value?.playing ?? false;
+  }
+
+  void _onPlaying(bool playing) {
+    _pauseTimer?.cancel();
+    _pauseTimer = null;
+    if (playing) {
+      state = true;
+      return;
+    }
+    _pauseTimer = Timer(chapterPicturePauseDelay, () {
+      _pauseTimer = null;
+      state = false;
+    });
+  }
+}
+
+/// The chapter picture to show now in [episodeId] (see
+/// [chapterPicturesOnProvider], [currentChapterPictureProvider]); null = the
+/// episode cover.
+final playerPictureProvider = Provider.autoDispose.family<String?, int>(
+  (ref, episodeId) => ref.watch(chapterPicturesOnProvider)
+      ? ref.watch(currentChapterPictureProvider(episodeId))
+      : null,
+);
+
 /// The big picture in the full-screen player: the episode's cover – or, once
 /// play was pressed and the position is in a chapter with a picture, that
 /// picture. Two minutes after pause the episode cover returns.
-class PlayerCover extends ConsumerStatefulWidget {
+class PlayerCover extends ConsumerWidget {
   const PlayerCover({
     required this.episodeId,
     required this.coverUrl,
@@ -96,52 +140,10 @@ class PlayerCover extends ConsumerStatefulWidget {
   final double size;
 
   @override
-  ConsumerState<PlayerCover> createState() => _PlayerCoverState();
-}
-
-class _PlayerCoverState extends ConsumerState<PlayerCover> {
-  /// Chapter pictures are on: since play was pressed, until the pause timer
-  /// ran out.
-  late bool _chapterPictures;
-  Timer? _pauseTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _chapterPictures = ref.read(playbackStateProvider).value?.playing ?? false;
-    ref.listenManual(
-      playbackStateProvider.select((s) => s.value?.playing ?? false),
-      (_, playing) => _onPlaying(playing),
-    );
-  }
-
-  void _onPlaying(bool playing) {
-    _pauseTimer?.cancel();
-    _pauseTimer = null;
-    if (playing) {
-      if (!_chapterPictures) setState(() => _chapterPictures = true);
-      return;
-    }
-    _pauseTimer = Timer(chapterPicturePauseDelay, () {
-      _pauseTimer = null;
-      if (mounted) setState(() => _chapterPictures = false);
-    });
-  }
-
-  @override
-  void dispose() {
-    _pauseTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final size = widget.size;
-    final episodeId = widget.episodeId;
-    final picture = _chapterPictures && episodeId != null
-        ? ref.watch(currentChapterPictureProvider(episodeId))
-        : null;
-    final cover = CoverImage(url: widget.coverUrl, size: size);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final id = episodeId;
+    final picture = id == null ? null : ref.watch(playerPictureProvider(id));
+    final cover = CoverImage(url: coverUrl, size: size);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),
       child: SizedBox.square(

@@ -231,6 +231,8 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
     ohne Bild → Folgen-Cover). Pause: das Bild bleibt **2 Minuten**, dann kommt das Folgen-Cover zurück
     (`chapterPicturePauseDelay`); Play schaltet die Kapitelbilder wieder ein. Ganzes Bild (`BoxFit.contain` im
     quadratischen Rahmen), weicher Wechsel (250 ms). Auch in der Kapitel-Liste als Vorschau (40 px).
+    Dasselbe Bild liegt geblurrt als Hintergrund des scrollbaren Bereichs (`ui-ux.md`); Zustand „Kapitelbilder an" in
+    `chapterPicturesOnProvider` (von Cover und Hintergrund geteilt).
     Mini-Player und Benachrichtigung zeigen weiter das Folgen-Cover.
   - Speicher: dekodiert nur in Anzeigegröße; Dateien insgesamt max. **60 MB** (älteste Folge zuerst), Bilder
     verschwundener Folgen werden beim App-Start gelöscht (`ChapterService.cleanUpImages`).

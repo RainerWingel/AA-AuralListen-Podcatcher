@@ -96,6 +96,15 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
     schmal oder riesige Schrift** nur Symbole (Beschriftung als Tooltip/Screenreader-Text). Den Knopf „Lesezeichen (n)"
     gibt es nicht mehr: **Langes Drücken auf „Lesezeichen setzen"** öffnet die Liste der Lesezeichen dieser Folge
     (Tooltip nennt die Anzahl). Boost/Tempo öffnen je eine Auswahl (`playback.md`). Pfeil nach unten schließt.
+  - **Geblurrter Hintergrund** (Benutzerwunsch 2026-10-17, `player_backdrop.dart`): Hinter dem scrollbaren Bereich liegt das
+    gerade gezeigte Bild (Kapitelbild oder Folgen-Cover) stark geblurrt (kleine Dekodierung, hochskaliert, Blur σ 24,
+    eigene Repaint-Boundary, 0,4 s Überblendung beim Bildwechsel) mit leichtem Schleier. Die **Vordergrundfarben dieses
+    Bereichs passen sich der Bildhelligkeit an** (mittlere Leuchtdichte eines 16-px-Abbilds, `averageLuminance`): über
+    0,2 dunkle Schrift (#14141A), sonst helle (#F5F5F7) – Texte, Symbole, Textknöpfe (Kapitel-Knopf mit
+    durchscheinender Fläche), Beschreibung als durchscheinende Platte mit Haarlinie (ersetzt die Dunkel-Modus-Fläche
+    des 2026-10-09 an dieser Stelle). Ohne Bild bleibt das normale Theme. Das **Bedienfeld** (Slider, Play-Reihe, vier
+    Knöpfe) hat die Flächenfarbe des Themes und wirft einen **Schatten** auf den Bildbereich (nach oben bzw. im
+    Querformat nach links), wirkt also darüber liegend. AppBar bleibt unverändert.
   - **Querformat am Handy** (Bildschirm breiter als hoch und unter 500 dp hoch; Benutzerwunsch 2026-10-16): **links** die
     Info (scrollbar, Cover höchstens so hoch wie der sichtbare Bereich), **rechts** Slider, −15/Play/+30 und die vier
     Knöpfe untereinander, senkrecht zentriert – unten angeheftet wäre dort zu eng. Die Knopfreihe misst auch hier ihre
