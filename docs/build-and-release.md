@@ -92,6 +92,9 @@ Bis v1.3.2 (Mac-Build, nur arm64): `flutter build apk --release --split-per-abi`
 - v1.3.3 (2026-10-07): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.3.3 – vorläufige
   Podcasts, Sterne, ⏮ ⏭ + Bluetooth-Zurück, fertige Folgen nach 10 Min., Kapitel-Fortschritt, Themen „als gespielt",
   Download-Verbesserungen (+501, Codes 5011/5012/5013; Tag auf `72294e4b…`, DB v20 → v25)
+- v1.3.4 (2026-10-16): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.3.4 – Player mit festen Bedienelementen,
+  geblurrtem Bildhintergrund, Querformat, Kapitelbilder, Streaming-Playlists, Statuszeilen beim Aktualisieren, Dauer-Korrektur
+  (+502, Codes 5021/5022/5023; Tag auf `febca26e…`, DB v25 → v28). Erstes Release nach der F-Droid-Aufnahme.
 - v1.2.1 (2026-09-30): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.1 – Englisch,
   Playlist-Fortsetzen und -Farben, Abos-Suche, 15-s-Regel, Download-Fix (http → https)
 
