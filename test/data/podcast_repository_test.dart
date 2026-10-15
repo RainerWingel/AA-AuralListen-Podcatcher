@@ -205,14 +205,19 @@ void main() {
       await pumpEventQueue();
       await sub.cancel();
 
-      // The oldest podcast still running is shown: the number only goes up
-      // (a quick one may never be the oldest) and the line ends with null.
+      // Every podcast being refreshed is listed, oldest first; the lines
+      // end with null.
       final shown = seen.whereType<RefreshProgress>().toList();
-      final numbers = shown.map((p) => p.current).toList();
-      expect(numbers, orderedEquals([...numbers]..sort()));
-      expect(numbers.first, 1);
       expect(shown.every((p) => p.total == 3), isTrue);
-      expect(shown.first.title, anyOf('Eins', 'Zwei', 'Drei'));
+      expect(shown.every((p) => p.running.isNotEmpty), isTrue);
+      expect(shown.first.running.first.number, 1);
+      // All three run at once (the mock answers at once, but they start
+      // together): at some point more than one line.
+      expect(shown.any((p) => p.running.length > 1), isTrue);
+      for (final p in shown) {
+        final numbers = p.running.map((r) => r.number).toList();
+        expect(numbers, orderedEquals([...numbers]..sort()));
+      }
       expect(seen.last, isNull);
     });
 

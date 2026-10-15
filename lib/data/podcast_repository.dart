@@ -30,12 +30,15 @@ typedef RefreshSummary = ({int succeeded, int failed, int moved});
 
 enum RefreshOutcome { updated, moved, failed }
 
-/// Where "refresh all" stands: the [current]th of [total] podcasts, named
-/// [title], is the oldest one still being refreshed (up to
-/// [PodcastRepository.refreshConcurrency] run at once). Moves on whenever it
-/// is done – with the newest one instead, the line would jump to "8 of 8"
-/// at once, as all of them start within moments.
-typedef RefreshProgress = ({int current, int total, String title});
+/// One podcast being refreshed: the [number]th of all (start order) and its
+/// [title].
+typedef RefreshingPodcast = ({int number, String title});
+
+/// Where "refresh all" stands: the podcasts being refreshed right now (up to
+/// [PodcastRepository.refreshConcurrency] at once, oldest first) out of
+/// [total]. Each is shown while it runs, so the line moves on whenever one
+/// is done (user wish 2026-10-15: one line per running podcast).
+typedef RefreshProgress = ({int total, List<RefreshingPodcast> running});
 
 /// A feed that was fetched and parsed, with the address to store for it.
 typedef _LoadedFeed = ({String url, FeedFetched fetched, ParsedFeed feed});
@@ -690,13 +693,13 @@ class PodcastRepository {
     // Running refreshes by start number (1-based), oldest first.
     final running = <int, String>{};
 
-    void showOldestRunning() {
+    void showRunning() {
       if (running.isEmpty) return;
-      final oldest = running.entries.first;
       _setProgress((
-        current: oldest.key,
         total: podcasts.length,
-        title: oldest.value,
+        running: [
+          for (final e in running.entries) (number: e.key, title: e.value),
+        ],
       ));
     }
 
@@ -704,10 +707,10 @@ class PodcastRepository {
       while (queue.moveNext()) {
         final number = ++started;
         running[number] = queue.current.title;
-        showOldestRunning();
+        showRunning();
         final outcome = await refreshPodcast(queue.current);
         running.remove(number);
-        showOldestRunning();
+        showRunning();
         switch (outcome) {
           case RefreshOutcome.updated:
             succeeded++;

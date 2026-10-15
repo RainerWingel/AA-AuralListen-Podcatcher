@@ -1723,9 +1723,19 @@ void main() {
     );
     expect(find.textContaining(' von '), findsNothing);
 
-    progress.add((current: 2, total: 11, title: 'Freak Show'));
+    progress.add((
+      total: 11,
+      running: [
+        (number: 2, title: 'Freak Show'),
+        (number: 3, title: 'Raumzeit'),
+        (number: 4, title: 'CRE'),
+      ],
+    ));
     await settle(tester);
+    // One line per podcast being refreshed.
     expect(find.text('2 von 11 · Freak Show'), findsOneWidget);
+    expect(find.text('3 von 11 · Raumzeit'), findsOneWidget);
+    expect(find.text('4 von 11 · CRE'), findsOneWidget);
 
     progress.add(null);
     await settle(tester);

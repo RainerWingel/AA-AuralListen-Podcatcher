@@ -114,7 +114,8 @@ class AppShell extends ConsumerWidget {
   }
 }
 
-/// Thin status line while all feeds are refreshed: "2 von 11 · Freak Show".
+/// Status lines while all feeds are refreshed: one per podcast being
+/// refreshed, e.g. "2 von 11 · Freak Show".
 class _RefreshStatus extends StatelessWidget {
   const _RefreshStatus(this.progress);
 
@@ -133,20 +134,23 @@ class _RefreshStatus extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             LinearProgressIndicator(
-              value: (progress.current - 1) / progress.total,
+              value: (progress.running.first.number - 1) / progress.total,
               minHeight: 2,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: Text(
-                l10n.refreshProgress(
-                  progress.current,
-                  progress.total,
-                  progress.title,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // One line per podcast being refreshed (up to 4 at once).
+                  for (final p in progress.running)
+                    Text(
+                      l10n.refreshProgress(p.number, progress.total, p.title),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall,
+                    ),
+                ],
               ),
             ),
           ],
