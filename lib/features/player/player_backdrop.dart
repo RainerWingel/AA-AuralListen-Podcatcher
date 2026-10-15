@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/image_luminance.dart';
+import '../../core/link_color.dart';
 import '../../data/chapters/chapter_image_store.dart';
 import '../../data/providers.dart';
 import '../../data/storage/cover_cache.dart';
@@ -56,6 +57,13 @@ ThemeData backdropTheme(ThemeData theme, Color foreground) {
       ),
     ),
     dividerColor: foreground.withValues(alpha: 0.2),
+    // Links stay blue, matching the picture's brightness.
+    extensions: [
+      ...theme.extensions.values.where((e) => e is! LinkColor),
+      LinkColor.forBackground(
+        onDarkBackground: foreground.computeLuminance() > 0.5,
+      ),
+    ],
   );
 }
 

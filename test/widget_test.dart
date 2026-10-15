@@ -12,6 +12,7 @@ import 'package:aapodcastguru/audio/audio_providers.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/core/app_info.dart';
 import 'package:aapodcastguru/core/app_platform.dart';
+import 'package:aapodcastguru/core/link_color.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/feed/opml.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
@@ -2663,6 +2664,23 @@ void main() {
       expect(notes, findsOneWidget);
       // On top: number as on the cover (own count: 1) and the date.
       expect(find.text('Folge 1 · 10. Juni 2025'), findsOneWidget);
+      // The link is drawn blue and underlined in the same blue.
+      final rich = tester.widget<RichText>(
+        find
+            .descendant(
+              of: find.byType(NotesText),
+              matching: find.byType(RichText),
+            )
+            .first,
+      );
+      TextSpan? link;
+      rich.text.visitChildren((span) {
+        if (span is TextSpan && span.text == 'Mehr') link = span;
+        return true;
+      });
+      expect(link?.style?.color, linkBlueOnLight);
+      expect(link?.style?.decorationColor, linkBlueOnLight);
+      expect(link?.style?.decoration, TextDecoration.underline);
 
       await disposeApp(tester);
     },

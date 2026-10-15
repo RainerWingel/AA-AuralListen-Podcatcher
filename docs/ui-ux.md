@@ -110,6 +110,9 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
     (transparente AppBar, `extendBodyBehindAppBar`; Titel, Pfeil und Statusleisten-Symbole folgen der Bildhelligkeit).
     **Hochformat:** Das Bedienfeld ist eine **Karte**, rundherum 12 dp nach innen eingerückt (Ecken 24), mit **Schatten
     an allen vier Kanten** (kräftiger: 50 %/35 % schwarz); Querformat: Fläche rechts mit Schatten nach links (55 %).
+  - **Links in den Shownotes** sind **blau** und in demselben Blau unterstrichen (Benutzerwunsch 2026-10-18; vorher Akzent-/
+    Schriftfarbe, im Player weiß): hellblau `#8AB4F8` auf dunklem Grund, dunkelblau `#0B57D0` auf hellem (`link_color.dart`,
+    `LinkColor` als Theme-Erweiterung; auf dem Bild-Hintergrund nach dessen Helligkeit) – gilt auch im Beschreibungs-Blatt.
   - **Querformat am Handy** (Bildschirm breiter als hoch und unter 500 dp hoch; Benutzerwunsch 2026-10-16): **links** die
     Info (scrollbar, Cover höchstens so hoch wie der sichtbare Bereich), **rechts** Slider, −15/Play/+30 und die vier
     Knöpfe untereinander, senkrecht zentriert – unten angeheftet wäre dort zu eng. Die Knopfreihe misst auch hier ihre

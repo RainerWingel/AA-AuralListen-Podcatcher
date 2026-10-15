@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/app_platform.dart';
+import '../../core/link_color.dart';
 import '../../core/text_utils.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/providers.dart';
@@ -183,9 +184,11 @@ class _NotesTextState extends ConsumerState<NotesText> {
 
   @override
   Widget build(BuildContext context) {
+    final color = linkColorOf(context);
     final linkStyle = TextStyle(
-      color: Theme.of(context).colorScheme.primary,
+      color: color,
       decoration: TextDecoration.underline,
+      decorationColor: color,
     );
     return SelectionArea(
       child: Text.rich(

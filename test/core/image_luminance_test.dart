@@ -1,4 +1,5 @@
 import 'package:aapodcastguru/core/image_luminance.dart';
+import 'package:aapodcastguru/core/link_color.dart';
 import 'package:aapodcastguru/features/player/player_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,4 +34,15 @@ void main() {
     expect(theme.textTheme.titleLarge?.color, ink);
     expect(theme.iconTheme.color, ink);
   });
+
+  test(
+    'links stay blue on any picture: light blue on dark, dark blue on light',
+    () {
+      final base = ThemeData(brightness: Brightness.dark);
+      final onDarkPicture = backdropTheme(base, backdropForeground(0.02));
+      final onLightPicture = backdropTheme(base, backdropForeground(0.9));
+      expect(onDarkPicture.extension<LinkColor>()?.color, linkBlueOnDark);
+      expect(onLightPicture.extension<LinkColor>()?.color, linkBlueOnLight);
+    },
+  );
 }
