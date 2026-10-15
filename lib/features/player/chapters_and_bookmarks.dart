@@ -53,70 +53,36 @@ class CurrentChapterLine extends ConsumerWidget {
   }
 }
 
-/// Buttons under the player controls: add bookmark, sleep timer, bookmarks.
-/// The chapter list opens from [CurrentChapterLine].
-class ChapterBookmarkButtons extends ConsumerWidget {
-  const ChapterBookmarkButtons({
-    required this.episodeId,
-    this.bookmarks = true,
-    super.key,
-  });
-
-  final int episodeId;
-
-  /// False for provisional podcasts: nothing is stored for them (user wish
-  /// 2026-10-05), so no bookmarks either.
-  final bool bookmarks;
-
-  Future<void> _addBookmark(BuildContext context, WidgetRef ref) async {
-    final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    // Take the position first – playback continues while the dialog is open.
-    final position = ref.read(audioHandlerProvider).position;
-    final note = await showTextInputDialog(
-      context,
-      title: l10n.bookmarkAdd,
-      confirmLabel: l10n.save,
-      label: l10n.bookmarkNote,
-      allowEmpty: true,
-    );
-    if (note == null) return;
-    await ref
-        .read(bookmarkRepositoryProvider)
-        .add(episodeId, position, note: note);
-    showInfoSnackBar(messenger, l10n.bookmarkAdded(formatClock(position)));
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final saved =
-        ref.watch(episodeBookmarksProvider(episodeId)).value ?? const [];
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 4,
-      children: [
-        if (bookmarks)
-          TextButton.icon(
-            onPressed: () => _addBookmark(context, ref),
-            icon: const Icon(Icons.bookmark_add_outlined),
-            label: Text(l10n.bookmarkAdd),
-          ),
-        const SleepTimerButton(),
-        if (bookmarks && saved.isNotEmpty)
-          TextButton.icon(
-            onPressed: () => showEpisodeBookmarksSheet(context, episodeId),
-            icon: const Icon(Icons.bookmarks_outlined),
-            label: Text(l10n.bookmarksCount(saved.length)),
-          ),
-      ],
-    );
-  }
+/// "Lesezeichen setzen" at the current position: asks for an optional note,
+/// stores it and confirms with an info box. The list of the episode's
+/// bookmarks opens from a long press on that button (user wish 2026-10-16).
+Future<void> addBookmarkHere(
+  BuildContext context,
+  WidgetRef ref,
+  int episodeId,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  // Take the position first – playback continues while the dialog is open.
+  final position = ref.read(audioHandlerProvider).position;
+  final note = await showTextInputDialog(
+    context,
+    title: l10n.bookmarkAdd,
+    confirmLabel: l10n.save,
+    label: l10n.bookmarkNote,
+    allowEmpty: true,
+  );
+  if (note == null) return;
+  await ref
+      .read(bookmarkRepositoryProvider)
+      .add(episodeId, position, note: note);
+  showInfoSnackBar(messenger, l10n.bookmarkAdded(formatClock(position)));
 }
 
-/// Stopwatch button: shows the sleep timer, tap to choose (docs/playback.md).
-class SleepTimerButton extends ConsumerWidget {
-  const SleepTimerButton({super.key});
+/// Choice of the sleep timer (dialog); the button itself is part of the
+/// player's action bar (docs/playback.md).
+class SleepTimerButton {
+  const SleepTimerButton._();
 
   static const minuteChoices = [5, 15, 30, 60];
 
@@ -124,7 +90,7 @@ class SleepTimerButton extends ConsumerWidget {
   static const customMin = 1;
   static const customMax = 3600;
 
-  Future<void> _choose(BuildContext context, WidgetRef ref) async {
+  static Future<void> choose(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
     final handler = ref.read(audioHandlerProvider);
     final timer = handler.sleepTimerState.timer;
@@ -199,25 +165,6 @@ class SleepTimerButton extends ConsumerWidget {
       'end' => const SleepTimerAtEpisodeEnd(),
       _ => SleepTimerAfter(Duration(minutes: int.parse(chosen))),
     });
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    ref.watch(sleepTimerProvider);
-    // The position ticks while playing – enough to refresh the countdown.
-    ref.watch(positionProvider);
-    final state = ref.read(audioHandlerProvider).sleepTimerState;
-    final label = switch (state.timer) {
-      SleepTimerOff() => l10n.sleepTimer,
-      SleepTimerAfter() => l10n.sleepTimerLeft(formatClock(state.remaining!)),
-      SleepTimerAtEpisodeEnd() => l10n.sleepTimerEpisodeEndShort,
-    };
-    return TextButton.icon(
-      onPressed: () => _choose(context, ref),
-      icon: Icon(state.isActive ? Icons.timer : Icons.timer_outlined),
-      label: Text(label),
-    );
   }
 }
 

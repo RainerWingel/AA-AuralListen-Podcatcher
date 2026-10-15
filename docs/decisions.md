@@ -150,3 +150,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-15 · **Player-Dauer schlägt veralteten Feed (VBR-Erkennung verfeinert)** (Benutzermeldung Sternenkraft) · Nach dem
   exakten Laden zählt die gemeldete Dauer; ohne Dauer wird normal neu geladen. Vorher blieb die Anzeige bei der
   Feed-Dauer hängen, wenn die Datei unter alter Adresse ersetzt wurde.
+- 2026-10-16 · **Player: Bedienelemente fest unten, nur der Rest scrollt** (Benutzer) · Slider, −15/Play/+30 und die vier
+  Knöpfe (Lesezeichen, Sleep-Timer, Boost, Tempo) in einer Reihe sind angeheftet; die Reihe zeigt je nach Breite Text,
+  Symbole mit Wert oder nur Symbole. „Lesezeichen (n)" entfällt (Langdruck auf „Lesezeichen setzen"), die Beschreibung
+  steht unter dem Kapitel-Knopf im scrollbaren Teil. Slider in eigener Semantik-Gruppe (Flutter-Assertion sonst).

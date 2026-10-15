@@ -811,6 +811,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarkAdd => 'Add bookmark';
 
   @override
+  String bookmarkListHint(int count) {
+    return 'Long press: list of bookmarks ($count)';
+  }
+
+  @override
   String get bookmarkNote => 'Note (optional)';
 
   @override

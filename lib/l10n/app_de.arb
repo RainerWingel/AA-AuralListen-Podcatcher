@@ -489,6 +489,8 @@
     }
   },
   "bookmarkAdd": "Lesezeichen setzen",
+  "bookmarkListHint": "Lang drücken: Liste der Lesezeichen ({count})",
+  "@bookmarkListHint": {"placeholders": {"count": {"type": "int"}}},
   "bookmarkNote": "Notiz (optional)",
   "bookmarkAdded": "Lesezeichen bei {time} gesetzt",
   "@bookmarkAdded": {

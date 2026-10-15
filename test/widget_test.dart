@@ -24,6 +24,7 @@ import 'package:aapodcastguru/features/episodes/episode_description.dart';
 import 'package:aapodcastguru/features/player/chapter_cover.dart';
 import 'package:aapodcastguru/features/player/chapters_and_bookmarks.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
+import 'package:aapodcastguru/features/player/player_action_bar.dart';
 import 'package:aapodcastguru/features/player/player_controls.dart';
 import 'package:aapodcastguru/features/player/player_screen.dart';
 import 'package:aapodcastguru/features/playlists/playlist_screen.dart';
@@ -546,7 +547,7 @@ void main() {
       await tester.tap(find.byType(MiniPlayer));
       await settle(tester);
       expect(find.byType(Slider), findsOneWidget);
-      expect(find.text('Boost: Aus'), findsOneWidget);
+      expect(find.byKey(PlayerActionBar.boostKey), findsOneWidget);
 
       await tester.tap(find.byTooltip('30 Sekunden vor'));
       await settle(tester);
@@ -1344,6 +1345,7 @@ void main() {
     // Chapters from the feed.
     expect(find.text('Kapitel 1/2: Begrüßung'), findsOneWidget);
     await handlerSeek(tester, handler, const Duration(minutes: 5));
+    await tester.ensureVisible(find.text('Kapitel 1/2: Begrüßung'));
     await tester.tap(find.text('Kapitel 1/2: Begrüßung'));
     await settle(tester);
     // The current chapter (0:00–10:00) shows how much of it is heard.
@@ -1367,14 +1369,20 @@ void main() {
     expect(handler.position, const Duration(minutes: 10));
 
     // Bookmark with a note.
-    await tester.ensureVisible(find.text('Lesezeichen setzen'));
-    await tester.tap(find.text('Lesezeichen setzen'));
+    await tester.tap(find.byKey(PlayerActionBar.bookmarkKey));
     await settle(tester);
     await tester.enterText(find.byType(TextField), 'Gute Stelle');
     await tester.tap(find.text('Speichern'));
     await settle(tester);
     expect(find.text('Lesezeichen bei 10:00 gesetzt'), findsOneWidget);
-    expect(find.text('Lesezeichen (1)'), findsOneWidget);
+    // The list of the episode's bookmarks opens from a long press on the
+    // button (there is no separate "Lesezeichen (n)" button any more).
+    expect(find.text('Lesezeichen (1)'), findsNothing);
+    await tester.longPress(find.byKey(PlayerActionBar.bookmarkKey));
+    await settle(tester);
+    expect(find.text('Gute Stelle'), findsOneWidget);
+    await tester.tapAt(const Offset(10, 10)); // close the list
+    await settle(tester);
 
     // "Skip" marks a chapter in memory; choosing it later un-skips it.
     await tester.ensureVisible(find.text('Kapitel 2/2: Hauptteil'));
@@ -2317,7 +2325,8 @@ void main() {
     timeout: timeout,
     (tester) async {
       tester.view
-        ..physicalSize = const Size(1080, 2340)
+        ..physicalSize =
+            const Size(3600, 2340) // wide: labelled buttons
         ..devicePixelRatio = 3;
       addTearDown(tester.view.reset);
       await pumpApp(tester);
@@ -2677,9 +2686,9 @@ void main() {
     'player: same visible gap between the control blocks',
     timeout: timeout,
     (tester) async {
-      // Wide enough that each button row stays one row in the test font.
+      // Wide enough for the labelled buttons in the test font.
       tester.view
-        ..physicalSize = const Size(2400, 2340)
+        ..physicalSize = const Size(3600, 2340)
         ..devicePixelRatio = 3;
       addTearDown(tester.view.reset);
       await pumpApp(tester);
@@ -2705,14 +2714,126 @@ void main() {
       );
       final play = tester.getRect(find.byType(PlayPauseButton).last);
       final bookmark = pill('Lesezeichen setzen');
-      final boost = pill('Boost: Aus');
+      final chapter = pill('Kapitel 1/2: Begrüßung');
       final description = tester.getRect(
         find.byType(EpisodeDescriptionSection),
       );
-      final rows = boost.top - bookmark.bottom;
-      expect(rows, 16);
-      expect(bookmark.top - play.bottom, rows);
-      expect(description.top - boost.bottom, rows);
+      // Pinned below: play row → button row; scrolling above: chapter
+      // button → description. The same visible gap (16) each time.
+      expect(bookmark.top - play.bottom, 16);
+      expect(description.top - chapter.bottom, 16);
+
+      await disposeApp(tester);
+    },
+  );
+
+  /// Plays "Erste Folge" in the full player at the given view size.
+  Future<void> openPlayerAt(WidgetTester tester, Size physicalSize) async {
+    tester.view
+      ..physicalSize = physicalSize
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.runAsync(
+      () =>
+          ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
+              .read(podcastRepositoryProvider)
+              .subscribe('https://example.com/feed'),
+    );
+    await settle(tester);
+    await tester.tap(find.text('Erste Folge'));
+    await settle(tester);
+    await tester.tap(find.byType(MiniPlayer));
+    await settle(tester);
+  }
+
+  testWidgets(
+    'player: seek bar, play row and the four buttons stay put while the '
+    'rest scrolls',
+    timeout: timeout,
+    (tester) async {
+      await openPlayerAt(tester, const Size(1080, 2340));
+      Rect rect(Finder f) => tester.getRect(f.first);
+      final seek = rect(find.byType(Slider));
+      final play = rect(find.byType(PlayPauseButton));
+      final skip = rect(find.byTooltip('30 Sekunden vor'));
+      final bookmark = rect(find.byKey(PlayerActionBar.bookmarkKey));
+      final speed = rect(find.byKey(PlayerActionBar.speedKey));
+      final description = rect(find.byType(EpisodeDescriptionSection));
+      final screen = tester.view.physicalSize.height / 3;
+
+      // The buttons sit at the bottom edge; the description above them.
+      expect(speed.bottom, greaterThan(screen - 80));
+      expect(bookmark.top, greaterThan(play.bottom));
+      expect(play.top, greaterThan(seek.bottom));
+
+      await tester.drag(
+        find.byType(SingleChildScrollView).first,
+        const Offset(0, -300),
+      );
+      await settle(tester);
+      expect(rect(find.byType(Slider)), seek);
+      expect(rect(find.byType(PlayPauseButton)), play);
+      expect(rect(find.byTooltip('30 Sekunden vor')), skip);
+      expect(rect(find.byKey(PlayerActionBar.bookmarkKey)), bookmark);
+      expect(rect(find.byKey(PlayerActionBar.speedKey)), speed);
+      // ... while the description moved with the scrolling content.
+      expect(
+        rect(find.byType(EpisodeDescriptionSection)).top,
+        lessThan(description.top),
+      );
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'player: the four buttons are labelled when wide, short in portrait, '
+    'icons only when narrow',
+    timeout: timeout,
+    (tester) async {
+      await openPlayerAt(tester, const Size(3600, 2340));
+      Finder inside(Key key, Finder what) =>
+          find.descendant(of: find.byKey(key), matching: what);
+
+      // Wide (landscape): everything spelled out.
+      expect(find.text('Lesezeichen setzen'), findsOneWidget);
+      expect(find.text('Sleep-Timer'), findsOneWidget);
+      expect(find.text('Boost: Aus'), findsOneWidget);
+      expect(find.text('Tempo: Aus'), findsOneWidget);
+
+      // Portrait: icons; boost with its dB value, tempo with its factor.
+      tester.view.physicalSize = const Size(1200, 2340);
+      await settle(tester);
+      expect(find.text('Lesezeichen setzen'), findsNothing);
+      expect(
+        inside(PlayerActionBar.bookmarkKey, find.byType(Text)),
+        findsNothing,
+      );
+      expect(inside(PlayerActionBar.sleepKey, find.byType(Text)), findsNothing);
+      expect(
+        inside(PlayerActionBar.boostKey, find.text('Aus')),
+        findsOneWidget,
+      );
+      expect(
+        inside(PlayerActionBar.speedKey, find.text('1,0x')),
+        findsOneWidget,
+      );
+      expect(find.byTooltip('Lesezeichen setzen'), findsOneWidget);
+
+      // Very narrow (or a huge font): icons only.
+      tester.view.physicalSize = const Size(1050, 2340);
+      await settle(tester);
+      for (final key in [
+        PlayerActionBar.bookmarkKey,
+        PlayerActionBar.sleepKey,
+        PlayerActionBar.boostKey,
+        PlayerActionBar.speedKey,
+      ]) {
+        expect(inside(key, find.byType(Text)), findsNothing, reason: '$key');
+      }
+      expect(find.byTooltip('Tempo: Aus'), findsOneWidget);
+      expect(find.byTooltip('Boost: Aus'), findsOneWidget);
 
       await disposeApp(tester);
     },
@@ -2769,7 +2890,8 @@ void main() {
     timeout: timeout,
     (tester) async {
       tester.view
-        ..physicalSize = const Size(1080, 2340)
+        ..physicalSize =
+            const Size(3600, 2340) // wide: labelled buttons
         ..devicePixelRatio = 3;
       addTearDown(tester.view.reset);
       // The player agrees with the feed (a differing length would count as

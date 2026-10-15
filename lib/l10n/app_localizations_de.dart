@@ -814,6 +814,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookmarkAdd => 'Lesezeichen setzen';
 
   @override
+  String bookmarkListHint(int count) {
+    return 'Lang drücken: Liste der Lesezeichen ($count)';
+  }
+
+  @override
   String get bookmarkNote => 'Notiz (optional)';
 
   @override

@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:audio_service/audio_service.dart' show MediaItem;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,11 +17,10 @@ import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
 import '../../l10n/app_localizations.dart';
 import '../episodes/episode_description.dart';
-import 'boost_sheet.dart';
 import 'chapter_cover.dart';
 import 'chapters_and_bookmarks.dart';
+import 'player_action_bar.dart';
 import 'player_controls.dart';
-import 'speed_sheet.dart';
 
 /// "Downloaded" mark in front of the podcast name – only when the file is
 /// complete (playback then comes from the phone, not the network).
@@ -65,6 +66,13 @@ class PlayerScreen extends ConsumerWidget {
     // (Weber–Fechner, perceived_brightness.dart).
     final theme = playerTheme(Theme.of(context));
     final item = ref.watch(mediaItemProvider).value?.mediaItem;
+    final podcastId = item?.extras?['podcastId'] as int?;
+    final episodeId = item?.extras?['episodeId'] as int?;
+    // Live, so "Abonnieren" during playback shows them at once.
+    final provisional = switch (podcastId) {
+      final id? => ref.watch(podcastProvider(id)).value?.provisional ?? false,
+      null => false,
+    };
 
     return Theme(
       data: theme,
@@ -79,121 +87,155 @@ class PlayerScreen extends ConsumerWidget {
         ),
         body: item == null
             ? const SizedBox.shrink()
-            : SafeArea(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final coverSize = (constraints.maxWidth - 64).clamp(
-                      120.0,
-                      360.0,
-                    );
-                    final podcastId = item.extras?['podcastId'] as int?;
-                    // Live, so "Abonnieren" during playback shows them at once.
-                    final provisional = switch (podcastId) {
-                      final id? =>
-                        ref.watch(podcastProvider(id)).value?.provisional ??
-                            false,
-                      null => false,
-                    };
-                    return SingleChildScrollView(
+            // Scrolls: cover, title, playlist, chapters and the description.
+            // The controls stay pinned below (user wish 2026-10-16).
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  // The cover never grows over the visible area (landscape):
+                  // it would only scroll away.
+                  final coverSize = max(
+                    72.0,
+                    min(
+                      constraints.maxWidth - 64,
+                      min(360.0, constraints.maxHeight - 32),
+                    ),
+                  );
+                  return SafeArea(
+                    bottom: false,
+                    child: SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
+                      child: _PlayerInfo(
+                        item: item,
+                        coverSize: coverSize,
+                        theme: theme,
+                        provisional: provisional,
+                      ),
+                    ),
+                  );
+                },
+              ),
+        // As the bottom bar of the scaffold, so info boxes float above the
+        // pinned buttons instead of covering them.
+        bottomNavigationBar: item == null
+            ? null
+            : SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Own semantics group: the slider below the scrolling area
+                      // otherwise trips a Flutter semantics assertion when
+                      // the episode changes under an open sheet (tests).
+                      Semantics(
+                        container: true,
+                        explicitChildNodes: true,
+                        child: _SeekBar(total: item.duration),
+                      ),
+                      const SizedBox(height: 8),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          const SizedBox(height: 16),
-                          PlayerCover(
-                            episodeId: item.extras?['episodeId'] as int?,
-                            coverUrl: item.artUri?.toString(),
-                            size: coverSize,
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            item.title,
-                            textAlign: TextAlign.center,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (item.extras?['episodeId'] case final int id)
-                                _DownloadedIcon(episodeId: id),
-                              Flexible(
-                                child: Text(
-                                  item.album ?? '',
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Above the seek bar, so the playlist context sits
-                          // with the title (user request 2026-10-01).
-                          if (item.extras?['playlistId'] case final int id)
-                            _PlaylistRow(playlistId: id)
-                          else if (item.extras?['suggestedPlaylistId']
-                              case final int id)
-                            _PlaylistRow(playlistId: id, offered: true),
-                          const SizedBox(height: 16),
-                          _SeekBar(total: item.duration),
-                          if (item.extras?['episodeId'] case final int id)
-                            CurrentChapterLine(episodeId: id),
-                          const SizedBox(height: 8),
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              SkipButton.back(),
-                              PlayPauseButton(size: 48, filled: true),
-                              SkipButton.forward(),
-                            ],
-                          ),
-                          // Same visible gap (16) everywhere between the
-                          // control blocks (user wish 2026-10-09): text
-                          // buttons carry 4 invisible tap-target padding on
-                          // each side, so 12 here + 4 = 16 = 8 + 4 + 4
-                          // between the two button rows.
-                          const SizedBox(height: _controlGap),
-                          if (item.extras?['episodeId'] case final int id)
-                            ChapterBookmarkButtons(
-                              episodeId: id,
-                              bookmarks: !provisional,
-                            ),
-                          const SizedBox(height: 8),
-                          // Boost and speed side by side (wrap on narrow
-                          // screens or large fonts).
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 8,
-                            children: [
-                              if (podcastId != null && !provisional)
-                                _BoostButton(podcastId),
-                              const _SpeedButton(),
-                            ],
-                          ),
-                          if (item.extras?['episodeId'] case final int id) ...[
-                            const SizedBox(height: _controlGap),
-                            _OnPlayerBackground(
-                              child: EpisodeDescriptionSection(
-                                episodeId: id,
-                                podcastId: podcastId,
-                                pubDate: switch (item.extras?['pubDateMs']) {
-                                  final int ms =>
-                                    DateTime.fromMillisecondsSinceEpoch(ms),
-                                  _ => null,
-                                },
-                              ),
-                            ),
-                          ],
-                          const SizedBox(height: 16),
+                          SkipButton.back(),
+                          PlayPauseButton(size: 48, filled: true),
+                          SkipButton.forward(),
                         ],
                       ),
-                    );
-                  },
+                      // Same visible gap (16) between the control blocks
+                      // (user wish 2026-10-09): text buttons carry 4
+                      // invisible tap-target padding on each side, so
+                      // 12 here + 4 = 16.
+                      const SizedBox(height: _controlGap),
+                      if (episodeId != null)
+                        PlayerActionBar(
+                          episodeId: episodeId,
+                          podcastId: podcastId,
+                          bookmarks: !provisional,
+                        ),
+                    ],
+                  ),
                 ),
               ),
       ),
+    );
+  }
+}
+
+/// The scrolling part of the player: cover, title, podcast, playlist row,
+/// the chapter button and – one step below it – the description.
+class _PlayerInfo extends ConsumerWidget {
+  const _PlayerInfo({
+    required this.item,
+    required this.coverSize,
+    required this.theme,
+    required this.provisional,
+  });
+
+  final MediaItem item;
+  final double coverSize;
+  final ThemeData theme;
+  final bool provisional;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final podcastId = item.extras?['podcastId'] as int?;
+    final episodeId = item.extras?['episodeId'] as int?;
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        PlayerCover(
+          episodeId: episodeId,
+          coverUrl: item.artUri?.toString(),
+          size: coverSize,
+        ),
+        const SizedBox(height: 24),
+        Text(
+          item.title,
+          textAlign: TextAlign.center,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleLarge,
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (episodeId != null) _DownloadedIcon(episodeId: episodeId),
+            Flexible(
+              child: Text(
+                item.album ?? '',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+        // Under the title, so the playlist context sits with it (user
+        // request 2026-10-01).
+        if (item.extras?['playlistId'] case final int id)
+          _PlaylistRow(playlistId: id)
+        else if (item.extras?['suggestedPlaylistId'] case final int id)
+          _PlaylistRow(playlistId: id, offered: true),
+        const SizedBox(height: 8),
+        if (episodeId != null) ...[
+          CurrentChapterLine(episodeId: episodeId),
+          const SizedBox(height: _controlGap),
+          _OnPlayerBackground(
+            child: EpisodeDescriptionSection(
+              episodeId: episodeId,
+              podcastId: podcastId,
+              pubDate: switch (item.extras?['pubDateMs']) {
+                final int ms => DateTime.fromMillisecondsSinceEpoch(ms),
+                _ => null,
+              },
+            ),
+          ),
+        ],
+        const SizedBox(height: 16),
+      ],
     );
   }
 }
@@ -296,43 +338,6 @@ class _TotalOrRemaining extends ConsumerWidget {
               : '-${formatClock(remaining)}$effective',
         ),
       ),
-    );
-  }
-}
-
-class _SpeedButton extends ConsumerWidget {
-  const _SpeedButton();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final speed = ref.watch(playbackSpeedProvider).value ?? 1;
-    return TextButton.icon(
-      onPressed: () => showSpeedSheet(context),
-      icon: const Icon(Icons.speed),
-      label: Text(
-        l10n.speedButton(speed == 1 ? l10n.boostOff : formatSpeed(l10n, speed)),
-      ),
-    );
-  }
-}
-
-class _BoostButton extends ConsumerWidget {
-  const _BoostButton(this.podcastId);
-
-  final int podcastId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final boost = ref.watch(boostSettingProvider(podcastId));
-    final value = boost.db <= 0
-        ? l10n.boostOff
-        : l10n.boostValue(boost.db.round());
-    return TextButton.icon(
-      onPressed: () => showBoostSheet(context, podcastId),
-      icon: Icon(boost.db > 0 ? Icons.volume_up : Icons.volume_down),
-      label: Text(l10n.boostButton(value)),
     );
   }
 }

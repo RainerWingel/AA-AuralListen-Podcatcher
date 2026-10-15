@@ -1424,6 +1424,12 @@ abstract class AppLocalizations {
   /// **'Lesezeichen setzen'**
   String get bookmarkAdd;
 
+  /// No description provided for @bookmarkListHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Lang drücken: Liste der Lesezeichen ({count})'**
+  String bookmarkListHint(int count);
+
   /// No description provided for @bookmarkNote.
   ///
   /// In de, this message translates to:

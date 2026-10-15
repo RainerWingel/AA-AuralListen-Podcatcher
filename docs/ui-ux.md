@@ -75,16 +75,24 @@ Einstellungen: Abschnitt „Abos" → „OPML-Datei importieren".
 war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 → Knopfreihe 2 → Beschreibung jeweils **16**
   sichtbar (`_controlGap` = 12 + 4 unsichtbarer Tipp-Rand der Textknöpfe; zwischen den Reihen 8 + 4 + 4), ein
   Widget-Test misst es nach.
-- **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation): großes Cover, Titel, Podcast (davor ✓-Download-Symbol „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist),
-  Slider mit „verstrichen" / „-verbleibend" (Tippen auf die rechte Zeit wechselt zur Gesamtlänge und zurück, gemerkt in
-  `settings['player.showTotalTime']`, Benutzerwunsch 2026-10-03; bei Tempo ≠ 1 zusätzlich „(-tatsächliche Restzeit)"),
-  −15 s / Play / +30 s, „Boost: …" und daneben „Tempo: …" (öffnen je eine Auswahl, `playback.md`). Pfeil nach unten schließt.
-  Darunter „Kapitel x/n: Titel" (falls vorhanden; tippen → Kapitel-Liste) und Knöpfe „Lesezeichen setzen", Sleep-Timer (Stoppuhr;
-  aktiv: „noch mm:ss" bzw. „Bis Folgenende"), „Lesezeichen (n)". Ganz unten aufklappbarer Bereich „Beschreibung"
-  (Shownotes mit Links, zugeklappt; Benutzerwunsch 2026-10-01). Aufgeklappt steht oben „Folge 105 · 26. September
-  2025" – Nummer wie am Cover (eigene Zählung/Versatz/Staffel „S2·5" beachtet), Erscheinungsdatum aus
-  `mediaItem.extras['pubDateMs']` (Benutzerwunsch 2026-10-04); der Bereich erscheint auch ohne Shownotes, wenn es
-  Nummer oder Datum gibt.
+- **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation), **zwei Bereiche** (Benutzerwunsch 2026-10-16):
+  - **Oben, scrollbar:** großes Cover (nie höher als der sichtbare Bereich), Titel, Podcast (davor ✓-Download-Symbol
+    „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist), Playlist-Zeile, darunter „Kapitel x/n: Titel" (bzw.
+    „Kapitel (n)" vor dem ersten Kapitel; tippen → Kapitel-Liste) und **eine Stufe darunter** der aufklappbare Bereich
+    „Beschreibung" (Shownotes mit Links, zugeklappt; Benutzerwunsch 2026-10-01). Aufgeklappt steht oben „Folge 105 ·
+    26. September 2025" – Nummer wie am Cover (eigene Zählung/Versatz/Staffel „S2·5" beachtet), Erscheinungsdatum aus
+    `mediaItem.extras['pubDateMs']` (Benutzerwunsch 2026-10-04); der Bereich erscheint auch ohne Shownotes, wenn es
+    Nummer oder Datum gibt.
+  - **Unten, fest angeheftet** (`bottomNavigationBar` des Scaffolds, scrollt nicht mit; Infoboxen schweben darüber):
+    Slider mit „verstrichen" / „-verbleibend" (Tippen auf die rechte Zeit wechselt zur Gesamtlänge und zurück, gemerkt
+    in `settings['player.showTotalTime']`, Benutzerwunsch 2026-10-03; bei Tempo ≠ 1 zusätzlich „(-tatsächliche
+    Restzeit)"), darunter −15 s / Play / +30 s und darunter **eine Reihe mit vier Knöpfen** (`PlayerActionBar`):
+    Lesezeichen setzen, Sleep-Timer, Boost, Tempo. Anzeige je nach Breite (gemessen mit echter Schrift und
+    Schriftgröße): **breit** (z. B. Querformat) ausgeschrieben („Lesezeichen setzen", „Sleep-Timer"/„noch mm:ss",
+    „Boost: +6 dB", „Tempo: 1,5x"); **Hochformat** nur Symbole, Boost zusätzlich mit dB-Wert, Tempo mit Faktor; **sehr
+    schmal oder riesige Schrift** nur Symbole (Beschriftung als Tooltip/Screenreader-Text). Den Knopf „Lesezeichen (n)"
+    gibt es nicht mehr: **Langes Drücken auf „Lesezeichen setzen"** öffnet die Liste der Lesezeichen dieser Folge
+    (Tooltip nennt die Anzahl). Boost/Tempo öffnen je eine Auswahl (`playback.md`). Pfeil nach unten schließt.
   Kapitel-Liste: Titel, darunter Startzeit, rechts Chip „Skip" (übersprungen = durchgestrichen) → `playback.md`.
   **Kapitelbilder:** Das große Cover wird beim Abspielen durch das Bild des laufenden Kapitels ersetzt, 2 Minuten nach
   Pause kommt das Folgen-Cover zurück (`playback.md`).

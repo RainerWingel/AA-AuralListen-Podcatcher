@@ -38,7 +38,7 @@ Regressionstest: „switching episodes while playing reports "playing"".
 
 ### Sleep-Timer (Benutzerwunsch 2026-09-28)
 Code: `lib/audio/sleep_timer.dart` (Einstellung), `PodcastAudioHandler` (Abschnitt „sleep timer"),
-Knopf `SleepTimerButton` rechts neben „Lesezeichen setzen" im Vollbild-Player.
+Knopf in der festen Knopfreihe des Vollbild-Players (`PlayerActionBar`, `ui-ux.md`; Auswahl: `SleepTimerButton.choose`).
 - Auswahl: Aus · 5 · 15 · 30 · 60 Minuten · **Eigene Zeit…** (Zahlenfeld, ganze Minuten 1–3600, „Starten" nur bei
   gültigem Wert; gesetzt steht dort „Eigene Zeit: n Minuten") · Bis Ende der Folge. Nur im Arbeitsspeicher.
 - Auch der schon gewählte Eintrag reagiert auf Tippen (`toggleable`): „Eigene Zeit" lässt sich so ändern, eine feste
@@ -270,7 +270,7 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
 
 ## Lesezeichen (M6 ✅)
 - Vollbild-Player → „Lesezeichen setzen": merkt die Position **beim Tippen** (Wiedergabe läuft weiter), optional Notiz.
-- „Lesezeichen (n)" im Player: Liste der Folge, Tippen springt. Optionen → „Lesezeichen": alle, neueste zuerst;
+- Langes Drücken auf „Lesezeichen setzen" im Player: Liste der Folge (kein eigener Knopf mehr, 2026-10-16), Tippen springt. Optionen → „Lesezeichen": alle, neueste zuerst;
   Tippen spielt die Folge **genau** ab dieser Stelle (`playEpisode(startAt:)`, auch wenn sie schon gespielt war).
 - Langes Drücken bearbeitet die Notiz, Papierkorb löscht – **nach Rückfrage** „Lesezeichen löschen? „Notiz/Zeit“ wirklich
   löschen?" (Benutzerwunsch 2026-10-10), danach Infobox. Gilt in der Folgen- und der globalen Liste (`BookmarkTile`).
