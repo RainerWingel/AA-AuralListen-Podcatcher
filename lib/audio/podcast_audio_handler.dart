@@ -73,6 +73,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   static const rewindInterval = Duration(seconds: 15);
   static const fastForwardInterval = Duration(seconds: 30);
 
+  /// Holding a skip button: every [scanTick] the shown position moves by
+  /// [scanStep] (user wish 2026-10-20).
+  static const scanTick = Duration(milliseconds: 100);
+  static const scanStep = Duration(seconds: 15);
+
   /// When resuming, jump back a little to regain context.
   static const resumeRewind = Duration(seconds: 3);
 
@@ -330,6 +335,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     int? playlistId,
     Duration? startAt,
   }) async {
+    await _finishScan();
     _resetRecovery();
     // The old episode's membership watcher must not act while switching.
     await _stopWatching();
@@ -483,8 +489,72 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
+  Timer? _scanTimer;
+
+  /// Playback was running when the scan began: it goes on when it ends.
+  bool _scanResume = false;
+
+  /// A skip button is being held (see [startScan]).
+  bool get isScanning => _scanTimer != null;
+
+  /// Hold of a skip button: the audio stops and is unloaded (nothing is read
+  /// or played while scanning – also no stream requests), only the shown
+  /// position runs on, [scanStep] every [scanTick], backwards or [forward].
+  /// [stopScan] stores the place once and – if it was playing before – plays
+  /// on from exactly there.
+  Future<void> startScan({required bool forward}) async {
+    if (_episodeId == null || _scanTimer != null) return;
+    _scanResume = _loaded && _engine.state.playing;
+    if (_loaded) await stop();
+    if (_episodeId == null) return;
+    _exactStart = true;
+    _scanTimer = Timer.periodic(scanTick, (_) {
+      // Only the position display moves (no state broadcast, no database).
+      final step = forward ? scanStep : -scanStep;
+      _setIdlePosition(_scanClamp(_idlePosition + step));
+    });
+  }
+
+  /// Ends a scan begun with [startScan]: the position is stored, playback
+  /// goes on if it was running before the scan.
+  Future<void> stopScan() async {
+    if (_scanTimer == null) return;
+    final resume = _scanResume;
+    await _finishScan();
+    if (resume) await play();
+  }
+
+  /// Stops the scan timer and stores where it ended. Also used when
+  /// something else takes over (play, a new episode).
+  Future<void> _finishScan() async {
+    final timer = _scanTimer;
+    if (timer == null) return;
+    timer.cancel();
+    _scanTimer = null;
+    _scanResume = false;
+    final id = _episodeId;
+    if (id == null) return;
+    _exactStart = true;
+    _broadcastState();
+    if (!await _playback.isProvisional(id)) {
+      await _playback.savePosition(id, _idlePosition);
+    }
+  }
+
+  /// A scan stays one second before the end, so it never ends the episode.
+  Duration _scanClamp(Duration position) {
+    final max = mediaItem.value?.duration;
+    if (position < Duration.zero) return Duration.zero;
+    if (max != null && max > const Duration(seconds: 1)) {
+      final last = max - const Duration(seconds: 1);
+      if (position > last) return last;
+    }
+    return position;
+  }
+
   @override
   Future<void> play() async {
+    await _finishScan();
     final error = await _tryPlay();
     if (error != null) await _handleFailure(error, _Retry.none);
   }
@@ -584,6 +654,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Releases everything (tests and app shutdown).
   Future<void> dispose() async {
+    _scanTimer?.cancel();
     _pauseTimer?.cancel();
     _finishedCleanUp?.cancel();
     _cancelSleepTimers();

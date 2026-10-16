@@ -128,6 +128,14 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 
 ## Sprünge
 −15 s / +30 s im Vollbild-Player und in der Benachrichtigung (Grenzen: 0 und Dauer).
+- **Gedrückt halten = Suchlauf** (Benutzerwunsch 2026-10-20, nur die Knöpfe im Player): Solange ein Skip-Knopf gehalten
+  wird (langes Drücken), läuft die **angezeigte Position** alle 100 ms um 15 s vor bzw. zurück (`startScan`/`stopScan`,
+  `scanTick`/`scanStep`). Das Audio wird dabei **gestoppt und entladen** (wie nach dem Pause-Timeout) – es wird nichts
+  gelesen, gespielt oder gestreamt, auch keine Seeks. Die Position steht nur im Anzeige-Strom (`_setIdlePosition`), nicht in
+  der DB und nicht im Benachrichtigungs-Zustand. Grenzen: 0:00 und **1 s vor dem Ende** (ein Suchlauf beendet die Folge nie).
+  Loslassen: Position wird **einmal** gespeichert (vorläufige Podcasts nichts) und, **wenn vorher Wiedergabe lief**, spielt
+  sie exakt dort weiter (`_exactStart`); war sie pausiert, bleibt sie pausiert. Play/neue Folge während des Suchlaufs beenden
+  ihn zuerst (`_finishScan`). Der Tooltip der Knöpfe löst nicht mehr per Langdruck aus (sonst gewänne er die Geste).
 
 ## Hörposition
 - Gespeichert: alle **5 s** während der Wiedergabe, bei Pause, Seek, Stopp und Folgenwechsel.

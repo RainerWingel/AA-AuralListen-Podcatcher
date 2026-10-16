@@ -3147,6 +3147,49 @@ void main() {
   );
 
   testWidgets(
+    'holding the skip buttons scans; a tap still skips',
+    timeout: timeout,
+    (tester) async {
+      await openPlayerAt(tester, const Size(1080, 2340));
+      final start = handler.position;
+
+      // A tap: +30 s as before.
+      await tester.tap(find.byTooltip('30 Sekunden vor'));
+      await settle(tester);
+      expect(handler.position - start, const Duration(seconds: 30));
+      expect(handler.isScanning, isFalse);
+
+      // Held: the position runs on, the audio is not played meanwhile.
+      final before = handler.position;
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byTooltip('30 Sekunden vor')),
+      );
+      // The long press fires after 500 ms; the audio is unloaded (a
+      // database write, hence the real-time settle), then the scan runs.
+      await settle(tester);
+      await settle(tester);
+      expect(handler.isScanning, isTrue);
+      expect(
+        handler.position - before,
+        greaterThan(const Duration(minutes: 1)),
+      );
+      expect(engine.state.playing, isFalse);
+
+      // Released: scanning ends and playback goes on from there.
+      await gesture.up();
+      await settle(tester);
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 100)),
+      );
+      await settle(tester);
+      expect(handler.isScanning, isFalse);
+      expect(engine.state.playing, isTrue);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'tapping the remaining time shows the total length, remembered',
     timeout: timeout,
     (tester) async {

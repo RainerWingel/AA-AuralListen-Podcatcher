@@ -91,7 +91,7 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
   - **Unten, fest angeheftet** (`bottomNavigationBar` des Scaffolds, scrollt nicht mit; Infoboxen schweben darüber):
     Slider mit „verstrichen" / „-verbleibend" (Tippen auf die rechte Zeit wechselt zur Gesamtlänge und zurück, gemerkt
     in `settings['player.showTotalTime']`, Benutzerwunsch 2026-10-03; bei Tempo ≠ 1 zusätzlich „(-tatsächliche
-    Restzeit)"), darunter −15 s / Play / +30 s und darunter **eine Reihe mit vier Knöpfen** (`PlayerActionBar`):
+    Restzeit)"), darunter −15 s / Play / +30 s (**gedrückt halten spult** alle 100 ms um 15 s, `playback.md`) und darunter **eine Reihe mit vier Knöpfen** (`PlayerActionBar`):
     Lesezeichen setzen, Sleep-Timer, Boost, Tempo. Anzeige je nach Breite (gemessen mit echter Schrift und
     Schriftgröße): **breit** (z. B. Querformat) ausgeschrieben („Lesezeichen setzen", „Sleep-Timer"/„noch mm:ss",
     „Boost: +6 dB", „Tempo: 1,5x"); **Hochformat** nur Symbole, Boost zusätzlich mit dB-Wert, Tempo mit Faktor; **sehr

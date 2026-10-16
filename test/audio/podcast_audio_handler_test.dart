@@ -587,6 +587,94 @@ void main() {
     expect(handler.position, const Duration(minutes: 10));
   });
 
+  group('holding a skip button scans the position', () {
+    Future<void> wait(int ms) =>
+        Future<void>.delayed(Duration(milliseconds: ms));
+
+    test('plays on from exactly there, nothing is loaded meanwhile', () async {
+      await handler.playEpisode(episodeId); // 57 s, playing
+      final loadsBefore = engine.exactLoads.length;
+
+      await handler.startScan(forward: true);
+      expect(handler.isScanning, isTrue);
+      expect(engine.calls.last, 'stop'); // unloaded, not just paused
+      await wait(370);
+      // About every 100 ms 15 s: clearly beyond the +30 s of a tap
+      // (57 s + 30 s = 87 s).
+      final scanned = handler.position;
+      expect(scanned, greaterThan(const Duration(seconds: 95)));
+      // No load, seek or play while scanning.
+      expect(engine.exactLoads.length, loadsBefore);
+      expect(engine.calls.where((c) => c == 'seek'), isEmpty);
+      expect(engine.state.playing, isFalse);
+
+      await handler.stopScan();
+      expect(handler.isScanning, isFalse);
+      // Stored once, then played again from exactly this place.
+      final stopped = handler.position;
+      expect((await episode()).positionMs, stopped.inMilliseconds);
+      expect(engine.loadedAt, stopped);
+      expect(engine.state.playing, isTrue);
+      expect(stopped, greaterThanOrEqualTo(scanned));
+    });
+
+    test('was paused before: stays paused, the place is kept', () async {
+      await handler.playEpisode(episodeId);
+      await handler.pause();
+      engine.emitPosition(const Duration(minutes: 8));
+      await handler.startScan(forward: false);
+      await wait(250);
+      await handler.stopScan();
+
+      expect(engine.state.playing, isFalse);
+      final e = await episode();
+      expect(e.positionMs, lessThan(const Duration(minutes: 8).inMilliseconds));
+      expect(handler.position, Duration(milliseconds: e.positionMs));
+      // Play then starts exactly at the scanned place.
+      await handler.play();
+      expect(engine.loadedAt, handler.position);
+    });
+
+    test(
+      'stays within the episode: 0:00 … one second before the end',
+      () async {
+        await handler.playEpisode(episodeId);
+        await handler.startScan(forward: false);
+        await wait(700);
+        expect(handler.position, Duration.zero);
+        await handler.stopScan();
+
+        await handler.startScan(forward: true);
+        await wait(4500); // 40 steps of 15 s reach the 10-minute end
+        expect(handler.position, const Duration(minutes: 9, seconds: 59));
+        await handler.stopScan();
+        // Does not end the episode.
+        expect((await episode()).status, isNot(EpisodeStatus.played));
+      },
+    );
+
+    test('play during a scan ends it and plays from there', () async {
+      await handler.playEpisode(episodeId);
+      await handler.startScan(forward: true);
+      await wait(250);
+      await handler.play();
+      expect(handler.isScanning, isFalse);
+      expect(engine.state.playing, isTrue);
+      expect(engine.loadedAt, isNot(const Duration(seconds: 57)));
+    });
+
+    test('a provisional podcast stores nothing', () async {
+      await (db.update(db.podcasts)..where((p) => p.id.equals(podcastId)))
+          .write(const PodcastsCompanion(provisional: Value(true)));
+      final before = await episode();
+      await handler.playEpisode(episodeId);
+      await handler.startScan(forward: true);
+      await wait(250);
+      await handler.stopScan();
+      expect((await episode()).positionMs, before.positionMs);
+    });
+  });
+
   test('a long pause stops the player', () async {
     await handler.playEpisode(episodeId);
     await handler.pause();
