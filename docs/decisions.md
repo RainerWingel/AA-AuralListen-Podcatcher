@@ -163,3 +163,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-17 · **Player: Bild auch hinter der Titelleiste, Bedienfeld als eingerückte Karte mit Rundum-Schatten** (Benutzer) ·
   Scaffold transparent über dem Hintergrund; das Bedienfeld behält das normale Theme.
 - 2026-10-19 · **Podcast-Beschreibung aufklappbar** (Benutzer) · 4 Zeilen, „Weiterlesen"/„Weniger anzeigen" nur bei längerem Text.
+- 2026-10-16 · **Keine Chromecast-Unterstützung** (Benutzer) · Google Cast braucht das Cast-Framework mit Google-Play-Diensten –
+  das verbietet die F-Droid-Regel (`f-droid.md`: keine Google-Dienste). Nicht umgesetzt; nur mit Rückfrage neu aufrollen.
