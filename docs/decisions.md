@@ -175,3 +175,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   (geschlossener Test 12 Tester × 14 Tage, abgebrochen).
 - 2026-10-20 · **Tempo „Nur für diesen Podcast"** (Benutzer) · Analog zum Boost: eigene Spalte `podcasts.speed` (Schema v29,
   nur eine neue Spalte), gleiche Regeln und Beschriftung; Restzeit-Anzeige nutzt das wirksame Tempo.
+- 2026-10-21 · **Suche: „Beliebt“ und „Neuheiten“** (Benutzer) · Beliebt = Apples Top-Chart für Deutschland (kein Key, Feed-Adressen
+  per Lookup), Neuheiten = fyyd „latest“ (deutsch, mit Folgen). Für fyyd habe ich keinen funktionierenden „hot“-Endpunkt gefunden,
+  Apple bietet keine „Neu“-Liste. Neue Netzwerkziele nur auf Tipp, keine Suchbegriffe; `datenschutz.md`/`privacy.md` ergänzt.

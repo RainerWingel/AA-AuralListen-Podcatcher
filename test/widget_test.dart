@@ -122,6 +122,37 @@ final _itunesJson = jsonEncode({
   ],
 });
 
+// "Popular": Apple's chart (ids) and the lookup that adds the feed address.
+final _chartJson = jsonEncode({
+  'feed': {
+    'results': [
+      {'id': '555', 'name': 'Beliebter Podcast', 'artistName': 'Star'},
+    ],
+  },
+});
+final _lookupJson = jsonEncode({
+  'results': [
+    {
+      'collectionId': 555,
+      'feedUrl': 'https://example.com/feed',
+      'trackCount': 7,
+    },
+  ],
+});
+
+// "New": freshly added podcasts of fyyd.
+final _latestJson = jsonEncode({
+  'status': 1,
+  'data': [
+    {
+      'title': 'Frischer Podcast',
+      'xmlURL': 'https://example.com/frisch',
+      'author': 'Neuling',
+      'episode_count': 2,
+    },
+  ],
+});
+
 /// Like pumpAndSettle, but also lets real async work (SQLite, mocked HTTP) run.
 /// pumpAndSettle alone never settles while a loading spinner waits for drift.
 Future<void> settle(WidgetTester tester) async {
@@ -203,10 +234,20 @@ void main() {
                   200,
                 ),
                 'itunes.apple.com' => http.Response.bytes(
-                  utf8.encode(_itunesJson),
+                  utf8.encode(
+                    request.url.path == '/lookup' ? _lookupJson : _itunesJson,
+                  ),
                   200,
                 ),
-                'api.fyyd.de' => http.Response('', 500),
+                // Apple's chart of popular podcasts.
+                'rss.applemarketingtools.com' => http.Response.bytes(
+                  utf8.encode(_chartJson),
+                  200,
+                ),
+                'api.fyyd.de' =>
+                  request.url.path == '/0.2/podcast/latest'
+                      ? http.Response.bytes(utf8.encode(_latestJson), 200)
+                      : http.Response('', 500),
                 _ => http.Response('', 404),
               },
             ),
@@ -425,6 +466,54 @@ void main() {
       await tester.tap(find.byTooltip('Suche schließen'));
       await settle(tester);
       expect(find.byType(TextField), findsNothing);
+      expect(find.text('Widget-Podcast'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'search: buttons for popular and new podcasts',
+    timeout: timeout,
+    (tester) async {
+      await pumpApp(tester);
+      await tester.tap(find.byTooltip('Suchen'));
+      await settle(tester);
+
+      // Under the hint, two buttons.
+      expect(
+        find.text('Durchsucht Apple Podcasts und fyyd.de'),
+        findsOneWidget,
+      );
+      expect(find.widgetWithText(FilledButton, 'Beliebt'), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Neuheiten'), findsOneWidget);
+
+      // Popular: Apple's chart (feed address from the lookup).
+      await tester.tap(find.widgetWithText(FilledButton, 'Beliebt'));
+      await settle(tester);
+      expect(find.text('Beliebter Podcast'), findsOneWidget);
+      expect(find.text('Star · 7 Folgen'), findsOneWidget);
+      expect(find.byType(ChoiceChip), findsNWidgets(2));
+
+      // New: fyyd's freshly added ones, one tap on the other chip.
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Neuheiten'));
+      await settle(tester);
+      expect(find.text('Frischer Podcast'), findsOneWidget);
+      expect(find.text('Beliebter Podcast'), findsNothing);
+
+      // Subscribing works like in a search result.
+      await tester.tap(find.byTooltip('Hinzufügen'));
+      await settle(tester);
+      expect(
+        find.text('„Frischer Podcast“ vorläufig hinzugefügt'),
+        findsOneWidget,
+      );
+
+      // Searching clears the list.
+      await tester.enterText(find.byType(TextField), 'widget');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await settle(tester);
+      expect(find.byType(ChoiceChip), findsNothing);
       expect(find.text('Widget-Podcast'), findsOneWidget);
 
       await disposeApp(tester);

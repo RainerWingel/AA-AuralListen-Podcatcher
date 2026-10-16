@@ -320,6 +320,18 @@ abstract class AppLocalizations {
   /// **'Durchsucht Apple Podcasts und fyyd.de'**
   String get searchStartHint;
 
+  /// No description provided for @searchPopular.
+  ///
+  /// In de, this message translates to:
+  /// **'Beliebt'**
+  String get searchPopular;
+
+  /// No description provided for @searchNew.
+  ///
+  /// In de, this message translates to:
+  /// **'Neuheiten'**
+  String get searchNew;
+
   /// Abos tab: the search there only looks in subscribed podcasts and their episodes (local).
   ///
   /// In de, this message translates to:

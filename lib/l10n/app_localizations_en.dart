@@ -148,6 +148,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchStartHint => 'Searches Apple Podcasts and fyyd.de';
 
   @override
+  String get searchPopular => 'Popular';
+
+  @override
+  String get searchNew => 'New';
+
+  @override
   String get subsSearchHint => 'Search subscriptions';
 
   @override

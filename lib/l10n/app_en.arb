@@ -37,6 +37,8 @@
   "searchHint": "Search podcasts",
   "searchStart": "Search by title, topic or author",
   "searchStartHint": "Searches Apple Podcasts and fyyd.de",
+  "searchPopular": "Popular",
+  "searchNew": "New",
   "subsSearchHint": "Search subscriptions",
   "subsSearchClose": "Close search",
   "searchClear": "Clear",

@@ -105,4 +105,107 @@ void main() {
       isNot(feedUrlKey('https://example.com/b')),
     );
   });
+
+  group('popular and new podcasts', () {
+    final chart = jsonEncode({
+      'feed': {
+        'results': [
+          {'id': '111', 'name': 'Platz Eins', 'artistName': 'A. Autor'},
+          {'id': '222', 'name': 'Ohne Feed', 'artistName': 'B'},
+          {'id': '333', 'name': 'Platz Drei', 'artistName': 'C'},
+        ],
+      },
+    });
+    final lookup = jsonEncode({
+      'results': [
+        // Not in chart order on purpose: the chart's order counts.
+        {
+          'collectionId': 333,
+          'feedUrl': 'https://example.com/drei',
+          'artworkUrl100': 'https://img.example.com/3.jpg',
+          'trackCount': 30,
+        },
+        {
+          'collectionId': 111,
+          'feedUrl': 'https://example.com/eins',
+          'trackCount': 100,
+        },
+        // Apple-exclusive: no feed → left out.
+        {'collectionId': 222},
+      ],
+    });
+    final latest = jsonEncode({
+      'status': 1,
+      'data': [
+        {
+          'title': 'Frisch',
+          'xmlURL': 'https://example.com/frisch',
+          'author': 'Neu',
+          'episode_count': 3,
+        },
+        // No episode yet: nothing to listen to.
+        {
+          'title': 'Leer',
+          'xmlURL': 'https://example.com/leer',
+          'episode_count': 0,
+        },
+      ],
+    });
+
+    DirectorySearch search(List<Uri> requests) => DirectorySearch([
+      ItunesDirectory(
+        MockClient((request) async {
+          requests.add(request.url);
+          if (request.url.host == 'rss.applemarketingtools.com') {
+            return http.Response.bytes(utf8.encode(chart), 200);
+          }
+          if (request.url.path == '/lookup') {
+            return http.Response.bytes(utf8.encode(lookup), 200);
+          }
+          return http.Response('', 404);
+        }),
+      ),
+      FyydDirectory(
+        MockClient((request) async {
+          requests.add(request.url);
+          return http.Response.bytes(utf8.encode(latest), 200);
+        }),
+      ),
+    ]);
+
+    test('popular: Apple chart of Germany, feeds from one lookup', () async {
+      final requests = <Uri>[];
+      final outcome = await search(requests).top();
+
+      expect(outcome.failedDirectories, isEmpty);
+      expect(outcome.results.map((r) => r.title), ['Platz Eins', 'Platz Drei']);
+      expect(outcome.results.first.feedUrl, 'https://example.com/eins');
+      expect(outcome.results.first.author, 'A. Autor');
+      expect(outcome.results.last.imageUrl, 'https://img.example.com/3.jpg');
+      expect(outcome.results.last.episodeCount, 30);
+      expect(requests.first.path, '/api/v2/de/podcasts/top/50/podcasts.json');
+      expect(requests.last.queryParameters['id'], '111,222,333');
+    });
+
+    test('new: freshly added podcasts of fyyd with episodes', () async {
+      final requests = <Uri>[];
+      final outcome = await search(requests).latest();
+
+      expect(outcome.results.map((r) => r.title), ['Frisch']);
+      expect(requests.single.path, '/0.2/podcast/latest');
+      expect(requests.single.queryParameters['language'], 'de');
+    });
+
+    test('a failing source is reported, not thrown', () async {
+      final down = DirectorySearch([
+        ItunesDirectory(MockClient((_) async => http.Response('', 503))),
+        FyydDirectory(MockClient((_) async => http.Response('', 500))),
+      ]);
+      final top = await down.top();
+      expect(top.results, isEmpty);
+      expect(top.failedDirectories, ['Apple Podcasts']);
+      final latest = await down.latest();
+      expect(latest.failedDirectories, ['fyyd']);
+    });
+  });
 }

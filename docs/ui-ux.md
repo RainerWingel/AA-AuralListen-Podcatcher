@@ -52,7 +52,7 @@ Symbole, dunkel: helle) – sonst waren sie im hellen Modus weiß (Bug 2026-09-3
 Tab-Beschriftungen höchstens 9 Zeichen (Länge von „Downloads"): Bei 5 Tabs und großer Systemschrift brechen längere
 Wörter auf dem S25 um (Test: „layout fits a Galaxy S25 with enlarged font").
 
-Suche (Verzeichnisse, neue Podcasts): Lupe oben rechts auf **Start** → Suchbildschirm (`/abos/suche`) mit Eingabefeld
+Suche (Verzeichnisse, neue Podcasts): Lupe oben rechts auf **Start** → Suchbildschirm (`/abos/suche`) mit Eingabefeld und – solange nichts gesucht wird – den Knöpfen **„Beliebt“** und **„Neuheiten“** (`feeds-and-directories.md`)
 in der AppBar.
 Treffer: Cover, Titel, „Autor · N Folgen", rechts ⊕ (abonnieren) bzw. ✓ (abonniert). Nach dem Abonnieren
 Snackbar „„X" abonniert" mit Aktion „Öffnen".

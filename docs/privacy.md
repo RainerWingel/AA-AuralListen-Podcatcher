@@ -35,6 +35,9 @@ The app connects **directly** to the following – never through a server of the
 - **Servers of the podcast providers**, to load feeds, episodes, cover images and chapters. Which servers these are is
   determined by your subscriptions.
 - **Apple iTunes Search API** and **fyyd.de**, when you search for podcasts. Your search term is transmitted.
+- **Apple** (chart of popular podcasts, `rss.applemarketingtools.com` and the iTunes lookup) and **fyyd.de** (newly added
+  podcasts), when you tap "Popular" or "New" in the search. No search term and nothing about you is transmitted, only the
+  request for the list.
 
 As with any request on the internet, these servers see technically necessary information, in particular your
 **IP address**, the time and the app's identifier (user agent "AA-AuralListen/version"). The respective operators are

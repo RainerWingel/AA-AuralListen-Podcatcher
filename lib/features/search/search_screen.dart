@@ -21,6 +21,9 @@ class SearchScreen extends ConsumerStatefulWidget {
   ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
+/// The lists below the search field (user wish 2026-10-21).
+enum _Browse { top, latest }
+
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   static const _debounce = Duration(milliseconds: 600);
   static const _minLength = 3;
@@ -28,6 +31,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
   Timer? _debounceTimer;
   String _term = '';
+
+  /// A list instead of a search: popular or new podcasts.
+  _Browse? _browse;
 
   /// Feed URLs currently being subscribed (spinner) or just subscribed.
   final _busy = <String>{};
@@ -49,8 +55,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _search(String text) {
     _debounceTimer?.cancel();
     final term = text.trim();
-    if (term.isEmpty || term == _term) return;
-    setState(() => _term = term);
+    if (term.isEmpty || (term == _term && _browse == null)) return;
+    setState(() {
+      _term = term;
+      _browse = null;
+    });
+  }
+
+  void _show(_Browse list) {
+    _debounceTimer?.cancel();
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _browse = list;
+      _term = '';
+      _controller.clear();
+    });
   }
 
   Future<void> _subscribe(DirectoryResult result) async {
@@ -110,31 +129,90 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
         ],
       ),
-      body: _term.isEmpty
-          ? EmptyState(
-              icon: Icons.search,
-              title: l10n.searchStart,
-              hint: l10n.searchStartHint,
-            )
-          : _Results(
-              term: _term,
+      body: _term.isNotEmpty
+          ? _Results(
+              outcome: ref.watch(directorySearchResultsProvider(_term)),
+              directories: 2,
               busy: _busy,
               justSubscribed: _justSubscribed,
               onSubscribe: _subscribe,
-            ),
+            )
+          : switch (_browse) {
+              null => EmptyState(
+                icon: Icons.search,
+                title: l10n.searchStart,
+                hint: l10n.searchStartHint,
+                // Popular and new podcasts, below the hint.
+                action: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    FilledButton.tonalIcon(
+                      onPressed: () => _show(_Browse.top),
+                      icon: const Icon(Icons.trending_up),
+                      label: Text(l10n.searchPopular),
+                    ),
+                    FilledButton.tonalIcon(
+                      onPressed: () => _show(_Browse.latest),
+                      icon: const Icon(Icons.fiber_new_outlined),
+                      label: Text(l10n.searchNew),
+                    ),
+                  ],
+                ),
+              ),
+              final list => Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Row(
+                      children: [
+                        ChoiceChip(
+                          label: Text(l10n.searchPopular),
+                          selected: list == _Browse.top,
+                          onSelected: (_) => _show(_Browse.top),
+                        ),
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          label: Text(l10n.searchNew),
+                          selected: list == _Browse.latest,
+                          onSelected: (_) => _show(_Browse.latest),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: _Results(
+                      outcome: ref.watch(switch (list) {
+                        _Browse.top => directoryTopProvider,
+                        _Browse.latest => directoryLatestProvider,
+                      }),
+                      directories: 1,
+                      busy: _busy,
+                      justSubscribed: _justSubscribed,
+                      onSubscribe: _subscribe,
+                    ),
+                  ),
+                ],
+              ),
+            },
     );
   }
 }
 
 class _Results extends ConsumerWidget {
   const _Results({
-    required this.term,
+    required this.outcome,
+    required this.directories,
     required this.busy,
     required this.justSubscribed,
     required this.onSubscribe,
   });
 
-  final String term;
+  final AsyncValue<DirectorySearchOutcome> outcome;
+
+  /// How many directories were asked (all failed = a connection problem).
+  final int directories;
   final Set<String> busy;
   final Set<String> justSubscribed;
   final void Function(DirectoryResult) onSubscribe;
@@ -142,7 +220,6 @@ class _Results extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final outcome = ref.watch(directorySearchResultsProvider(term));
     final subscribedKeys = ref.watch(subscribedFeedKeysProvider);
 
     return outcome.when(
@@ -151,7 +228,8 @@ class _Results extends ConsumerWidget {
           EmptyState(icon: Icons.cloud_off, title: l10n.searchFailed),
       data: (outcome) {
         final allFailed =
-            outcome.results.isEmpty && outcome.failedDirectories.length > 1;
+            outcome.results.isEmpty &&
+            outcome.failedDirectories.length >= directories;
         if (allFailed) {
           return EmptyState(icon: Icons.cloud_off, title: l10n.searchFailed);
         }

@@ -4,7 +4,7 @@
 | Dienst | Key nötig | Zweck |
 |--------|-----------|-------|
 | Apple Podcasts (iTunes Search API) | nein | große internationale Abdeckung; `country=DE`, max. 25 Treffer |
-| fyyd.de (`/0.2/search/podcast?term=`) | nein | deutsches Verzeichnis, gute Abdeckung deutschsprachiger Podcasts; max. 25 Treffer |
+| fyyd.de (`/0.2/search/podcast?term=`, `/0.2/podcast/latest`) | nein | deutsches Verzeichnis, gute Abdeckung deutschsprachiger Podcasts; max. 25 Treffer; liefert auch die „Neuheiten“ |
 
 Code: `lib/data/directory/directory_search.dart`, UI: `lib/features/search/search_screen.dart`.
 - Beide Dienste werden parallel gefragt (Timeout 15 s). Ergebnisse werden **abwechselnd** zusammengeführt
@@ -12,6 +12,14 @@ Code: `lib/data/directory/directory_search.dart`, UI: `lib/features/search/searc
 - Dubletten fliegen raus: gleiche Feed-URL (Vergleich über `feedUrlKey`: ohne Schema, `www.`, Groß/Klein, End-Slash)
   **oder** gleicher Titel + Autor. Das erste Vorkommen gewinnt.
 - Fällt ein Dienst aus, werden die anderen trotzdem angezeigt (Hinweis-Banner „… nicht erreichbar").
+- **„Beliebt“ und „Neuheiten“** (Benutzerwunsch 2026-10-21): Zwei Knöpfe unter „Durchsucht Apple Podcasts und fyyd.de“ im leeren
+  Suchbildschirm. **Beliebt** = Apples Chart der Top-Podcasts für Deutschland
+  (`rss.applemarketingtools.com/api/v2/de/podcasts/top/50/podcasts.json`, Rang 1 zuerst); die Charts enthalten nur Id und
+  Name, die Feed-Adressen kommen mit **einem** iTunes-„lookup“ (`id=1,2,…` für alle 50), Podcasts ohne Feed-Adresse
+  (Apple-exklusiv) fallen heraus. **Neuheiten** = fyyd `/0.2/podcast/latest?language=de` (neu aufgenommene Podcasts, neueste
+  zuerst, nur mit mindestens einer Folge). Anzeige wie Suchergebnisse (⊕ → vorläufig hinzufügen); oben zwei Auswahl-Chips
+  zum Wechseln, eine neue Suche beendet die Liste. Ist die Quelle nicht erreichbar: „Suche fehlgeschlagen“ statt leerer
+  Liste. Code: `TopCharts.top`, `NewPodcasts.latest`, `DirectorySearch.top/latest`.
 - iTunes-Treffer ohne `feedUrl` (Apple-exklusive Podcasts) werden übersprungen.
 - Suche startet 600 ms nach dem Tippen (ab 3 Zeichen) oder sofort per Enter/Lupe.
 - Bereits abonnierte Treffer zeigen ein Häkchen (Vergleich per `feedUrlKey`, Tooltip „Schon in deinen Abos").

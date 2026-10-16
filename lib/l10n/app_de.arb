@@ -81,6 +81,8 @@
   "searchHint": "Podcast suchen",
   "searchStart": "Suche nach Titel, Thema oder Autor",
   "searchStartHint": "Durchsucht Apple Podcasts und fyyd.de",
+  "searchPopular": "Beliebt",
+  "searchNew": "Neuheiten",
   "subsSearchHint": "In Abos suchen",
   "@subsSearchHint": {
     "description": "Abos tab: the search there only looks in subscribed podcasts and their episodes (local)."

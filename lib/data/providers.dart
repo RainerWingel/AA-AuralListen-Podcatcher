@@ -228,6 +228,17 @@ final directorySearchResultsProvider = FutureProvider.autoDispose
       (ref, term) => ref.watch(directorySearchProvider).search(term),
     );
 
+/// The most popular podcasts (Apple's chart for Germany).
+final directoryTopProvider = FutureProvider.autoDispose<DirectorySearchOutcome>(
+  (ref) => ref.watch(directorySearchProvider).top(),
+);
+
+/// Freshly added podcasts (fyyd).
+final directoryLatestProvider =
+    FutureProvider.autoDispose<DirectorySearchOutcome>(
+      (ref) => ref.watch(directorySearchProvider).latest(),
+    );
+
 /// Storage limit for downloads in bytes (setting, default 5 GB).
 final downloadLimitProvider = StreamProvider.autoDispose<int>(
   (ref) => ref

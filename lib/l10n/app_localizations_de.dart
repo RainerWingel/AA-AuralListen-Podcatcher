@@ -148,6 +148,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchStartHint => 'Durchsucht Apple Podcasts und fyyd.de';
 
   @override
+  String get searchPopular => 'Beliebt';
+
+  @override
+  String get searchNew => 'Neuheiten';
+
+  @override
   String get subsSearchHint => 'In Abos suchen';
 
   @override

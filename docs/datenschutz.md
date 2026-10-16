@@ -36,6 +36,9 @@ Die App verbindet sich **direkt** mit folgenden Stellen – nie über einen Serv
 - **Server der Podcast-Anbieter**, um Feeds, Folgen, Cover-Bilder und Kapitel zu laden. Welche Server das sind,
   bestimmst du durch deine Abos.
 - **Apple iTunes Search API** und **fyyd.de**, wenn du nach Podcasts suchst. Dabei wird dein Suchbegriff übertragen.
+- **Apple** (Chart der beliebten Podcasts, `rss.applemarketingtools.com` und iTunes-„lookup“) und **fyyd.de** (neu aufgenommene
+  Podcasts), wenn du in der Suche auf „Beliebt“ bzw. „Neuheiten“ tippst. Dabei wird kein Suchbegriff und nichts über dich
+  übertragen, nur die Anfrage nach der Liste.
 
 Wie bei jedem Abruf im Internet sehen diese Server dabei technisch notwendige Angaben, insbesondere deine
 **IP-Adresse**, den Zeitpunkt und die Kennung der App (User-Agent „AA-AuralListen/Version"). Für die Verarbeitung

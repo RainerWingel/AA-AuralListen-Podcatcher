@@ -37,6 +37,18 @@ abstract interface class PodcastDirectory {
   Future<List<DirectoryResult>> search(String term);
 }
 
+/// A directory that knows its most popular podcasts (user wish 2026-10-21).
+abstract interface class TopCharts {
+  String get name;
+  Future<List<DirectoryResult>> top();
+}
+
+/// A directory that lists freshly added podcasts (user wish 2026-10-21).
+abstract interface class NewPodcasts {
+  String get name;
+  Future<List<DirectoryResult>> latest();
+}
+
 const _userAgent = appUserAgent;
 const _searchTimeout = Duration(seconds: 15);
 const _maxResultsPerDirectory = 25;
@@ -56,8 +68,11 @@ String? _string(Object? value) {
   return text == null || text.isEmpty ? null : text;
 }
 
+/// How many podcasts the "popular" and "new" lists show.
+const _listLength = 50;
+
 /// Apple Podcasts directory (no API key needed).
-class ItunesDirectory implements PodcastDirectory {
+class ItunesDirectory implements PodcastDirectory, TopCharts {
   ItunesDirectory(this._client);
 
   final http.Client _client;
@@ -94,10 +109,65 @@ class ItunesDirectory implements PodcastDirectory {
           ),
     ];
   }
+
+  /// Apple's chart of the most popular podcasts (Germany): the chart lists
+  /// names and ids only, so the feed addresses come from one "lookup" call.
+  @override
+  Future<List<DirectoryResult>> top() async {
+    final chart = await _getJson(
+      _client,
+      Uri.https(
+        'rss.applemarketingtools.com',
+        '/api/v2/de/podcasts/top/$_listLength/podcasts.json',
+      ),
+    );
+    final entries = [
+      for (final item
+          in ((chart['feed'] as Map<String, Object?>?)?['results']
+                      as List<Object?>? ??
+                  const [])
+              .whereType<Map<String, Object?>>())
+        if (_string(item['id']) case final id?) (id: id, item: item),
+    ];
+    if (entries.isEmpty) return const [];
+    final lookup = await _getJson(
+      _client,
+      Uri.https('itunes.apple.com', '/lookup', {
+        'id': entries.map((e) => e.id).join(','),
+        'entity': 'podcast',
+        'country': 'DE',
+      }),
+    );
+    final byId = {
+      for (final item
+          in (lookup['results'] as List<Object?>? ?? const [])
+              .whereType<Map<String, Object?>>())
+        '${item['collectionId']}': item,
+    };
+    return [
+      for (final (:id, :item) in entries)
+        if (byId[id] case final found?)
+          if ((_string(found['feedUrl']) ?? '') case final feedUrl
+              when feedUrl.isNotEmpty)
+            DirectoryResult(
+              title:
+                  _string(item['name']) ??
+                  _string(found['collectionName']) ??
+                  '',
+              feedUrl: feedUrl,
+              author:
+                  _string(item['artistName']) ?? _string(found['artistName']),
+              imageUrl:
+                  _string(found['artworkUrl100']) ??
+                  _string(item['artworkUrl100']),
+              episodeCount: found['trackCount'] as int?,
+            ),
+    ];
+  }
 }
 
 /// fyyd.de – German podcast directory (no API key needed).
-class FyydDirectory implements PodcastDirectory {
+class FyydDirectory implements PodcastDirectory, NewPodcasts {
   FyydDirectory(this._client);
 
   final http.Client _client;
@@ -130,13 +200,67 @@ class FyydDirectory implements PodcastDirectory {
           ),
     ];
   }
+
+  /// Freshly added podcasts with a language of Germany and at least one
+  /// episode, newest first.
+  @override
+  Future<List<DirectoryResult>> latest() async {
+    final json = await _getJson(
+      _client,
+      Uri.https('api.fyyd.de', '/0.2/podcast/latest', {
+        'count': '$_listLength',
+        'language': 'de',
+      }),
+    );
+    final results = json['data'] as List<Object?>? ?? const [];
+    return [
+      for (final item in results.whereType<Map<String, Object?>>())
+        if ((_string(item['title']), _string(item['xmlURL'])) case (
+          final title?,
+          final feedUrl?,
+        ))
+          if (item['episode_count'] case final int count when count > 0)
+            DirectoryResult(
+              title: title,
+              feedUrl: feedUrl,
+              author: _string(item['author']),
+              imageUrl:
+                  _string(item['smallImageURL']) ?? _string(item['imgURL']),
+              episodeCount: count,
+            ),
+    ];
+  }
 }
 
 /// Searches all directories in parallel and merges the results.
 class DirectorySearch {
   DirectorySearch(this._directories);
 
-  final List<PodcastDirectory> _directories;
+  final List<Object> _directories;
+
+  /// The most popular podcasts, most popular first (Apple's chart for
+  /// Germany). Failures are reported like in a search.
+  Future<DirectorySearchOutcome> top() =>
+      _list<TopCharts>((d) => d.top(), (d) => d.name);
+
+  /// Freshly added podcasts, newest first (fyyd).
+  Future<DirectorySearchOutcome> latest() =>
+      _list<NewPodcasts>((d) => d.latest(), (d) => d.name);
+
+  Future<DirectorySearchOutcome> _list<T>(
+    Future<List<DirectoryResult>> Function(T) load,
+    String Function(T) name,
+  ) async {
+    final failed = <String>[];
+    final lists = await Future.wait([
+      for (final directory in _directories.whereType<T>())
+        load(directory).catchError((Object _) {
+          failed.add(name(directory));
+          return <DirectoryResult>[];
+        }),
+    ]);
+    return (results: mergeDirectoryResults(lists), failedDirectories: failed);
+  }
 
   Future<DirectorySearchOutcome> search(String term) async {
     final query = term.trim();
@@ -146,7 +270,7 @@ class DirectorySearch {
 
     final failed = <String>[];
     final lists = await Future.wait([
-      for (final directory in _directories)
+      for (final directory in _directories.whereType<PodcastDirectory>())
         directory.search(query).catchError((Object _) {
           failed.add(directory.name);
           return <DirectoryResult>[];
