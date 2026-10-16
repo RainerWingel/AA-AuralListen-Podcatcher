@@ -180,3 +180,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Apple bietet keine „Neu“-Liste. Neue Netzwerkziele nur auf Tipp, keine Suchbegriffe; `datenschutz.md`/`privacy.md` ergänzt.
 - 2026-10-21 · **„Neuheiten“ folgt der App-Sprache** (Benutzer) · fyyd `latest?language=de|en` aus den Einstellungen; „Beliebt“ bleibt
   Apples Chart für Deutschland (andere Länder wären möglich).
+- 2026-10-21 · **„Beliebt“ folgt ebenfalls der App-Sprache** (Benutzer) · Deutsch → Apple-Chart Deutschland, Englisch → USA (Lookup mit
+  passendem `country`). Weitere Sprachen später: Land je `AppLanguage` ergänzen.

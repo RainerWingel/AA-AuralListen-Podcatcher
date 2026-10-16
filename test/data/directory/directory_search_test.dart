@@ -185,6 +185,13 @@ void main() {
       expect(outcome.results.last.episodeCount, 30);
       expect(requests.first.path, '/api/v2/de/podcasts/top/50/podcasts.json');
       expect(requests.last.queryParameters['id'], '111,222,333');
+      expect(requests.last.queryParameters['country'], 'DE');
+
+      // Another country (English app: USA).
+      requests.clear();
+      await search(requests).top('us');
+      expect(requests.first.path, '/api/v2/us/podcasts/top/50/podcasts.json');
+      expect(requests.last.queryParameters['country'], 'US');
     });
 
     test('new: freshly added podcasts of fyyd with episodes', () async {

@@ -167,6 +167,8 @@ Future<void> settle(WidgetTester tester) async {
 void main() {
   // The addresses fyyd's "new podcasts" list was asked for.
   final latestRequests = <Uri>[];
+  // ... and Apple's chart of popular podcasts.
+  final chartRequests = <Uri>[];
   late AppDatabase db;
   late FakePlayerEngine engine;
   late PodcastAudioHandler handler;
@@ -242,10 +244,10 @@ void main() {
                   200,
                 ),
                 // Apple's chart of popular podcasts.
-                'rss.applemarketingtools.com' => http.Response.bytes(
-                  utf8.encode(_chartJson),
-                  200,
-                ),
+                'rss.applemarketingtools.com' => (() {
+                  chartRequests.add(request.url);
+                  return http.Response.bytes(utf8.encode(_chartJson), 200);
+                })(),
                 'api.fyyd.de' =>
                   request.url.path == '/0.2/podcast/latest'
                       ? (() {
@@ -481,7 +483,7 @@ void main() {
   );
 
   testWidgets(
-    'search: the new podcasts follow the app language',
+    'search: popular and new podcasts follow the app language',
     timeout: timeout,
     (tester) async {
       latestRequests.clear();
@@ -492,6 +494,13 @@ void main() {
       await settle(tester);
       expect(latestRequests.single.queryParameters['language'], 'en');
       expect(find.text('Frischer Podcast'), findsOneWidget);
+
+      // Popular: the USA's chart for the English app.
+      chartRequests.clear();
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Popular'));
+      await settle(tester);
+      expect(chartRequests.single.path, contains('/us/'));
+      expect(find.text('Beliebter Podcast'), findsOneWidget);
 
       await disposeApp(tester);
     },

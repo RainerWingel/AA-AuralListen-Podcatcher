@@ -13,8 +13,8 @@ Code: `lib/data/directory/directory_search.dart`, UI: `lib/features/search/searc
   **oder** gleicher Titel + Autor. Das erste Vorkommen gewinnt.
 - Fällt ein Dienst aus, werden die anderen trotzdem angezeigt (Hinweis-Banner „… nicht erreichbar").
 - **„Beliebt“ und „Neuheiten“** (Benutzerwunsch 2026-10-21): Zwei Knöpfe unter „Durchsucht Apple Podcasts und fyyd.de“ im leeren
-  Suchbildschirm. **Beliebt** = Apples Chart der Top-Podcasts für Deutschland
-  (`rss.applemarketingtools.com/api/v2/de/podcasts/top/50/podcasts.json`, Rang 1 zuerst); die Charts enthalten nur Id und
+  Suchbildschirm. **Beliebt** = Apples Chart der Top-Podcasts (Benutzerwunsch 2026-10-21: nach App-Sprache – Deutsch → Deutschland `de`,
+  Englisch → USA `us`; `rss.applemarketingtools.com/api/v2/<Land>/podcasts/top/50/podcasts.json`, Rang 1 zuerst); die Charts enthalten nur Id und
   Name, die Feed-Adressen kommen mit **einem** iTunes-„lookup“ (`id=1,2,…` für alle 50), Podcasts ohne Feed-Adresse
   (Apple-exklusiv) fallen heraus. **Neuheiten** = fyyd `/0.2/podcast/latest?language=<App-Sprache>` (Benutzerwunsch 2026-10-21: Sprache aus
   den Einstellungen, `de` oder `en`; neu aufgenommene Podcasts, neueste zuerst, nur mit mindestens einer Folge). Anzeige wie Suchergebnisse (⊕ → vorläufig hinzufügen); oben zwei Auswahl-Chips

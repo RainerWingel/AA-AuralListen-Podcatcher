@@ -40,7 +40,9 @@ abstract interface class PodcastDirectory {
 /// A directory that knows its most popular podcasts (user wish 2026-10-21).
 abstract interface class TopCharts {
   String get name;
-  Future<List<DirectoryResult>> top();
+
+  /// Most popular podcasts of [country] (ISO code, e.g. "de", "us").
+  Future<List<DirectoryResult>> top(String country);
 }
 
 /// A directory that lists freshly added podcasts (user wish 2026-10-21).
@@ -112,15 +114,15 @@ class ItunesDirectory implements PodcastDirectory, TopCharts {
     ];
   }
 
-  /// Apple's chart of the most popular podcasts (Germany): the chart lists
+  /// Apple's chart of the most popular podcasts of [country]: the chart lists
   /// names and ids only, so the feed addresses come from one "lookup" call.
   @override
-  Future<List<DirectoryResult>> top() async {
+  Future<List<DirectoryResult>> top(String country) async {
     final chart = await _getJson(
       _client,
       Uri.https(
         'rss.applemarketingtools.com',
-        '/api/v2/de/podcasts/top/$_listLength/podcasts.json',
+        '/api/v2/$country/podcasts/top/$_listLength/podcasts.json',
       ),
     );
     final entries = [
@@ -137,7 +139,7 @@ class ItunesDirectory implements PodcastDirectory, TopCharts {
       Uri.https('itunes.apple.com', '/lookup', {
         'id': entries.map((e) => e.id).join(','),
         'entity': 'podcast',
-        'country': 'DE',
+        'country': country.toUpperCase(),
       }),
     );
     final byId = {
@@ -240,10 +242,10 @@ class DirectorySearch {
 
   final List<Object> _directories;
 
-  /// The most popular podcasts, most popular first (Apple's chart for
-  /// Germany). Failures are reported like in a search.
-  Future<DirectorySearchOutcome> top() =>
-      _list<TopCharts>((d) => d.top(), (d) => d.name);
+  /// The most popular podcasts of [country], most popular first (Apple's
+  /// chart). Failures are reported like in a search.
+  Future<DirectorySearchOutcome> top([String country = 'de']) =>
+      _list<TopCharts>((d) => d.top(country), (d) => d.name);
 
   /// Freshly added podcasts in [language] (the app's language), newest first
   /// (fyyd).
