@@ -167,3 +167,9 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   das verbietet die F-Droid-Regel (`f-droid.md`: keine Google-Dienste). Nicht umgesetzt; nur mit Rückfrage neu aufrollen.
 - 2026-10-20 · **Skip-Knöpfe: Gedrückt halten = Suchlauf** (Benutzer) · Alle 100 ms 15 s; das Audio wird dabei entladen statt
   ständig zu springen (kein Streaming-Verkehr, kein Gestotter), erst beim Loslassen einmal gesetzt und ggf. weitergespielt.
+- 2026-10-20 · **Kein Samsung Galaxy Store** (Benutzer) · Registrierung als kostenloser (privater) Seller im Seller Portal
+  getestet: Samsung verlangt für Android-Inhalte den Status „Corporate Commercial Distribution Seller" (Unternehmen, DUNS
+  oder Gewerbeunterlagen) – auch für kostenlose Apps; sonst werden Android-Inhalte eingestellt bzw. lassen sich nicht
+  registrieren. Für ein Hobby-Projekt nicht sinnvoll. Verteilung bleibt F-Droid + GitHub-Releases (README: Obtainium).
+  Nur neu aufrollen, wenn Samsung die Regel lockert oder ein Unternehmen ohnehin besteht. Gleiche Lage wie beim Play Store
+  (geschlossener Test 12 Tester × 14 Tage, abgebrochen).
