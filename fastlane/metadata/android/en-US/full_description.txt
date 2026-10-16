@@ -5,30 +5,39 @@
 <li>Search Apple Podcasts and fyyd.de, subscribe by RSS address, import and export OPML</li>
 <li>New podcasts start out provisional: listen in (streaming only), then subscribe</li>
 <li>Rate podcasts with 1 to 5 stars – your subscriptions are sorted by it</li>
-<li>Pull to refresh; moved podcasts (new feed address) are followed automatically</li>
+<li>Pull to refresh with a status line for each podcast being refreshed; moved podcasts (new feed address) are followed automatically</li>
 <li>Red counter of unplayed episodes on each subscription; search within your subscriptions</li>
-<li>Podcast page with description and links to the website and to support the podcast</li>
+<li>Podcast page with a foldable description and links to the website and to support the podcast</li>
+<li>Home: a flame marks podcasts and topics you hardly ever skip</li>
 <li>Seasons: "S2·5" on the cover and a season filter; serial podcasts in listening order</li>
 </ul>
 
 <p><b>Listening</b></p>
 <ul>
 <li>Background playback with notification, lock screen and Bluetooth controls</li>
-<li>Skip −15 s / +30 s, speed 1.0× to 2.0×, volume boost (global or per podcast)</li>
+<li>Skip −15 s / +30 s – hold a skip button to scan through the episode without playing; speed 1.0× to 2.0×, volume boost (global or per podcast)</li>
 <li>Remaining time or total length at a tap; at higher speed also the real remaining time</li>
 <li>Show notes with tappable links, episode number and release date</li>
-<li>Chapters (Podlove, JSON, ID3) with the progress of the current chapter and per-chapter skip, bookmarks with notes</li>
+<li>Chapters (Podlove, JSON, ID3) with chapter pictures, the progress of the current chapter and per-chapter skip; bookmarks with notes (long press the bookmark button for the list)</li>
 <li>Sleep timer with gentle fade-out, also "until the end of the episode"</li>
 <li>Remembers the position of every episode; an episode counts as played only at its end</li>
 <li>Playback history of the last 100 episodes played to the end</li>
 <li>Robust against network problems and MP3s with variable bitrate</li>
 </ul>
 
+<p><b>Player</b></p>
+<ul>
+<li>Seek bar, play row and the four action buttons stay pinned at the bottom, the rest scrolls</li>
+<li>Strongly blurred cover or chapter picture as background; text colors follow its brightness</li>
+<li>Own landscape layout: info on the left, controls on the right</li>
+</ul>
+
 <p><b>Playlists</b></p>
 <ul>
 <li>Several playlists that continue automatically, with colors, sorting and "Resume"</li>
 <li>"Play next" and "Add to the end" for the playlist that is playing; ⏮ ⏭ in the player and via Bluetooth</li>
-<li>Finished episodes leave the playlist at once, after 5 minutes or never – your choice</li>
+<li>Finished episodes leave the playlist at once, after 5 minutes or never – your choice; "mark as played" follows the same setting</li>
+<li>New episodes of a podcast can go into a playlist without downloading (streamed)</li>
 <li>All new or unplayed episodes of a podcast, topic or season into a playlist</li>
 <li>A symbol on every episode that is in a playlist</li>
 </ul>
