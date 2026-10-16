@@ -46,7 +46,9 @@ abstract interface class TopCharts {
 /// A directory that lists freshly added podcasts (user wish 2026-10-21).
 abstract interface class NewPodcasts {
   String get name;
-  Future<List<DirectoryResult>> latest();
+
+  /// Newest podcasts in [language] (ISO code, e.g. "de", "en").
+  Future<List<DirectoryResult>> latest(String language);
 }
 
 const _userAgent = appUserAgent;
@@ -201,15 +203,15 @@ class FyydDirectory implements PodcastDirectory, NewPodcasts {
     ];
   }
 
-  /// Freshly added podcasts with a language of Germany and at least one
-  /// episode, newest first.
+  /// Freshly added podcasts in [language] with at least one episode, newest
+  /// first.
   @override
-  Future<List<DirectoryResult>> latest() async {
+  Future<List<DirectoryResult>> latest(String language) async {
     final json = await _getJson(
       _client,
       Uri.https('api.fyyd.de', '/0.2/podcast/latest', {
         'count': '$_listLength',
-        'language': 'de',
+        'language': language,
       }),
     );
     final results = json['data'] as List<Object?>? ?? const [];
@@ -243,9 +245,10 @@ class DirectorySearch {
   Future<DirectorySearchOutcome> top() =>
       _list<TopCharts>((d) => d.top(), (d) => d.name);
 
-  /// Freshly added podcasts, newest first (fyyd).
-  Future<DirectorySearchOutcome> latest() =>
-      _list<NewPodcasts>((d) => d.latest(), (d) => d.name);
+  /// Freshly added podcasts in [language] (the app's language), newest first
+  /// (fyyd).
+  Future<DirectorySearchOutcome> latest([String language = 'de']) =>
+      _list<NewPodcasts>((d) => d.latest(language), (d) => d.name);
 
   Future<DirectorySearchOutcome> _list<T>(
     Future<List<DirectoryResult>> Function(T) load,

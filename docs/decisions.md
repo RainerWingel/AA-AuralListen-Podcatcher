@@ -178,3 +178,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-21 · **Suche: „Beliebt“ und „Neuheiten“** (Benutzer) · Beliebt = Apples Top-Chart für Deutschland (kein Key, Feed-Adressen
   per Lookup), Neuheiten = fyyd „latest“ (deutsch, mit Folgen). Für fyyd habe ich keinen funktionierenden „hot“-Endpunkt gefunden,
   Apple bietet keine „Neu“-Liste. Neue Netzwerkziele nur auf Tipp, keine Suchbegriffe; `datenschutz.md`/`privacy.md` ergänzt.
+- 2026-10-21 · **„Neuheiten“ folgt der App-Sprache** (Benutzer) · fyyd `latest?language=de|en` aus den Einstellungen; „Beliebt“ bleibt
+  Apples Chart für Deutschland (andere Länder wären möglich).

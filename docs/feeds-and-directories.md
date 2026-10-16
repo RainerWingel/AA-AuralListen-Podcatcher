@@ -16,8 +16,8 @@ Code: `lib/data/directory/directory_search.dart`, UI: `lib/features/search/searc
   Suchbildschirm. **Beliebt** = Apples Chart der Top-Podcasts für Deutschland
   (`rss.applemarketingtools.com/api/v2/de/podcasts/top/50/podcasts.json`, Rang 1 zuerst); die Charts enthalten nur Id und
   Name, die Feed-Adressen kommen mit **einem** iTunes-„lookup“ (`id=1,2,…` für alle 50), Podcasts ohne Feed-Adresse
-  (Apple-exklusiv) fallen heraus. **Neuheiten** = fyyd `/0.2/podcast/latest?language=de` (neu aufgenommene Podcasts, neueste
-  zuerst, nur mit mindestens einer Folge). Anzeige wie Suchergebnisse (⊕ → vorläufig hinzufügen); oben zwei Auswahl-Chips
+  (Apple-exklusiv) fallen heraus. **Neuheiten** = fyyd `/0.2/podcast/latest?language=<App-Sprache>` (Benutzerwunsch 2026-10-21: Sprache aus
+  den Einstellungen, `de` oder `en`; neu aufgenommene Podcasts, neueste zuerst, nur mit mindestens einer Folge). Anzeige wie Suchergebnisse (⊕ → vorläufig hinzufügen); oben zwei Auswahl-Chips
   zum Wechseln, eine neue Suche beendet die Liste. Eine Liste wird bei einem Fehler **einmal** nach 0,5 s neu
   versucht (auf dem A05s schlug die allererste Anfrage einmal fehl); ist die Quelle dann nicht erreichbar: „Suche
   fehlgeschlagen“ statt leerer Liste. Code: `TopCharts.top`, `NewPodcasts.latest`, `DirectorySearch.top/latest`.

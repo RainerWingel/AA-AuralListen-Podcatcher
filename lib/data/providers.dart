@@ -233,11 +233,12 @@ final directoryTopProvider = FutureProvider.autoDispose<DirectorySearchOutcome>(
   (ref) => ref.watch(directorySearchProvider).top(),
 );
 
-/// Freshly added podcasts (fyyd).
+/// Freshly added podcasts (fyyd) in the language of the app.
 final directoryLatestProvider =
-    FutureProvider.autoDispose<DirectorySearchOutcome>(
-      (ref) => ref.watch(directorySearchProvider).latest(),
-    );
+    FutureProvider.autoDispose<DirectorySearchOutcome>((ref) {
+      final language = ref.watch(appLanguageProvider).value ?? AppLanguage.de;
+      return ref.watch(directorySearchProvider).latest(language.name);
+    });
 
 /// Storage limit for downloads in bytes (setting, default 5 GB).
 final downloadLimitProvider = StreamProvider.autoDispose<int>(

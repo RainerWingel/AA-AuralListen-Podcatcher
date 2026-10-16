@@ -165,6 +165,8 @@ Future<void> settle(WidgetTester tester) async {
 }
 
 void main() {
+  // The addresses fyyd's "new podcasts" list was asked for.
+  final latestRequests = <Uri>[];
   late AppDatabase db;
   late FakePlayerEngine engine;
   late PodcastAudioHandler handler;
@@ -246,7 +248,13 @@ void main() {
                 ),
                 'api.fyyd.de' =>
                   request.url.path == '/0.2/podcast/latest'
-                      ? http.Response.bytes(utf8.encode(_latestJson), 200)
+                      ? (() {
+                          latestRequests.add(request.url);
+                          return http.Response.bytes(
+                            utf8.encode(_latestJson),
+                            200,
+                          );
+                        })()
                       : http.Response('', 500),
                 _ => http.Response('', 404),
               },
@@ -467,6 +475,23 @@ void main() {
       await settle(tester);
       expect(find.byType(TextField), findsNothing);
       expect(find.text('Widget-Podcast'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'search: the new podcasts follow the app language',
+    timeout: timeout,
+    (tester) async {
+      latestRequests.clear();
+      await pumpApp(tester, language: 'en');
+      await tester.tap(find.byTooltip('Search'));
+      await settle(tester);
+      await tester.tap(find.widgetWithText(FilledButton, 'New'));
+      await settle(tester);
+      expect(latestRequests.single.queryParameters['language'], 'en');
+      expect(find.text('Frischer Podcast'), findsOneWidget);
 
       await disposeApp(tester);
     },

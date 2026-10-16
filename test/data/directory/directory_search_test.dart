@@ -194,6 +194,11 @@ void main() {
       expect(outcome.results.map((r) => r.title), ['Frisch']);
       expect(requests.single.path, '/0.2/podcast/latest');
       expect(requests.single.queryParameters['language'], 'de');
+
+      // The app language decides: English app, English news.
+      requests.clear();
+      await search(requests).latest('en');
+      expect(requests.single.queryParameters['language'], 'en');
     });
 
     test('a failed first request is tried once more', () async {
