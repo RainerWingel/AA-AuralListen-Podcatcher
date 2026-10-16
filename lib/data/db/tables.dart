@@ -71,6 +71,9 @@ class Podcasts extends Table {
   /// Loudness boost in dB; null = use the global default.
   RealColumn get boostDb => real().nullable()();
 
+  /// Playback speed of this podcast (v29); null = use the global speed.
+  RealColumn get speed => real().nullable()();
+
   /// Auto-downloaded episodes are also added to this playlist – schema v10.
   /// Null = none. No foreign key on purpose: if the playlist was deleted,
   /// the next auto-download creates it again under [autoPlaylistName].

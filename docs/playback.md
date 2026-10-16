@@ -202,12 +202,21 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 ## Abspielgeschwindigkeit (Benutzerwunsch 2026-10-03)
 - Knopf „Tempo: …" rechts neben „Boost: …" im Vollbild-Player → Auswahl **Aus (1,0x) · 1,2x · 1,5x · 2,0x**
   (`lib/features/player/speed_sheet.dart`, `PodcastAudioHandler.speeds`).
-- Gilt für **alle** Podcasts, gespeichert in `settings['player.speed']` (fehlt = 1,0), bei jedem Laden neu gesetzt
+- Gilt für **alle** Podcasts (außer einem mit eigenem Tempo, s. u.), gespeichert in `settings['player.speed']` (fehlt = 1,0), bei jedem Laden neu gesetzt
   (`_load`); Tonhöhe bleibt (ExoPlayer). `PlaybackState.speed` wird mitgemeldet, damit der Fortschritt in der
   Benachrichtigung richtig läuft; `setSpeed` ist auch die audio_service-Aktion.
 - Zeitanzeigen laufen in Audio-Zeit (also schneller). Bei Restzeit-Anzeige und Tempo ≠ 1 steht dahinter in Klammern
   die **tatsächliche** Restzeit: „-1:05:00 (-43:20)" = Rest ÷ Tempo. Zu breit (schmaler Bildschirm, große Schrift) →
   die rechte Zeit wird verkleinert statt abgeschnitten. Sleep-Timer und Hänger-Erkennung zählen echte Zeit.
+- **„Nur für diesen Podcast"** (Benutzerwunsch 2026-10-20, wie beim Boost): Der Tempo-Dialog hat einen Schalter. **An:** der
+  gezeigte Wert wird sofort als `podcasts.speed` des laufenden Podcasts gespeichert (v29), das globale Tempo
+  (`settings['player.speed']`) bleibt. Stufe wählen bei **eingeschaltetem** Schalter: nur dieser Podcast; bei
+  **ausgeschaltetem**: globales Tempo, ein eigener Wert wird gelöscht. **Aus:** eigener Wert gelöscht, das globale gilt
+  wieder (`PodcastAudioHandler.setSpeedChoice` / `clearPodcastSpeed`). Beim Laden zählt `podcast.speed ?? global`.
+  Das System (Benachrichtigung/Bluetooth `setSpeed`) ändert das Tempo des Podcasts, wenn er ein eigenes hat, sonst das
+  globale. Anzeige (Knopf, Restzeit „(-…)") nutzt das wirksame Tempo (`speedSettingProvider`). Vorläufige Podcasts: kein
+  Schalter, nie ein eigener Wert. Reihenfolge-Tipp: erst global einstellen (Schalter aus), dann Schalter an und den
+  Sonderwert wählen – sonst löscht das Ausschalten den Sonderwert.
 
 ## Lautstärke-Boost
 - Android `LoudnessEnhancer` über `just_audio` (`AndroidLoudnessEnhancer`), Zielverstärkung in dB; 0 = aus.

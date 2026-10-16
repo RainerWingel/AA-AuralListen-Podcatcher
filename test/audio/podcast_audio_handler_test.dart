@@ -375,6 +375,103 @@ void main() {
     expect(engine.speed, 1.5);
   });
 
+  group('playback speed "only for this podcast"', () {
+    Future<Podcast> podcast(int id) =>
+        (db.select(db.podcasts)..where((p) => p.id.equals(id))).getSingle();
+
+    /// An episode of a second podcast.
+    Future<({int podcastId, int episodeId})> otherPodcast() async {
+      final id = await db
+          .into(db.podcasts)
+          .insert(
+            PodcastsCompanion.insert(
+              feedUrl: 'https://example.com/other',
+              title: 'Anderer',
+              subscribedAt: now,
+            ),
+          );
+      final episode = await db
+          .into(db.episodes)
+          .insert(
+            EpisodesCompanion.insert(
+              podcastId: id,
+              guid: 'o1',
+              title: 'Andere Folge',
+              audioUrl: 'https://example.com/o1.mp3',
+              addedAt: now,
+            ),
+          );
+      return (podcastId: id, episodeId: episode);
+    }
+
+    test('stored for the podcast, the global speed stays', () async {
+      final other = await otherPodcast();
+      await settings.set(SettingsKeys.playbackSpeed, '1.2');
+      await handler.playEpisode(episodeId);
+      expect(engine.speed, 1.2);
+
+      // Switch on: the shown (global) value becomes the podcast's own.
+      await handler.setSpeedChoice(1.2, forPodcastOnly: true);
+      expect((await podcast(podcastId)).speed, 1.2);
+      // Choosing with the switch on: only this podcast.
+      await handler.setSpeedChoice(2, forPodcastOnly: true);
+      expect(engine.speed, 2);
+      expect(handler.playbackState.value.speed, 2);
+      expect((await podcast(podcastId)).speed, 2);
+      expect(await settings.getDouble(SettingsKeys.playbackSpeed), 1.2);
+
+      // Another podcast plays at the global speed; coming back: its own.
+      await handler.playEpisode(other.episodeId);
+      expect(engine.speed, 1.2);
+      await handler.playEpisode(episodeId);
+      expect(engine.speed, 2);
+    });
+
+    test('choosing globally removes the podcast\'s own speed', () async {
+      await handler.playEpisode(episodeId);
+      await handler.setSpeedChoice(2, forPodcastOnly: true);
+
+      await handler.setSpeedChoice(1.5, forPodcastOnly: false);
+      expect((await podcast(podcastId)).speed, isNull);
+      expect(await settings.getDouble(SettingsKeys.playbackSpeed), 1.5);
+      expect(engine.speed, 1.5);
+    });
+
+    test('switch off: back to the global speed', () async {
+      await settings.set(SettingsKeys.playbackSpeed, '1.2');
+      await handler.playEpisode(episodeId);
+      await handler.setSpeedChoice(2, forPodcastOnly: true);
+      expect(engine.speed, 2);
+
+      await handler.clearPodcastSpeed();
+      expect((await podcast(podcastId)).speed, isNull);
+      expect(engine.speed, 1.2);
+      expect(handler.speed, 1.2);
+    });
+
+    test('the system\'s speed change follows the current setting', () async {
+      await handler.playEpisode(episodeId);
+      await handler.setSpeedChoice(1.5, forPodcastOnly: true);
+      await handler.setSpeed(2); // e.g. from the notification
+      expect((await podcast(podcastId)).speed, 2);
+      expect(await settings.getDouble(SettingsKeys.playbackSpeed), isNull);
+
+      await handler.clearPodcastSpeed();
+      await handler.setSpeed(1.2);
+      expect((await podcast(podcastId)).speed, isNull);
+      expect(await settings.getDouble(SettingsKeys.playbackSpeed), 1.2);
+    });
+
+    test('a provisional podcast never gets its own speed', () async {
+      await (db.update(db.podcasts)..where((p) => p.id.equals(podcastId)))
+          .write(const PodcastsCompanion(provisional: Value(true)));
+      await handler.playEpisode(episodeId);
+      await handler.setSpeedChoice(2, forPodcastOnly: true);
+      expect((await podcast(podcastId)).speed, isNull);
+      expect(engine.speed, 2); // applies for now
+    });
+  });
+
   test('saves the position at most every 5 s and on pause', () async {
     final fresh = await addEpisode('2');
     await handler.playEpisode(fresh);

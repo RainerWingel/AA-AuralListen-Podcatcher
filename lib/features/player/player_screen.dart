@@ -317,7 +317,10 @@ class _PlayerControls extends StatelessWidget {
         Semantics(
           container: true,
           explicitChildNodes: true,
-          child: _SeekBar(total: item.duration),
+          child: _SeekBar(
+            total: item.duration,
+            podcastId: item.extras?['podcastId'] as int?,
+          ),
         ),
         const SizedBox(height: 8),
         const Row(
@@ -424,7 +427,10 @@ class _PlayerInfo extends ConsumerWidget {
 /// Slider with elapsed / remaining time. While dragging, the slider follows
 /// the finger; the seek happens on release.
 class _SeekBar extends ConsumerStatefulWidget {
-  const _SeekBar({required this.total});
+  const _SeekBar({required this.total, required this.podcastId});
+
+  /// The podcast playing: its own speed counts for the real remaining time.
+  final int? podcastId;
 
   final Duration? total;
 
@@ -476,7 +482,11 @@ class _SeekBarState extends ConsumerState<_SeekBar> {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerRight,
-                  child: _TotalOrRemaining(total: total, shown: shown),
+                  child: _TotalOrRemaining(
+                    total: total,
+                    shown: shown,
+                    podcastId: widget.podcastId,
+                  ),
                 ),
               ),
             ],
@@ -490,7 +500,13 @@ class _SeekBarState extends ConsumerState<_SeekBar> {
 /// Right time under the slider: remaining time ("-12:34", default) or the
 /// total length. A tap switches; the choice is stored (settings).
 class _TotalOrRemaining extends ConsumerWidget {
-  const _TotalOrRemaining({required this.total, required this.shown});
+  const _TotalOrRemaining({
+    required this.total,
+    required this.shown,
+    required this.podcastId,
+  });
+
+  final int? podcastId;
 
   final Duration total;
   final Duration shown;
@@ -498,7 +514,7 @@ class _TotalOrRemaining extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final showTotal = ref.watch(showTotalTimeProvider).value ?? false;
-    final speed = ref.watch(playbackSpeedProvider).value ?? 1;
+    final speed = ref.watch(speedSettingProvider(podcastId)).speed;
     final remaining = total - shown;
     // Faster than normal: also the time it really takes, in brackets.
     final effective = speed == 1

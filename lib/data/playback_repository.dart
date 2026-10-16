@@ -320,6 +320,12 @@ class PlaybackRepository {
         const PodcastsCompanion(streamVaries: Value(true)),
       );
 
+  /// Per-podcast playback speed; null = use the global speed (v29).
+  Future<void> setPodcastSpeed(int podcastId, double? speed) =>
+      (_db.update(_db.podcasts)..where((p) => p.id.equals(podcastId))).write(
+        PodcastsCompanion(speed: Value(speed)),
+      );
+
   /// Per-podcast loudness boost; null = use the global default.
   Future<void> setPodcastBoost(int podcastId, double? boostDb) =>
       (_db.update(_db.podcasts)..where((p) => p.id.equals(podcastId))).write(

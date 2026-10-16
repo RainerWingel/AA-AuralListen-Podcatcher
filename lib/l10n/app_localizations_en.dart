@@ -300,6 +300,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get speedPerPodcast => 'Only for this podcast';
+
+  @override
+  String get speedPerPodcastHint =>
+      'Otherwise the speed applies to all podcasts without their own setting.';
+
+  @override
   String get boostPerPodcast => 'Only for this podcast';
 
   @override

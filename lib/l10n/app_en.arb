@@ -79,6 +79,8 @@
   "boostOff": "Off",
   "boostValue": "+{db} dB",
   "boostButton": "Boost: {value}",
+  "speedPerPodcast": "Only for this podcast",
+  "speedPerPodcastHint": "Otherwise the speed applies to all podcasts without their own setting.",
   "boostPerPodcast": "Only for this podcast",
   "boostPerPodcastHint": "Otherwise the value applies to all podcasts without their own setting.",
   "markPlayed": "Mark as played",

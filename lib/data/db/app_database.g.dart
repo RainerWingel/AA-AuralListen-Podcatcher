@@ -268,6 +268,15 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _speedMeta = const VerificationMeta('speed');
+  @override
+  late final GeneratedColumn<double> speed = GeneratedColumn<double>(
+    'speed',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _autoPlaylistIdMeta = const VerificationMeta(
     'autoPlaylistId',
   );
@@ -371,6 +380,7 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
     autoDownloadMaxEpisodes,
     autoDeletePlayed,
     boostDb,
+    speed,
     autoPlaylistId,
     autoPlaylistName,
     episodeCounter,
@@ -555,6 +565,12 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         boostDb.isAcceptableOrUnknown(data['boost_db']!, _boostDbMeta),
       );
     }
+    if (data.containsKey('speed')) {
+      context.handle(
+        _speedMeta,
+        speed.isAcceptableOrUnknown(data['speed']!, _speedMeta),
+      );
+    }
     if (data.containsKey('auto_playlist_id')) {
       context.handle(
         _autoPlaylistIdMeta,
@@ -712,6 +728,10 @@ class $PodcastsTable extends Podcasts with TableInfo<$PodcastsTable, Podcast> {
         DriftSqlType.double,
         data['${effectivePrefix}boost_db'],
       ),
+      speed: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}speed'],
+      ),
       autoPlaylistId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}auto_playlist_id'],
@@ -797,6 +817,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
   /// Loudness boost in dB; null = use the global default.
   final double? boostDb;
 
+  /// Playback speed of this podcast (v29); null = use the global speed.
+  final double? speed;
+
   /// Auto-downloaded episodes are also added to this playlist – schema v10.
   /// Null = none. No foreign key on purpose: if the playlist was deleted,
   /// the next auto-download creates it again under [autoPlaylistName].
@@ -840,6 +863,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     required this.autoDownloadMaxEpisodes,
     required this.autoDeletePlayed,
     this.boostDb,
+    this.speed,
     this.autoPlaylistId,
     this.autoPlaylistName,
     required this.episodeCounter,
@@ -903,6 +927,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     if (!nullToAbsent || boostDb != null) {
       map['boost_db'] = Variable<double>(boostDb);
     }
+    if (!nullToAbsent || speed != null) {
+      map['speed'] = Variable<double>(speed);
+    }
     if (!nullToAbsent || autoPlaylistId != null) {
       map['auto_playlist_id'] = Variable<int>(autoPlaylistId);
     }
@@ -965,6 +992,9 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       boostDb: boostDb == null && nullToAbsent
           ? const Value.absent()
           : Value(boostDb),
+      speed: speed == null && nullToAbsent
+          ? const Value.absent()
+          : Value(speed),
       autoPlaylistId: autoPlaylistId == null && nullToAbsent
           ? const Value.absent()
           : Value(autoPlaylistId),
@@ -1013,6 +1043,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       ),
       autoDeletePlayed: serializer.fromJson<bool>(json['autoDeletePlayed']),
       boostDb: serializer.fromJson<double?>(json['boostDb']),
+      speed: serializer.fromJson<double?>(json['speed']),
       autoPlaylistId: serializer.fromJson<int?>(json['autoPlaylistId']),
       autoPlaylistName: serializer.fromJson<String?>(json['autoPlaylistName']),
       episodeCounter: serializer.fromJson<bool>(json['episodeCounter']),
@@ -1054,6 +1085,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
       ),
       'autoDeletePlayed': serializer.toJson<bool>(autoDeletePlayed),
       'boostDb': serializer.toJson<double?>(boostDb),
+      'speed': serializer.toJson<double?>(speed),
       'autoPlaylistId': serializer.toJson<int?>(autoPlaylistId),
       'autoPlaylistName': serializer.toJson<String?>(autoPlaylistName),
       'episodeCounter': serializer.toJson<bool>(episodeCounter),
@@ -1087,6 +1119,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     int? autoDownloadMaxEpisodes,
     bool? autoDeletePlayed,
     Value<double?> boostDb = const Value.absent(),
+    Value<double?> speed = const Value.absent(),
     Value<int?> autoPlaylistId = const Value.absent(),
     Value<String?> autoPlaylistName = const Value.absent(),
     bool? episodeCounter,
@@ -1124,6 +1157,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
         autoDownloadMaxEpisodes ?? this.autoDownloadMaxEpisodes,
     autoDeletePlayed: autoDeletePlayed ?? this.autoDeletePlayed,
     boostDb: boostDb.present ? boostDb.value : this.boostDb,
+    speed: speed.present ? speed.value : this.speed,
     autoPlaylistId: autoPlaylistId.present
         ? autoPlaylistId.value
         : this.autoPlaylistId,
@@ -1186,6 +1220,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ? data.autoDeletePlayed.value
           : this.autoDeletePlayed,
       boostDb: data.boostDb.present ? data.boostDb.value : this.boostDb,
+      speed: data.speed.present ? data.speed.value : this.speed,
       autoPlaylistId: data.autoPlaylistId.present
           ? data.autoPlaylistId.value
           : this.autoPlaylistId,
@@ -1233,6 +1268,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           ..write('autoDownloadMaxEpisodes: $autoDownloadMaxEpisodes, ')
           ..write('autoDeletePlayed: $autoDeletePlayed, ')
           ..write('boostDb: $boostDb, ')
+          ..write('speed: $speed, ')
           ..write('autoPlaylistId: $autoPlaylistId, ')
           ..write('autoPlaylistName: $autoPlaylistName, ')
           ..write('episodeCounter: $episodeCounter, ')
@@ -1268,6 +1304,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
     autoDownloadMaxEpisodes,
     autoDeletePlayed,
     boostDb,
+    speed,
     autoPlaylistId,
     autoPlaylistName,
     episodeCounter,
@@ -1302,6 +1339,7 @@ class Podcast extends DataClass implements Insertable<Podcast> {
           other.autoDownloadMaxEpisodes == this.autoDownloadMaxEpisodes &&
           other.autoDeletePlayed == this.autoDeletePlayed &&
           other.boostDb == this.boostDb &&
+          other.speed == this.speed &&
           other.autoPlaylistId == this.autoPlaylistId &&
           other.autoPlaylistName == this.autoPlaylistName &&
           other.episodeCounter == this.episodeCounter &&
@@ -1334,6 +1372,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
   final Value<int> autoDownloadMaxEpisodes;
   final Value<bool> autoDeletePlayed;
   final Value<double?> boostDb;
+  final Value<double?> speed;
   final Value<int?> autoPlaylistId;
   final Value<String?> autoPlaylistName;
   final Value<bool> episodeCounter;
@@ -1364,6 +1403,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.autoDownloadMaxEpisodes = const Value.absent(),
     this.autoDeletePlayed = const Value.absent(),
     this.boostDb = const Value.absent(),
+    this.speed = const Value.absent(),
     this.autoPlaylistId = const Value.absent(),
     this.autoPlaylistName = const Value.absent(),
     this.episodeCounter = const Value.absent(),
@@ -1395,6 +1435,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     this.autoDownloadMaxEpisodes = const Value.absent(),
     this.autoDeletePlayed = const Value.absent(),
     this.boostDb = const Value.absent(),
+    this.speed = const Value.absent(),
     this.autoPlaylistId = const Value.absent(),
     this.autoPlaylistName = const Value.absent(),
     this.episodeCounter = const Value.absent(),
@@ -1428,6 +1469,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Expression<int>? autoDownloadMaxEpisodes,
     Expression<bool>? autoDeletePlayed,
     Expression<double>? boostDb,
+    Expression<double>? speed,
     Expression<int>? autoPlaylistId,
     Expression<String>? autoPlaylistName,
     Expression<bool>? episodeCounter,
@@ -1461,6 +1503,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
         'auto_download_max_episodes': autoDownloadMaxEpisodes,
       if (autoDeletePlayed != null) 'auto_delete_played': autoDeletePlayed,
       if (boostDb != null) 'boost_db': boostDb,
+      if (speed != null) 'speed': speed,
       if (autoPlaylistId != null) 'auto_playlist_id': autoPlaylistId,
       if (autoPlaylistName != null) 'auto_playlist_name': autoPlaylistName,
       if (episodeCounter != null) 'episode_counter': episodeCounter,
@@ -1495,6 +1538,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     Value<int>? autoDownloadMaxEpisodes,
     Value<bool>? autoDeletePlayed,
     Value<double?>? boostDb,
+    Value<double?>? speed,
     Value<int?>? autoPlaylistId,
     Value<String?>? autoPlaylistName,
     Value<bool>? episodeCounter,
@@ -1527,6 +1571,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           autoDownloadMaxEpisodes ?? this.autoDownloadMaxEpisodes,
       autoDeletePlayed: autoDeletePlayed ?? this.autoDeletePlayed,
       boostDb: boostDb ?? this.boostDb,
+      speed: speed ?? this.speed,
       autoPlaylistId: autoPlaylistId ?? this.autoPlaylistId,
       autoPlaylistName: autoPlaylistName ?? this.autoPlaylistName,
       episodeCounter: episodeCounter ?? this.episodeCounter,
@@ -1612,6 +1657,9 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
     if (boostDb.present) {
       map['boost_db'] = Variable<double>(boostDb.value);
     }
+    if (speed.present) {
+      map['speed'] = Variable<double>(speed.value);
+    }
     if (autoPlaylistId.present) {
       map['auto_playlist_id'] = Variable<int>(autoPlaylistId.value);
     }
@@ -1659,6 +1707,7 @@ class PodcastsCompanion extends UpdateCompanion<Podcast> {
           ..write('autoDownloadMaxEpisodes: $autoDownloadMaxEpisodes, ')
           ..write('autoDeletePlayed: $autoDeletePlayed, ')
           ..write('boostDb: $boostDb, ')
+          ..write('speed: $speed, ')
           ..write('autoPlaylistId: $autoPlaylistId, ')
           ..write('autoPlaylistName: $autoPlaylistName, ')
           ..write('episodeCounter: $episodeCounter, ')
@@ -5911,6 +5960,7 @@ typedef $$PodcastsTableCreateCompanionBuilder = PodcastsCompanion Function({
   Value<int> autoDownloadMaxEpisodes,
   Value<bool> autoDeletePlayed,
   Value<double?> boostDb,
+  Value<double?> speed,
   Value<int?> autoPlaylistId,
   Value<String?> autoPlaylistName,
   Value<bool> episodeCounter,
@@ -5942,6 +5992,7 @@ typedef $$PodcastsTableUpdateCompanionBuilder = PodcastsCompanion Function({
   Value<int> autoDownloadMaxEpisodes,
   Value<bool> autoDeletePlayed,
   Value<double?> boostDb,
+  Value<double?> speed,
   Value<int?> autoPlaylistId,
   Value<String?> autoPlaylistName,
   Value<bool> episodeCounter,
@@ -6096,6 +6147,11 @@ class $$PodcastsTableFilterComposer
 
   ColumnFilters<double> get boostDb => $composableBuilder(
     column: $table.boostDb,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get speed => $composableBuilder(
+    column: $table.speed,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6279,6 +6335,11 @@ class $$PodcastsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get speed => $composableBuilder(
+    column: $table.speed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get autoPlaylistId => $composableBuilder(
     column: $table.autoPlaylistId,
     builder: (column) => ColumnOrderings(column),
@@ -6415,6 +6476,9 @@ class $$PodcastsTableAnnotationComposer
   GeneratedColumn<double> get boostDb =>
       $composableBuilder(column: $table.boostDb, builder: (column) => column);
 
+  GeneratedColumn<double> get speed =>
+      $composableBuilder(column: $table.speed, builder: (column) => column);
+
   GeneratedColumn<int> get autoPlaylistId => $composableBuilder(
     column: $table.autoPlaylistId,
     builder: (column) => column,
@@ -6522,6 +6586,7 @@ class $$PodcastsTableTableManager
                 Value<int> autoDownloadMaxEpisodes = const Value.absent(),
                 Value<bool> autoDeletePlayed = const Value.absent(),
                 Value<double?> boostDb = const Value.absent(),
+                Value<double?> speed = const Value.absent(),
                 Value<int?> autoPlaylistId = const Value.absent(),
                 Value<String?> autoPlaylistName = const Value.absent(),
                 Value<bool> episodeCounter = const Value.absent(),
@@ -6552,6 +6617,7 @@ class $$PodcastsTableTableManager
                 autoDownloadMaxEpisodes: autoDownloadMaxEpisodes,
                 autoDeletePlayed: autoDeletePlayed,
                 boostDb: boostDb,
+                speed: speed,
                 autoPlaylistId: autoPlaylistId,
                 autoPlaylistName: autoPlaylistName,
                 episodeCounter: episodeCounter,
@@ -6584,6 +6650,7 @@ class $$PodcastsTableTableManager
                 Value<int> autoDownloadMaxEpisodes = const Value.absent(),
                 Value<bool> autoDeletePlayed = const Value.absent(),
                 Value<double?> boostDb = const Value.absent(),
+                Value<double?> speed = const Value.absent(),
                 Value<int?> autoPlaylistId = const Value.absent(),
                 Value<String?> autoPlaylistName = const Value.absent(),
                 Value<bool> episodeCounter = const Value.absent(),
@@ -6614,6 +6681,7 @@ class $$PodcastsTableTableManager
                 autoDownloadMaxEpisodes: autoDownloadMaxEpisodes,
                 autoDeletePlayed: autoDeletePlayed,
                 boostDb: boostDb,
+                speed: speed,
                 autoPlaylistId: autoPlaylistId,
                 autoPlaylistName: autoPlaylistName,
                 episodeCounter: episodeCounter,

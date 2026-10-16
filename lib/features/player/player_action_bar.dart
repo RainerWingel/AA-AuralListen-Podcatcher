@@ -95,7 +95,7 @@ class PlayerActionBar extends ConsumerWidget {
       SleepTimerAtEpisodeEnd() => l10n.sleepTimerEpisodeEndShort,
     };
 
-    final speed = ref.watch(playbackSpeedProvider).value ?? 1;
+    final speed = ref.watch(speedSettingProvider(podcastId)).speed;
     final speedFull = l10n.speedButton(
       speed == 1 ? l10n.boostOff : formatSpeed(l10n, speed),
     );
@@ -150,7 +150,7 @@ class PlayerActionBar extends ConsumerWidget {
         full: speedFull,
         compact: formatSpeed(l10n, speed),
         tooltip: speedFull,
-        onPressed: () => showSpeedSheet(context),
+        onPressed: () => showSpeedSheet(context, podcastId: podcastId),
       ),
     ];
 

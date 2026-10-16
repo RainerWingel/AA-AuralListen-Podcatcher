@@ -85,6 +85,21 @@ final playbackSpeedProvider = StreamProvider.autoDispose<double>(
       .map((value) => double.tryParse(value ?? '') ?? 1),
 );
 
+typedef SpeedSetting = ({double speed, bool perPodcast});
+
+/// Effective playback speed for a podcast: its own, else the global speed
+/// (null podcast: the global speed).
+final speedSettingProvider = Provider.autoDispose.family<SpeedSetting, int?>((
+  ref,
+  podcastId,
+) {
+  final own = podcastId == null
+      ? null
+      : ref.watch(podcastProvider(podcastId)).value?.speed;
+  final global = ref.watch(playbackSpeedProvider).value ?? 1;
+  return (speed: own ?? global, perPodcast: own != null);
+});
+
 final globalBoostProvider = StreamProvider.autoDispose<double>(
   (ref) => ref
       .watch(settingsRepositoryProvider)

@@ -198,6 +198,8 @@
       }
     }
   },
+  "speedPerPodcast": "Nur für diesen Podcast",
+  "speedPerPodcastHint": "Sonst gilt das Tempo für alle Podcasts ohne eigene Einstellung.",
   "boostPerPodcast": "Nur für diesen Podcast",
   "boostPerPodcastHint": "Sonst gilt der Wert für alle Podcasts ohne eigene Einstellung.",
   "markPlayed": "Als gespielt markieren",

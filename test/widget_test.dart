@@ -3190,6 +3190,55 @@ void main() {
   );
 
   testWidgets(
+    'speed dialog: "Nur für diesen Podcast" keeps the global speed',
+    timeout: timeout,
+    (tester) async {
+      await openPlayerAt(tester, const Size(3600, 2340));
+      Future<void> openSpeed() async {
+        await tester.tap(find.byKey(PlayerActionBar.speedKey));
+        await settle(tester);
+      }
+
+      // Global: 1,2x.
+      await openSpeed();
+      expect(find.text('Nur für diesen Podcast'), findsOneWidget);
+      await tester.tap(find.text('1,2x'));
+      await settle(tester);
+      Navigator.of(tester.element(find.text('Abspielgeschwindigkeit'))).pop();
+      await settle(tester);
+      expect(find.text('Tempo: 1,2x'), findsOneWidget);
+
+      // Switch on, then 2,0x: only this podcast.
+      await openSpeed();
+      await tester.tap(find.byType(Switch));
+      await settle(tester);
+      await tester.tap(find.text('2,0x'));
+      await settle(tester);
+      Navigator.of(tester.element(find.text('Abspielgeschwindigkeit'))).pop();
+      await settle(tester);
+      expect(find.text('Tempo: 2,0x'), findsOneWidget);
+      expect(handler.speed, 2);
+      final stored = await tester.runAsync(() async {
+        final podcast = await db.select(db.podcasts).getSingle();
+        final global = await SettingsRepository(db)
+            .getDouble(SettingsKeys.playbackSpeed);
+        return (podcast.speed, global);
+      });
+      expect(stored, (2.0, 1.2));
+
+      // Switch off: back to the global 1,2x.
+      await openSpeed();
+      await tester.tap(find.byType(Switch));
+      await settle(tester);
+      Navigator.of(tester.element(find.text('Abspielgeschwindigkeit'))).pop();
+      await settle(tester);
+      expect(find.text('Tempo: 1,2x'), findsOneWidget);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'tapping the remaining time shows the total length, remembered',
     timeout: timeout,
     (tester) async {

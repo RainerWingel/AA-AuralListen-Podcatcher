@@ -173,3 +173,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   registrieren. Für ein Hobby-Projekt nicht sinnvoll. Verteilung bleibt F-Droid + GitHub-Releases (README: Obtainium).
   Nur neu aufrollen, wenn Samsung die Regel lockert oder ein Unternehmen ohnehin besteht. Gleiche Lage wie beim Play Store
   (geschlossener Test 12 Tester × 14 Tage, abgebrochen).
+- 2026-10-20 · **Tempo „Nur für diesen Podcast"** (Benutzer) · Analog zum Boost: eigene Spalte `podcasts.speed` (Schema v29,
+  nur eine neue Spalte), gleiche Regeln und Beschriftung; Restzeit-Anzeige nutzt das wirksame Tempo.

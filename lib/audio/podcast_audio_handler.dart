@@ -392,15 +392,56 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Offered playback speeds (user wish 2026-10-03); 1 = off.
   static const speeds = <double>[1, 1.2, 1.5, 2];
 
-  /// Playback speed for all episodes, stored in the settings.
+  /// Effective playback speed of the current episode: its podcast's own
+  /// speed, else the global one from the settings.
   double get speed => _speed;
   double _speed = 1;
 
+  /// The current podcast's own speed (null = none, the global one counts).
+  double? _ownSpeed;
+
+  /// Speed from the system (notification, Bluetooth): for the current
+  /// podcast if it has its own speed, otherwise globally.
   @override
-  Future<void> setSpeed(double speed) async {
+  Future<void> setSpeed(double speed) =>
+      setSpeedChoice(speed, forPodcastOnly: _ownSpeed != null);
+
+  /// Applies a new speed: for the current podcast only, or globally (user
+  /// wish 2026-10-20, like [setBoost]). Choosing globally removes the
+  /// podcast's own speed. A provisional podcast never gets an own speed.
+  Future<void> setSpeedChoice(
+    double speed, {
+    required bool forPodcastOnly,
+  }) async {
+    final podcastId = _currentPodcastId;
+    final id = _episodeId;
+    final provisional = id != null && await _playback.isProvisional(id);
+    if (forPodcastOnly && podcastId != null && !provisional) {
+      await _playback.setPodcastSpeed(podcastId, speed);
+      _ownSpeed = speed;
+    } else {
+      await _settings.set(SettingsKeys.playbackSpeed, '$speed');
+      if (podcastId != null && !provisional) {
+        await _playback.setPodcastSpeed(podcastId, null);
+      }
+      _ownSpeed = null;
+    }
     _speed = speed;
-    await _settings.set(SettingsKeys.playbackSpeed, '$speed');
     await _engine.setSpeed(speed);
+    _broadcastState();
+  }
+
+  /// Removes the current podcast's own speed; the global one counts again.
+  Future<void> clearPodcastSpeed() async {
+    final podcastId = _currentPodcastId;
+    final id = _episodeId;
+    if (podcastId == null || id == null || await _playback.isProvisional(id)) {
+      return;
+    }
+    await _playback.setPodcastSpeed(podcastId, null);
+    _ownSpeed = null;
+    _speed = await _settings.getDouble(SettingsKeys.playbackSpeed) ?? 1;
+    await _engine.setSpeed(_speed);
     _broadcastState();
   }
 
@@ -914,7 +955,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _knownPosition = start;
     _retriedReachable = false;
     await _engine.setBoostDb(await _boostFor(row.podcast));
-    _speed = await _settings.getDouble(SettingsKeys.playbackSpeed) ?? 1;
+    _ownSpeed = row.podcast.speed;
+    _speed =
+        _ownSpeed ?? await _settings.getDouble(SettingsKeys.playbackSpeed) ?? 1;
     await _engine.setSpeed(_speed);
 
     _loaded = true;

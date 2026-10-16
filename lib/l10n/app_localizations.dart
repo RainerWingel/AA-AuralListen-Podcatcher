@@ -572,6 +572,18 @@ abstract class AppLocalizations {
   /// **'Boost: {value}'**
   String boostButton(String value);
 
+  /// No description provided for @speedPerPodcast.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur für diesen Podcast'**
+  String get speedPerPodcast;
+
+  /// No description provided for @speedPerPodcastHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Sonst gilt das Tempo für alle Podcasts ohne eigene Einstellung.'**
+  String get speedPerPodcastHint;
+
   /// No description provided for @boostPerPodcast.
   ///
   /// In de, this message translates to:

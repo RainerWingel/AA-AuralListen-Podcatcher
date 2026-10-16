@@ -193,6 +193,24 @@ void main() {
     await db.close();
   });
 
+  test('upgrade to v29: podcasts get an empty own speed', () async {
+    final schema = await verifier.schemaAt(28);
+    schema.rawDatabase.execute(
+      'INSERT INTO podcasts (feed_url, title, subscribed_at) '
+      "VALUES ('https://example.com/feed', 'P', 1767225600)",
+    );
+    final db = AppDatabase.forTesting(schema.newConnection());
+    expect((await db.select(db.podcasts).getSingle()).speed, isNull);
+    await db.close();
+  });
+
+  test('upgrade v28 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(28);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
   test(
     'a database older than 1.3.1 starts empty instead of crashing',
     () async {

@@ -41,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 28;
+  int get schemaVersion => 29;
 
   /// Oldest schema that is still migrated (app 1.3.1); see [migration].
   static const oldestMigratedSchema = 20;
@@ -114,6 +114,9 @@ class AppDatabase extends _$AppDatabase {
         // are read again (feed at the next refresh, JSON/ID3 when the
         // chapters are opened) – this time with their pictures.
         await customStatement('DELETE FROM chapters');
+      }
+      if (from < 29) {
+        await m.addColumn(podcasts, podcasts.speed);
       }
     },
     beforeOpen: (details) async {
