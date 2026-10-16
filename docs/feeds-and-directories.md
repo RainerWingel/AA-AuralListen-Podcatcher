@@ -18,8 +18,9 @@ Code: `lib/data/directory/directory_search.dart`, UI: `lib/features/search/searc
   Name, die Feed-Adressen kommen mit **einem** iTunes-„lookup“ (`id=1,2,…` für alle 50), Podcasts ohne Feed-Adresse
   (Apple-exklusiv) fallen heraus. **Neuheiten** = fyyd `/0.2/podcast/latest?language=de` (neu aufgenommene Podcasts, neueste
   zuerst, nur mit mindestens einer Folge). Anzeige wie Suchergebnisse (⊕ → vorläufig hinzufügen); oben zwei Auswahl-Chips
-  zum Wechseln, eine neue Suche beendet die Liste. Ist die Quelle nicht erreichbar: „Suche fehlgeschlagen“ statt leerer
-  Liste. Code: `TopCharts.top`, `NewPodcasts.latest`, `DirectorySearch.top/latest`.
+  zum Wechseln, eine neue Suche beendet die Liste. Eine Liste wird bei einem Fehler **einmal** nach 0,5 s neu
+  versucht (auf dem A05s schlug die allererste Anfrage einmal fehl); ist die Quelle dann nicht erreichbar: „Suche
+  fehlgeschlagen“ statt leerer Liste. Code: `TopCharts.top`, `NewPodcasts.latest`, `DirectorySearch.top/latest`.
 - iTunes-Treffer ohne `feedUrl` (Apple-exklusive Podcasts) werden übersprungen.
 - Suche startet 600 ms nach dem Tippen (ab 3 Zeichen) oder sofort per Enter/Lupe.
 - Bereits abonnierte Treffer zeigen ein Häkchen (Vergleich per `feedUrlKey`, Tooltip „Schon in deinen Abos").

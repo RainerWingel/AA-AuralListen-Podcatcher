@@ -196,6 +196,24 @@ void main() {
       expect(requests.single.queryParameters['language'], 'de');
     });
 
+    test('a failed first request is tried once more', () async {
+      var calls = 0;
+      final flaky = DirectorySearch([
+        FyydDirectory(
+          MockClient((request) async {
+            calls++;
+            return calls == 1
+                ? http.Response('', 503)
+                : http.Response.bytes(utf8.encode(latest), 200);
+          }),
+        ),
+      ]);
+      final outcome = await flaky.latest();
+      expect(calls, 2);
+      expect(outcome.failedDirectories, isEmpty);
+      expect(outcome.results.map((r) => r.title), ['Frisch']);
+    });
+
     test('a failing source is reported, not thrown', () async {
       final down = DirectorySearch([
         ItunesDirectory(MockClient((_) async => http.Response('', 503))),

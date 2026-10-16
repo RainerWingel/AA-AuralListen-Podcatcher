@@ -254,12 +254,25 @@ class DirectorySearch {
     final failed = <String>[];
     final lists = await Future.wait([
       for (final directory in _directories.whereType<T>())
-        load(directory).catchError((Object _) {
+        _retryOnce(() => load(directory)).catchError((Object _) {
           failed.add(name(directory));
           return <DirectoryResult>[];
         }),
     ]);
     return (results: mergeDirectoryResults(lists), failedDirectories: failed);
+  }
+
+  /// A list is loaded on a tap, so one more try is cheap (seen on the
+  /// phone: the very first request of a list failed once, the next worked).
+  static Future<List<DirectoryResult>> _retryOnce(
+    Future<List<DirectoryResult>> Function() load,
+  ) async {
+    try {
+      return await load();
+    } on Exception {
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      return load();
+    }
   }
 
   Future<DirectorySearchOutcome> search(String term) async {
