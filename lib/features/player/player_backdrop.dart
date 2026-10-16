@@ -108,7 +108,9 @@ class _PlayerBackdropState extends ConsumerState<PlayerBackdrop> {
     _provider = provider;
     if (provider == null) return;
     averageLuminance(provider).then((value) {
-      if (!mounted || provider != _provider || value == null) return;
+      if (!mounted || provider != _provider) return;
+      // No value: the picture cannot be loaded – then there is no backdrop
+      // (and no veil) at all, the plain surface stays.
       setState(() => _luminance = value);
     });
   }
@@ -137,7 +139,7 @@ class _PlayerBackdropState extends ConsumerState<PlayerBackdrop> {
       children: [
         // Plain surface under everything (no picture, or while it loads).
         ColoredBox(color: base.colorScheme.surface),
-        if (provider != null)
+        if (provider != null && luminance != null)
           // Painted once (repaint boundary), a small decode scaled up and
           // blurred: cheap on weak phones, nothing to do while scrolling.
           RepaintBoundary(

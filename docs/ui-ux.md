@@ -105,7 +105,8 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
     Bereichs passen sich der Bildhelligkeit an** (mittlere Leuchtdichte eines 16-px-Abbilds, `averageLuminance`): über
     0,2 dunkle Schrift (#14141A), sonst helle (#F5F5F7) – Texte, Symbole, Textknöpfe (Kapitel-Knopf mit
     durchscheinender Fläche), Beschreibung als durchscheinende Platte mit Haarlinie (ersetzt die Dunkel-Modus-Fläche
-    des 2026-10-09 an dieser Stelle). Ohne Bild bleibt das normale Theme. Das **Bedienfeld** (Slider, Play-Reihe, vier
+    des 2026-10-09 an dieser Stelle). Ohne Bild – oder wenn es sich nicht laden lässt (Cover-Adresse tot, defekte Datei; dann auch **kein** Schleier, sonst
+    wirkte die Fläche grau, S25 2026-10-16) – bleibt die normale Fläche und das normale Theme. Das **Bedienfeld** (Slider, Play-Reihe, vier
     Knöpfe) hat die Flächenfarbe des Themes und wirft einen **Schatten** auf den Bildbereich (nach oben bzw. im
     Querformat nach links), wirkt also darüber liegend (eigenes `Material`, damit schlichter `Text` wie die Zeitmarken die
     Themefarbe behält und nicht die Bildfarbe – Fehler 2026-10-17: weiß auf weiß im hellen Design bei dunklem Bild). **Ab 2026-10-17 reicht das Bild auch hinter die Titelleiste**

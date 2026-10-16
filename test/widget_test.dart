@@ -3056,6 +3056,64 @@ void main() {
   );
 
   testWidgets(
+    'player: a picture that cannot be loaded leaves the plain surface (no veil)',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final pictures = Directory.systemTemp.createTempSync('broken_pic_');
+      addTearDown(() => pictures.deleteSync(recursive: true));
+      await pumpApp(
+        tester,
+        overrides: [
+          chapterImagesDirectoryProvider.overrideWithValue(
+            () async => pictures,
+          ),
+        ],
+      );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationBar)),
+      );
+      await tester.runAsync(
+        () => container
+            .read(podcastRepositoryProvider)
+            .subscribe('https://example.com/feed'),
+      );
+      final episode = await tester.runAsync(
+        () => db.select(db.episodes).getSingle(),
+      );
+      // A "picture" that is no image at all.
+      await tester.runAsync(() async {
+        final reference = await container
+            .read(chapterImageStoreProvider)
+            .save(
+              episode!.id,
+              0,
+              Uint8List.fromList(List.filled(64, 7)),
+              'png',
+            );
+        await (db.update(db.chapters)..where((c) => c.startMs.equals(0))).write(
+          ChaptersCompanion(imageUrl: Value(reference)),
+        );
+      });
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 400)),
+      );
+      await settle(tester);
+      expect(find.byType(ImageFiltered), findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'player: the control panel is a card inset from the edges, with a '
     'shadow on all sides',
     timeout: timeout,
