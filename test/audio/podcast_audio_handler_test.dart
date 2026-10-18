@@ -1066,6 +1066,67 @@ void main() {
       },
     );
 
+    group('stale timer (nothing played for an hour)', () {
+      setUp(() async {
+        await handler.dispose();
+        engine = FakePlayerEngine();
+        handler = PodcastAudioHandler(
+          engine: engine,
+          playback: PlaybackRepository(db, () => now),
+          settings: settings,
+          playlists: playlists,
+          sleepFadeDuration: const Duration(milliseconds: 40),
+          sleepIdleExpiry: const Duration(milliseconds: 80),
+        );
+      });
+
+      test('is dropped when playback stood still too long', () async {
+        await handler.playEpisode(episodeId);
+        handler.setSleepTimer(const SleepTimerAfter(Duration(minutes: 30)));
+        await handler.pause();
+        await ms(120);
+
+        // Shown as off at once, and Play really drops it.
+        expect(handler.sleepTimerState.isActive, isFalse);
+        await handler.play();
+        expect(handler.sleepTimerState.isActive, isFalse);
+        await ms(60);
+        expect(handler.playbackState.value.playing, isTrue);
+      });
+
+      test('"until the end of the episode" is dropped as well', () async {
+        await handler.playEpisode(episodeId);
+        handler.setSleepTimer(const SleepTimerAtEpisodeEnd());
+        await handler.pause();
+        await ms(120);
+
+        await handler.play();
+        expect(handler.sleepTimerState.isActive, isFalse);
+      });
+
+      test('a short pause keeps the timer', () async {
+        await handler.playEpisode(episodeId);
+        handler.setSleepTimer(const SleepTimerAfter(Duration(minutes: 30)));
+        await handler.pause();
+        await ms(30);
+
+        expect(handler.sleepTimerState.isActive, isTrue);
+        await handler.play();
+        expect(handler.sleepTimerState.isActive, isTrue);
+      });
+
+      test('a timer set while paused gets a fresh idle clock', () async {
+        await handler.playEpisode(episodeId);
+        await handler.pause();
+        await ms(120);
+        handler.setSleepTimer(const SleepTimerAfter(Duration(minutes: 30)));
+
+        expect(handler.sleepTimerState.isActive, isTrue);
+        await handler.play();
+        expect(handler.sleepTimerState.isActive, isTrue);
+      });
+    });
+
     test('"Aus" during the fade restores the volume', () async {
       await handler.playEpisode(episodeId);
       handler.setSleepTimer(const SleepTimerAfter(Duration(milliseconds: 60)));

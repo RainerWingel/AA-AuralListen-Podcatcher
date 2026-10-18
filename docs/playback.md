@@ -60,6 +60,11 @@ Knopf in der festen Knopfreihe des Vollbild-Players (`PlayerActionBar`, `ui-ux.m
 - **Bis Ende der Folge:** Die Folge endet regulär (gespielt, raus aus Playlists), aber die nächste Playlist-Folge startet
   **nicht**; danach „Aus". Gilt auch, wenn das Ende durch ein übersprungenes letztes Kapitel kommt.
 - Folgenwechsel lässt den Timer weiterlaufen. „Aus" bricht ihn ab.
+- **Verfällt nach 1 Stunde Stillstand** (Benutzerwunsch 2026-10-18): Wurde die Wiedergabe gestoppt und lief danach eine Stunde
+  lang nichts (`sleepIdleExpiry`), gilt der Timer als abgelaufen – egal ob Minuten oder „Bis Ende der Folge". Sonst
+  schlüge er am nächsten Tag bei der ersten Folge zu. Geprüft wird **faul** (ohne Timer): `sleepTimerState` zeigt dann
+  „Aus", und das nächste Play (`_tryPlay`) setzt ihn wirklich zurück. Gemessen mit Wanduhrzeit (`DateTime.now()`), damit
+  auch Handy-Schlaf zählt. Ein in der Pause neu gesetzter Timer beginnt die Stunde neu.
 
 ### Hänger-Erkennung (Benutzerwunsch, sparsam)
 Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell`.

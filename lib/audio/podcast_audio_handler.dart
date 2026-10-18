@@ -34,6 +34,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     this.stallCheckInterval = const Duration(seconds: 10),
     this.recoveryRetryDelay = const Duration(seconds: 15),
     this.sleepFadeDuration = const Duration(seconds: 30),
+    this.sleepIdleExpiry = const Duration(hours: 1),
   }) {
     _subscriptions
       ..add(_engine.stateStream.listen(_onEngineState))
@@ -148,6 +149,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Sleep timer: the last [sleepFadeDuration] fade the volume to 0.
   final Duration sleepFadeDuration;
   Timer? _sleepFade;
+
+  /// A sleep timer is dropped once playback has been stopped this long
+  /// (it must not wake up with the next day's first episode).
+  final Duration sleepIdleExpiry;
+
+  /// Since when playback stands still; null while playing. Checked lazily
+  /// (no timer): see [_sleepTimerStale].
+  DateTime? _sleepIdleSince;
   bool _volumeLowered = false;
   final _sleepStates = StreamController<SleepTimerState>.broadcast();
 
@@ -262,15 +271,17 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   // ------------------------------------------------------------ public API
 
   /// Current sleep timer with the playing time left.
-  SleepTimerState get sleepTimerState => switch (_sleepTimer) {
-    SleepTimerAfter(:final duration) => SleepTimerState(
-      _sleepTimer,
-      remaining: duration > _sleepPlayed.elapsed
-          ? duration - _sleepPlayed.elapsed
-          : Duration.zero,
-    ),
-    final timer => SleepTimerState(timer),
-  };
+  SleepTimerState get sleepTimerState => _sleepTimerStale
+      ? SleepTimerState.off
+      : switch (_sleepTimer) {
+          SleepTimerAfter(:final duration) => SleepTimerState(
+            _sleepTimer,
+            remaining: duration > _sleepPlayed.elapsed
+                ? duration - _sleepPlayed.elapsed
+                : Duration.zero,
+          ),
+          final timer => SleepTimerState(timer),
+        };
 
   /// Sleep timer now and after every change (not every second – the UI
   /// computes the countdown from [sleepTimerState] while it is visible).
@@ -289,6 +300,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _sleepPlayed
       ..stop()
       ..reset();
+    _sleepIdleSince = null; // a new timer starts the idle clock afresh
     _sleepTimer = timer;
     _updateSleepTimer(_engine.state.playing && _loaded);
     _emitSleepState();
@@ -605,6 +617,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<Object?> _tryPlay() async {
     if (_episodeId == null) return null;
     _pauseTimer?.cancel();
+    if (_sleepTimerStale) setSleepTimer(const SleepTimerOff());
     if (!_loaded) {
       try {
         await (_loadInFlight ??= _load().whenComplete(
@@ -1201,6 +1214,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Counts playing time: the stopwatch and the timers run only while
   /// playing. The fade-out starts [sleepFadeDuration] before the end.
   void _updateSleepTimer(bool playing) {
+    _sleepIdleSince = playing ? null : (_sleepIdleSince ?? DateTime.now());
     final timer = _sleepTimer;
     if (timer is! SleepTimerAfter) return;
     if (playing && !_sleepPlayed.isRunning) {
@@ -1274,6 +1288,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   static double sleepFadeVolume(double share) {
     final s = share.clamp(0.0, 1.0);
     return s * s * s;
+  }
+
+  /// The timer was set, but nothing has played for [sleepIdleExpiry].
+  bool get _sleepTimerStale {
+    final since = _sleepIdleSince;
+    return _sleepTimer is! SleepTimerOff &&
+        since != null &&
+        DateTime.now().difference(since) >= sleepIdleExpiry;
   }
 
   /// Pause (the volume is 0 already), then switch the timer off. Full volume

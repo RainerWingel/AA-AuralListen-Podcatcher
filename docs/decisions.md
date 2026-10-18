@@ -182,3 +182,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Apples Chart für Deutschland (andere Länder wären möglich).
 - 2026-10-21 · **„Beliebt“ folgt ebenfalls der App-Sprache** (Benutzer) · Deutsch → Apple-Chart Deutschland, Englisch → USA (Lookup mit
   passendem `country`). Weitere Sprachen später: Land je `AppLanguage` ergänzen.
+- 2026-10-18 · **Sleep-Timer verfällt nach 1 Stunde Stillstand** (Benutzer) · Ein gesetzter, aber nicht abgelaufener Timer
+  (z. B. Wiedergabe vorher von Hand gestoppt) schlug am nächsten Tag bei der ersten Folge zu. Jetzt: 1 Stunde ohne
+  Wiedergabe → Timer „Aus". Faul geprüft (kein zusätzlicher Timer, `DateTime.now()`), siehe `playback.md`.
