@@ -185,3 +185,10 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-10-18 · **Sleep-Timer verfällt nach 1 Stunde Stillstand** (Benutzer) · Ein gesetzter, aber nicht abgelaufener Timer
   (z. B. Wiedergabe vorher von Hand gestoppt) schlug am nächsten Tag bei der ersten Folge zu. Jetzt: 1 Stunde ohne
   Wiedergabe → Timer „Aus". Faul geprüft (kein zusätzlicher Timer, `DateTime.now()`), siehe `playback.md`.
+- 2026-10-19 · **`audio_service` als angepasste Kopie im Repo** (Benutzer) · Ein Bluetooth-Kopfhörer mit Multipoint (Shokz OpenRun
+  Pro 2) schickt bei einem Anruf auf dem zweiten Handy „Pause" (AVRCP), teils zweimal. Das Plugin behandelte die Tasten
+  „Pause"/„Play" als Umschalter (`AudioService.java`, `onMediaButtonEvent`) – das zweite „Pause" startete einen schon
+  pausierten Podcast, der ins Leere spielte. Per `adb logcat` auf dem S25 nachgewiesen (Pause-Taste bei pausierter App →
+  „Spielt" nach 8 ms). Jetzt: Pause pausiert nur, Play spielt nur. Kopie 0.18.19 (MIT) in `third_party/audio_service`, nur
+  diese eine Stelle geändert (`PATCH.md`), Pfad-Abhängigkeit statt pub.dev; F-Droid baut weiter komplett aus dem Repo.
+  Beim Plugin-Update die Änderung wiederholen. Nicht gelöst: ein „Play" vom Kopfhörer.

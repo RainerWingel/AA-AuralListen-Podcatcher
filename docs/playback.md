@@ -130,6 +130,12 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 - Anruf / andere App mit Audio → Pause; nach einer **kurzen** Unterbrechung (z. B. Anruf) geht es automatisch weiter.
 - Navigationsansage → leiser (Ducking).
 - Kopfhörer abgezogen / Bluetooth getrennt → Pause.
+- **Medientasten (Bluetooth/Kabel), Stand 2026-10-19:** „Pause" pausiert **nur**, „Play" spielt **nur**; erst die echten
+  Umschalter (Play/Pause, Kopfhörer-Taste) schalten um. Hintergrund: Ein Kopfhörer mit Multipoint (Shokz OpenRun Pro 2)
+  schickt bei einem Anruf auf dem anderen Handy „Pause" an alle Geräte, teils mehrfach. `audio_service` machte daraus
+  einen Umschalter – das zweite „Pause" startete einen schon pausierten Podcast, der dann ins Leere spielte. Behoben in
+  der angepassten Plugin-Kopie `third_party/audio_service` (`PATCH.md`). Nicht abgedeckt: ein „Play" vom Kopfhörer
+  (z. B. „Anruf beendet") startet weiterhin – es ist von einem echten Tastendruck nicht zu unterscheiden.
 
 ## Sprünge
 −15 s / +30 s im Vollbild-Player und in der Benachrichtigung (Grenzen: 0 und Dauer).

@@ -11,6 +11,7 @@ kommen aus diesem Repo. Stand 2026-10-05: eingereicht (MR !51179); Prüfer verla
 | Store-Texte, Icon, Changelog – de-DE und en-US | `fastlane/metadata/android/<Sprache>/` |
 | Screenshots (macht der Benutzer selbst) | `fastlane/metadata/android/<Sprache>/images/phoneScreenshots/` |
 | SQLite aus Quellcode statt heruntergeladener Binärdatei | `third_party/sqlite/`, `hooks:` in `pubspec.yaml` |
+| `audio_service` als angepasste Kopie (Medientaste Pause ist kein Umschalter) | `third_party/audio_service/` (`PATCH.md`), Pfad-Abhängigkeit in `pubspec.yaml` |
 | Ohne `key.properties` bleibt die Release-APK unsigniert | `android/app/build.gradle.kts` |
 | Versionsschema Build-Nummer × 10 + ABI (F-Droid-Vorgabe) | `android/app/build.gradle.kts` (`abiCodes`) |
 
