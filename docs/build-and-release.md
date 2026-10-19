@@ -2,7 +2,17 @@
 
 ## Zielgerät
 - **Testhandy: Samsung Galaxy A05s** – frei nutzbar zum Installieren, Durchtippen, Test-Feeds, Screenshots.
-  WLAN-Debugging per `adb connect <IP>:<Port>` (Port wechselt; steht unter „Wireless Debugging" auf dem Handy).
+  Zwei Wege (Stand 2026-10-19), Reihenfolge der Wahl: **USB**, sonst WLAN.
+  - **USB-Kabel (bevorzugt, ohne Einschalten am Handy):** „USB-Debugging" in den Entwickleroptionen ist an, der Mac ist
+    mit „Immer zulassen" vertraut. Das Gerät erscheint in `adb devices` als `R7AX103QAYX` (`usb:…`); Ziel immer mit
+    `adb -s R7AX103QAYX …` angeben. Kein Port, keine Kopplung. Braucht ein **Datenkabel** (reine Ladekabel zeigen es
+    nicht) und den USB-Modus „Dateiübertragung".
+  - **WLAN-Debugging** per `adb connect <IP>:<Port>` (Port wechselt; steht unter „Wireless Debugging" auf dem Handy).
+    Ist es noch an, steht das A05s zusätzlich als `adb-R7AX103QAYX-…` in der Liste – deshalb immer mit `-s` arbeiten.
+  - Es ist **kein** Dauerkabel nötig: ist es gesteckt, nehmen wir USB; sonst WLAN wie unten. **Shizuku** ersetzt das
+    WLAN-Debugging nicht (es nutzt es selbst) und hilft hier nicht.
+- Mit **zwei** Geräten gleichzeitig (A05s + S25) meldet `adb` ohne Ziel „more than one device/emulator": immer
+  `adb -s <Kennung>` bzw. `flutter run -d <ID>` benutzen.
 - **Samsung Galaxy S25 (SM-S931B) = Produktiv-Handy des Benutzers**, Android 16 / API 36, keine SD-Karte. **Nie zum
   Testen benutzen**; nur auf ausdrückliche Ansage installieren (ein Neustart beim Installieren beendet laufende Aktionen,
   z. B. ein Backup).
