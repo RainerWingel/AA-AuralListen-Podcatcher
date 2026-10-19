@@ -1945,6 +1945,22 @@ void main() {
       );
       expect(title.style?.color, Color(expected));
 
+      // The chapter list is a plain sheet: it follows the app's light/dark
+      // setting, not the picture (white text on a light sheet, 2026-10-19).
+      final appOnSurface = Theme.of(
+        tester.element(find.byType(NavigationBar, skipOffstage: false)),
+      ).colorScheme.onSurface;
+      await tester.tap(find.byType(CurrentChapterLine));
+      await settle(tester);
+      final chapterTitle = find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.text('Begrüßung'),
+      );
+      expect(chapterTitle, findsOneWidget);
+      final sheetTheme = Theme.of(tester.element(chapterTitle));
+      expect(sheetTheme.colorScheme.onSurface, appOnSurface);
+      expect(sheetTheme.colorScheme.onSurface, isNot(Color(expected)));
+
       await disposeApp(tester);
     });
   }

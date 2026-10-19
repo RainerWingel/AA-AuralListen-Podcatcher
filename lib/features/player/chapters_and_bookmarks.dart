@@ -267,12 +267,23 @@ void _closeOnEpisodeChange(BuildContext context, WidgetRef ref, int episodeId) {
   });
 }
 
+/// A sheet opened from the player inherits the theme of the place it was
+/// opened from – for the chapter button that is the picture-adapted one
+/// (light texts on a dark picture), but the sheet itself is a plain surface
+/// that follows the app's light/dark setting (bug 2026-10-19: white text on
+/// a light sheet). So the sheet content gets the app theme back.
+Widget _onAppTheme(BuildContext context, Widget child) => Theme(
+  data: Theme.of(Navigator.of(context, rootNavigator: true).context),
+  child: child,
+);
+
 Future<void> showChaptersSheet(BuildContext context, int episodeId) =>
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      builder: (_) => _ChaptersSheet(episodeId: episodeId),
+      builder: (_) =>
+          _onAppTheme(context, _ChaptersSheet(episodeId: episodeId)),
     );
 
 class _ChaptersSheet extends ConsumerStatefulWidget {
@@ -472,7 +483,8 @@ Future<void> showEpisodeBookmarksSheet(BuildContext context, int episodeId) =>
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
-      builder: (_) => _EpisodeBookmarksSheet(episodeId: episodeId),
+      builder: (_) =>
+          _onAppTheme(context, _EpisodeBookmarksSheet(episodeId: episodeId)),
     );
 
 class _EpisodeBookmarksSheet extends ConsumerWidget {

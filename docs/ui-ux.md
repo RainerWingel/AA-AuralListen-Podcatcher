@@ -121,6 +121,10 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
     Knöpfe untereinander, senkrecht zentriert – unten angeheftet wäre dort zu eng. Die Knopfreihe misst auch hier ihre
     Breite (in der halben Breite meist Symbole mit Wert). Tablets und große Querformat-Fenster behalten die Leiste unten.
   Kapitel-Liste: Titel, darunter Startzeit, rechts Chip „Skip" (übersprungen = durchgestrichen) → `playback.md`.
+  Die Kapitel-Liste (und die Lesezeichen-Liste) ist ein normales Sheet und folgt der **App-Einstellung** Hell/Dunkel,
+  nicht der Bildhelligkeit: Der Kapitel-Knopf liegt im bildangepassten Bereich, ein Sheet erbt sonst dessen Theme
+  (weiße Schrift auf hellem Sheet, Fehler 2026-10-19). Deshalb setzt `_onAppTheme` (`chapters_and_bookmarks.dart`) das
+  App-Theme im Sheet zurück. Neue Sheets, die aus dem scrollbaren Bereich geöffnet werden, brauchen dasselbe.
   **Kapitelbilder:** Das große Cover wird beim Abspielen durch das Bild des laufenden Kapitels ersetzt, 2 Minuten nach
   Pause kommt das Folgen-Cover zurück (`playback.md`).
 - **Boost-Auswahl** (Bottom-Sheet): Aus / +3 / +6 / +9 / +12 dB, Schalter „Nur für diesen Podcast".
