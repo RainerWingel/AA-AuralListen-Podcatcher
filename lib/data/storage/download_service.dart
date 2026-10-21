@@ -61,7 +61,7 @@ class DownloadService implements PodcastFilesCleaner, NewEpisodePlaylister {
   static const maxAutoAttempts = 3;
 
   /// Downloads restarted by [downloadNow]: the "canceled" event of the old
-  /// task must not delete the row of the new one.
+  /// task must not set the new one (already running) back to "queued".
   final _replacing = <int>{};
 
   final _progress = <int, double>{};
@@ -490,17 +490,7 @@ class DownloadService implements PodcastFilesCleaner, NewEpisodePlaylister {
       case DownloadStarted():
         await _setState(id, DownloadState.running);
       case DownloadWaiting():
-        // Back to "queued" (e.g. connection lost, retry pending); the old
-        // progress is no longer current. Done/failed rows stay as they are.
-        _clearProgress(id);
-        await (_db.update(_db.downloads)..where(
-              (d) =>
-                  d.episodeId.equals(id) &
-                  d.state.equalsValue(DownloadState.running),
-            ))
-            .write(
-              const DownloadsCompanion(state: Value(DownloadState.queued)),
-            );
+        await _backToQueued(id);
       case DownloadProgress(:final fraction):
         _progress[id] = fraction;
         _emitProgress();
@@ -522,9 +512,26 @@ class DownloadService implements PodcastFilesCleaner, NewEpisodePlaylister {
         _clearProgress(id);
         await _fail(id);
       case DownloadCanceled():
-        _clearProgress(id);
-        await delete(id);
+        // Not a cancel by the user: our own cancel paths (cancel,
+        // deleteForPodcast, downloadNow) remove or replace the row themselves.
+        // The plugin also reports "canceled" when Android stops the worker,
+        // e.g. because the network is gone – WorkManager starts it again
+        // later. Deleting the row here showed the episode as not downloading,
+        // a new tap then started a second worker (bug 2026-10-21, docs/eviction.md).
+        await _backToQueued(id);
     }
+  }
+
+  /// Back to "queued" (e.g. connection lost, retry pending); the old progress
+  /// is no longer current. Done/failed rows stay as they are.
+  Future<void> _backToQueued(int id) async {
+    _clearProgress(id);
+    await (_db.update(_db.downloads)..where(
+          (d) =>
+              d.episodeId.equals(id) &
+              d.state.equalsValue(DownloadState.running),
+        ))
+        .write(const DownloadsCompanion(state: Value(DownloadState.queued)));
   }
 
   void _emitProgress() {

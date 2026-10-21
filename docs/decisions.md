@@ -201,3 +201,8 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Datei am Ende heil). Version 9.6.4 behebt das laut Änderungsprotokoll nicht und **lässt sich nicht bauen** (das Plugin legt
   das Kotlin-Serialisierungs-Plugin auf 2.3.20 fest, das Projekt nutzt Kotlin 2.4.0; zusätzlich neue indirekte Pakete
   `connectivity_plus` und `nm`). Offen: Wiederaufnahme per `transfers`-Schnittstelle (ab 9.6.0) oder Plugin-Kopie – nur bei Bedarf.
+- 2026-10-21 · **„Abgebrochen" vom Download-Paket löscht keinen Eintrag mehr** (Benutzer) · Das Plugin meldet `canceled` auch, wenn Android den
+  Arbeiter bei Netzverlust stoppt. Die App hielt das für einen Abbruch des Benutzers und löschte Zeile und Datei; die Folge
+  stand wieder als „nicht geladen" da, ein neuer Tipp reihte einen weiteren Arbeiter ein (Fehlerbericht S25 vom 2026-10-21: drei
+  Arbeiter für `episode-85`, alle drei am Ende „erfolgreich"). Jetzt: `canceled` setzt `running` auf `queued`; eigene Abbrüche
+  entfernen die Zeile selbst. Der Neustart von Byte 0 nach Netzverlust bleibt (Plugin).

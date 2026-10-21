@@ -26,6 +26,12 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
    `enqueued`/`waitingToRetry`/`paused` werden zu `DownloadWaiting` (`downloadEventFor`) und setzen `running` zurück auf
    `queued`, **nicht** auf „0 % Fortschritt" (Bug 2026-10-05: der Ring bei 0 % war eine leere Lücke). `done`/`failed`
    bleiben davon unberührt.
+   **Auch „abgebrochen" (`DownloadCanceled`) setzt nur `running` zurück auf `queued`** und löscht nichts (Bug 2026-10-21):
+   Das Paket meldet „abgebrochen" auch, wenn Android den Arbeiter stoppt (z. B. Netz weg, Wechsel WLAN ↔ Mobilfunk);
+   WorkManager startet ihn später neu (dann **von Byte 0**, `decisions.md` 2026-10-21). Früher löschte die App dabei die
+   Zeile, die Folge stand wieder als „nicht geladen" da, ein neuer Tipp reihte einen zweiten Arbeiter ein – im Fehlerbericht
+   liefen zeitweise drei für dieselbe Datei. Eigene Abbrüche (`cancel`, `deleteForPodcast`, `downloadNow`) entfernen oder
+   ersetzen die Zeile selbst; bleibt ein Eintrag ohne Aufgabe zurück, räumt ihn `reconcile` auf.
 
 ### Automatisches Löschen (Regel des Benutzers)
 - Eine Folge gilt als **gespielt**, sobald sie bis zum Ende abgelaufen ist (`data-model.md`; bis 2026-10-03: ab 98 %).
@@ -74,7 +80,7 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 - **„Jetzt über Mobilfunk laden"** (Benutzerwunsch 2026-10-05): Eine Folge, die auf WLAN wartet, lässt sich per Menü
   (langes Drücken) oder Knopf im Downloads-Tab sofort über jedes Netz laden (`DownloadService.downloadNow`). Das Paket kann
   eine wartende Aufgabe nicht ändern, also wird sie abgebrochen und neu eingereiht; das späte „abgebrochen" der alten
-  Aufgabe wird einmal ignoriert (`_replacing`), sonst löschte es den neuen Eintrag.
+  Aufgabe wird einmal ignoriert (`_replacing`), sonst setzte es den schon laufenden neuen Download zurück auf „wartet".
 
 ### Wartung (`runMaintenance`)
 Reihenfolge: Abgleich → 96-h-Löschung → Speicherlimit → Auto-Download. Läuft beim App-Start (nach dem Refresh), nach jedem

@@ -194,12 +194,53 @@ void main() {
       await engine.finish(id);
       expect((await row(id))!.state, DownloadState.done);
 
-      // A later real cancel is handled normally again.
+      // Our own cancel leaves nothing behind, a late event brings nothing back.
       final other = await addEpisode('2');
       await service.download(other);
+      await service.cancel(other);
       engine.emit(DownloadCanceled(other));
       await pumpEventQueue();
       expect(await row(other), isNull);
+    });
+
+    test('a "canceled" we did not ask for (Android stopped the worker, e.g. no '
+        'network) keeps the download waiting', () async {
+      final id = await addEpisode('1');
+      await service.download(id);
+      final progress = <Map<int, double>>[];
+      final sub = service.progress.listen(progress.add);
+      engine
+        ..emit(DownloadStarted(id))
+        ..emit(DownloadProgress(id, 0.4));
+      await pumpEventQueue();
+      expect((await row(id))!.state, DownloadState.running);
+
+      engine.emit(DownloadCanceled(id));
+      await pumpEventQueue();
+      // WorkManager starts the task again later: the row stays, waiting.
+      expect((await row(id))!.state, DownloadState.queued);
+      expect(progress.last, isEmpty);
+
+      // The task finishes after all.
+      await engine.finish(id);
+      expect((await row(id))!.state, DownloadState.done);
+      await sub.cancel();
+    });
+
+    test('a late "canceled" does not touch done or failed rows', () async {
+      final done = await addEpisode('1');
+      await downloaded(done);
+      final failed = await addEpisode('2');
+      await service.download(failed);
+      await engine.fail(failed);
+
+      engine
+        ..emit(DownloadCanceled(done))
+        ..emit(DownloadCanceled(failed));
+      await pumpEventQueue();
+      expect((await row(done))!.state, DownloadState.done);
+      expect(fileOf(done).existsSync(), isTrue);
+      expect((await row(failed))!.state, DownloadState.failed);
     });
 
     test(
