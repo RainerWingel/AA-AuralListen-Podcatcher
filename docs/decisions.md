@@ -192,3 +192,12 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   „Spielt" nach 8 ms). Jetzt: Pause pausiert nur, Play spielt nur. Kopie 0.18.19 (MIT) in `third_party/audio_service`, nur
   diese eine Stelle geändert (`PATCH.md`), Pfad-Abhängigkeit statt pub.dev; F-Droid baut weiter komplett aus dem Repo.
   Beim Plugin-Update die Änderung wiederholen. Nicht gelöst: ein „Play" vom Kopfhörer.
+- 2026-10-21 · **`background_downloader` bleibt auf 9.5.9** (Benutzer wollte 9.6.4 versuchen) · Bei Netzverlust (WLAN aus) stoppt Android
+  den Download-Arbeiter (`Job was cancelled`) und plant ihn mit den ursprünglichen Daten neu ein: **Neustart von Byte 0**, die
+  Teildatei geht verloren (`DownloadTaskRunner.kt`: „Partially downloaded file not available, resume not possible"). Nur das
+  plugin-eigene Wiederaufnehmen nach einem Verbindungsabbruch setzt fort. Mit einem gedrosselten lokalen Test-Server nachgestellt
+  (A05s, 100 MB, 8 WLAN-Unterbrechungen: Abrufe ohne `Range`, 8 + 2 + 6 MB verworfen). Außerdem im Fehlerbericht vom 2026-10-20
+  (S25, NSFW098): drei Einreihungen derselben Aufgabe, zeitweise zwei Arbeiter gleichzeitig (springende Fortschrittsanzeige,
+  Datei am Ende heil). Version 9.6.4 behebt das laut Änderungsprotokoll nicht und **lässt sich nicht bauen** (das Plugin legt
+  das Kotlin-Serialisierungs-Plugin auf 2.3.20 fest, das Projekt nutzt Kotlin 2.4.0; zusätzlich neue indirekte Pakete
+  `connectivity_plus` und `nm`). Offen: Wiederaufnahme per `transfers`-Schnittstelle (ab 9.6.0) oder Plugin-Kopie – nur bei Bedarf.
