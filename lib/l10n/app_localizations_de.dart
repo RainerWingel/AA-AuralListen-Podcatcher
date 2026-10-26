@@ -979,6 +979,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get panelDesignFacets => 'Kristall';
 
   @override
+  String get panelDesignCamouflage => 'Camouflage';
+
+  @override
   String get themeSystem => 'System';
 
   @override

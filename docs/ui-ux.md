@@ -256,7 +256,7 @@ Abschnitt „Darstellung": „Sprache" → Dialog Deutsch / English (`settings['
   zeigt dann „Orange"). Die Hintergrundbild-Farbe wird in `main.dart` vor dem ersten Bild gelesen (kein Orange-Aufblitzen).
 - **„Bedienfeld im Player"**: Auswahl des Hintergrunds hinter Zeitleiste und Knöpfen im Vollbild-Player
   (`settings['ui.panelDesign']`, `PanelDesign`, `lib/core/panel_design.dart`): **Schlicht** (Standard, wie bisher),
-  **Sternenhimmel**, **Nordlicht**, **Wellen**, **Kristall**. Jede Auswahl zeigt eine kleine Vorschau mit Mini-Zeitleiste
+  **Sternenhimmel**, **Nordlicht**, **Wellen**, **Kristall**, **Camouflage** (Benutzerwunsch 2026-10-26 nachträglich). Jede Auswahl zeigt eine kleine Vorschau mit Mini-Zeitleiste
   und Knöpfen, gemalt mit den aktuellen Farben. Die Hintergründe sind **im Code gemalt** (`panel_background.dart`,
   `CustomPainter`, feste Zufallszahlen → immer dasselbe Bild; keine Bilddateien, keine Animation, nichts zum Aufräumen),
   aus dem Farbschema des Players – sie folgen **Hell/Dunkel und App-Farbe** von selbst. Sie gelten im Hochformat (Karte)

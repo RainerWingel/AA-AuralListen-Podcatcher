@@ -1688,6 +1688,12 @@ abstract class AppLocalizations {
   /// **'Kristall'**
   String get panelDesignFacets;
 
+  /// No description provided for @panelDesignCamouflage.
+  ///
+  /// In de, this message translates to:
+  /// **'Camouflage'**
+  String get panelDesignCamouflage;
+
   /// No description provided for @themeSystem.
   ///
   /// In de, this message translates to:

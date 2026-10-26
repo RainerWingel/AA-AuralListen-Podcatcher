@@ -92,6 +92,8 @@ class PanelDesignPainter extends CustomPainter {
         _waves(canvas, size);
       case PanelDesign.facets:
         _facets(canvas, size);
+      case PanelDesign.camouflage:
+        _camouflage(canvas, size);
     }
   }
 
@@ -315,6 +317,74 @@ class PanelDesignPainter extends CustomPainter {
         triangle(b, e, d, light * 0.8);
       }
     }
+  }
+
+  // ------------------------------------------------------------- camouflage
+
+  void _camouflage(Canvas canvas, Size size) {
+    // Woodland camouflage: a base color and three layers of irregular
+    // blotches in related tones, all calm enough to read text on.
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = _mix(surface, primary, _dark ? 0.12 : 0.14),
+    );
+    final tones = _dark
+        ? [
+            _mix(surface, primary, 0.24),
+            _mix(surface, tertiary, 0.2),
+            _mix(surface, Colors.black, 0.28),
+          ]
+        : [
+            _mix(surface, primary, 0.3),
+            _mix(surface, tertiary, 0.26),
+            _mix(surface, secondary, 0.38),
+          ];
+    final random = Random(23);
+    final scale = size.shortestSide / 300;
+    final count = (size.width * size.height / 9000).round().clamp(10, 42);
+    final paint = Paint()..isAntiAlias = true;
+    for (var layer = 0; layer < tones.length; layer++) {
+      paint.color = tones[layer];
+      for (var i = 0; i < count; i++) {
+        final center = Offset(
+          random.nextDouble() * size.width,
+          random.nextDouble() * size.height,
+        );
+        final radius = (20 + random.nextDouble() * 38) * scale;
+        canvas.drawPath(_blotch(random, center, radius), paint);
+      }
+    }
+  }
+
+  /// A smooth, irregular closed shape around [center].
+  static Path _blotch(Random random, Offset center, double radius) {
+    const points = 9;
+    // Stretched a little, so the blotches are not round.
+    final stretch = 1 + random.nextDouble() * 0.7;
+    final tilt = random.nextDouble() * pi;
+    final ring = [
+      for (var i = 0; i < points; i++)
+        () {
+          final angle = 2 * pi * i / points + random.nextDouble() * 0.35;
+          final r = radius * (0.6 + random.nextDouble() * 0.8);
+          final local = Offset(cos(angle) * r * stretch, sin(angle) * r);
+          return center +
+              Offset(
+                local.dx * cos(tilt) - local.dy * sin(tilt),
+                local.dx * sin(tilt) + local.dy * cos(tilt),
+              );
+        }(),
+    ];
+    Offset middle(Offset a, Offset b) =>
+        Offset((a.dx + b.dx) / 2, (a.dy + b.dy) / 2);
+    final start = middle(ring.last, ring.first);
+    final path = Path()..moveTo(start.dx, start.dy);
+    for (var i = 0; i < points; i++) {
+      final control = ring[i];
+      final end = middle(control, ring[(i + 1) % points]);
+      path.quadraticBezierTo(control.dx, control.dy, end.dx, end.dy);
+    }
+    return path..close();
   }
 
   @override

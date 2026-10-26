@@ -16,7 +16,10 @@ enum PanelDesign {
   waves,
 
   /// Low-poly crystal facets.
-  facets;
+  facets,
+
+  /// Blotches in several tones, like woodland camouflage.
+  camouflage;
 
   static const standard = PanelDesign.plain;
 

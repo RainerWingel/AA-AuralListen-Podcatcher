@@ -2340,6 +2340,7 @@ void main() {
       'Nordlicht',
       'Wellen',
       'Kristall',
+      'Camouflage',
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
     }
@@ -2402,6 +2403,7 @@ void main() {
           PanelDesign.aurora,
           PanelDesign.waves,
           PanelDesign.facets,
+          PanelDesign.camouflage,
         ]),
       );
 

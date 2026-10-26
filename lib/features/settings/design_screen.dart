@@ -16,6 +16,7 @@ String panelDesignName(AppLocalizations l10n, PanelDesign design) =>
       PanelDesign.aurora => l10n.panelDesignAurora,
       PanelDesign.waves => l10n.panelDesignWaves,
       PanelDesign.facets => l10n.panelDesignFacets,
+      PanelDesign.camouflage => l10n.panelDesignCamouflage,
     };
 
 /// Optionen → Design: light/dark mode, app color and the background of the
