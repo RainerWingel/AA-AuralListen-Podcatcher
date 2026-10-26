@@ -206,8 +206,11 @@ Auf Android 7–9 ungetestet.
 - Format **JPG, 720 × 1600, Qualität 80** (`sips -Z 1600 -s format jpeg -s formatOptions 80`), Hochformat, Dateinamen
   sortieren die Reihenfolge (`1.jpg`, `2.jpg` …), 2–8 Stück je Sprache. **Keine PNGs einchecken** (3–4× größer, bläht
   die Git-Historie auf; `.gitignore` blockt sie). Kein Git-LFS: F-Droid lädt LFS-Dateien beim Bauen nicht.
-- Stand 2026-10-04: je 5 Bilder (en-US: Start, Abos, Player, Downloads, Optionen; de-DE: Downloads, Start, Podcast-Menü,
-  Playlists, Optionen – teils dunkel), PNG-Originale beim Benutzer unter `~/Pictures/AA-AuralListen-Screenshots-2026-10-04/`.
+- Stand 2026-10-27: je **8 Bilder** (Maximum), gleiche Reihenfolge in de-DE und en-US: 1 Start oben, 2 Start weiter
+  unten, 3 Abos, 4 Podcast-Seite, 5 Player (Bedienfeld „Schlicht"), 6 Downloads, 7 Optionen, 8 Design-Seite. Der Benutzer
+  stellte jeweils die Ansicht am A05s ein, Claude nahm sie per `adb exec-out screencap` auf (1080 × 2400, dunkel) und
+  wandelte sie mit `sips` um; die PNG-Originale liegen nur im Arbeitsordner der Sitzung, nicht im Repo.
+  (Vorher, 2026-10-04: je 5 Bilder, PNG-Originale beim Benutzer unter `~/Pictures/AA-AuralListen-Screenshots-2026-10-04/`.)
 - Vorschlag: Start (mit Hintergrund), Abos, Podcast-Seite, Player, Playlists (mit Farben), Downloads, Optionen.
 - Auf dem Handy: App-Sprache umstellen (Optionen → Sprache) für die englischen Bilder; Seitentaste + Leiser.
 - Achtung, öffentlich: nichts Privates im Bild (Benachrichtigungen, Namen in Playlists …).
