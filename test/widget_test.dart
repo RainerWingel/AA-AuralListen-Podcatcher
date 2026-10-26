@@ -13,6 +13,7 @@ import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/core/app_info.dart';
 import 'package:aapodcastguru/core/app_platform.dart';
 import 'package:aapodcastguru/core/link_color.dart';
+import 'package:aapodcastguru/core/panel_design.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/feed/opml.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
@@ -26,6 +27,7 @@ import 'package:aapodcastguru/features/episodes/episode_description.dart';
 import 'package:aapodcastguru/features/player/chapter_cover.dart';
 import 'package:aapodcastguru/features/player/chapters_and_bookmarks.dart';
 import 'package:aapodcastguru/features/player/mini_player.dart';
+import 'package:aapodcastguru/features/player/panel_background.dart';
 import 'package:aapodcastguru/features/player/player_action_bar.dart';
 import 'package:aapodcastguru/features/player/player_controls.dart';
 import 'package:aapodcastguru/features/player/player_screen.dart';
@@ -162,6 +164,12 @@ Future<void> settle(WidgetTester tester) async {
     );
     await tester.pump(const Duration(milliseconds: 50));
   }
+}
+
+/// Optionen → Design (light/dark mode, app color, player panel background).
+Future<void> openDesign(WidgetTester tester) async {
+  await tester.tap(find.widgetWithText(ListTile, 'Design'));
+  await settle(tester);
 }
 
 void main() {
@@ -2174,6 +2182,7 @@ void main() {
       expect(primary.b, greaterThan(primary.r));
       await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
       await settle(tester);
+      await openDesign(tester);
       expect(
         find.widgetWithText(ListTile, 'Wie Hintergrundbild'),
         findsOneWidget,
@@ -2185,6 +2194,7 @@ void main() {
       await pumpApp(tester);
       await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
       await settle(tester);
+      await openDesign(tester);
       expect(find.widgetWithText(ListTile, 'Orange'), findsOneWidget);
       await disposeApp(tester);
     },
@@ -2214,6 +2224,7 @@ void main() {
       final orange = primary();
       await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
       await settle(tester);
+      await openDesign(tester);
       await tester.tap(find.text('App-Farbe'));
       await settle(tester);
       for (final name in [
@@ -2255,6 +2266,7 @@ void main() {
       await pumpApp(tester);
       await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
       await settle(tester);
+      await openDesign(tester);
       await choose('Wie Hintergrundbild');
       expect(find.text('Wie Hintergrundbild'), findsOneWidget);
       final fromWallpaper = primary();
@@ -2279,6 +2291,7 @@ void main() {
 
     await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
     await settle(tester);
+    await openDesign(tester);
     await tester.tap(find.text('Dunkel'));
     await settle(tester);
     expect(mode(), ThemeMode.dark);
@@ -2287,7 +2300,10 @@ void main() {
       Brightness.dark,
     );
 
-    // The backup section is further down – scroll there like a user.
+    // Back in Optionen (the Design page is a sub page); the backup section is
+    // further down – scroll there like a user.
+    await tester.tap(find.byType(BackButton));
+    await settle(tester);
     await tester.scrollUntilVisible(find.text('Backup erstellen'), 300);
     await settle(tester);
     expect(find.text('Backup erstellen'), findsOneWidget);
@@ -2295,6 +2311,126 @@ void main() {
 
     await disposeApp(tester);
   });
+
+  testWidgets('Optionen → Design holds mode, app color and panel designs', (
+    tester,
+  ) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2340)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+    await settle(tester);
+    // Moved out of Optionen: only the "Design" entry (and the language) stay.
+    expect(find.widgetWithText(ListTile, 'Design'), findsOneWidget);
+    expect(find.text('Dunkel'), findsNothing);
+    expect(find.text('App-Farbe'), findsNothing);
+    expect(find.widgetWithText(ListTile, 'Sprache'), findsOneWidget);
+
+    await openDesign(tester);
+    expect(find.text('System'), findsOneWidget);
+    expect(find.text('Hell'), findsOneWidget);
+    expect(find.text('Dunkel'), findsOneWidget);
+    expect(find.text('App-Farbe'), findsOneWidget);
+    expect(find.text('Bedienfeld im Player'), findsOneWidget);
+    for (final name in [
+      'Schlicht',
+      'Sternenhimmel',
+      'Nordlicht',
+      'Wellen',
+      'Kristall',
+    ]) {
+      expect(find.text(name), findsOneWidget, reason: name);
+    }
+    // Nothing chosen: the plain panel, as before.
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('panel-design-plain')),
+        matching: find.text('Schlicht'),
+      ),
+      findsOneWidget,
+    );
+    await disposeApp(tester);
+  });
+
+  testWidgets(
+    'the panel design can be chosen, is stored and shown in the player',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      Future<String?> stored() => tester.runAsync<String?>(
+        () => SettingsRepository(db).get(SettingsKeys.panelDesign),
+      );
+      Iterable<PanelDesign> painted() => tester
+          .widgetList<CustomPaint>(find.byType(CustomPaint))
+          .map((p) => p.painter)
+          .whereType<PanelDesignPainter>()
+          .map((p) => p.design);
+
+      await pumpApp(tester);
+      await tester.runAsync(
+        () => ProviderScope.containerOf(
+          tester.element(find.byType(NavigationBar)),
+        ).read(podcastRepositoryProvider).subscribe('https://example.com/feed'),
+      );
+      await settle(tester);
+
+      // Choose "Sternenhimmel" in Optionen → Design.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      await openDesign(tester);
+      await tester.tap(find.byKey(const ValueKey('panel-design-stars')));
+      await settle(tester);
+      expect(await stored(), 'stars');
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('panel-design-stars')),
+          matching: find.byIcon(Icons.check_circle),
+        ),
+        findsOneWidget,
+      );
+      // The choices are previews painted with the current colors.
+      expect(
+        painted(),
+        containsAll([
+          PanelDesign.stars,
+          PanelDesign.aurora,
+          PanelDesign.waves,
+          PanelDesign.facets,
+        ]),
+      );
+
+      // The player's control panel wears it.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Start'));
+      await settle(tester);
+      await tester.tap(find.text('Erste Folge'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      expect(
+        find.descendant(
+          of: find.byType(PlayerScreen),
+          matching: find.byType(PanelBackground),
+        ),
+        findsOneWidget,
+      );
+      expect(painted(), [PanelDesign.stars]);
+
+      // Back to "Schlicht": no pattern behind the controls any more.
+      await tester.runAsync(
+        () => SettingsRepository(db).set(SettingsKeys.panelDesign, 'plain'),
+      );
+      await settle(tester);
+      expect(painted(), isEmpty);
+
+      await disposeApp(tester);
+    },
+  );
 
   testWidgets(
     'first start asks for the language; Optionen can change it',
@@ -2340,7 +2476,10 @@ void main() {
         find.widgetWithText(NavigationDestination, 'Settings'),
         findsOneWidget,
       );
-      expect(find.text('Dark'), findsOneWidget);
+      expect(
+        find.text('Light/dark, app color, player controls'),
+        findsOneWidget,
+      );
 
       await disposeApp(tester);
     },

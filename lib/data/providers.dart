@@ -11,6 +11,7 @@ import '../audio/audio_providers.dart';
 import '../core/app_color.dart';
 import '../core/app_language.dart';
 import '../core/clock.dart';
+import '../core/panel_design.dart';
 import 'backup/backup_service.dart';
 import 'bookmark_repository.dart';
 import 'chapters/chapter_image_store.dart';
@@ -405,6 +406,14 @@ final showTotalTimeProvider = StreamProvider<bool>(
       .watch(settingsRepositoryProvider)
       .watch(SettingsKeys.showTotalTime)
       .map((v) => v == 'true'),
+);
+
+/// Background design of the player's control panel (Optionen → Design).
+final panelDesignProvider = StreamProvider<PanelDesign>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.panelDesign)
+      .map(PanelDesign.fromSetting),
 );
 
 /// Light/dark mode chosen in Optionen (default: follow the system).

@@ -9,6 +9,7 @@ abstract final class Routes {
   static const bookmarks = '$settings/lesezeichen';
   static const history = '$settings/verlauf';
   static const info = '$settings/info';
+  static const design = '$settings/design';
 
   static const search = '$subscriptions/suche';
 

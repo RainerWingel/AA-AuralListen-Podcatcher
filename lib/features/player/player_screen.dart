@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/routes.dart';
 import '../../audio/audio_providers.dart';
 import '../../core/formatting.dart';
+import '../../core/panel_design.dart';
 import '../../core/perceived_brightness.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../data/db/app_database.dart' show DownloadState, EpisodeStatus;
@@ -20,6 +21,7 @@ import '../../l10n/app_localizations.dart';
 import '../episodes/episode_description.dart';
 import 'chapter_cover.dart';
 import 'chapters_and_bookmarks.dart';
+import 'panel_background.dart';
 import 'player_action_bar.dart';
 import 'player_backdrop.dart';
 import 'player_controls.dart';
@@ -68,6 +70,8 @@ class PlayerScreen extends ConsumerWidget {
     // (Weber–Fechner, perceived_brightness.dart).
     final theme = playerTheme(Theme.of(context));
     final item = ref.watch(mediaItemProvider).value?.mediaItem;
+    // Background of the control panel (Optionen → Design).
+    final design = ref.watch(panelDesignProvider).value ?? PanelDesign.standard;
     final podcastId = item?.extras?['podcastId'] as int?;
     final episodeId = item?.extras?['episodeId'] as int?;
     // Live, so "Abonnieren" during playback shows them at once.
@@ -135,18 +139,21 @@ class PlayerScreen extends ConsumerWidget {
                                   context,
                                   const Offset(-6, 0),
                                 ),
-                                child: Center(
-                                  child: SingleChildScrollView(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      8,
-                                      8,
-                                      24,
-                                      8,
-                                    ),
-                                    child: _PlayerControls(
-                                      item: item,
-                                      podcastId: podcastId,
-                                      provisional: provisional,
+                                child: PanelBackground(
+                                  design: design,
+                                  child: Center(
+                                    child: SingleChildScrollView(
+                                      padding: const EdgeInsets.fromLTRB(
+                                        8,
+                                        8,
+                                        24,
+                                        8,
+                                      ),
+                                      child: _PlayerControls(
+                                        item: item,
+                                        podcastId: podcastId,
+                                        provisional: provisional,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -184,12 +191,21 @@ class PlayerScreen extends ConsumerWidget {
                         child: _PanelMaterial(
                           child: DecoratedBox(
                             decoration: _cardDecoration(context),
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                              child: _PlayerControls(
-                                item: item,
-                                podcastId: podcastId,
-                                provisional: provisional,
+                            child: PanelBackground(
+                              design: design,
+                              borderRadius: BorderRadius.circular(24),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  8,
+                                  16,
+                                  8,
+                                ),
+                                child: _PlayerControls(
+                                  item: item,
+                                  podcastId: podcastId,
+                                  provisional: provisional,
+                                ),
                               ),
                             ),
                           ),

@@ -1634,6 +1634,60 @@ abstract class AppLocalizations {
   /// **'Darstellung'**
   String get settingsSectionAppearance;
 
+  /// No description provided for @designTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Design'**
+  String get designTitle;
+
+  /// No description provided for @designSubtitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Hell/Dunkel, App-Farbe, Bedienfeld im Player'**
+  String get designSubtitle;
+
+  /// No description provided for @designSectionPanel.
+  ///
+  /// In de, this message translates to:
+  /// **'Bedienfeld im Player'**
+  String get designSectionPanel;
+
+  /// No description provided for @designPanelHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Der Hintergrund hinter Zeitleiste und Knöpfen im Vollbild-Player. Er folgt Hell/Dunkel und der App-Farbe.'**
+  String get designPanelHint;
+
+  /// No description provided for @panelDesignPlain.
+  ///
+  /// In de, this message translates to:
+  /// **'Schlicht'**
+  String get panelDesignPlain;
+
+  /// No description provided for @panelDesignStars.
+  ///
+  /// In de, this message translates to:
+  /// **'Sternenhimmel'**
+  String get panelDesignStars;
+
+  /// No description provided for @panelDesignAurora.
+  ///
+  /// In de, this message translates to:
+  /// **'Nordlicht'**
+  String get panelDesignAurora;
+
+  /// No description provided for @panelDesignWaves.
+  ///
+  /// In de, this message translates to:
+  /// **'Wellen'**
+  String get panelDesignWaves;
+
+  /// No description provided for @panelDesignFacets.
+  ///
+  /// In de, this message translates to:
+  /// **'Kristall'**
+  String get panelDesignFacets;
+
   /// No description provided for @themeSystem.
   ///
   /// In de, this message translates to:

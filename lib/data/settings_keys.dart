@@ -12,6 +12,9 @@ abstract final class SettingsKeys {
   /// Light/dark mode: `system`, `light` or `dark` (ThemeMode names).
   static const themeMode = 'ui.themeMode';
 
+  /// Background of the player's control panel: a `PanelDesign` name.
+  static const panelDesign = 'ui.panelDesign';
+
   /// UI language: `de` or `en` (AppLanguage names). Missing = not chosen yet,
   /// the app asks on start.
   static const language = 'ui.language';

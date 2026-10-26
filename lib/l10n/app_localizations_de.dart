@@ -951,6 +951,34 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSectionAppearance => 'Darstellung';
 
   @override
+  String get designTitle => 'Design';
+
+  @override
+  String get designSubtitle => 'Hell/Dunkel, App-Farbe, Bedienfeld im Player';
+
+  @override
+  String get designSectionPanel => 'Bedienfeld im Player';
+
+  @override
+  String get designPanelHint =>
+      'Der Hintergrund hinter Zeitleiste und Knöpfen im Vollbild-Player. Er folgt Hell/Dunkel und der App-Farbe.';
+
+  @override
+  String get panelDesignPlain => 'Schlicht';
+
+  @override
+  String get panelDesignStars => 'Sternenhimmel';
+
+  @override
+  String get panelDesignAurora => 'Nordlicht';
+
+  @override
+  String get panelDesignWaves => 'Wellen';
+
+  @override
+  String get panelDesignFacets => 'Kristall';
+
+  @override
   String get themeSystem => 'System';
 
   @override

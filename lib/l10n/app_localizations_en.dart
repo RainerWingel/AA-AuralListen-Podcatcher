@@ -949,6 +949,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSectionAppearance => 'Appearance';
 
   @override
+  String get designTitle => 'Design';
+
+  @override
+  String get designSubtitle => 'Light/dark, app color, player controls';
+
+  @override
+  String get designSectionPanel => 'Player controls';
+
+  @override
+  String get designPanelHint =>
+      'The background behind the seek bar and buttons in the full-screen player. It follows light/dark mode and the app color.';
+
+  @override
+  String get panelDesignPlain => 'Plain';
+
+  @override
+  String get panelDesignStars => 'Starry sky';
+
+  @override
+  String get panelDesignAurora => 'Aurora';
+
+  @override
+  String get panelDesignWaves => 'Waves';
+
+  @override
+  String get panelDesignFacets => 'Crystal';
+
+  @override
   String get themeSystem => 'System';
 
   @override

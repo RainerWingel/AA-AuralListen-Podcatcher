@@ -206,3 +206,10 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   stand wieder als „nicht geladen" da, ein neuer Tipp reihte einen weiteren Arbeiter ein (Fehlerbericht S25 vom 2026-10-21: drei
   Arbeiter für `episode-85`, alle drei am Ende „erfolgreich"). Jetzt: `canceled` setzt `running` auf `queued`; eigene Abbrüche
   entfernen die Zeile selbst. Der Neustart von Byte 0 nach Netzverlust bleibt (Plugin).
+- 2026-10-26 · **Wählbare Hintergründe für das Bedienfeld im Player + Untermenü „Design"** (Benutzer) · Das Bedienfeld war schlicht
+  einfarbig. Neu: Optionen → Design mit System/Hell/Dunkel und App-Farbe (von der Hauptseite verschoben) und der Auswahl
+  Schlicht / Sternenhimmel / Nordlicht / Wellen / Kristall. **Im Code gemalt** (`CustomPainter`), kein Bildmaterial: keine PNGs im
+  Repo (Regel), keine neuen Pakete, kein Speicher zu verwalten; die Farben kommen aus dem Farbschema und folgen Hell/Dunkel und
+  App-Farbe. **Statisch** (keine Animation) wegen schwacher Handys und Akku. **Standard bleibt „Schlicht"**, damit sich für
+  Bestandsnutzer nichts ändert. Lesbarkeit per Test abgesichert (≥ 6:1 für Haupttext, ≥ 4,5:1 für Nebentext, alle Designs, beide
+  Modi, 7 Farben). Keine Schemaänderung (Einstellung `ui.panelDesign`).

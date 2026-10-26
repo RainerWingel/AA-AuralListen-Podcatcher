@@ -13,7 +13,6 @@ import '../../data/settings_keys.dart';
 import '../../data/storage/download_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../downloads/downloads_screen.dart';
-import 'app_color_picker.dart';
 import 'backup_flow.dart';
 import 'language_picker.dart';
 import 'opml_import_flow.dart';
@@ -78,43 +77,20 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         children: [
-          _SectionHeader(l10n.settingsSectionAppearance),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SegmentedButton<ThemeMode>(
-              segments: [
-                ButtonSegment(
-                  value: ThemeMode.system,
-                  label: Text(l10n.themeSystem),
-                  icon: const Icon(Icons.brightness_auto),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.light,
-                  label: Text(l10n.themeLight),
-                  icon: const Icon(Icons.light_mode),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.dark,
-                  label: Text(l10n.themeDark),
-                  icon: const Icon(Icons.dark_mode),
-                ),
-              ],
-              selected: {
-                ref.watch(themeModeProvider).value ?? ThemeMode.system,
-              },
-              onSelectionChanged: (v) => ref
-                  .read(settingsRepositoryProvider)
-                  .set(SettingsKeys.themeMode, v.single.name),
-            ),
-          ),
+          SettingsSectionHeader(l10n.settingsSectionAppearance),
           ListTile(
             leading: const Icon(Icons.language),
             title: Text(l10n.language),
             subtitle: Text(languageName(l10n, language)),
             onTap: () => chooseAppLanguage(context, ref, language),
           ),
-          const AppColorTile(),
-          _SectionHeader(l10n.settingsSectionListening),
+          ListTile(
+            leading: const Icon(Icons.auto_awesome_outlined),
+            title: Text(l10n.designTitle),
+            subtitle: Text(l10n.designSubtitle),
+            onTap: () => context.go(Routes.design),
+          ),
+          SettingsSectionHeader(l10n.settingsSectionListening),
           ListTile(
             leading: const Icon(Icons.bookmarks_outlined),
             title: Text(l10n.bookmarks),
@@ -128,14 +104,14 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const _FinishedRemovalTile(),
           const _BackgroundPlaybackTile(),
-          _SectionHeader(l10n.settingsSectionSubscriptions),
+          SettingsSectionHeader(l10n.settingsSectionSubscriptions),
           ListTile(
             leading: const Icon(Icons.file_upload_outlined),
             title: Text(l10n.opmlImport),
             subtitle: Text(l10n.opmlImportSubtitle),
             onTap: () => runOpmlImport(context, ref),
           ),
-          _SectionHeader(l10n.settingsSectionDownloads),
+          SettingsSectionHeader(l10n.settingsSectionDownloads),
           ListTile(
             leading: const Icon(Icons.sd_storage_outlined),
             title: Text(l10n.downloadLimit),
@@ -150,7 +126,7 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l10n.cleanUpNow),
             onTap: () => cleanUpDownloads(context, ref),
           ),
-          _SectionHeader(l10n.settingsSectionBackup),
+          SettingsSectionHeader(l10n.settingsSectionBackup),
           ListTile(
             leading: const Icon(Icons.ios_share),
             title: Text(l10n.opmlExport),
@@ -169,7 +145,7 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: Text(l10n.backupRestoreSubtitle),
             onTap: () => restoreBackup(context, ref),
           ),
-          _SectionHeader(l10n.infoTitle),
+          SettingsSectionHeader(l10n.infoTitle),
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(l10n.infoAbout),
@@ -182,8 +158,8 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.text);
+class SettingsSectionHeader extends StatelessWidget {
+  const SettingsSectionHeader(this.text, {super.key});
 
   final String text;
 

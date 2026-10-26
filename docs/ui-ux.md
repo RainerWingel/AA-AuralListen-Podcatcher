@@ -246,13 +246,23 @@ Beim Aktualisieren aller Podcasts (App-Start, Pull-to-Refresh) zeigt unten je la
 Hat ein Pull-to-Refresh Umzüge erkannt, meldet eine Infobox „N Podcast(s) umgezogen – die Adresse wurde aktualisiert."
 
 ## Optionen
-Abschnitt „Darstellung": System / Hell / Dunkel (`settings['ui.themeMode']`, Dark Mode aus derselben Grundfarbe),
-darunter „Sprache" → Dialog Deutsch / English (`settings['ui.language']`, die App wechselt sofort), dann
-„App-Farbe" → Dialog mit 8 Farbkreisen + „Wie Hintergrundbild" (nur wenn das Handy Wallpaper-Farben liefert,
-Android 12+; `settings['ui.appColor']`, `AppColor`, `lib/features/settings/app_color_picker.dart`). Alles – Knöpfe,
-Balken, Tabs, Punkte und die Hintergründe von Start und Downloads – folgt der Farbe; Cover, rotes Ungespielt-Abzeichen,
-Playlist-Farben und Fehlerrot nicht. **Standard = „Wie Hintergrundbild"**; ohne Wallpaper-Farben Orange (die Zeile
-zeigt dann „Orange"). Die Hintergrundbild-Farbe wird in `main.dart` vor dem ersten Bild gelesen (kein Orange-Aufblitzen).
+Abschnitt „Darstellung": „Sprache" → Dialog Deutsch / English (`settings['ui.language']`, die App wechselt sofort) und
+**„Design"** → eigene Seite (`design_screen.dart`, Benutzerwunsch 2026-10-26; Route `/einstellungen/design`):
+- **System / Hell / Dunkel** (`settings['ui.themeMode']`, Dark Mode aus derselben Grundfarbe) und
+- **„App-Farbe"** → Dialog mit 8 Farbkreisen + „Wie Hintergrundbild" (nur wenn das Handy Wallpaper-Farben liefert,
+  Android 12+; `settings['ui.appColor']`, `AppColor`, `lib/features/settings/app_color_picker.dart`). Alles – Knöpfe,
+  Balken, Tabs, Punkte und die Hintergründe von Start und Downloads – folgt der Farbe; Cover, rotes Ungespielt-Abzeichen,
+  Playlist-Farben und Fehlerrot nicht. **Standard = „Wie Hintergrundbild"**; ohne Wallpaper-Farben Orange (die Zeile
+  zeigt dann „Orange"). Die Hintergrundbild-Farbe wird in `main.dart` vor dem ersten Bild gelesen (kein Orange-Aufblitzen).
+- **„Bedienfeld im Player"**: Auswahl des Hintergrunds hinter Zeitleiste und Knöpfen im Vollbild-Player
+  (`settings['ui.panelDesign']`, `PanelDesign`, `lib/core/panel_design.dart`): **Schlicht** (Standard, wie bisher),
+  **Sternenhimmel**, **Nordlicht**, **Wellen**, **Kristall**. Jede Auswahl zeigt eine kleine Vorschau mit Mini-Zeitleiste
+  und Knöpfen, gemalt mit den aktuellen Farben. Die Hintergründe sind **im Code gemalt** (`panel_background.dart`,
+  `CustomPainter`, feste Zufallszahlen → immer dasselbe Bild; keine Bilddateien, keine Animation, nichts zum Aufräumen),
+  aus dem Farbschema des Players – sie folgen **Hell/Dunkel und App-Farbe** von selbst. Sie gelten im Hochformat (Karte)
+  und im Querformat (rechte Hälfte). Lesbarkeit ist getestet: Für jedes Design, beide Modi und 7 App-Farben hält
+  die Textfarbe auf jedem 12-px-Bereich mindestens 6:1 Kontrast (`panel_background_test.dart`, WCAG AA wäre 4,5:1).
+  Neue Designs: in `PanelDesign` und `PanelDesignPainter` ergänzen, Namen in beiden ARB-Dateien, Test läuft automatisch.
 Abschnitt „Info" (ganz unten): „Über die App" → Info-Seite (`info_screen.dart`): App-Symbol, Name, **Version + Build
 automatisch von Android** (Kanal `aurallisten/app`, kommt beim Bauen aus `pubspec.yaml`), „Entwickelt von Artem A.",
 Links Datenschutzerklärung und „Quellcode auf GitHub" (öffnen den Browser). **Kein Zahlungslink in der App** –
