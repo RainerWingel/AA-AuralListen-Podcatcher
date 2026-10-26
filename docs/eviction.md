@@ -123,6 +123,10 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
 - Hänger-Erkennung: Timer existiert nur während der Wiedergabe; Timer und `problems`-Stream werden in `dispose()`
   beendet (Test `the watchdog only runs while playing`). ✅
 - Der Live-Positions-Stream wird nur abonniert, solange Mini-/Vollbild-Player sichtbar sind (`autoDispose`). ✅
+- Player-Bedienfeld „Sternenhimmel" (`PanelBackground`, Benutzerwunsch 2026-10-27): ein `Timer.periodic` (60 s), der die Sterne neu
+  verteilt – **nur** im Player (die Vorschauen in Optionen bleiben still), **nur** bei diesem Design und **nur** solange die App im
+  Vordergrund ist (`WidgetsBindingObserver`; im Hintergrund/bei Bildschirm aus gibt es keinen Timer), in `dispose()` beendet.
+  Kosten: ein Neuzeichnen der Karte pro Minute plus 0,9 s Überblendung, keine Animation sonst. Tests: `panel_reshuffle_test.dart`. ✅
 - `audio_service` nutzt für Benachrichtigungs-Cover den begrenzten `CoverCacheManager` (kein zweiter Cache). ✅
 - Positions-Updates des Players gedrosselt in die DB schreiben (alle 5 s + bei Pause/Seek/Stopp/Folgenwechsel). ✅
 - Lange Listen nur mit `ListView.builder`; Bilder mit `memCacheWidth`/`cacheWidth` dekodieren.

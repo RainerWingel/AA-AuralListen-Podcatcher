@@ -144,6 +144,7 @@ class PlayerScreen extends ConsumerWidget {
                                 ),
                                 child: PanelBackground(
                                   design: design,
+                                  reshuffle: true,
                                   child: Center(
                                     child: SingleChildScrollView(
                                       padding: const EdgeInsets.fromLTRB(
@@ -196,6 +197,7 @@ class PlayerScreen extends ConsumerWidget {
                             decoration: _cardDecoration(context),
                             child: PanelBackground(
                               design: design,
+                              reshuffle: true,
                               borderRadius: BorderRadius.circular(24),
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(

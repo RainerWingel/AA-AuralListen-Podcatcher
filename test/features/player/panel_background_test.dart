@@ -14,6 +14,7 @@ Future<({Uint8List rgba, int width, int height})> paintPanel(
   ColorScheme scheme, {
   int width = 360,
   int height = 300,
+  int seed = 0,
 }) async {
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder)
@@ -28,6 +29,7 @@ Future<({Uint8List rgba, int width, int height})> paintPanel(
     primary: scheme.primary,
     secondary: scheme.secondary,
     tertiary: scheme.tertiary,
+    seed: seed,
   ).paint(canvas, Size(width.toDouble(), height.toDouble()));
   final picture = recorder.endRecording();
   final image = await picture.toImage(width, height);
@@ -69,34 +71,45 @@ void main() {
             seedColor: entry.value,
             brightness: brightness,
           );
-          final panel = await paintPanel(design, scheme);
-          for (var by = 0; by + 12 <= panel.height; by += 12) {
-            for (var bx = 0; bx + 12 <= panel.width; bx += 12) {
-              var r = 0, g = 0, b = 0;
-              for (var y = by; y < by + 12; y++) {
-                for (var x = bx; x < bx + 12; x++) {
-                  final i = (y * panel.width + x) * 4;
-                  r += panel.rgba[i];
-                  g += panel.rgba[i + 1];
-                  b += panel.rgba[i + 2];
+          // The stars are scattered anew every minute: any sky must read well.
+          for (final seed
+              in design == PanelDesign.stars
+                  ? const [0, 1, 2, 3, 4, 5, 6, 7, 424242, 99999989]
+                  : const [0]) {
+            final panel = await paintPanel(design, scheme, seed: seed);
+            for (var by = 0; by + 12 <= panel.height; by += 12) {
+              for (var bx = 0; bx + 12 <= panel.width; bx += 12) {
+                var r = 0, g = 0, b = 0;
+                for (var y = by; y < by + 12; y++) {
+                  for (var x = bx; x < bx + 12; x++) {
+                    final i = (y * panel.width + x) * 4;
+                    r += panel.rgba[i];
+                    g += panel.rgba[i + 1];
+                    b += panel.rgba[i + 2];
+                  }
                 }
+                final average = Color.fromARGB(
+                  255,
+                  r ~/ 144,
+                  g ~/ 144,
+                  b ~/ 144,
+                );
+                final ratio = contrast(scheme.onSurface, average);
+                worst = min(worst, ratio);
+                // Secondary texts (onSurfaceVariant) must at least reach AA.
+                expect(
+                  contrast(scheme.onSurfaceVariant, average),
+                  greaterThanOrEqualTo(4.5),
+                  reason: '${entry.key}: secondary text at ($bx, $by)',
+                );
+                expect(
+                  ratio,
+                  greaterThanOrEqualTo(6),
+                  reason:
+                      '${entry.key}: text on the pattern at ($bx, $by) '
+                      'has contrast ${ratio.toStringAsFixed(2)}',
+                );
               }
-              final average = Color.fromARGB(255, r ~/ 144, g ~/ 144, b ~/ 144);
-              final ratio = contrast(scheme.onSurface, average);
-              worst = min(worst, ratio);
-              // Secondary texts (onSurfaceVariant) must at least reach AA.
-              expect(
-                contrast(scheme.onSurfaceVariant, average),
-                greaterThanOrEqualTo(4.5),
-                reason: '${entry.key}: secondary text at ($bx, $by)',
-              );
-              expect(
-                ratio,
-                greaterThanOrEqualTo(6),
-                reason:
-                    '${entry.key}: text on the pattern at ($bx, $by) '
-                    'has contrast ${ratio.toStringAsFixed(2)}',
-              );
             }
           }
         }
@@ -158,6 +171,18 @@ void main() {
       );
       expect(light.rgba, isNot(dark.rgba), reason: design.name);
       expect(light.rgba, isNot(red.rgba), reason: design.name);
+    }
+  });
+
+  test('another seed scatters the stars anew, other designs stay', () async {
+    final scheme = ColorScheme.fromSeed(seedColor: seeds['blue']!);
+    final sky0 = await paintPanel(PanelDesign.stars, scheme);
+    final sky1 = await paintPanel(PanelDesign.stars, scheme, seed: 1);
+    expect(sky0.rgba, isNot(sky1.rgba));
+    for (final design in designs.where((d) => d != PanelDesign.stars)) {
+      final a = await paintPanel(design, scheme);
+      final b = await paintPanel(design, scheme, seed: 1);
+      expect(a.rgba, b.rgba, reason: design.name);
     }
   });
 

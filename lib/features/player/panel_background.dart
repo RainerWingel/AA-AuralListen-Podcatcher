@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -10,15 +11,22 @@ import '../../core/panel_design.dart';
 /// app color; it is kept calm (small contrast) so that texts and buttons on
 /// top stay readable (test/features/player/panel_background_test.dart).
 ///
-/// Static on purpose: one paint inside a [RepaintBoundary], no timers or
-/// animation controllers – nothing to leak, cheap on weak phones.
-class PanelBackground extends StatelessWidget {
+/// Static: one paint inside a [RepaintBoundary], no animation controller.
+/// The only exception (user wish 2026-10-27): with [reshuffle] the stars of
+/// "Sternenhimmel" are scattered anew every [reshuffleInterval] – one timer
+/// that only runs while this widget is shown and the app is in the
+/// foreground, one repaint per minute, a short cross-fade.
+class PanelBackground extends StatefulWidget {
   const PanelBackground({
     required this.design,
     required this.child,
     this.borderRadius = BorderRadius.zero,
+    this.reshuffle = false,
     super.key,
   });
+
+  /// How often the stars are scattered anew.
+  static const reshuffleInterval = Duration(seconds: 60);
 
   final PanelDesign design;
   final Widget child;
@@ -26,37 +34,103 @@ class PanelBackground extends StatelessWidget {
   /// Clips the pattern to the rounded corners of the card around it.
   final BorderRadius borderRadius;
 
+  /// Scatter the stars of [PanelDesign.stars] anew every minute (the player;
+  /// the previews in Optionen stay still).
+  final bool reshuffle;
+
+  @override
+  State<PanelBackground> createState() => _PanelBackgroundState();
+}
+
+class _PanelBackgroundState extends State<PanelBackground>
+    with WidgetsBindingObserver {
+  /// 0 = the standard sky (as in the previews); then random.
+  int _seed = 0;
+  Timer? _timer;
+
+  bool get _wanted => widget.reshuffle && widget.design == PanelDesign.stars;
+
+  bool get _foreground {
+    final state = WidgetsBinding.instance.lifecycleState;
+    return state == null || state == AppLifecycleState.resumed;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _syncTimer();
+  }
+
+  @override
+  void didUpdateWidget(PanelBackground old) {
+    super.didUpdateWidget(old);
+    _syncTimer();
+  }
+
+  /// No timer in the background (screen off, other app): nobody sees it.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) => _syncTimer();
+
+  void _syncTimer() {
+    final run = _wanted && _foreground;
+    if (run && _timer == null) {
+      _timer = Timer.periodic(PanelBackground.reshuffleInterval, (_) {
+        if (mounted) setState(() => _seed = Random().nextInt(1 << 30));
+      });
+    } else if (!run) {
+      _timer?.cancel();
+      _timer = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (design == PanelDesign.plain) return child;
+    if (widget.design == PanelDesign.plain) return widget.child;
     final scheme = Theme.of(context).colorScheme;
     return ClipRRect(
-      borderRadius: borderRadius,
+      borderRadius: widget.borderRadius,
       child: Stack(
         children: [
           Positioned.fill(
-            child: RepaintBoundary(
-              child: CustomPaint(
-                painter: PanelDesignPainter(
-                  design: design,
-                  brightness: scheme.brightness,
-                  surface: scheme.surface,
-                  primary: scheme.primary,
-                  secondary: scheme.secondary,
-                  tertiary: scheme.tertiary,
+            child: AnimatedSwitcher(
+              // Only a new sky fades in; the other designs never change.
+              duration: const Duration(milliseconds: 900),
+              child: SizedBox.expand(
+                key: ValueKey(_seed),
+                child: RepaintBoundary(
+                  child: CustomPaint(
+                    painter: PanelDesignPainter(
+                      design: widget.design,
+                      brightness: scheme.brightness,
+                      surface: scheme.surface,
+                      primary: scheme.primary,
+                      secondary: scheme.secondary,
+                      tertiary: scheme.tertiary,
+                      seed: _seed,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-          child,
+          widget.child,
         ],
       ),
     );
   }
 }
 
-/// Draws one [PanelDesign]. Deterministic: fixed seeds, so the pattern never
-/// changes between frames or app starts.
+/// Draws one [PanelDesign]. Deterministic for a given [seed]: the pattern never
+/// changes between frames or app starts (the stars get a new seed only when
+/// [PanelBackground] reshuffles).
 class PanelDesignPainter extends CustomPainter {
   const PanelDesignPainter({
     required this.design,
@@ -65,7 +139,11 @@ class PanelDesignPainter extends CustomPainter {
     required this.primary,
     required this.secondary,
     required this.tertiary,
+    this.seed = 0,
   });
+
+  /// Varies the random parts (the stars); 0 is the standard sky.
+  final int seed;
 
   final PanelDesign design;
   final Brightness brightness;
@@ -138,7 +216,7 @@ class PanelDesignPainter extends CustomPainter {
         ).createShader(nebula),
     );
 
-    final random = Random(7);
+    final random = Random(7 + seed);
     final count = (size.width * size.height / 1500).round().clamp(40, 170);
     final starColor = _dark ? _mix(Colors.white, primary, 0.15) : primary;
     final dot = Paint();
@@ -148,13 +226,13 @@ class PanelDesignPainter extends CustomPainter {
       // Mostly tiny, a few bigger ones.
       final big = random.nextDouble();
       final radius = 0.5 + big * big * big * 1.2;
-      final alpha = (_dark ? 0.28 : 0.22) + random.nextDouble() * 0.35;
+      final alpha = (_dark ? 0.2 : 0.22) + random.nextDouble() * 0.3;
       dot.color = starColor.withValues(alpha: alpha.clamp(0, 0.7));
       canvas.drawCircle(Offset(x, y), radius, dot);
     }
     // A handful of four-pointed sparkles.
     final sparkle = Paint()
-      ..color = starColor.withValues(alpha: _dark ? 0.8 : 0.6);
+      ..color = starColor.withValues(alpha: _dark ? 0.62 : 0.6);
     for (var i = 0; i < 7; i++) {
       final center = Offset(
         size.width * (0.08 + random.nextDouble() * 0.84),
@@ -382,7 +460,8 @@ class PanelDesignPainter extends CustomPainter {
       surface != old.surface ||
       primary != old.primary ||
       secondary != old.secondary ||
-      tertiary != old.tertiary;
+      tertiary != old.tertiary ||
+      seed != old.seed;
 }
 
 /// One camouflage blotch: many overlapping discs along a wiggly line, whose
