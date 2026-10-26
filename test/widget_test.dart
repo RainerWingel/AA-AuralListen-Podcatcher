@@ -1953,6 +1953,27 @@ void main() {
       );
       expect(title.style?.color, Color(expected));
 
+      // The description plate is lighter than the picture: white on a light
+      // picture (dark texts), the light text color on a dark picture.
+      final plate =
+          tester
+                  .widget<DecoratedBox>(
+                    find
+                        .ancestor(
+                          of: find.byType(EpisodeDescriptionSection),
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
+                  )
+                  .decoration
+              as BoxDecoration;
+      expect(
+        plate.color,
+        expected == 0xFF14141A
+            ? Colors.white.withValues(alpha: descriptionPlateLightAlpha)
+            : Color(expected).withValues(alpha: 0.12),
+      );
+
       // The chapter list is a plain sheet: it follows the app's light/dark
       // setting, not the picture (white text on a light sheet, 2026-10-19).
       final appOnSurface = Theme.of(

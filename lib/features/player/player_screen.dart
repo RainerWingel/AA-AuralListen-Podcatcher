@@ -55,6 +55,9 @@ class _DownloadedIcon extends ConsumerWidget {
   }
 }
 
+/// Opacity of the white description plate on a light picture (dark text).
+const descriptionPlateLightAlpha = 0.3;
+
 /// Gap above the button rows and above the description, so they are as far
 /// apart as the two button rows (see the comment at its first use).
 const double _controlGap = 12;
@@ -669,8 +672,11 @@ class _PlaylistRow extends ConsumerWidget {
 }
 
 /// The description section lies on the blurred picture as a translucent
-/// plate in the text color, outlined by a thin line (user wishes 2026-10-09
-/// and 2026-10-17).
+/// plate, outlined by a thin line (user wishes 2026-10-09 and 2026-10-17).
+/// The plate is always *lighter* than the picture (user wish 2026-10-26): in
+/// the text color when that is light (dark picture), white when the text is
+/// dark (light picture) – before it was dark ink there, a plate darker than
+/// the picture.
 class _OnPlayerBackground extends StatelessWidget {
   const _OnPlayerBackground({required this.child});
 
@@ -681,7 +687,9 @@ class _OnPlayerBackground extends StatelessWidget {
     final ink = Theme.of(context).colorScheme.onSurface;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: ink.withValues(alpha: 0.12),
+        color: ink.computeLuminance() < 0.5
+            ? Colors.white.withValues(alpha: descriptionPlateLightAlpha)
+            : ink.withValues(alpha: 0.12),
         border: Border.all(color: ink.withValues(alpha: 0.4)),
         borderRadius: BorderRadius.circular(16),
       ),

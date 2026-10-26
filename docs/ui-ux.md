@@ -105,7 +105,8 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
     Bereichs passen sich der Bildhelligkeit an** (mittlere Leuchtdichte eines 16-px-Abbilds, `averageLuminance`): über
     0,2 dunkle Schrift (#14141A), sonst helle (#F5F5F7) – Texte, Symbole, Textknöpfe (Kapitel-Knopf mit
     durchscheinender Fläche), Beschreibung als durchscheinende Platte mit Haarlinie (ersetzt die Dunkel-Modus-Fläche
-    des 2026-10-09 an dieser Stelle). Ohne Bild – oder wenn es sich nicht laden lässt (Cover-Adresse tot, defekte Datei; dann auch **kein** Schleier, sonst
+    des 2026-10-09 an dieser Stelle). Die Platte ist **immer heller als das Bild** (Benutzerwunsch 2026-10-26): bei dunkler Schrift (helles Bild) Weiß mit
+    30 % Deckkraft (`descriptionPlateLightAlpha`), bei heller Schrift (dunkles Bild) die Schriftfarbe mit 12 %. Vorher war es bei hellen Bildern dunkle Tinte – eine zu dunkle Platte. Ohne Bild – oder wenn es sich nicht laden lässt (Cover-Adresse tot, defekte Datei; dann auch **kein** Schleier, sonst
     wirkte die Fläche grau, S25 2026-10-16) – bleibt die normale Fläche und das normale Theme. Das **Bedienfeld** (Slider, Play-Reihe, vier
     Knöpfe) hat die Flächenfarbe des Themes und wirft einen **Schatten** auf den Bildbereich (nach oben bzw. im
     Querformat nach links), wirkt also darüber liegend (eigenes `Material`, damit schlichter `Text` wie die Zeitmarken die
