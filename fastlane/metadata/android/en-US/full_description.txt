@@ -8,6 +8,7 @@
 <li>Pull to refresh with a status line for each podcast being refreshed; moved podcasts (new feed address) are followed automatically</li>
 <li>Red counter of unplayed episodes on each subscription; search within your subscriptions</li>
 <li>Podcast page with a foldable description and links to the website and to support the podcast</li>
+<li>Search with “Popular” (Apple charts) and “New” – by app language</li>
 <li>Home: a flame marks podcasts and topics you hardly ever skip</li>
 <li>Seasons: "S2·5" on the cover and a season filter; serial podcasts in listening order</li>
 </ul>
@@ -15,7 +16,7 @@
 <p><b>Listening</b></p>
 <ul>
 <li>Background playback with notification, lock screen and Bluetooth controls</li>
-<li>Skip −15 s / +30 s – hold a skip button to scan through the episode without playing; speed 1.0× to 2.0×, volume boost (global or per podcast)</li>
+<li>Skip −15 s / +30 s – hold a skip button to scan through the episode without playing; speed 1.0× to 2.0× and volume boost, each global or per podcast</li>
 <li>Remaining time or total length at a tap; at higher speed also the real remaining time</li>
 <li>Show notes with tappable links, episode number and release date</li>
 <li>Chapters (Podlove, JSON, ID3) with chapter pictures, the progress of the current chapter and per-chapter skip; bookmarks with notes (long press the bookmark button for the list)</li>
@@ -30,6 +31,7 @@
 <li>Seek bar, play row and the four action buttons stay pinned at the bottom, the rest scrolls</li>
 <li>Strongly blurred cover or chapter picture as background; text colors follow its brightness</li>
 <li>Own landscape layout: info on the left, controls on the right</li>
+<li>Choose the control panel background (Settings → Design): starry sky, aurora, waves, crystal, camouflage</li>
 </ul>
 
 <p><b>Playlists</b></p>

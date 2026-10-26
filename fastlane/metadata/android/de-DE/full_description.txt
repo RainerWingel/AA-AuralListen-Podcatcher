@@ -5,9 +5,10 @@
 <li>Suche über Apple Podcasts und fyyd.de, Abo per RSS-Adresse, OPML-Import und -Export</li>
 <li>Neue Podcasts erst vorläufig: reinhören (nur streamen), dann abonnieren</li>
 <li>Podcasts mit 1 bis 5 Sternen bewerten – die Abos sind danach sortiert</li>
-<li>Aktualisieren per Herunterziehen mit Statuszeile je Podcast; umgezogene Podcasts (neue Feed-Adresse) werden übernommen</li>
+<li>Herunterziehen aktualisiert mit Statuszeile je Podcast; umgezogene Feeds werden übernommen</li>
 <li>Rote Zahl ungespielter Folgen an jedem Abo; Suche innerhalb deiner Abos</li>
-<li>Podcast-Seite mit aufklappbarer Beschreibung sowie Links zur Website und zum Unterstützen</li>
+<li>Podcast-Seite mit aufklappbarer Beschreibung und Links</li>
+<li>Suche mit „Beliebt“ (Apple-Charts) und „Neuheiten“ – je nach App-Sprache</li>
 <li>Start: Flamme für Podcasts und Themen, die du fast nie überspringst</li>
 <li>Staffeln: „S2·5“ am Cover und Filter nach Staffel; Serien-Podcasts in Hörreihenfolge</li>
 </ul>
@@ -15,7 +16,7 @@
 <p><b>Hören</b></p>
 <ul>
 <li>Wiedergabe im Hintergrund mit Benachrichtigung, Sperrbildschirm- und Bluetooth-Tasten</li>
-<li>Sprünge −15 s / +30 s – Skip-Knopf gedrückt halten spult durch die Folge, ohne zu spielen; Tempo 1,0× bis 2,0×, Lautstärke-Boost (global oder pro Podcast)</li>
+<li>Sprünge −15 s / +30 s – Skip-Knopf gedrückt halten spult durch die Folge, ohne zu spielen; Tempo 1,0× bis 2,0× und Lautstärke-Boost, jeweils global oder pro Podcast</li>
 <li>Restzeit oder Gesamtlänge per Antippen; bei höherem Tempo zusätzlich die tatsächliche Restzeit</li>
 <li>Shownotes mit antippbaren Links, Folgennummer und Erscheinungsdatum</li>
 <li>Kapitel (Podlove, JSON, ID3) mit Kapitelbildern, Fortschritt des laufenden Kapitels und „Skip“ je Kapitel; Lesezeichen mit Notiz (langes Drücken auf den Lesezeichen-Knopf zeigt die Liste)</li>
@@ -27,9 +28,10 @@
 
 <p><b>Player</b></p>
 <ul>
-<li>Slider, Play-Reihe und die vier Aktionsknöpfe bleiben fest unten, der Rest scrollt</li>
+<li>Slider, Play-Reihe und Aktionsknöpfe bleiben fest unten, der Rest scrollt</li>
 <li>Stark geblurrtes Cover oder Kapitelbild als Hintergrund; die Schriftfarben folgen seiner Helligkeit</li>
 <li>Eigene Querformat-Ansicht: Info links, Bedienelemente rechts</li>
+<li>Bedienfeld-Hintergrund wählbar (Optionen → Design): Sternenhimmel, Nordlicht, Wellen, Kristall, Camouflage</li>
 </ul>
 
 <p><b>Playlists</b></p>
@@ -39,7 +41,6 @@
 <li>Fertige Folgen verlassen die Playlist sofort, nach 5 Minuten oder nie – wie du willst; „Als gespielt markieren“ folgt derselben Einstellung</li>
 <li>Neue Folgen eines Podcasts können ohne Download in eine Playlist kommen (gestreamt)</li>
 <li>Alle neuen oder ungespielten Folgen eines Podcasts, Themas oder einer Staffel in eine Playlist</li>
-<li>Symbol an jeder Folge, die in einer Playlist steht</li>
 </ul>
 
 <p><b>Downloads</b></p>
