@@ -321,70 +321,58 @@ class PanelDesignPainter extends CustomPainter {
 
   // ------------------------------------------------------------- camouflage
 
+  /// Classic "duck hunter" camouflage (user wish 2026-10-26): a sand colored
+  /// ground with large, smooth, flowing blotches in olive, brown and
+  /// charcoal, each separated from its neighbours by a thin sand colored gap.
+  /// The palette is fixed (that is the look) but washed out in light mode and
+  /// darkened in dark mode, so texts and buttons on top stay readable.
   void _camouflage(Canvas canvas, Size size) {
-    // Woodland camouflage: a base color and three layers of irregular
-    // blotches in related tones, all calm enough to read text on.
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()..color = _mix(surface, primary, _dark ? 0.12 : 0.14),
+    final ground = _mix(
+      _dark ? const Color(0xFF48453A) : const Color(0xFFE0DBC8),
+      surface,
+      0.1,
     );
-    final tones = _dark
-        ? [
-            _mix(surface, primary, 0.24),
-            _mix(surface, tertiary, 0.2),
-            _mix(surface, Colors.black, 0.28),
-          ]
-        : [
-            _mix(surface, primary, 0.3),
-            _mix(surface, tertiary, 0.26),
-            _mix(surface, secondary, 0.38),
-          ];
-    final random = Random(23);
-    final scale = size.shortestSide / 300;
-    final count = (size.width * size.height / 9000).round().clamp(10, 42);
-    final paint = Paint()..isAntiAlias = true;
-    for (var layer = 0; layer < tones.length; layer++) {
-      paint.color = tones[layer];
-      for (var i = 0; i < count; i++) {
+    final tones = [
+      _dark ? const Color(0xFF34402B) : const Color(0xFFAEBB96), // olive
+      _dark ? const Color(0xFF3D3025) : const Color(0xFFC2AE92), // brown
+      _dark ? const Color(0xFF14150F) : const Color(0xFFB2B4AA), // charcoal
+    ].map((c) => _mix(c, surface, 0.08)).toList();
+    canvas.drawRect(Offset.zero & size, Paint()..color = ground);
+
+    final random = Random(5);
+    // Blotch size follows the panel (card 190 dp high = 1), so the small
+    // previews show the same picture as the real panel.
+    final unit = (size.shortestSide / 190).clamp(0.5, 1.4);
+    final cell = 50 * unit;
+    final gap = 4.5 * unit;
+    final blobs = <_Blotch>[];
+    for (var row = -1; row * cell < size.height + cell; row++) {
+      for (var col = -1; col * cell < size.width + cell; col++) {
+        if (random.nextDouble() < 0.04) continue;
         final center = Offset(
-          random.nextDouble() * size.width,
-          random.nextDouble() * size.height,
+          (col + 0.5 + (random.nextDouble() - 0.5) * 0.8) * cell,
+          (row + 0.5 + (random.nextDouble() - 0.5) * 0.8) * cell,
         );
-        final radius = (20 + random.nextDouble() * 38) * scale;
-        canvas.drawPath(_blotch(random, center, radius), paint);
+        blobs.add(_Blotch.random(random, center, unit));
       }
     }
-  }
-
-  /// A smooth, irregular closed shape around [center].
-  static Path _blotch(Random random, Offset center, double radius) {
-    const points = 9;
-    // Stretched a little, so the blotches are not round.
-    final stretch = 1 + random.nextDouble() * 0.7;
-    final tilt = random.nextDouble() * pi;
-    final ring = [
-      for (var i = 0; i < points; i++)
-        () {
-          final angle = 2 * pi * i / points + random.nextDouble() * 0.35;
-          final r = radius * (0.6 + random.nextDouble() * 0.8);
-          final local = Offset(cos(angle) * r * stretch, sin(angle) * r);
-          return center +
-              Offset(
-                local.dx * cos(tilt) - local.dy * sin(tilt),
-                local.dx * sin(tilt) + local.dy * cos(tilt),
-              );
-        }(),
-    ];
-    Offset middle(Offset a, Offset b) =>
-        Offset((a.dx + b.dx) / 2, (a.dy + b.dy) / 2);
-    final start = middle(ring.last, ring.first);
-    final path = Path()..moveTo(start.dx, start.dy);
-    for (var i = 0; i < points; i++) {
-      final control = ring[i];
-      final end = middle(control, ring[(i + 1) % points]);
-      path.quadraticBezierTo(control.dx, control.dy, end.dx, end.dy);
+    // The three tones in turn (in a shuffled order), so each is as frequent
+    // as the others.
+    blobs.shuffle(random);
+    final ground0 = Paint()..color = ground;
+    final fill = Paint()..isAntiAlias = true;
+    for (var i = 0; i < blobs.length; i++) {
+      final blob = blobs[i];
+      // Later blotches get a sand colored halo that cuts into earlier ones:
+      // that makes the thin gaps between neighbours.
+      for (final disc in blob.discs) {
+        canvas.drawCircle(disc.center, disc.radius + gap, ground0);
+      }
+      fill.color = tones[i % tones.length];
+      for (final disc in blob.discs) {
+        canvas.drawCircle(disc.center, disc.radius, fill);
+      }
     }
-    return path..close();
   }
 
   @override
@@ -395,4 +383,78 @@ class PanelDesignPainter extends CustomPainter {
       primary != old.primary ||
       secondary != old.secondary ||
       tertiary != old.tertiary;
+}
+
+/// One camouflage blotch: many overlapping discs along a wiggly line, whose
+/// radius swells and shrinks smoothly – that gives the flowing, lumpy outline
+/// of the classic pattern. A side branch makes some of them mushroom- or
+/// L-shaped.
+class _Blotch {
+  _Blotch(this.discs);
+
+  factory _Blotch.random(Random random, Offset center, double unit) {
+    final angle = random.nextDouble() * pi;
+    final direction = Offset(cos(angle), sin(angle));
+    final across = Offset(-direction.dy, direction.dx);
+    final length = (80 + random.nextDouble() * 90) * unit;
+    final width = (14 + random.nextDouble() * 10) * unit; // base radius
+    Offset at(double along, double side) =>
+        center + direction * (along * length) + across * (side * length);
+    final wiggle = (random.nextDouble() - 0.5) * 1.2;
+    final a = at(-0.5, 0);
+    final b = at(-0.2, wiggle);
+    final c = at(0.2, -wiggle);
+    final d = at(0.5, 0);
+
+    final discs = <({Offset center, double radius})>[];
+    void addLine(Offset Function(double t) point, double span, double scale) {
+      final steps = max(8, (span / (width * 0.16)).ceil());
+      final phase1 = random.nextDouble() * 2 * pi;
+      final phase2 = random.nextDouble() * 2 * pi;
+      final freq1 = 1 + random.nextDouble() * 1.5;
+      final freq2 = 2.5 + random.nextDouble() * 2;
+      for (var i = 0; i <= steps; i++) {
+        final t = i / steps;
+        // Swelling and shrinking, rounded off at both ends.
+        final swell =
+            0.62 +
+            0.26 * sin(2 * pi * freq1 * t + phase1) +
+            0.12 * sin(2 * pi * freq2 * t + phase2);
+        final round = 0.55 + 0.45 * sin(pi * t);
+        discs.add((
+          center: point(t),
+          radius: max(width * 0.3, width * scale * swell * round * 1.25),
+        ));
+      }
+    }
+
+    Offset cubic(double t) {
+      final u = 1 - t;
+      return a * (u * u * u) +
+          b * (3 * u * u * t) +
+          c * (3 * u * t * t) +
+          d * (t * t * t);
+    }
+
+    addLine(cubic, length, 1);
+    if (random.nextDouble() < 0.5) {
+      final from = cubic(0.3 + random.nextDouble() * 0.4);
+      final side = random.nextBool() ? 1.0 : -1.0;
+      final tip =
+          from +
+          across * (side * length * (0.35 + random.nextDouble() * 0.3)) +
+          direction * (length * (random.nextDouble() - 0.5) * 0.4);
+      final bend = (random.nextDouble() - 0.5) * 0.5;
+      addLine(
+        (t) =>
+            Offset.lerp(from, tip, t)! +
+            direction * (sin(pi * t) * bend * length),
+        (tip - from).distance,
+        0.85,
+      );
+    }
+    return _Blotch(discs);
+  }
+
+  final List<({Offset center, double radius})> discs;
 }

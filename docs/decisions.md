@@ -208,7 +208,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   entfernen die Zeile selbst. Der Neustart von Byte 0 nach Netzverlust bleibt (Plugin).
 - 2026-10-26 · **Wählbare Hintergründe für das Bedienfeld im Player + Untermenü „Design"** (Benutzer) · Das Bedienfeld war schlicht
   einfarbig. Neu: Optionen → Design mit System/Hell/Dunkel und App-Farbe (von der Hauptseite verschoben) und der Auswahl
-  Schlicht / Sternenhimmel / Nordlicht / Wellen / Kristall / Camouflage (letzteres auf Zuruf nachgereicht: unregelmäßige Flecken in drei Tönen der App-Farbe). **Im Code gemalt** (`CustomPainter`), kein Bildmaterial: keine PNGs im
+  Schlicht / Sternenhimmel / Nordlicht / Wellen / Kristall / Camouflage (letzteres auf Zuruf nachgereicht; der erste Entwurf mit kleinen eckigen Flecken in App-Farben gefiel nicht, die Vorlage war das klassische Duck-Hunter-Muster → feste Palette, einzige Ausnahme von „folgt der App-Farbe"). **Im Code gemalt** (`CustomPainter`), kein Bildmaterial: keine PNGs im
   Repo (Regel), keine neuen Pakete, kein Speicher zu verwalten; die Farben kommen aus dem Farbschema und folgen Hell/Dunkel und
   App-Farbe. **Statisch** (keine Animation) wegen schwacher Handys und Akku. **Standard bleibt „Schlicht"**, damit sich für
   Bestandsnutzer nichts ändert. Lesbarkeit per Test abgesichert (≥ 6:1 für Haupttext, ≥ 4,5:1 für Nebentext, alle Designs, beide
