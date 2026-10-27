@@ -58,7 +58,8 @@ verlangt) als srclib; sonst keine Submodule (SQLite liegt als Quellcode im Repo)
 **MR gemerged 2026-10-14** (Prüfer); die App ist seitdem im F-Droid-Index (v1.3.3, Codes 5011–5013). Der Bot findet neue
 Tags selbst. **v1.3.4 veröffentlicht 2026-10-16** (Tag auf `febca26e…`, Codes 5021–5023): Rezept-Kopie im Repo auf 1.3.4
 gesetzt, APKs per Skript gebaut (alle drei „verified"), ins GitHub-Release gelegt – der Bot-Build muss sie vergleichen
-können. Ab jetzt der normale Ablauf aus `build-and-release.md` („GitHub-Release").
+können. **v1.3.5 veröffentlicht 2026-10-27** (Tag auf `beac6f70…`, Codes 5031–5033, alle drei „verified"): mit den
+neuen Store-Texten und acht Screenshots je Sprache. Ab jetzt der normale Ablauf aus `build-and-release.md` („GitHub-Release").
 1. **Screenshots** machen (siehe unten), in die beiden `phoneScreenshots`-Ordner legen (alte `3.jpg`/`4.jpg` sind
    gelöscht) – Claude committet und pusht sie auf Ansage. **Vor dem Tag**: F-Droid liest Texte und Bilder aus dem
    getaggten Stand.
