@@ -1,0 +1,8 @@
+• Neu: Optionen → Design mit Hell/Dunkel, App-Farbe und wählbaren Hintergründen fürs Player-Bedienfeld (Sternenhimmel, Nordlicht, Wellen, Kristall, Camouflage)
+• Skip-Knopf gedrückt halten spult durch die Folge
+• Tempo pro Podcast einstellbar
+• Suche: „Beliebt“ und „Neuheiten“
+• Downloads bleiben bei Netzverlust in der Liste
+• Bluetooth: „Pause“ vom Kopfhörer startet nichts mehr
+• Sleep-Timer verfällt nach einer Stunde Stillstand
+• Weitere Korrekturen am Player

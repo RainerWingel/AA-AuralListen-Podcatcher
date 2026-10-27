@@ -1,0 +1,8 @@
+• New: Settings → Design with light/dark, app color and selectable backgrounds for the player controls (starry sky, aurora, waves, crystal, camouflage)
+• Hold a skip button to scan through the episode
+• Playback speed per podcast
+• Search: "Popular" and "New"
+• Downloads stay in the list when the network drops
+• Bluetooth: a "Pause" from the headset no longer starts playback
+• Sleep timer expires after an hour of silence
+• More player fixes
