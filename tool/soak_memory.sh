@@ -8,7 +8,9 @@
 # (docs/eviction.md); a slow upward trend of TOTAL PSS over 2 h is a leak.
 # If the pid changes, the process was restarted: check the reason with
 #   adb shell dumpsys activity exit-info io.github.rainerwingel.aurallisten
-set -euo pipefail
+# No pipefail: awk stops reading early ("exit"), and the SIGPIPE of the stage
+# before it ended the whole run after a few samples (2026-10-30).
+set -eu
 ADB="${ADB:-$HOME/Library/Android/sdk/platform-tools/adb}"
 PKG=io.github.rainerwingel.aurallisten
 MINUTES="${1:-120}"
