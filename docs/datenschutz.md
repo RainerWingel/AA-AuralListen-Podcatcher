@@ -56,8 +56,10 @@ auf dem Gerät; übertragen wird dabei nichts.
 
 Mit **Android Auto** gibt die App Titel, Podcast-Namen, Hörstand und zwischengespeicherte Cover-Bilder deiner Folgen,
 Playlists und Abos an die Android-Auto-App auf deinem Handy weiter, damit sie im Auto angezeigt werden. Das geschieht
-auf dem Gerät; die App selbst überträgt dabei nichts ins Internet. Für Android Auto ist Google verantwortlich; es gilt
-die [Datenschutzerklärung von Google](https://policies.google.com/privacy?hl=de).
+auf dem Gerät; die App selbst überträgt dabei nichts ins Internet. Sprachbefehle („Hey Google, spiele …") erkennt
+Google; die App erhält nur den erkannten Text und sucht damit auf dem Gerät in deinen Playlists und Abos. Für Android
+Auto und die Spracherkennung ist Google verantwortlich; es gilt die
+[Datenschutzerklärung von Google](https://policies.google.com/privacy?hl=de).
 
 ## Berechtigungen
 

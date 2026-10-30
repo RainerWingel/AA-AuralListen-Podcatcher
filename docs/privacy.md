@@ -55,7 +55,9 @@ device; nothing is transmitted.
 
 With **Android Auto**, the app passes titles, podcast names, listening progress and cached cover images of your
 episodes, playlists and subscriptions to the Android Auto app on your phone so they can be shown in the car. This
-happens on the device; the app itself transmits nothing to the internet. Google is responsible for Android Auto; the
+happens on the device; the app itself transmits nothing to the internet. Voice commands ("Hey Google, play …") are
+recognized by Google; the app only receives the recognized text and uses it to search your playlists and subscriptions
+on the device. Google is responsible for Android Auto and speech recognition; the
 [Google Privacy Policy](https://policies.google.com/privacy) applies.
 
 ## Permissions

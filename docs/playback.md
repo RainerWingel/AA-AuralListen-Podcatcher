@@ -325,7 +325,7 @@ Menübaum und den Player-Zustand; Android Auto baut daraus die Oberfläche. Kein
 (nur `meta-data` im Manifest + `res/xml/automotive_app_desc.xml`) → F-Droid-tauglich.
 
 **Code:** `CarBrowser` (`lib/audio/car_browser.dart`, Baum + Media-IDs), `CarRepository` (`lib/data/car_repository.dart`,
-Abfragen), im `PodcastAudioHandler` `getChildren` / `getMediaItem` / `playFromMediaId`. Tests: `test/audio/car_browser_test.dart`,
+Abfragen), im `PodcastAudioHandler` `getChildren` / `getMediaItem` / `playFromMediaId` / `playFromSearch`. Tests: `test/audio/car_browser_test.dart`,
 Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
 
 **Menübaum (4 Reiter mit weißen Symbolen `res/drawable/ic_car_*`, nur lesen):**
@@ -353,13 +353,46 @@ Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
   als Bild über die Mediensitzung.
 - **Speicher:** Menülisten sind einmalige DB-Abfragen (`get`, kein `watch`), keine offenen Streams pro Auto-Bildschirm.
   Das Auto fragt beim Öffnen einer Liste neu; Änderungen in der App erscheinen also beim nächsten Öffnen.
-- **Später, optional:** Sprachsuche „Hey Google, spiele … in AuralListen" (`playFromSearch`, sucht in den Abos).
+- **Sprachbefehle** (`playFromSearch`, Benutzerwunsch 2026-10-30): ohne Worte („Hey Google, spiele AA-AuralListen")
+  → die laufende bzw. zuletzt gespielte Folge geht weiter; noch nie etwas gehört → Meldung im Auto. Mit Namen →
+  zuerst eine **Playlist** (geht weiter wie „Fortsetzen", wird aktiv), sonst ein **Podcast** (nächste ungespielte Folge:
+  bei Serien die nächste in Hörreihenfolge, sonst die neueste; alles gespielt → die neueste). Der Name muss alle
+  gesprochenen Wörter enthalten (Groß/Klein egal); Füllwörter („spiele", „die", „Playlist", „in", „AA-AuralListen" …)
+  und Anführungszeichen fallen weg – „Spiele die Playlist 'Wiedergabeliste' in AA-AuralListen" findet „Wiedergabeliste".
+  Nichts gefunden → Meldung „Nichts gefunden für …" im Auto. Folgentitel werden nicht durchsucht.
+- **Fehler im Auto:** Probleme, nach denen die Wiedergabe steht (Laden fehlgeschlagen, Hänger aufgegeben, Folge beim
+  Anbieter weg, Format), meldet der Handler zusätzlich zur Infobox als **nicht fatalen Fehler** in der Mediensitzung
+  (`errorCode`/`errorMessage`, gleicher Text wie die Infobox); Android Auto zeigt ihn als Hinweis. Gelöscht beim
+  nächsten Play. Hinweise, bei denen es weiterläuft (kaputter Download → Stream, wechselnde Werbung), nicht im Auto.
 - **Nutzer außerhalb des Play Stores** (F-Droid, GitHub): Android Auto zeigt solche Apps nur mit „Unbekannte Quellen"
   (Android-Auto-Einstellungen → „Version" zehnmal antippen → ⋮ → Entwicklereinstellungen). Hinweis im README.
 - **Getestet 2026-10-30** mit der DHU am A05s (Android 15, Android Auto 17.9): Reiter mit Symbolen, Cover (auch im
   Abo-Raster), Hörstand-Punkte, Abspielen aus Neu und Playlist, −15/+30, Pause, ⏮ ⏭ nur mit Playlist. Mit „Musik
   automatisch starten" (Android-Auto-Einstellung) setzt das Auto beim Verbinden die letzte Folge fort. Im App-Raster von
   Android Auto heißt die App „AA-AuralL…" (System-Name der App, gekürzt).
+- **Zuverlässigkeitstest 2026-10-30** (DHU, A05s): **Kaltstart** (App per `am force-stop` beendet → Android Auto
+  startet sie selbst, setzt die letzte Folge mit aktiver Playlist fort, Menü da) ✓ · **Verbindungsabbruch** beim
+  Spielen → App pausiert sofort, kein Weiterspielen über den Handy-Lautsprecher ✓ · **Lenkradtasten** ⏭/⏮
+  (`keycode media_next/previous`) springen in der Playlist, Hörstände bleiben ✓ · **Folgenende** in einer Playlist →
+  nächste startet, das Auto zeigt sie ✓ · **Sprachbefehle** nicht im Emulator testbar (die DHU nimmt nur das echte
+  Mac-Mikrofon, das macOS sperrt) → Unit-Tests + Praxistest · **Ohne Netz** nicht testbar über WLAN-ADB (Flugmodus
+  trennt ADB) → Unit-Tests + Praxistest.
 - **Testen ohne Auto:** Desktop Head Unit (SDK-Paket `extras;google;auto`, `~/Library/Android/sdk/extras/google/auto/desktop-head-unit`).
   Auf dem A05s in Android Auto den Entwicklermodus einschalten, ⋮ → „Server für Infotainmentsystem starten" (Android Auto 17.9),
   dann `adb -s <A05s> forward tcp:5277 tcp:5277` und `./desktop-head-unit` starten (Handy entsperrt).
+
+### Praxistest im echten Auto (Checkliste)
+Vorher: App-Version mit Android Auto installiert; ohne Play Store in Android Auto „Unbekannte Quellen" an (siehe oben).
+1. **Verbinden** per Kabel (und, falls das Auto es kann, kabellos): AuralListen erscheint im App-Raster, Menü öffnet sich.
+2. **Weiterhören:** Beim Einsteigen läuft die letzte Folge an der richtigen Stelle weiter (oder Play-Taste).
+3. **Ton** kommt aus den Fahrzeuglautsprechern; Lautstärke über das Auto regelbar.
+4. **Lenkradtasten:** Play/Pause, weiter/zurück (mit aktiver Playlist nächste/vorige Folge).
+5. **Sprache:** „Hey Google, spiele AA-AuralListen" (geht weiter) und „Hey Google, spiele die Playlist
+   Wiedergabeliste in AA-AuralListen" (startet die Playlist); ein unbekannter Name → Meldung „Nichts gefunden".
+6. **Navigation:** Ansage von Google Maps senkt den Podcast kurz ab, danach normal weiter.
+7. **Anruf** über das Auto: Podcast pausiert, nach dem Auflegen geht es weiter.
+8. **Funkloch / Tunnel** beim Streamen: kurzer Aussetzer → es geht an gleicher Stelle weiter; länger → Meldung im Auto.
+   Heruntergeladene Folgen spielen ohne Netz.
+9. **Auto aus** (Zündung aus / Kabel ziehen) während der Wiedergabe: Handy spielt **nicht** über den eigenen
+   Lautsprecher weiter; beim nächsten Start geht es an der Stelle weiter.
+10. **Lange Fahrt** (≥ 1 h): keine Aussetzer, App nicht beendet (Akku-Einstellung „Nicht eingeschränkt").
