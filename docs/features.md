@@ -36,6 +36,7 @@ APK über GitHub-Releases, F-Droid (Aufnahme läuft); Play Store verworfen (Name
 | F30 | Folgennummer am Cover | Feed-Nummer oder eigene Zählung + Versatz, pro Podcast → `ui-ux.md` |
 | F20 | Podcast-Umzug | 301/308, `itunes:new-feed-url`, manuell „Feed-Adresse ändern" → `feeds-and-directories.md` |
 | F18 | Auto-Download nach Thema | Netzwerk-Feeds wie WRINT: nur angehakte Themen laden → `feeds-and-directories.md` |
+| F31 | Android Auto (geplant) | Menü Playlists / Neu / Downloads / Abos, Player-Tasten im Auto, Cover aus dem Cache → `playback.md` |
 
 ## Soll (M6–M7)
 | # | Funktion | Details |
@@ -47,5 +48,5 @@ APK über GitHub-Releases, F-Droid (Aufnahme läuft); Play Store verworfen (Name
 | F17 | Dark Mode | |
 
 ## Bewusst NICHT
-Geschwindigkeit, Stille kürzen, CarPlay/Android Auto, Video, Sync/Cloud, Hintergrund-Feed-Update,
+Geschwindigkeit, Stille kürzen, CarPlay, Video, Sync/Cloud, Hintergrund-Feed-Update,
 Transkripte, KI-Funktionen, Statistiken, SD-Karte (Gerät hat keinen Slot).

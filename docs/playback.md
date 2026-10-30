@@ -318,3 +318,28 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
   daraus. Tippen spielt die Folge, solange sie (noch oder wieder) abonniert ist, sonst Infobox „Diese Folge ist nicht
   mehr in deinen Abos.". Papierkorb oben → „Verlauf löschen" mit Rückfrage.
 - Eingetragen vom Player über den Rückruf `onFinished` (`main.dart` → `HistoryRepository.addFinished`).
+
+## Android Auto (geplant, Benutzerwunsch 2026-10-30) – ENTWURF, noch nicht abgesegnet
+Die App zeichnet im Auto **nichts selbst**: Sie liefert über den vorhandenen `MediaBrowserService` (`audio_service`,
+Manifest) nur einen Menübaum und den Player-Zustand; Android Auto baut daraus die Oberfläche. Kein neues Paket,
+keine Google-Bibliothek (nur `meta-data` + `res/xml/automotive_app_desc.xml`) → F-Droid-tauglich.
+
+**Menübaum (max. 4 Reiter, Listen höchstens 50 Einträge, nur lesen):**
+| Reiter | Inhalt | Tippen auf eine Folge |
+|--------|--------|-----------------------|
+| Playlists | alle Playlists in eigener Reihenfolge → Folgen der Playlist | spielt sie, Playlist wird **aktiv** (wie in der Playlist-Ansicht) |
+| Neu | neueste ungespielte Folgen aller Abos (wie Start) | spielt sie, Regeln wie Start (`playlists.md`: Folge außerhalb einer Playlist) |
+| Downloads | heruntergeladene Folgen (offline, kein Funkloch-Problem) | wie Neu |
+| Abos | Podcasts alphabetisch → deren Folgen, neueste zuerst | wie Neu |
+
+- **„Weiterhören"** beim Einsteigen: `recentRootId` liefert die zuletzt gespielte Folge, Play setzt an der gemerkten Position fort.
+- **Tasten im Auto-Player:** Play/Pause, −15 s, +30 s, „Nächste Folge" (nur mit aktiver Playlist); optional „Lesezeichen setzen"
+  (ohne Notiz).
+- **Bewusst nicht im Auto:** Downloads starten/löschen, als gespielt markieren, Einstellungen, Suche nach neuen Podcasts.
+- **Cover:** Android Auto lädt Bilder nur über `content://`-Adressen. Kleiner eigener Kotlin-`ContentProvider`, der **nur aus
+  dem vorhandenen Cover-Cache** liest; nicht im Cache → kein Bild (im Auto wird nichts nachgeladen, kein zweiter Cache).
+- **Speicher:** Menülisten sind einmalige DB-Abfragen (`get`, kein `watch`), keine offenen Streams pro Auto-Bildschirm.
+- **Später, optional:** Sprachsuche „Hey Google, spiele … in AuralListen" (`playFromSearch`, sucht in den Abos).
+- **Nutzer außerhalb des Play Stores** (F-Droid, GitHub): Android Auto zeigt solche Apps nur nach „Unbekannte Quellen" in den
+  Entwickler-Einstellungen von Android Auto (vor Umsetzung prüfen) → Hinweis in README/Store-Text.
+- **Testen ohne Auto:** Desktop Head Unit (DHU, Android SDK) auf dem Mac, verbunden mit dem A05s per ADB.

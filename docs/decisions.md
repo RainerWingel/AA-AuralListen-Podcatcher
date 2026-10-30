@@ -213,3 +213,8 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   App-Farbe. **Statisch** (keine Animation) wegen schwacher Handys und Akku. **Standard bleibt „Schlicht"**, damit sich für
   Bestandsnutzer nichts ändert. Lesbarkeit per Test abgesichert (≥ 6:1 für Haupttext, ≥ 4,5:1 für Nebentext, alle Designs, beide
   Modi, 7 Farben). Keine Schemaänderung (Einstellung `ui.panelDesign`).
+- 2026-10-30 · **Android Auto wird unterstützt (geplant)** (Benutzer) · Ersetzt „CarPlay/Android Auto: bewusst nicht" (`features.md`; CarPlay
+  bleibt draußen). Bleibt Flutter: Im Auto zeichnet Android Auto die Oberfläche aus Menübaum und Player-Zustand, die App liefert
+  nur Daten über den vorhandenen `MediaBrowserService` von `audio_service`; ein Wechsel zu Kotlin brächte dafür nichts. Kein neues
+  Paket, keine Google-Bibliothek (F-Droid). Cover über einen kleinen eigenen Kotlin-`ContentProvider` aus dem vorhandenen Cache.
+  Entwurf in `playback.md`, Umsetzung erst nach Freigabe der Menü-Struktur.
