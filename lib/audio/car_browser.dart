@@ -176,7 +176,7 @@ class CarBrowser {
     List<EpisodeWithPodcast> rows, {
     int? playlistId,
   }) async {
-    // Most episodes of a list share the podcast cover: look it up once.
+    // Most episodes of a list share a cover: look each one up only once.
     final covers = <String, Uri?>{};
     return [
       for (final row in rows)
@@ -191,14 +191,15 @@ class CarBrowser {
   }) async {
     final e = row.episode;
     final p = row.podcast;
-    final image = e.imageUrl ?? p.imageUrl;
-    final cover = image == null
+    final lookedUp = covers ?? <String, Uri?>{};
+    Future<Uri?> cached(String? url) async => url == null
         ? null
-        : covers == null
-        ? await _cover(image)
-        : covers.containsKey(image)
-        ? covers[image]
-        : covers[image] = await _cover(image);
+        : lookedUp.containsKey(url)
+        ? lookedUp[url]
+        : lookedUp[url] = await _cover(url);
+    // An episode's own picture is only cached once the app has shown it;
+    // until then the podcast cover stands in (nothing is downloaded).
+    final cover = await cached(e.imageUrl) ?? await cached(p.imageUrl);
     return MediaItem(
       id: playlistId == null ? '${e.id}' : '${e.id}@$playlistId',
       title: e.title,

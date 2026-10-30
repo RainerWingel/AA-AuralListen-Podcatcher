@@ -348,7 +348,8 @@ Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
 - **Bewusst nicht im Auto:** Downloads starten/löschen, als gespielt markieren, Einstellungen, Suche nach neuen Podcasts.
 - **Cover:** Android Auto lädt Bilder nur über `content://`. `CoverProvider` (Kotlin) liefert Dateien **nur** aus dem
   Cover-Cache (`cacheDir/coverCache`, nur reine Dateinamen, nur lesen); `CoverCacheManager.carCoverUri` fragt den Cache.
-  Nicht im Cache → kein Bild (im Auto wird nichts nachgeladen, kein zweiter Cache). Das laufende Cover kommt wie bisher
+  Eigenes Folgenbild nicht im Cache (in der App noch nie angezeigt) → das Podcast-Cover (Benutzermeldung 2026-10-30:
+  „#4 … Dirk Bach" ohne Bild); auch das nicht im Cache → kein Bild. Im Auto wird nichts nachgeladen, kein zweiter Cache. Das laufende Cover kommt wie bisher
   als Bild über die Mediensitzung.
 - **Speicher:** Menülisten sind einmalige DB-Abfragen (`get`, kein `watch`), keine offenen Streams pro Auto-Bildschirm.
   Das Auto fragt beim Öffnen einer Liste neu; Änderungen in der App erscheinen also beim nächsten Öffnen.

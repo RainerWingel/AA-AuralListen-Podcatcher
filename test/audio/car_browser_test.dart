@@ -121,6 +121,34 @@ void main() {
     },
   );
 
+  test('an episode picture not in the cache: the podcast cover', () async {
+    final a = await addPodcast('A');
+    Future<int> withImage(String guid, String image) => db
+        .into(db.episodes)
+        .insert(
+          EpisodesCompanion.insert(
+            podcastId: a,
+            guid: guid,
+            title: 'Folge $guid',
+            audioUrl: 'https://example.com/$guid.mp3',
+            imageUrl: Value('https://example.com/$image.jpg'),
+            pubDate: Value(DateTime.utc(2026, 10, guid.length)),
+            addedAt: now,
+          ),
+        );
+    await withImage('own', 'Eigen');
+    await withImage('notyet', 'Kein');
+
+    final items = await car.children(CarBrowser.tabNew);
+    expect(
+      [for (final i in items) i.artUri],
+      [
+        Uri.parse('content://covers/A.jpg'),
+        Uri.parse('content://covers/Eigen.jpg'),
+      ],
+    );
+  });
+
   test('a playlist: its order, ids carry the playlist', () async {
     final a = await addPodcast('A');
     final first = await addEpisode(a, '1', day: 1);
