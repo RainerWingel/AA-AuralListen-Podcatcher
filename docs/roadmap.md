@@ -161,7 +161,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [ ] Praxistest auf dem S25 (Benutzer)
 
 ## Zusatz – Android Auto (geplant, 2026-10-30)
-- [ ] Menü-Struktur und Tasten abgesegnet (Benutzer; Entwurf in `playback.md`)
+- [x] Menü-Struktur und Tasten abgesegnet (Benutzer, 2026-10-30; `playback.md`)
 - [ ] Prüfen: Sichtbarkeit für Apps außerhalb des Play Stores („Unbekannte Quellen"), aktuelle Android-Auto-Vorgaben
 - [ ] DHU (Desktop Head Unit) auf dem Mac einrichten, A05s per ADB verbinden (Benutzer stimmt Download zu)
 - [ ] Manifest-`meta-data` + `automotive_app_desc.xml`

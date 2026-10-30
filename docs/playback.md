@@ -319,7 +319,7 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
   mehr in deinen Abos.". Papierkorb oben → „Verlauf löschen" mit Rückfrage.
 - Eingetragen vom Player über den Rückruf `onFinished` (`main.dart` → `HistoryRepository.addFinished`).
 
-## Android Auto (geplant, Benutzerwunsch 2026-10-30) – ENTWURF, noch nicht abgesegnet
+## Android Auto (geplant, Benutzerwunsch 2026-10-30) – vom Benutzer abgesegnet 2026-10-30
 Die App zeichnet im Auto **nichts selbst**: Sie liefert über den vorhandenen `MediaBrowserService` (`audio_service`,
 Manifest) nur einen Menübaum und den Player-Zustand; Android Auto baut daraus die Oberfläche. Kein neues Paket,
 keine Google-Bibliothek (nur `meta-data` + `res/xml/automotive_app_desc.xml`) → F-Droid-tauglich.
