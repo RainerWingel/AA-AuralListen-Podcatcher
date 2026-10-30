@@ -174,7 +174,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] README: Hinweis „Unbekannte Quellen"
 - [ ] Store-Texte (fastlane de/en) beim Release ergänzen
 - [x] A05s vorbereitet (2026-10-30): Android-Auto-Entwicklermodus, „Unbekannte Quellen" an, 1.3.5+Auto installiert, DHU verbindet
-- [ ] Test mit der DHU auf dem A05s (wartet auf Zustimmung des Benutzers zum Android-Auto-Einrichtungsdialog)
+- [x] Test mit der DHU auf dem A05s (2026-10-30; Fund: ⏭ ohne Playlist ohne Wirkung → nur noch mit aktiver Playlist)
 - [ ] Praxistest im echten Auto (falls Gelegenheit)
 
 ## Offene Punkte

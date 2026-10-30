@@ -340,8 +340,9 @@ Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
   `MediaItem`, so markiert das Auto die laufende Folge) bzw. `<episodeId>@<playlistId>` in einer Playlist.
 - Folgen zeigen ihren Hörstand (neu / angefangen / gespielt, `android.media.extra.PLAYBACK_STATUS`).
 - **„Weiterhören"** beim Einsteigen: `recentRootId` liefert die zuletzt gespielte Folge; Play setzt an der gemerkten Stelle fort.
-- **Tasten im Auto:** Play/Pause, −15 s, +30 s, „Nächste Folge" (nur mit aktiver Playlist). −15/+30 macht `audio_service`
-  ab Android 13 selbst zu „Custom Actions" – genau die zeigt Android Auto; die Benachrichtigung bleibt unverändert.
+- **Tasten im Auto:** Play/Pause, −15 s, +30 s, mit aktiver Playlist zusätzlich ⏮ ⏭. −15/+30 macht `audio_service`
+  ab Android 13 selbst zu „Custom Actions" – genau die zeigt Android Auto. `MediaAction.skipToNext` wird nur mit aktiver
+  Playlist gemeldet (vorher immer): ohne Playlist tat ⏭ nichts, stand aber im Auto und in den System-Mediensteuerungen.
   „Lesezeichen setzen" im Auto: noch nicht (optional, `roadmap.md`).
 - **Texte** der Reiter folgen der App-Sprache, auch nach einem Wechsel ohne Neustart (`l10n` wird je Abruf gelesen).
 - **Bewusst nicht im Auto:** Downloads starten/löschen, als gespielt markieren, Einstellungen, Suche nach neuen Podcasts.
@@ -354,6 +355,10 @@ Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
 - **Später, optional:** Sprachsuche „Hey Google, spiele … in AuralListen" (`playFromSearch`, sucht in den Abos).
 - **Nutzer außerhalb des Play Stores** (F-Droid, GitHub): Android Auto zeigt solche Apps nur mit „Unbekannte Quellen"
   (Android-Auto-Einstellungen → „Version" zehnmal antippen → ⋮ → Entwicklereinstellungen). Hinweis im README.
+- **Getestet 2026-10-30** mit der DHU am A05s (Android 15, Android Auto 17.9): Reiter mit Symbolen, Cover (auch im
+  Abo-Raster), Hörstand-Punkte, Abspielen aus Neu und Playlist, −15/+30, Pause, ⏮ ⏭ nur mit Playlist. Mit „Musik
+  automatisch starten" (Android-Auto-Einstellung) setzt das Auto beim Verbinden die letzte Folge fort. Im App-Raster von
+  Android Auto heißt die App „AA-AuralL…" (System-Name der App, gekürzt).
 - **Testen ohne Auto:** Desktop Head Unit (SDK-Paket `extras;google;auto`, `~/Library/Android/sdk/extras/google/auto/desktop-head-unit`).
   Auf dem A05s in Android Auto den Entwicklermodus einschalten, ⋮ → „Server für Infotainmentsystem starten" (Android Auto 17.9),
   dann `adb -s <A05s> forward tcp:5277 tcp:5277` und `./desktop-head-unit` starten (Handy entsperrt).

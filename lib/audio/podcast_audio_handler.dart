@@ -1542,7 +1542,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
           MediaAction.seekBackward,
           MediaAction.rewind,
           MediaAction.fastForward,
-          MediaAction.skipToNext,
+          // Without an active playlist "next" does nothing: no ⏭ in the
+          // car or the system's media controls then (docs/playback.md).
+          if (_activePlaylistId != null) MediaAction.skipToNext,
           // Bluetooth "back" key → previous playlist episode (user wish
           // 2026-10-06); only with an active playlist, like ⏮ in the player.
           if (_activePlaylistId != null) MediaAction.skipToPrevious,

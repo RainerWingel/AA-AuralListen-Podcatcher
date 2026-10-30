@@ -2098,6 +2098,10 @@ void main() {
       expect(engine.loadedUri, Uri.parse('https://example.com/1.mp3'));
       expect(handler.playbackState.value.playing, isTrue);
       expect(handler.activePlaylistId, list);
+      expect(
+        handler.playbackState.value.systemActions,
+        contains(MediaAction.skipToNext),
+      );
     });
 
     test(
@@ -2109,6 +2113,11 @@ void main() {
         await handler.playFromMediaId('$episodeId');
         expect(handler.playbackState.value.playing, isTrue);
         expect(handler.activePlaylistId, isNull);
+        // "Next" would do nothing: no ⏭ in the car.
+        expect(
+          handler.playbackState.value.systemActions,
+          isNot(contains(MediaAction.skipToNext)),
+        );
       },
     );
 
