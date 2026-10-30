@@ -10,7 +10,7 @@ permalink: /datenschutz/
 **App:** AA-AuralListen Podcatcher (Android, Paketname `io.github.rainerwingel.aurallisten`)
 **Entwickler:** Artem A. · Kontakt: über die
 [Issues des GitHub-Projekts](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
-**Stand:** 3. Oktober 2026
+**Stand:** 30. Oktober 2026
 
 ## Kurz gesagt
 
@@ -53,6 +53,11 @@ diese Podcasts funktionieren; solche Übertragungen sind dann nicht verschlüsse
 
 Die App-Farbe „Wie Hintergrundbild" liest die Farben deines Hintergrundbilds aus dem Android-System. Das geschieht nur
 auf dem Gerät; übertragen wird dabei nichts.
+
+Mit **Android Auto** gibt die App Titel, Podcast-Namen, Hörstand und zwischengespeicherte Cover-Bilder deiner Folgen,
+Playlists und Abos an die Android-Auto-App auf deinem Handy weiter, damit sie im Auto angezeigt werden. Das geschieht
+auf dem Gerät; die App selbst überträgt dabei nichts ins Internet. Für Android Auto ist Google verantwortlich; es gilt
+die [Datenschutzerklärung von Google](https://policies.google.com/privacy?hl=de).
 
 ## Berechtigungen
 

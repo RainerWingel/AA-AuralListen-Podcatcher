@@ -218,3 +218,9 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   nur Daten über den vorhandenen `MediaBrowserService` von `audio_service`; ein Wechsel zu Kotlin brächte dafür nichts. Kein neues
   Paket, keine Google-Bibliothek (F-Droid). Cover über einen kleinen eigenen Kotlin-`ContentProvider` aus dem vorhandenen Cache.
   Entwurf in `playback.md`, Umsetzung erst nach Freigabe der Menü-Struktur.
+- 2026-10-30 · **Android Auto: Cover über eigenen, exportierten `CoverProvider`, Abos bis 200** · Android Auto lädt Bilder nur
+  über `content://`. Der Provider ist ohne Berechtigung exportiert (die Android-Auto-App läuft in einem anderen Prozess,
+  `grantUriPermission` je Bild wäre aufwendig), liefert aber nur Dateien direkt aus dem Cover-Cache (reine Dateinamen,
+  nur lesen) – öffentliche Feed-Bilder, nichts Persönliches. Nichts wird fürs Auto nachgeladen. Abweichend vom Entwurf
+  („Listen max. 50") zeigt der Reiter „Abos" bis zu 200 Podcasts, weil alphabetisch abgeschnittene Abos sonst
+  stillschweigend fehlen würden; Folgenlisten bleiben bei 50.

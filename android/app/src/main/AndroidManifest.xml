@@ -51,6 +51,16 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+        <!-- Android Auto: media app (menu via the MediaBrowserService above),
+             see docs/playback.md. No Google library is needed for this. -->
+        <meta-data android:name="com.google.android.gms.car.application"
+            android:resource="@xml/automotive_app_desc"/>
+        <!-- Covers for Android Auto, read-only from the cover cache. Exported
+             without permission: the car app runs in another process, and the
+             covers are public pictures from the feeds. -->
+        <provider android:name=".CoverProvider"
+            android:authorities="io.github.rainerwingel.aurallisten.covers"
+            android:exported="true"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Optionen'**
   String get navSettings;
 
+  /// Android Auto tab: newest unplayed episodes
+  ///
+  /// In de, this message translates to:
+  /// **'Neu'**
+  String get carNew;
+
   /// Temporary text on screens that are not implemented yet.
   ///
   /// In de, this message translates to:

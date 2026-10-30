@@ -162,16 +162,19 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 
 ## Zusatz – Android Auto (geplant, 2026-10-30)
 - [x] Menü-Struktur und Tasten abgesegnet (Benutzer, 2026-10-30; `playback.md`)
-- [ ] Prüfen: Sichtbarkeit für Apps außerhalb des Play Stores („Unbekannte Quellen"), aktuelle Android-Auto-Vorgaben
-- [ ] DHU (Desktop Head Unit) auf dem Mac einrichten, A05s per ADB verbinden (Benutzer stimmt Download zu)
-- [ ] Manifest-`meta-data` + `automotive_app_desc.xml`
-- [ ] Menübaum: `getChildren` / `getMediaItem` / `playFromMediaId` im `PodcastAudioHandler`, „Weiterhören" (`recentRootId`)
-- [ ] Tasten im Auto: −15 s / +30 s / Nächste Folge, optional Lesezeichen
-- [ ] Cover per `ContentProvider` aus dem Cover-Cache
-- [ ] Tests (Menübaum, Playlist wird aktiv, Listenlänge) + Leak-Test
-- [ ] Datenschutzerklärung de/en: Übergabe von Titel/Cover an Android Auto auf dem Gerät
-- [ ] README/Store-Text: Hinweis „Unbekannte Quellen"
-- [ ] Test mit der DHU auf dem A05s; Praxistest im echten Auto (falls Gelegenheit)
+- [x] Prüfen: Sichtbarkeit für Apps außerhalb des Play Stores („Unbekannte Quellen" nötig), Android-Auto-Vorgaben (Manifest, max. 4 Reiter, Cover nur `content://`)
+- [x] DHU (Desktop Head Unit) auf dem Mac installiert (Benutzer stimmte Download zu)
+- [x] Manifest-`meta-data` + `automotive_app_desc.xml`
+- [x] Menübaum: `getChildren` / `getMediaItem` / `playFromMediaId` im `PodcastAudioHandler`, „Weiterhören" (`recentRootId`)
+- [x] Tasten im Auto: −15 s / +30 s / Nächste Folge (−15/+30 liefert `audio_service` ab Android 13 als Custom Actions)
+- [ ] Optional: „Lesezeichen setzen" als Taste im Auto
+- [x] Cover per `ContentProvider` aus dem Cover-Cache
+- [x] Tests (Menübaum, Playlist wird aktiv, Listen, IDs); keine Streams/Timer → kein eigener Leak-Test nötig
+- [x] Datenschutzerklärung de/en: Übergabe von Titel/Cover an Android Auto auf dem Gerät
+- [x] README: Hinweis „Unbekannte Quellen"
+- [ ] Store-Texte (fastlane de/en) beim Release ergänzen
+- [ ] Test mit der DHU auf dem A05s (A05s per ADB verbinden)
+- [ ] Praxistest im echten Auto (falls Gelegenheit)
 
 ## Offene Punkte
 - keine

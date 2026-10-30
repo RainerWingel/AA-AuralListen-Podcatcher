@@ -10,7 +10,7 @@ permalink: /privacy/
 **App:** AA-AuralListen Podcatcher (Android, package name `io.github.rainerwingel.aurallisten`)
 **Developer:** Artem A. · Contact: via the
 [issues of the GitHub project](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
-**Last updated:** October 3, 2026
+**Last updated:** October 30, 2026
 
 ## In short
 
@@ -52,6 +52,11 @@ podcasts work; such transfers are then not encrypted.
 
 The app color "Match wallpaper" reads the colors of your wallpaper from the Android system. This happens only on the
 device; nothing is transmitted.
+
+With **Android Auto**, the app passes titles, podcast names, listening progress and cached cover images of your
+episodes, playlists and subscriptions to the Android Auto app on your phone so they can be shown in the car. This
+happens on the device; the app itself transmits nothing to the internet. Google is responsible for Android Auto; the
+[Google Privacy Policy](https://policies.google.com/privacy) applies.
 
 ## Permissions
 

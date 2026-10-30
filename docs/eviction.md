@@ -128,6 +128,8 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
   Vordergrund ist (`WidgetsBindingObserver`; im Hintergrund/bei Bildschirm aus gibt es keinen Timer), in `dispose()` beendet.
   Kosten: ein Neuzeichnen der Karte pro Minute plus 0,9 s Überblendung, keine Animation sonst. Tests: `panel_reshuffle_test.dart`. ✅
 - `audio_service` nutzt für Benachrichtigungs-Cover den begrenzten `CoverCacheManager` (kein zweiter Cache). ✅
+- Android Auto: `CoverProvider` (Kotlin) liest Cover **nur** aus dem `CoverCacheManager`-Ordner, lädt nichts nach und
+  legt keine Kopie an; Menülisten sind einmalige DB-Abfragen ohne offene Streams (`CarRepository`). ✅
 - Positions-Updates des Players gedrosselt in die DB schreiben (alle 5 s + bei Pause/Seek/Stopp/Folgenwechsel). ✅
 - Lange Listen nur mit `ListView.builder`; Bilder mit `memCacheWidth`/`cacheWidth` dekodieren.
 - Feed-XML nach dem Parsen verwerfen; Beschreibungen gekürzt speichern.

@@ -28,6 +28,9 @@ Gerät. Geschrieben in Flutter.
 
 **Hören**
 - Wiedergabe im Hintergrund mit Benachrichtigung, Sperrbildschirm- und Bluetooth-Tasten
+- Android Auto: Playlists, neue Folgen, Downloads und Abos im Auto; −15 s / +30 s und „Nächste Folge“. Wer die App
+  nicht aus dem Play Store hat (F-Droid, GitHub), schaltet in Android Auto einmalig „Unbekannte Quellen“ ein:
+  Android-Auto-Einstellungen → „Version“ zehnmal antippen → ⋮ → Entwicklereinstellungen → „Unbekannte Quellen“
 - Sprünge −15 s / +30 s, Abspielgeschwindigkeit 1,0× / 1,2× / 1,5× / 2,0×, Lautstärke-Boost (global oder pro Podcast)
 - Restzeit (bei höherem Tempo zusätzlich die tatsächliche Restzeit) oder Gesamtlänge – per Antippen umschaltbar
 - Shownotes mit antippbaren Links, Folgennummer und Erscheinungsdatum

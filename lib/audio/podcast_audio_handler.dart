@@ -10,6 +10,7 @@ import '../data/playback_repository.dart';
 import '../data/playlist_repository.dart';
 import '../data/settings_keys.dart';
 import '../data/settings_repository.dart';
+import 'car_browser.dart';
 import 'chapter_skips.dart';
 import 'player_engine.dart';
 import 'sleep_timer.dart';
@@ -30,6 +31,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     this._checkStream,
     this._deleteDownload,
     this._onFinished,
+    this._car,
     this.stopAfterPause = const Duration(minutes: 10),
     this.stallCheckInterval = const Duration(seconds: 10),
     this.recoveryRetryDelay = const Duration(seconds: 15),
@@ -70,6 +72,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Called when an episode was played to the end ("Abspielverlauf").
   final Future<void> Function(int episodeId)? _onFinished;
+
+  /// Menu for Android Auto; null in tests that do not need it.
+  final CarBrowser? _car;
 
   static const rewindInterval = Duration(seconds: 15);
   static const fastForwardInterval = Duration(seconds: 30);
@@ -519,6 +524,29 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// "Next" in the notification / full player: next playlist episode. The
   /// current one is NOT marked as played and stays in the playlist.
+  // ------------------------------------------------------------ Android Auto
+
+  @override
+  Future<List<MediaItem>> getChildren(
+    String parentMediaId, [
+    Map<String, dynamic>? options,
+  ]) async => await _car?.children(parentMediaId) ?? const [];
+
+  @override
+  Future<MediaItem?> getMediaItem(String mediaId) async => _car?.item(mediaId);
+
+  /// The car started an episode: from a playlist that playlist becomes
+  /// active, otherwise the same rules as a tap in the app.
+  @override
+  Future<void> playFromMediaId(
+    String mediaId, [
+    Map<String, dynamic>? extras,
+  ]) async {
+    final playable = CarBrowser.parsePlayable(mediaId);
+    if (playable == null) return;
+    await playEpisode(playable.episodeId, playlistId: playable.playlistId);
+  }
+
   @override
   Future<void> skipToNext() async {
     final next = await _nextInPlaylist();

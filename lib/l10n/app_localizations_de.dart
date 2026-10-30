@@ -28,6 +28,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navSettings => 'Optionen';
 
   @override
+  String get carNew => 'Neu';
+
+  @override
   String get placeholderComingSoon => 'Kommt bald';
 
   @override

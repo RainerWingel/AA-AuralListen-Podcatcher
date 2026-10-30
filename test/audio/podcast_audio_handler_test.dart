@@ -2088,6 +2088,42 @@ void main() {
       expect(restarted.mediaItem.value!.extras!['playlistId'], playlistId);
     });
   });
+
+  group('Android Auto', () {
+    test('from a playlist: plays and makes the playlist active', () async {
+      final list = await playlists.create('Liste');
+      await playlists.add(list, episodeId);
+
+      await handler.playFromMediaId('$episodeId@$list');
+      expect(engine.loadedUri, Uri.parse('https://example.com/1.mp3'));
+      expect(handler.playbackState.value.playing, isTrue);
+      expect(handler.activePlaylistId, list);
+    });
+
+    test(
+      'elsewhere: like a tap in the app, the playlist is not active',
+      () async {
+        final list = await playlists.create('Liste');
+        await playlists.add(list, episodeId);
+
+        await handler.playFromMediaId('$episodeId');
+        expect(handler.playbackState.value.playing, isTrue);
+        expect(handler.activePlaylistId, isNull);
+      },
+    );
+
+    test(
+      'folders and unknown ids play nothing; no menu without a car',
+      () async {
+        await handler.playFromMediaId('podcast:$podcastId');
+        expect(engine.calls, isEmpty);
+        expect(
+          await handler.getChildren(AudioService.browsableRootId),
+          isEmpty,
+        );
+      },
+    );
+  });
 }
 
 /// Ticks until a hang is detected (checks without progress, plus one to

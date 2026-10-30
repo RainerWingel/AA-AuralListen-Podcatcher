@@ -319,27 +319,41 @@ Quellen in dieser Reihenfolge – die erste, die Kapitel liefert, gewinnt; Ergeb
   mehr in deinen Abos.". Papierkorb oben → „Verlauf löschen" mit Rückfrage.
 - Eingetragen vom Player über den Rückruf `onFinished` (`main.dart` → `HistoryRepository.addFinished`).
 
-## Android Auto (geplant, Benutzerwunsch 2026-10-30) – vom Benutzer abgesegnet 2026-10-30
-Die App zeichnet im Auto **nichts selbst**: Sie liefert über den vorhandenen `MediaBrowserService` (`audio_service`,
-Manifest) nur einen Menübaum und den Player-Zustand; Android Auto baut daraus die Oberfläche. Kein neues Paket,
-keine Google-Bibliothek (nur `meta-data` + `res/xml/automotive_app_desc.xml`) → F-Droid-tauglich.
+## Android Auto (Benutzerwunsch 2026-10-30, Menü vom Benutzer abgesegnet)
+Die App zeichnet im Auto **nichts selbst**: Sie liefert über den `MediaBrowserService` von `audio_service` nur einen
+Menübaum und den Player-Zustand; Android Auto baut daraus die Oberfläche. Kein neues Paket, keine Google-Bibliothek
+(nur `meta-data` im Manifest + `res/xml/automotive_app_desc.xml`) → F-Droid-tauglich.
 
-**Menübaum (max. 4 Reiter, Listen höchstens 50 Einträge, nur lesen):**
+**Code:** `CarBrowser` (`lib/audio/car_browser.dart`, Baum + Media-IDs), `CarRepository` (`lib/data/car_repository.dart`,
+Abfragen), im `PodcastAudioHandler` `getChildren` / `getMediaItem` / `playFromMediaId`. Tests: `test/audio/car_browser_test.dart`,
+Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
+
+**Menübaum (4 Reiter mit weißen Symbolen `res/drawable/ic_car_*`, nur lesen):**
 | Reiter | Inhalt | Tippen auf eine Folge |
 |--------|--------|-----------------------|
-| Playlists | alle Playlists in eigener Reihenfolge → Folgen der Playlist | spielt sie, Playlist wird **aktiv** (wie in der Playlist-Ansicht) |
-| Neu | neueste ungespielte Folgen aller Abos (wie Start) | spielt sie, Regeln wie Start (`playlists.md`: Folge außerhalb einer Playlist) |
-| Downloads | heruntergeladene Folgen (offline, kein Funkloch-Problem) | wie Neu |
-| Abos | Podcasts alphabetisch → deren Folgen, neueste zuerst | wie Neu |
+| Playlists | alle Playlists in eigener Reihenfolge → Folgen der Playlist (max. 50) | spielt sie, Playlist wird **aktiv** (wie in der Playlist-Ansicht) |
+| Neu | neueste **ungespielte** Folgen aller Abos (max. 50, ohne vorläufige Podcasts) | wie ein Tippen auf „Start“ (`playlists.md`: Folge außerhalb einer Playlist – Playlist nur angeboten, also nicht aktiv) |
+| Downloads | fertig heruntergeladene Folgen, zuletzt geladene zuerst (max. 50) | wie Neu |
+| Abos | Podcasts **alphabetisch** als Raster mit Cover (max. 200, damit keiner stillschweigend fehlt) → Folgen, neueste zuerst bzw. Serien in Hörreihenfolge (max. 50) | wie Neu |
 
-- **„Weiterhören"** beim Einsteigen: `recentRootId` liefert die zuletzt gespielte Folge, Play setzt an der gemerkten Position fort.
-- **Tasten im Auto-Player:** Play/Pause, −15 s, +30 s, „Nächste Folge" (nur mit aktiver Playlist); optional „Lesezeichen setzen"
-  (ohne Notiz).
+- **Media-IDs:** Reiter `tab:…`, Ordner `playlist:<id>` / `podcast:<id>`, Folgen `<episodeId>` (gleiche ID wie das laufende
+  `MediaItem`, so markiert das Auto die laufende Folge) bzw. `<episodeId>@<playlistId>` in einer Playlist.
+- Folgen zeigen ihren Hörstand (neu / angefangen / gespielt, `android.media.extra.PLAYBACK_STATUS`).
+- **„Weiterhören"** beim Einsteigen: `recentRootId` liefert die zuletzt gespielte Folge; Play setzt an der gemerkten Stelle fort.
+- **Tasten im Auto:** Play/Pause, −15 s, +30 s, „Nächste Folge" (nur mit aktiver Playlist). −15/+30 macht `audio_service`
+  ab Android 13 selbst zu „Custom Actions" – genau die zeigt Android Auto; die Benachrichtigung bleibt unverändert.
+  „Lesezeichen setzen" im Auto: noch nicht (optional, `roadmap.md`).
+- **Texte** der Reiter folgen der App-Sprache, auch nach einem Wechsel ohne Neustart (`l10n` wird je Abruf gelesen).
 - **Bewusst nicht im Auto:** Downloads starten/löschen, als gespielt markieren, Einstellungen, Suche nach neuen Podcasts.
-- **Cover:** Android Auto lädt Bilder nur über `content://`-Adressen. Kleiner eigener Kotlin-`ContentProvider`, der **nur aus
-  dem vorhandenen Cover-Cache** liest; nicht im Cache → kein Bild (im Auto wird nichts nachgeladen, kein zweiter Cache).
+- **Cover:** Android Auto lädt Bilder nur über `content://`. `CoverProvider` (Kotlin) liefert Dateien **nur** aus dem
+  Cover-Cache (`cacheDir/coverCache`, nur reine Dateinamen, nur lesen); `CoverCacheManager.carCoverUri` fragt den Cache.
+  Nicht im Cache → kein Bild (im Auto wird nichts nachgeladen, kein zweiter Cache). Das laufende Cover kommt wie bisher
+  als Bild über die Mediensitzung.
 - **Speicher:** Menülisten sind einmalige DB-Abfragen (`get`, kein `watch`), keine offenen Streams pro Auto-Bildschirm.
+  Das Auto fragt beim Öffnen einer Liste neu; Änderungen in der App erscheinen also beim nächsten Öffnen.
 - **Später, optional:** Sprachsuche „Hey Google, spiele … in AuralListen" (`playFromSearch`, sucht in den Abos).
-- **Nutzer außerhalb des Play Stores** (F-Droid, GitHub): Android Auto zeigt solche Apps nur nach „Unbekannte Quellen" in den
-  Entwickler-Einstellungen von Android Auto (vor Umsetzung prüfen) → Hinweis in README/Store-Text.
-- **Testen ohne Auto:** Desktop Head Unit (DHU, Android SDK) auf dem Mac, verbunden mit dem A05s per ADB.
+- **Nutzer außerhalb des Play Stores** (F-Droid, GitHub): Android Auto zeigt solche Apps nur mit „Unbekannte Quellen"
+  (Android-Auto-Einstellungen → „Version" zehnmal antippen → ⋮ → Entwicklereinstellungen). Hinweis im README.
+- **Testen ohne Auto:** Desktop Head Unit (SDK-Paket `extras;google;auto`, `~/Library/Android/sdk/extras/google/auto/desktop-head-unit`).
+  Auf dem A05s in Android Auto den Entwicklermodus einschalten, ⋮ → „Start head unit server" (deutsche Beschriftung kann abweichen),
+  dann `adb -s <A05s> forward tcp:5277 tcp:5277` und `./desktop-head-unit` starten (Handy entsperrt).

@@ -6,6 +6,10 @@
   "navPlaylists": "Playlists",
   "navDownloads": "Downloads",
   "navSettings": "Optionen",
+  "carNew": "Neu",
+  "@carNew": {
+    "description": "Android Auto tab: newest unplayed episodes"
+  },
   "@navSettings": {
     "description": "Short tab label (5 tabs must fit on a phone). The screen title is settingsTitle."
   },

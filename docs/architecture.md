@@ -28,11 +28,13 @@ lib/
   data/
     providers.dart          # Riverpod-Provider der Datenschicht (DB, HTTP, Repository, Streams)
     podcast_repository.dart # Abos, Refresh, Folgen-Abfragen
+    car_repository.dart # Abfragen für das Android-Auto-Menü (nur lesen)
     db/           # Drift-Datenbank, Tabellen, Migrationen
     feed/         # RSS-/OPML-Parser, Feed-Fetcher
     directory/    # iTunes, fyyd, Podcast Index
     storage/      # cover_cache, download_engine (Paket-Kapsel), download_service (Downloads + Eviction)
-  audio/          # PodcastAudioHandler (Logik), PlayerEngine (just_audio-Kapsel), audio_providers.dart
+  audio/          # PodcastAudioHandler (Logik), PlayerEngine (just_audio-Kapsel), audio_providers.dart,
+                  # car_browser.dart (Android-Auto-Menü)
   features/       # je Feature: Screens, Widgets, Provider
     subscriptions/ search/ episodes/ player/ playlists/
     downloads/ bookmarks/ settings/ backup/

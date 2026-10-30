@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Release builds strip resources that look unused. audio_service looks up its
      notification icons (play, pause, −15 s, +30 s) and our status bar icon by
-     name at runtime, so keep them. -->
+     name at runtime, so keep them. Android Auto loads the tab icons by
+     address (android.resource://…/drawable/ic_car_*). -->
 <resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@drawable/audio_service_*,@drawable/ic_stat_podcast" />
+    tools:keep="@drawable/audio_service_*,@drawable/ic_stat_podcast,@drawable/ic_car_*" />

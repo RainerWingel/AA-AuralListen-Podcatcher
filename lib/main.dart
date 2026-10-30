@@ -7,10 +7,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app.dart';
 import 'audio/audio_providers.dart';
+import 'audio/car_browser.dart';
 import 'audio/player_engine.dart';
 import 'audio/podcast_audio_handler.dart';
 import 'audio/stream_check.dart';
 import 'core/app_language.dart';
+import 'data/car_repository.dart';
 import 'data/db/app_database.dart';
 import 'data/history_repository.dart';
 import 'data/playback_repository.dart';
@@ -27,14 +29,17 @@ Future<void> main() async {
   // The database is created first because the audio handler (which lives
   // outside the widget tree, in the playback service) needs it too.
   final db = AppDatabase();
+  final settings = SettingsRepository(db);
   // The notification channel is named before the widget tree exists, so the
   // language is read here directly (null = not chosen yet → device language).
-  final language =
-      AppLanguage.fromSetting(
-        await SettingsRepository(db).get(SettingsKeys.language),
-      ) ??
-      AppLanguage.forDevice(PlatformDispatcher.instance.locale);
-  final l10n = lookupAppLocalizations(language.locale);
+  Future<AppLocalizations> currentL10n() async => lookupAppLocalizations(
+    (AppLanguage.fromSetting(await settings.get(SettingsKeys.language)) ??
+            AppLanguage.forDevice(PlatformDispatcher.instance.locale))
+        .locale,
+  );
+  final l10n = await currentL10n();
+  final playlists = PlaylistRepository(db, DateTime.now);
+  final playback = PlaybackRepository(db, DateTime.now);
   // Before the first frame, so the app starts right away in this color.
   final wallpaperColor = await readWallpaperColor();
   // The container is created after the handler; the handler only calls this
@@ -43,9 +48,9 @@ Future<void> main() async {
   final handler = await AudioService.init(
     builder: () => PodcastAudioHandler(
       engine: JustAudioEngine(),
-      playback: PlaybackRepository(db, DateTime.now),
-      settings: SettingsRepository(db),
-      playlists: PlaylistRepository(db, DateTime.now),
+      playback: playback,
+      settings: settings,
+      playlists: playlists,
       localAudioFile: (id) =>
           container.read(downloadServiceProvider).localFile(id),
       // Only used when playback failed, to tell the cause (docs/playback.md).
@@ -54,6 +59,15 @@ Future<void> main() async {
       deleteDownload: (id) =>
           container.read(downloadServiceProvider).delete(id),
       onFinished: HistoryRepository(db, DateTime.now).addFinished,
+      car: CarBrowser(
+        cars: CarRepository(db),
+        playlists: playlists,
+        playback: playback,
+        settings: settings,
+        // The language may change while the app runs.
+        l10n: currentL10n,
+        coverUri: CoverCacheManager.instance.carCoverUri,
+      ),
     ),
     // Reuse the bounded cover cache instead of a second, separate image cache.
     cacheManager: CoverCacheManager.instance,
@@ -73,6 +87,8 @@ Future<void> main() async {
       // Notification artwork is decoded small to save RAM.
       artDownscaleWidth: 512,
       artDownscaleHeight: 512,
+      // Android Auto shows its menus as lists (docs/playback.md).
+      androidBrowsableRootExtras: CarBrowser.rootExtras,
     ),
   );
 
