@@ -355,5 +355,5 @@ Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
 - **Nutzer außerhalb des Play Stores** (F-Droid, GitHub): Android Auto zeigt solche Apps nur mit „Unbekannte Quellen"
   (Android-Auto-Einstellungen → „Version" zehnmal antippen → ⋮ → Entwicklereinstellungen). Hinweis im README.
 - **Testen ohne Auto:** Desktop Head Unit (SDK-Paket `extras;google;auto`, `~/Library/Android/sdk/extras/google/auto/desktop-head-unit`).
-  Auf dem A05s in Android Auto den Entwicklermodus einschalten, ⋮ → „Start head unit server" (deutsche Beschriftung kann abweichen),
+  Auf dem A05s in Android Auto den Entwicklermodus einschalten, ⋮ → „Server für Infotainmentsystem starten" (Android Auto 17.9),
   dann `adb -s <A05s> forward tcp:5277 tcp:5277` und `./desktop-head-unit` starten (Handy entsperrt).

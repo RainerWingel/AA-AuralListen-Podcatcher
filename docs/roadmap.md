@@ -173,7 +173,8 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Datenschutzerklärung de/en: Übergabe von Titel/Cover an Android Auto auf dem Gerät
 - [x] README: Hinweis „Unbekannte Quellen"
 - [ ] Store-Texte (fastlane de/en) beim Release ergänzen
-- [ ] Test mit der DHU auf dem A05s (A05s per ADB verbinden)
+- [x] A05s vorbereitet (2026-10-30): Android-Auto-Entwicklermodus, „Unbekannte Quellen" an, 1.3.5+Auto installiert, DHU verbindet
+- [ ] Test mit der DHU auf dem A05s (wartet auf Zustimmung des Benutzers zum Android-Auto-Einrichtungsdialog)
 - [ ] Praxistest im echten Auto (falls Gelegenheit)
 
 ## Offene Punkte
