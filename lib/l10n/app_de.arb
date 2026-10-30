@@ -10,6 +10,15 @@
   "@carNew": {
     "description": "Android Auto tab: newest unplayed episodes"
   },
+  "carNotFound": "Nichts gefunden für „{query}“",
+  "@carNotFound": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "carNothingToPlay": "Noch nichts gehört – bitte eine Folge auswählen",
   "@navSettings": {
     "description": "Short tab label (5 tabs must fit on a phone). The screen title is settingsTitle."
   },

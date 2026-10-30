@@ -31,6 +31,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get carNew => 'Neu';
 
   @override
+  String carNotFound(String query) {
+    return 'Nichts gefunden für „$query“';
+  }
+
+  @override
+  String get carNothingToPlay =>
+      'Noch nichts gehört – bitte eine Folge auswählen';
+
+  @override
   String get placeholderComingSoon => 'Kommt bald';
 
   @override

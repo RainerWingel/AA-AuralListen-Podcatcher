@@ -7,6 +7,8 @@
   "navDownloads": "Downloads",
   "navSettings": "Settings",
   "carNew": "New",
+  "carNotFound": "Nothing found for “{query}”",
+  "carNothingToPlay": "Nothing played yet – please choose an episode",
   "placeholderComingSoon": "Coming soon",
   "cancel": "Cancel",
   "loadError": "Error while loading",

@@ -1,15 +1,19 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui' show Locale;
 
+import 'package:aapodcastguru/audio/car_browser.dart';
 import 'package:aapodcastguru/audio/player_engine.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/audio/sleep_timer.dart';
 import 'package:aapodcastguru/audio/stream_check.dart';
+import 'package:aapodcastguru/data/car_repository.dart';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/playback_repository.dart';
 import 'package:aapodcastguru/data/playlist_repository.dart';
 import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/settings_repository.dart';
+import 'package:aapodcastguru/l10n/app_localizations.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
@@ -2120,6 +2124,76 @@ void main() {
         );
       },
     );
+
+    group('with the car menu', () {
+      late StreamCheck serverSays;
+
+      setUp(() async {
+        await handler.dispose();
+        engine = FakePlayerEngine();
+        serverSays = StreamCheck.gone;
+        handler = PodcastAudioHandler(
+          engine: engine,
+          playback: PlaybackRepository(db, () => now),
+          settings: settings,
+          playlists: playlists,
+          checkStream: (_) async => serverSays,
+          car: CarBrowser(
+            cars: CarRepository(db),
+            playlists: playlists,
+            playback: PlaybackRepository(db, () => now),
+            settings: settings,
+            l10n: () async => lookupAppLocalizations(const Locale('de')),
+            coverUri: (_) async => null,
+          ),
+        );
+      });
+
+      test(
+        '"Hey Google, spiele AuralListen": the last episode goes on',
+        () async {
+          await settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
+          await handler.playFromSearch('');
+          expect(handler.playbackState.value.playing, isTrue);
+          expect(engine.loadedUri, Uri.parse('https://example.com/1.mp3'));
+        },
+      );
+
+      test('nothing played yet: the car says so', () async {
+        await handler.playFromSearch('');
+        expect(handler.playbackState.value.playing, isFalse);
+        expect(
+          handler.playbackState.value.errorMessage,
+          'Noch nichts gehört – bitte eine Folge auswählen',
+        );
+      });
+
+      test('a podcast by name: its next unplayed episode', () async {
+        await handler.playFromSearch('spiele testpodcast');
+        expect(handler.mediaItem.value!.id, '$episodeId');
+        expect(handler.playbackState.value.playing, isTrue);
+      });
+
+      test('an unknown name: message in the car, then gone on Play', () async {
+        await handler.playFromSearch('Unbekannt');
+        expect(
+          handler.playbackState.value.errorMessage,
+          'Nichts gefunden für „Unbekannt“',
+        );
+        await handler.playEpisode(episodeId);
+        expect(handler.playbackState.value.errorMessage, isNull);
+      });
+
+      test('playback stops for good: the car shows the reason', () async {
+        engine.failLoads = true;
+        await handler.playEpisode(episodeId);
+        await pumpEventQueue();
+        final state = handler.playbackState.value;
+        expect(state.playing, isFalse);
+        expect(state.errorCode, CarBrowser.errorApp);
+        expect(state.errorMessage, isNotNull);
+      });
+    });
 
     test(
       'folders and unknown ids play nothing; no menu without a car',

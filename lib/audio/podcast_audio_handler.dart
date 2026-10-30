@@ -76,6 +76,10 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// Menu for Android Auto; null in tests that do not need it.
   final CarBrowser? _car;
 
+  /// Message the car shows (Android Auto has no info box of the app); kept
+  /// until the next Play.
+  ({int code, String message})? _carError;
+
   static const rewindInterval = Duration(seconds: 15);
   static const fastForwardInterval = Duration(seconds: 30);
 
@@ -547,6 +551,36 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await playEpisode(playable.episodeId, playlistId: playable.playlistId);
   }
 
+  /// Voice command in the car ("Hey Google, spiele … in AuralListen"):
+  /// without words it goes on with the last episode, otherwise it plays the
+  /// playlist or podcast named (docs/playback.md → Android Auto).
+  @override
+  Future<void> playFromSearch(
+    String query, [
+    Map<String, dynamic>? extras,
+  ]) async {
+    final car = _car;
+    if (query.trim().isEmpty || car == null) {
+      if (_episodeId == null) await restoreLastEpisode();
+      if (_episodeId == null) {
+        return _showInCar(await car?.nothingToPlayMessage());
+      }
+      return play();
+    }
+    final found = await car.search(query);
+    if (found == null) return _showInCar(await car.notFoundMessage(query));
+    await playEpisode(found.episodeId, playlistId: found.playlistId);
+  }
+
+  Future<void> _showInCar(
+    String? message, {
+    int code = CarBrowser.errorApp,
+  }) async {
+    if (message == null) return;
+    _carError = (code: code, message: message);
+    _broadcastState();
+  }
+
   @override
   Future<void> skipToNext() async {
     final next = await _nextInPlaylist();
@@ -635,6 +669,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> play() async {
+    _carError = null;
     await _finishScan();
     final error = await _tryPlay();
     if (error != null) await _handleFailure(error, _Retry.none);
@@ -1521,6 +1556,21 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   void _emitProblem(PlaybackProblem problem) {
     if (!_problems.isClosed) _problems.add(problem);
+    final car = _car;
+    if (car != null && CarBrowser.stopsPlayback(problem)) {
+      unawaited(
+        car
+            .problemMessage(problem)
+            .then(
+              (m) => _showInCar(
+                m,
+                code: problem == PlaybackProblem.unsupportedFormat
+                    ? CarBrowser.errorNotSupported
+                    : CarBrowser.errorApp,
+              ),
+            ),
+      );
+    }
   }
 
   void _broadcastState() {
@@ -1562,6 +1612,9 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         playing: playing,
         // Lets the notification's progress bar run at the right pace.
         speed: _speed,
+        // Android Auto shows it as a short message (non-fatal error).
+        errorCode: _carError?.code,
+        errorMessage: _carError?.message,
         updatePosition: position,
         bufferedPosition: _engine.bufferedPosition,
       ),

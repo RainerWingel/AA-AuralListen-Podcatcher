@@ -223,6 +223,45 @@ void main() {
     expect(await car.item('999'), isNull);
   });
 
+  group('voice search', () {
+    test('a playlist goes on where it was', () async {
+      final a = await addPodcast('A');
+      final first = await addEpisode(a, '1', day: 1);
+      final second = await addEpisode(a, '2', day: 2);
+      final list = await playlists.create('Fürs Auto');
+      await playlists.add(list, first);
+      await playlists.add(list, second);
+      await playlists.setLastEpisode(list, second);
+
+      expect(
+        await car.search("Spiele die Playlist 'Fürs Auto' in AA-AuralListen"),
+        (episodeId: second, playlistId: list),
+      );
+      expect(await car.search('spiele die Playlist fürs auto'), (
+        episodeId: second,
+        playlistId: list,
+      ));
+    });
+
+    test('a podcast: its newest unplayed episode', () async {
+      final a = await addPodcast('Lage der Nation');
+      await addEpisode(a, 'old', day: 1);
+      final newer = await addEpisode(a, 'new', day: 2);
+      await addEpisode(a, 'newest', day: 3, status: EpisodeStatus.played);
+
+      expect(await car.search('Lage der Nation'), (
+        episodeId: newer,
+        playlistId: null,
+      ));
+    });
+
+    test('nothing matching, or only filler words', () async {
+      await addPodcast('A');
+      expect(await car.search('Hotel Matze'), isNull);
+      expect(await car.search('spiele den Podcast'), isNull);
+    });
+  });
+
   test('media ids of episodes', () {
     expect(CarBrowser.parsePlayable('12'), (episodeId: 12, playlistId: null));
     expect(CarBrowser.parsePlayable('12@3'), (episodeId: 12, playlistId: 3));

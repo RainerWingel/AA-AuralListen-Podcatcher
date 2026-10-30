@@ -140,6 +140,18 @@ abstract class AppLocalizations {
   /// **'Neu'**
   String get carNew;
 
+  /// No description provided for @carNotFound.
+  ///
+  /// In de, this message translates to:
+  /// **'Nichts gefunden für „{query}“'**
+  String carNotFound(String query);
+
+  /// No description provided for @carNothingToPlay.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch nichts gehört – bitte eine Folge auswählen'**
+  String get carNothingToPlay;
+
   /// Temporary text on screens that are not implemented yet.
   ///
   /// In de, this message translates to:

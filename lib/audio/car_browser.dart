@@ -7,6 +7,7 @@ import '../data/playlist_repository.dart';
 import '../data/settings_keys.dart';
 import '../data/settings_repository.dart';
 import '../l10n/app_localizations.dart';
+import 'podcast_audio_handler.dart';
 
 /// What the car plays for a media id: the episode, and the playlist that
 /// becomes active (only for entries opened from a playlist).
@@ -68,6 +69,10 @@ class CarBrowser {
   static const contentStyleGrid = 2;
   static const completionStatus = 'android.media.extra.PLAYBACK_STATUS';
 
+  // Error codes of PlaybackStateCompat.
+  static const errorApp = 1;
+  static const errorNotSupported = 2;
+
   /// Extras of the browse root: lists by default.
   static const rootExtras = <String, dynamic>{
     contentStyleSupported: true,
@@ -126,6 +131,97 @@ class CarBrowser {
     if (row == null) return null;
     return _episode(row, playlistId: playable.playlistId);
   }
+
+  /// What a spoken name means: first a playlist (it goes on where it was),
+  /// then a podcast (its next unplayed episode – the oldest of a serial
+  /// podcast, else the newest). Names only need to contain the words.
+  /// Null = nothing found or nothing to play there.
+  Future<CarPlayable?> search(String query) async {
+    final words = _words(query);
+    if (words.isEmpty) return null;
+    bool matches(String name) {
+      final n = name.toLowerCase();
+      return words.every(n.contains);
+    }
+
+    for (final p in await _playlists.playlists()) {
+      if (!matches(p.name)) continue;
+      final episodeId = await _playlists.resumeEpisode(p.id);
+      if (episodeId != null) return (episodeId: episodeId, playlistId: p.id);
+    }
+    for (final p in await _cars.podcasts(limit: maxPodcasts)) {
+      if (!matches(p.title)) continue;
+      final episodes = await _cars.podcastEpisodes(p.id, limit: maxEpisodes);
+      if (episodes.isEmpty) continue;
+      final next = episodes.firstWhere(
+        (e) => e.episode.status != EpisodeStatus.played,
+        orElse: () => episodes.first,
+      );
+      return (episodeId: next.episode.id, playlistId: null);
+    }
+    return null;
+  }
+
+  /// Lower-case words of a spoken query, without quotes and filler words
+  /// the voice assistant may pass on ("spiele die Playlist „…“ in
+  /// AA-AuralListen").
+  static List<String> _words(String query) => [
+    for (final w in query.toLowerCase().split(RegExp('[\\s,.!?\'"„“”‚‘’]+')))
+      if (w.isNotEmpty && !_fillers.contains(w)) w,
+  ];
+
+  static const _fillers = {
+    'spiele',
+    'spiel',
+    'abspielen',
+    'podcast',
+    'playlist',
+    'den',
+    'die',
+    'das',
+    'von',
+    'in',
+    'auf',
+    'mit',
+    'aa',
+    'aurallisten',
+    'aa-aurallisten',
+    'podcatcher',
+    'play',
+    'the',
+    'my',
+  };
+
+  /// Problems after which playback stands still: the car must say why.
+  static bool stopsPlayback(PlaybackProblem problem) => switch (problem) {
+    PlaybackProblem.loadFailed ||
+    PlaybackProblem.stalled ||
+    PlaybackProblem.episodeGone ||
+    PlaybackProblem.unsupportedFormat => true,
+    PlaybackProblem.brokenDownload ||
+    PlaybackProblem.streamChanged ||
+    PlaybackProblem.streamVaries => false,
+  };
+
+  /// Same texts as the app's info boxes.
+  Future<String> problemMessage(PlaybackProblem problem) async {
+    final l10n = await _l10n();
+    return switch (problem) {
+      PlaybackProblem.loadFailed => l10n.playbackLoadFailed,
+      PlaybackProblem.stalled => l10n.playbackStalled,
+      PlaybackProblem.brokenDownload => l10n.playbackBrokenDownload,
+      PlaybackProblem.episodeGone => l10n.playbackEpisodeGone,
+      PlaybackProblem.unsupportedFormat => l10n.playbackUnsupported,
+      PlaybackProblem.streamChanged => l10n.playbackStreamChanged,
+      PlaybackProblem.streamVaries => l10n.playbackStreamVaries,
+    };
+  }
+
+  Future<String> notFoundMessage(String query) async =>
+      (await _l10n()).carNotFound(query.trim());
+
+  Future<String> nothingToPlayMessage() async =>
+      (await _l10n()).carNothingToPlay;
 
   /// Episode and playlist of an episode's media id, null for other ids.
   static CarPlayable? parsePlayable(String mediaId) {
