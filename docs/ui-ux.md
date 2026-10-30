@@ -244,7 +244,7 @@ Ganz unten „Feed-Adresse ändern" mit der aktuellen Adresse → Dialog (Hinwei
 Fehler erscheinen im Textfeld, Erfolg als Infobox „Feed-Adresse geändert.".
 Beim Aktualisieren aller Podcasts (App-Start, Pull-to-Refresh) zeigt unten je laufendem Podcast eine Statuszeile „2 von 11 · Name"
 (`feeds-and-directories.md`).
-Hat ein Pull-to-Refresh Umzüge erkannt, meldet eine Infobox „N Podcast(s) umgezogen – die Adresse wurde aktualisiert."
+Hat ein Pull-to-Refresh Umzüge erkannt, meldet eine Infobox mit Namen (Benutzerwunsch 2026-10-30): „Podcast „XY“ ist umgezogen – die Adresse wurde aktualisiert." bzw. „N Podcasts sind umgezogen (A, B, C, …) – …" (höchstens 3 Namen, alter Titel vor dem Refresh)
 
 ## Optionen
 Abschnitt „Darstellung": „Sprache" → Dialog Deutsch / English (`settings['ui.language']`, die App wechselt sofort) und

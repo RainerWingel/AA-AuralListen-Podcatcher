@@ -1853,8 +1853,8 @@ abstract class AppLocalizations {
   /// No description provided for @feedsMoved.
   ///
   /// In de, this message translates to:
-  /// **'{count, plural, =1{1 Podcast ist umgezogen – die Adresse wurde aktualisiert.} other{{count} Podcasts sind umgezogen – die Adressen wurden aktualisiert.}}'**
-  String feedsMoved(int count);
+  /// **'{count, plural, =1{Podcast „{names}“ ist umgezogen – die Adresse wurde aktualisiert.} other{{count} Podcasts sind umgezogen ({names}) – die Adressen wurden aktualisiert.}}'**
+  String feedsMoved(int count, String names);
 
   /// No description provided for @chapterSkip.
   ///

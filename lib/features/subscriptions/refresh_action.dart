@@ -16,8 +16,18 @@ Future<void> refreshAllFeeds(BuildContext context, WidgetRef ref) async {
   // New episodes may need auto-downloading; played ones may be due for deletion.
   unawaited(ref.read(downloadServiceProvider).runMaintenance());
   final messages = [
-    if (summary.moved > 0) l10n.feedsMoved(summary.moved),
+    if (summary.moved.isNotEmpty)
+      l10n.feedsMoved(summary.moved.length, movedPodcastNames(summary.moved)),
     if (summary.failed > 0) l10n.refreshFailed(summary.failed),
   ];
   if (messages.isNotEmpty) showInfoSnackBar(messenger, messages.join('\n'));
 }
+
+/// At most [maxMovedNames] podcast titles for the "moved" message, so a
+/// long list never fills the snackbar.
+const maxMovedNames = 3;
+
+String movedPodcastNames(List<String> titles) => [
+  ...titles.take(maxMovedNames),
+  if (titles.length > maxMovedNames) '…',
+].join(', ');

@@ -291,7 +291,7 @@
   "feedUrlChangeSubmit": "Apply",
   "feedUrlChanged": "Feed address changed.",
   "feedUrlTaken": "This address already belongs to another subscription.",
-  "feedsMoved": "{count, plural, =1{1 podcast has moved – its address was updated.} other{{count} podcasts have moved – their addresses were updated.}}",
+  "feedsMoved": "{count, plural, =1{Podcast “{names}” has moved – its address was updated.} other{{count} podcasts have moved ({names}) – their addresses were updated.}}",
   "chapterSkip": "Skip",
   "chapterSkipHint": "Skip chapters during playback (until the app is restarted)",
   "backgroundPlayback": "Background playback",

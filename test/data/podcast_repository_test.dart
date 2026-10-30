@@ -25,6 +25,10 @@ class _FakePlaylister implements NewEpisodePlaylister {
       calls.add(episodeIds);
 }
 
+/// The summary with the number of moved podcasts instead of their titles.
+({int succeeded, int failed, int moved}) counts(RefreshSummary s) =>
+    (succeeded: s.succeeded, failed: s.failed, moved: s.moved.length);
+
 void main() {
   late AppDatabase db;
   late _FakePlaylister playlister;
@@ -180,7 +184,7 @@ void main() {
           http.Response(updatedFeed, 200);
 
       final summary = await repo.refreshAll();
-      expect(summary, (succeeded: 1, failed: 0, moved: 0));
+      expect(counts(summary), (succeeded: 1, failed: 0, moved: 0));
 
       final episodes = await repo.watchEpisodes(id).first;
       expect(episodes, hasLength(3));
@@ -226,11 +230,19 @@ void main() {
       final id = await repo.subscribe('https://example.com/feed');
 
       server['https://example.com/feed'] = () => http.Response('', 500);
-      expect(await repo.refreshAll(), (succeeded: 0, failed: 1, moved: 0));
+      expect(counts(await repo.refreshAll()), (
+        succeeded: 0,
+        failed: 1,
+        moved: 0,
+      ));
       expect((await repo.watchPodcast(id).first)!.lastError, contains('500'));
 
       server['https://example.com/feed'] = () => http.Response('', 304);
-      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 0));
+      expect(counts(await repo.refreshAll()), (
+        succeeded: 1,
+        failed: 0,
+        moved: 0,
+      ));
       expect((await repo.watchPodcast(id).first)!.lastError, isNull);
     });
 
@@ -286,7 +298,9 @@ void main() {
       server[newUrl] = () =>
           http.Response(movedFeed, 200, headers: {'etag': '"neu"'});
 
-      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 1));
+      final summary = await repo.refreshAll();
+      expect(counts(summary), (succeeded: 1, failed: 0, moved: 1));
+      expect(summary.moved, ['Testpodcast']);
 
       final p = await podcast(id);
       expect(p.feedUrl, newUrl);
@@ -297,7 +311,11 @@ void main() {
 
       // Next refresh asks only the new address.
       server.remove(oldUrl);
-      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 0));
+      expect(counts(await repo.refreshAll()), (
+        succeeded: 1,
+        failed: 0,
+        moved: 0,
+      ));
     });
 
     test('a permanent redirect counts as a move', () async {
@@ -306,7 +324,11 @@ void main() {
           http.Response('', 301, headers: {'location': newUrl});
       server[newUrl] = () => http.Response(basicFeed, 200);
 
-      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 1));
+      expect(counts(await repo.refreshAll()), (
+        succeeded: 1,
+        failed: 0,
+        moved: 1,
+      ));
       expect((await podcast(id)).feedUrl, newUrl);
     });
 
@@ -315,7 +337,11 @@ void main() {
       server[oldUrl] = () => http.Response(announcing(newUrl), 200);
       server[newUrl] = () => http.Response('', 500);
 
-      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 0));
+      expect(counts(await repo.refreshAll()), (
+        succeeded: 1,
+        failed: 0,
+        moved: 0,
+      ));
       final p = await podcast(id);
       expect(p.feedUrl, oldUrl);
       expect(p.lastError, isNull);
@@ -328,7 +354,11 @@ void main() {
       await repo.subscribe(newUrl);
       server[oldUrl] = () => http.Response(announcing(newUrl), 200);
 
-      expect(await repo.refreshAll(), (succeeded: 2, failed: 0, moved: 0));
+      expect(counts(await repo.refreshAll()), (
+        succeeded: 2,
+        failed: 0,
+        moved: 0,
+      ));
       final p = await podcast(id);
       expect(p.feedUrl, oldUrl);
       expect(p.title, 'Testpodcast');
@@ -339,7 +369,11 @@ void main() {
       server[oldUrl] = () => http.Response(announcing(newUrl), 200);
       server[newUrl] = () => http.Response(announcing(oldUrl), 200);
 
-      expect(await repo.refreshAll(), (succeeded: 1, failed: 0, moved: 0));
+      expect(counts(await repo.refreshAll()), (
+        succeeded: 1,
+        failed: 0,
+        moved: 0,
+      ));
       expect((await podcast(id)).feedUrl, oldUrl);
     });
 

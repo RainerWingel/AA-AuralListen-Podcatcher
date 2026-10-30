@@ -90,7 +90,8 @@ erhalten, weil Folgen über ihre `guid` wiedererkannt werden (Hoster übernehmen
 3. **Manuell** (Umzug ohne Redirect/Ankündigung, alte Adresse tot): Podcast-Einstellungen → „Feed-Adresse ändern".
    Die neue Adresse muss laden und ein Feed sein und darf nicht zu einem anderen Abo gehören (`changeFeedUrl`).
 
-`refreshAll` zählt Umzüge (`RefreshSummary.moved`); Pull-to-Refresh meldet sie per Infobox. Beim App-Start passiert es still.
+`refreshAll` liefert die Titel umgezogener Podcasts (`RefreshSummary.moved`); Pull-to-Refresh meldet sie per Infobox mit
+Namen (`ui-ux.md`). Beim App-Start passiert es still. Die alte Adresse wird nicht aufbewahrt (kein Umzugsprotokoll).
 Nicht unterstützt: `<podcast:guid>`-basierte Umzugssuche über Podcast Index (kein Podcast Index, siehe `decisions.md`).
 Ändern sich beim Umzug die guids, entstehen die Folgen neu (alte bleiben mit Hörstand stehen).
 

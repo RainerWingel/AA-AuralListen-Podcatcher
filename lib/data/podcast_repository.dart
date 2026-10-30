@@ -25,8 +25,9 @@ class SubscribeException implements Exception {
   String toString() => 'SubscribeException: $error';
 }
 
-/// [moved]: podcasts whose feed address changed (docs/feeds-and-directories.md).
-typedef RefreshSummary = ({int succeeded, int failed, int moved});
+/// [moved]: titles (before the refresh) of podcasts whose feed address
+/// changed (docs/feeds-and-directories.md).
+typedef RefreshSummary = ({int succeeded, int failed, List<String> moved});
 
 enum RefreshOutcome { updated, moved, failed }
 
@@ -688,7 +689,7 @@ class PodcastRepository {
     final queue = podcasts.iterator;
     var succeeded = 0;
     var failed = 0;
-    var moved = 0;
+    final moved = <String>[];
     var started = 0;
     // Running refreshes by start number (1-based), oldest first.
     final running = <int, String>{};
@@ -705,10 +706,12 @@ class PodcastRepository {
 
     Future<void> worker() async {
       while (queue.moveNext()) {
+        // Other workers advance the shared iterator while this one awaits.
+        final podcast = queue.current;
         final number = ++started;
-        running[number] = queue.current.title;
+        running[number] = podcast.title;
         showRunning();
-        final outcome = await refreshPodcast(queue.current);
+        final outcome = await refreshPodcast(podcast);
         running.remove(number);
         showRunning();
         switch (outcome) {
@@ -716,7 +719,7 @@ class PodcastRepository {
             succeeded++;
           case RefreshOutcome.moved:
             succeeded++;
-            moved++;
+            moved.add(podcast.title);
           case RefreshOutcome.failed:
             failed++;
         }

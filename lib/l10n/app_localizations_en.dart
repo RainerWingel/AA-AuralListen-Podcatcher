@@ -1066,12 +1066,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'This address already belongs to another subscription.';
 
   @override
-  String feedsMoved(int count) {
+  String feedsMoved(int count, String names) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count podcasts have moved – their addresses were updated.',
-      one: '1 podcast has moved – its address was updated.',
+      other:
+          '$count podcasts have moved ($names) – their addresses were updated.',
+      one: 'Podcast “$names” has moved – its address was updated.',
     );
     return '$_temp0';
   }

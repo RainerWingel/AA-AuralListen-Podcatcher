@@ -619,11 +619,14 @@
   "feedUrlChangeSubmit": "Übernehmen",
   "feedUrlChanged": "Feed-Adresse geändert.",
   "feedUrlTaken": "Diese Adresse gehört schon zu einem anderen Abo.",
-  "feedsMoved": "{count, plural, =1{1 Podcast ist umgezogen – die Adresse wurde aktualisiert.} other{{count} Podcasts sind umgezogen – die Adressen wurden aktualisiert.}}",
+  "feedsMoved": "{count, plural, =1{Podcast „{names}“ ist umgezogen – die Adresse wurde aktualisiert.} other{{count} Podcasts sind umgezogen ({names}) – die Adressen wurden aktualisiert.}}",
   "@feedsMoved": {
     "placeholders": {
       "count": {
         "type": "int"
+      },
+      "names": {
+        "type": "String"
       }
     }
   },
