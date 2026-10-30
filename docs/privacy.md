@@ -10,7 +10,7 @@ permalink: /privacy/
 **App:** AA-AuralListen Podcatcher (Android, package name `io.github.rainerwingel.aurallisten`)
 **Developer:** Artem A. · Contact: via the
 [issues of the GitHub project](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
-**Last updated:** October 30, 2026
+**Last updated:** October 31, 2026
 
 ## In short
 
@@ -24,7 +24,8 @@ reports and no server of the developer. Everything you create in the app stays o
   app's private storage.
 - Downloaded episodes and cached cover images – also in the app's private storage.
 
-This data only leaves the device when **you** trigger it: when you create a backup or an OPML export, you save the
+The app does not take part in the automatic Android/Google backup. This data only leaves the device when **you**
+trigger it: when you create a backup or an OPML export, you save the
 file to a place of your choice (e.g. the Downloads folder or a cloud storage). Uninstalling the app or "Clear data" in
 the Android settings removes everything.
 

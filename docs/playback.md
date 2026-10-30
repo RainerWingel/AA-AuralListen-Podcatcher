@@ -377,6 +377,10 @@ Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
   nächste startet, das Auto zeigt sie ✓ · **Sprachbefehle** nicht im Emulator testbar (die DHU nimmt nur das echte
   Mac-Mikrofon, das macOS sperrt) → Unit-Tests + Praxistest · **Ohne Netz** nicht testbar über WLAN-ADB (Flugmodus
   trennt ADB) → Unit-Tests + Praxistest.
+- **Speicher-Soak mit Android Auto 2026-10-30** (`tool/soak_memory.sh 61 60`, Bildschirm aus, Menüs 103 Runden lang
+  wiederholt geöffnet): Speicher **flach** (erster Prozess 132–143 MB, nach dem Neustart 192–204 MB, jeweils ohne
+  Anstieg) → kein Leck. **Fund:** Um 23:42 beendete Android die App – automatische Google-Sicherung (siehe
+  `decisions.md` 2026-10-31), behoben mit `allowBackup="false"`; `bmgr backupnow` meldet seitdem „Backup is not allowed".
 - **Testen ohne Auto:** Desktop Head Unit (SDK-Paket `extras;google;auto`, `~/Library/Android/sdk/extras/google/auto/desktop-head-unit`).
   Auf dem A05s in Android Auto den Entwicklermodus einschalten, ⋮ → „Server für Infotainmentsystem starten" (Android Auto 17.9),
   dann `adb -s <A05s> forward tcp:5277 tcp:5277` und `./desktop-head-unit` starten (Handy entsperrt).

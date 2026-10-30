@@ -10,7 +10,7 @@ permalink: /datenschutz/
 **App:** AA-AuralListen Podcatcher (Android, Paketname `io.github.rainerwingel.aurallisten`)
 **Entwickler:** Artem A. · Kontakt: über die
 [Issues des GitHub-Projekts](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
-**Stand:** 30. Oktober 2026
+**Stand:** 31. Oktober 2026
 
 ## Kurz gesagt
 
@@ -25,7 +25,8 @@ deinem Gerät.
   im privaten Speicher der App.
 - Heruntergeladene Folgen und zwischengespeicherte Cover-Bilder – ebenfalls im privaten Speicher der App.
 
-Diese Daten verlassen das Gerät nur, wenn **du** es auslöst: beim Erstellen eines Backups oder eines OPML-Exports
+Die App nimmt nicht an der automatischen Android-/Google-Sicherung teil. Diese Daten verlassen das Gerät nur, wenn
+**du** es auslöst: beim Erstellen eines Backups oder eines OPML-Exports
 speicherst du die Datei an einem Ort deiner Wahl (z. B. im Download-Ordner oder in einem Cloud-Speicher). Beim
 Deinstallieren der App oder über „Daten löschen" in den Android-Einstellungen wird alles entfernt.
 

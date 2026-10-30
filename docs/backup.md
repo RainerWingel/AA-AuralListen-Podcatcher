@@ -4,6 +4,10 @@ Code: `lib/data/backup/backup_service.dart`, `lib/data/feed/opml.dart` (`buildOp
 UI: `lib/features/settings/backup_flow.dart`. Tests: `test/data/backup/backup_service_test.dart`, `test/data/feed/opml_test.dart`.
 
 ## OPML-Export
+**Keine automatische Android-/Google-Sicherung:** `android:allowBackup="false"` (`decisions.md` 2026-10-31) – sie
+beendete die App während der Wiedergabe und hätte Daten zu Google Drive kopiert. Gesichert wird nur über die Funktionen
+unten.
+
 Optionen → Sicherung → „Abos als OPML exportieren": OPML 2.0 mit allen Abos (`title`, `xmlUrl`, `htmlUrl`), gespeichert
 über den Android-Speichern-Dialog (Datei `AA-AuralListen-Abos-JJJJ-MM-TT.opml`). Nur Abos, kein Hörstand – für andere Apps.
 

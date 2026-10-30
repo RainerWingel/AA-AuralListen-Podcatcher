@@ -177,7 +177,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Test mit der DHU auf dem A05s (2026-10-30; Fund: ⏭ ohne Playlist ohne Wirkung → nur noch mit aktiver Playlist)
 - [x] Sprachbefehle (weiterspielen, Playlist/Podcast per Namen) und Fehlermeldungen im Auto (2026-10-30)
 - [x] Zuverlässigkeitstest mit der DHU: Kaltstart, Verbindungsabbruch, Lenkradtasten, Folgenende in Playlist (2026-10-30)
-- [ ] Speicher-Soak mit Android Auto (1 h Wiedergabe, Menüs wiederholt geöffnet)
+- [x] Speicher-Soak mit Android Auto (1 h, Menüs 103× geöffnet): flach; Fund: Google-Auto-Backup beendete die App → `allowBackup="false"`
 - [ ] Praxistest im echten Auto nach Checkliste in `playback.md` (falls Gelegenheit; Sprachbefehle und Funkloch nur dort testbar)
 
 ## Offene Punkte

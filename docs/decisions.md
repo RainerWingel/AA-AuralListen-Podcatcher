@@ -224,3 +224,10 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   nur lesen) – öffentliche Feed-Bilder, nichts Persönliches. Nichts wird fürs Auto nachgeladen. Abweichend vom Entwurf
   („Listen max. 50") zeigt der Reiter „Abos" bis zu 200 Podcasts, weil alphabetisch abgeschnittene Abos sonst
   stillschweigend fehlen würden; Folgenlisten bleiben bei 50.
+- 2026-10-31 · **Keine automatische Android-/Google-Sicherung (`android:allowBackup="false"`)** · Im Speicher-Soak mit
+  Android Auto (A05s, 2026-10-30) beendete Android die App mitten in der Wiedergabe: Die automatische Cloud-Sicherung
+  band den Backup-Agenten, scheiterte am 25-MB-Limit („Transport quota exceeded", Downloads liegen im App-Speicher) und
+  beendete danach den Prozess (`SIGNALED 9`, „crashed service"); ~18 s Stille, bis der Dienst neu startete. Läuft, wenn
+  das Handy lädt, im WLAN ist und der Bildschirm aus ist – also gerade beim Hören am Ladekabel oder im Auto mit Hotspot.
+  Außerdem hätte eine kleinere Sicherung die Datenbank zu Google Drive kopiert, entgegen der Datenschutzerklärung. Die
+  App hat ein eigenes Backup (`backup.md`). Geräteumzug per Kabel/Smart Switch (Android 12+) bleibt möglich.

@@ -9,7 +9,13 @@
 
     <!-- Full name in the system (app info, settings); the launcher shows the
          short activity label below, since longer names get cut off there. -->
+    <!-- allowBackup=false: no Google cloud backup of the app's data. It would
+         copy the database to Google Drive (contrary to docs/datenschutz.md),
+         and Android kills the app for every backup attempt – also during
+         playback (seen 2026-10-30 in the Android Auto soak test). The app has
+         its own backup (docs/backup.md). -->
     <application
+        android:allowBackup="false"
         android:label="AA-AuralListen Podcatcher"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
