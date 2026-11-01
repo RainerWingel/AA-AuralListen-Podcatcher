@@ -93,8 +93,11 @@ neuen Store-Texten und acht Screenshots je Sprache. Ab jetzt der normale Ablauf 
 - **Format exakt wie `fdroid rewritemeta`**, sonst wird der Pipeline-Job „fdroid rewritemeta" rot (2026-10-06: nur
   ein anderer Zeilenumbruch im Anti-Feature-Text). Lange Texte bricht rewritemeta nach etwa 80 Zeichen um; im Zweifel
   den Diff aus dem Job-Log übernehmen.
-- Änderungen am Rezept: Benutzer ersetzt die Datei im Fork `ArtemArb/fdroiddata` (Branch `master`) über die
-  Weboberfläche; der MR aktualisiert sich selbst, die Pipeline läuft neu. Nachrichten im MR schreibt nur der Benutzer.
+- Änderungen am Rezept: Der Fork `ArtemArb/fdroiddata` aus der Aufnahme wird nach dem Merge nicht mehr gebraucht und
+  ist zum Löschen vorgemerkt (3.11.2026). Neue Versionen brauchen keinen Fork (der Bot liest unsere Tags). Nur für
+  Änderungen am Rezept selbst: `fdroid/fdroiddata` **neu forken** (alter Fork wäre veraltet), Datei
+  `metadata/io.github.rainerwingel.aurallisten.yml` dort über die Weboberfläche ändern, neuen MR stellen.
+  Nachrichten im MR schreibt nur der Benutzer.
 
 ## Reproduzierbare Builds (seit v1.3.3, Prüferwunsch 2026-10-07)
 Ziel: F-Droid veröffentlicht **unsere** signierten APKs (`binary:` je Build + `AllowedAPKSigningKeys`), nachdem es
@@ -175,7 +178,7 @@ Genauso wie die Screenshots – alles kommt aus diesem Repo, nicht aus fdroiddat
 
 jeweils unter `fastlane/metadata/android/de-DE/` und `…/en-US/`. Ändern lassen (oder selbst ändern), committen,
 pushen – sichtbar mit dem **nächsten Release**. Dinge im Rezept (Kategorie, Lizenz, Spenden-Link, Autor) ändern sich
-dagegen nur per Merge Request in fdroiddata (Datei im Fork bearbeiten → MR).
+dagegen nur per Merge Request in fdroiddata (neu forken, Datei bearbeiten → MR).
 
 ### Wie gehe ich im Notfall auf ein älteres Release zurück?
 Echtes „Zurückdrehen" gibt es bei Android nicht: Ein Update mit **kleinerem** Versionscode lehnt Android ab (außer man
