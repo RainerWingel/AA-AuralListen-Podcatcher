@@ -157,6 +157,12 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] F-Droid-Texte `fr-FR` (ohne Screenshots – F-Droid nimmt die englischen)
 - [ ] Ab v1.3.6 Changelogs auch in `fr-FR/changelogs/`
 
+## Zusatz – Spanisch und Portugiesisch (2026-11-08)
+- [x] `app_es.arb` (neutrales Spanisch) und `app_pt.arb` (Brasilien), Español/Português im Sprachwähler
+- [x] Chart Spanien bzw. Brasilien, fyyd-Neuheiten `es`/`pt`, Füllwörter für Sprachbefehle im Auto
+- [x] F-Droid-Texte `es-ES` und `pt-BR` (ohne Screenshots)
+- [ ] Ab v1.3.6 Changelogs auch in `es-ES/` und `pt-BR/changelogs/`
+
 ## Zusatz – Playlist fortsetzen (2026-09-29)
 - [x] Jede Playlist merkt sich die zuletzt daraus gespielte Folge (Schema v7), ▶ und „Fortsetzen" spielen sie weiter
 - [x] Sortieren nur in der geöffneten Playlist, in der Übersicht stattdessen „Fortsetzen"

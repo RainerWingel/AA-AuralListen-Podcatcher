@@ -1,0 +1,60 @@
+<p>AA-AuralListen Podcatcher es una app de podcasts privada para Android. Solo audio, sin cuenta, sin anuncios, sin rastreo. Todo se queda en tu móvil – el desarrollador no tiene ningún servidor.</p>
+
+<p><b>Buscar y suscribirse</b></p>
+<ul>
+<li>Búsqueda en Apple Podcasts y fyyd.de, suscripción por dirección RSS, importación y exportación OPML</li>
+<li>Los podcasts nuevos empiezan como provisionales: escúchalos (streaming) y luego suscríbete</li>
+<li>Valoraciones de 1 a 5 estrellas – las suscripciones se ordenan por ellas</li>
+<li>Desliza para actualizar, con línea de estado; los podcasts que cambian de dirección se siguen automáticamente</li>
+<li>Contador rojo de episodios sin escuchar; búsqueda en tus suscripciones</li>
+<li>Página del podcast con descripción plegable, sitio web y enlace de apoyo</li>
+<li>Búsqueda con “Populares” (rankings de Apple) y “Novedades” – según el idioma de la app</li>
+<li>Inicio: una llama marca los podcasts que casi nunca te saltas</li>
+<li>Temporadas: “S2·5” en la portada y filtro; series en orden de escucha</li>
+</ul>
+
+<p><b>Escuchar</b></p>
+<ul>
+<li>Reproducción en segundo plano, pantalla de bloqueo, controles Bluetooth</li>
+<li>Saltos −15 s / +30 s (mantén pulsado para avanzar rápido); velocidad 1,0× a 2,0× y amplificación de volumen, globales o por podcast</li>
+<li>Tiempo restante o duración total; a mayor velocidad, también el tiempo real</li>
+<li>Notas del episodio con enlaces</li>
+<li>Capítulos (Podlove, JSON, ID3) con imágenes y salto de capítulos; marcadores con notas</li>
+<li>Temporizador con fundido suave, también “hasta el final del episodio”</li>
+<li>Recuerda la posición de cada episodio; cuenta como escuchado solo al final</li>
+<li>Historial de los últimos 100 episodios escuchados hasta el final</li>
+<li>Robusta ante cortes de red y MP3 con tasa de bits variable</li>
+</ul>
+
+<p><b>Reproductor</b></p>
+<ul>
+<li>Barra de progreso y botones fijos abajo, el resto se desplaza</li>
+<li>Portada difuminada de fondo</li>
+<li>Diseño horizontal propio: información a la izquierda, controles a la derecha</li>
+<li>Fondo de los controles a elegir (Ajustes → Diseño): cielo estrellado, aurora boreal, olas, cristal, camuflaje</li>
+</ul>
+
+<p><b>Playlists</b></p>
+<ul>
+<li>Varias playlists que continúan solas, con colores, orden y “Continuar”</li>
+<li>“Reproducir a continuación” y “Añadir al final” para la playlist activa; ⏮ ⏭ en el reproductor y por Bluetooth</li>
+<li>Los episodios terminados salen de la playlist al momento, tras 5 minutos o nunca – tú eliges</li>
+<li>Episodios nuevos a una playlist, también sin descargar</li>
+<li>Episodios nuevos o sin escuchar de un podcast, tema o temporada a una playlist</li>
+<li>Un símbolo en cada episodio que está en una playlist</li>
+</ul>
+
+<p><b>Descargas</b></p>
+<ul>
+<li>Descargas manuales o automáticas por podcast, opcionalmente a una playlist; opción “Solo wifi”</li>
+<li>Feeds de cadenas: descargas solo de los temas elegidos</li>
+<li>Las descargas escuchadas se eliminan tras 96 horas; límite de almacenamiento ajustable</li>
+</ul>
+
+<p><b>Además</b></p>
+<ul>
+<li>Español, portugués, francés, alemán e inglés, modo claro y oscuro, color a elegir o el del fondo de pantalla (Android 12+)</li>
+<li>Números de episodio en las portadas, copia de seguridad y restauración</li>
+</ul>
+
+<p>La búsqueda de podcasts usa la iTunes Search API de Apple y fyyd.de; tu término de búsqueda se les envía. Todo lo demás se conecta directamente con los proveedores de podcasts.</p>

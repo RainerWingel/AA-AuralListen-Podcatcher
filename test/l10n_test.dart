@@ -59,7 +59,13 @@ void main() {
   });
 
   test('every language has its own chart country', () {
-    expect(AppLanguage.values.map((l) => l.chartCountry), ['de', 'us', 'fr']);
+    expect(AppLanguage.values.map((l) => l.chartCountry), [
+      'de',
+      'us',
+      'fr',
+      'es',
+      'br',
+    ]);
   });
 
   test('stored setting and device default', () {
@@ -69,6 +75,8 @@ void main() {
     expect(AppLanguage.fromSetting('it'), isNull);
     expect(AppLanguage.forDevice(const Locale('de', 'AT')), AppLanguage.de);
     expect(AppLanguage.forDevice(const Locale('fr', 'CA')), AppLanguage.fr);
+    expect(AppLanguage.forDevice(const Locale('es', 'MX')), AppLanguage.es);
+    expect(AppLanguage.forDevice(const Locale('pt', 'PT')), AppLanguage.pt);
     expect(AppLanguage.forDevice(const Locale('it')), AppLanguage.en);
     expect(AppLanguage.forDevice(null), AppLanguage.en);
   });
@@ -79,6 +87,8 @@ void main() {
     expect(formatBytes(size, 'en'), '1.2 GB');
     expect(formatBytes(size, 'fr'), '1,2 Go');
     expect(formatBytes(350 * 1024 * 1024, 'fr'), '350 Mo');
+    expect(formatBytes(size, 'es'), '1,2 GB');
+    expect(formatBytes(size, 'pt'), '1,2 GB');
   });
 
   test('list dates use the short month name', () async {

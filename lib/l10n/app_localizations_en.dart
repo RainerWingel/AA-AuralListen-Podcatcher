@@ -1443,6 +1443,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageFrench => 'Français';
 
   @override
+  String get languageSpanish => 'Español';
+
+  @override
+  String get languagePortuguese => 'Português';
+
+  @override
   String get languagePickerWelcome =>
       'Welcome to the Podcatcher “AA-AuralListen”';
 

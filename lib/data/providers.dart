@@ -229,8 +229,8 @@ final directorySearchResultsProvider = FutureProvider.autoDispose
       (ref, term) => ref.watch(directorySearchProvider).search(term),
     );
 
-/// The most popular podcasts (Apple's chart): Germany for the German app, the
-/// USA for the English one, France for the French one.
+/// The most popular podcasts (Apple's chart) of the app language's country
+/// ([AppLanguage.chartCountry]).
 final directoryTopProvider = FutureProvider.autoDispose<DirectorySearchOutcome>(
   (ref) {
     final language = ref.watch(appLanguageProvider).value ?? AppLanguage.de;

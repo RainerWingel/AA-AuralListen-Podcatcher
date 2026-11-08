@@ -913,6 +913,14 @@
   "@languageFrench": {
     "description": "Always the language's own name – same text in every ARB file."
   },
+  "languageSpanish": "Español",
+  "@languageSpanish": {
+    "description": "Always the language's own name – same text in every ARB file."
+  },
+  "languagePortuguese": "Português",
+  "@languagePortuguese": {
+    "description": "Always the language's own name – same text in every ARB file."
+  },
   "languagePickerWelcome": "Willkommen beim Podcatcher „AA-AuralListen“",
   "@languagePickerWelcome": {
     "description": "First start: headline at the top of the language picker."

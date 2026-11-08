@@ -2539,20 +2539,28 @@ void main() {
     },
   );
 
-  testWidgets(
-    'the language picker speaks French on a French device',
-    timeout: timeout,
-    (tester) async {
-      tester.platformDispatcher.localesTestValue = const [Locale('fr', 'BE')];
-      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+  for (final (device, title) in [
+    (const Locale('fr', 'BE'), 'Choisir la langue'),
+    (const Locale('es', 'MX'), 'Elige el idioma'),
+    (const Locale('pt', 'BR'), 'Escolha o idioma'),
+  ]) {
+    testWidgets(
+      'the language picker speaks the language of a $device device',
+      timeout: timeout,
+      (tester) async {
+        tester.platformDispatcher.localesTestValue = [device];
+        addTearDown(tester.platformDispatcher.clearLocalesTestValue);
 
-      await pumpApp(tester, language: null);
-      expect(find.text('Choisir la langue'), findsOneWidget);
-      expect(find.text('Français'), findsOneWidget);
+        await pumpApp(tester, language: null);
+        expect(find.text(title), findsOneWidget);
+        for (final name in ['Français', 'Español', 'Português']) {
+          expect(find.text(name), findsOneWidget);
+        }
 
-      await disposeApp(tester);
-    },
-  );
+        await disposeApp(tester);
+      },
+    );
+  }
 
   testWidgets('feed address can be changed after a move', timeout: timeout, (
     tester,

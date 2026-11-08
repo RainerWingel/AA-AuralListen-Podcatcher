@@ -11,12 +11,14 @@ Future<void> setAppLanguage(WidgetRef ref, AppLanguage language) => ref
     .read(settingsRepositoryProvider)
     .set(SettingsKeys.language, language.name);
 
-/// Name of a language in that language ("Deutsch", "English", "Français").
+/// Name of a language in that language ("Deutsch", "English", "Français" …).
 String languageName(AppLocalizations l10n, AppLanguage language) =>
     switch (language) {
       AppLanguage.de => l10n.languageGerman,
       AppLanguage.en => l10n.languageEnglish,
       AppLanguage.fr => l10n.languageFrench,
+      AppLanguage.es => l10n.languageSpanish,
+      AppLanguage.pt => l10n.languagePortuguese,
     };
 
 /// First start: asks for the UI language before the app is shown.

@@ -76,7 +76,7 @@ Nur auf ausdrücklichen Wunsch des Benutzers (Repo ist öffentlich → APK für 
 **Seit v1.3.3 reproduzierbar** (F-Droid veröffentlicht unsere signierten APKs, `f-droid.md`) – Release-APKs nie
 mehr mit `flutter build` auf dem Mac, sondern im F-Droid-Container:
 1. `version:` in `pubspec.yaml` erhöhen (Name + Build-Nummer) **und** `appVersion` in `lib/core/app_info.dart`
-   (User-Agent; ein Test vergleicht beide); F-Droid-Changelogs für die drei Codes (de-DE, en-US, fr-FR); committen, pushen.
+   (User-Agent; ein Test vergleicht beide); F-Droid-Changelogs für die drei Codes in allen fünf Sprachen (de-DE, en-US, fr-FR, es-ES, pt-BR); committen, pushen.
 2. Im Rezept `fdroid/<appid>.yml` die drei Build-Blöcke auf die neue Version setzen (versionName, versionCode =
    Build-Nummer × 10 + 1/2/3, `commit:` = volle SHA des Release-Commits) und committen – das Skript baut daraus.
 3. `tool/fdroid_release_build.sh <out> --sign` (Docker/OrbStack, ~40 min für 3 ABIs): baut wie F-Droid, signiert mit

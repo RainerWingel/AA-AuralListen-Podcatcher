@@ -276,11 +276,34 @@ void main() {
       ));
     });
 
+    test('Spanish and Portuguese voice commands', () async {
+      final a = await addPodcast('A');
+      final first = await addEpisode(a, '1', day: 1);
+      final list = await playlists.create('Mañana en el coche');
+      await playlists.add(list, first);
+      await playlists.setLastEpisode(list, first);
+      final b = await addPodcast('Foro de Teresina');
+      final newest = await addEpisode(b, 'new', day: 2);
+
+      expect(
+        await car.search(
+          'pon la playlist “Mañana en el coche” en AA-AuralListen',
+        ),
+        (episodeId: first, playlistId: list),
+      );
+      expect(await car.search('toca o podcast Foro de Teresina'), (
+        episodeId: newest,
+        playlistId: null,
+      ));
+    });
+
     test('nothing matching, or only filler words', () async {
       await addPodcast('A');
       expect(await car.search('Hotel Matze'), isNull);
       expect(await car.search('spiele den Podcast'), isNull);
       expect(await car.search('joue le podcast'), isNull);
+      expect(await car.search('pon el podcast'), isNull);
+      expect(await car.search('toca o podcast'), isNull);
     });
   });
 

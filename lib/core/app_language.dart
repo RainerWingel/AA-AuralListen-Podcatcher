@@ -5,7 +5,9 @@ import 'dart:ui' show Locale;
 enum AppLanguage {
   de,
   en,
-  fr;
+  fr,
+  es,
+  pt;
 
   Locale get locale => Locale(name);
 
@@ -27,5 +29,7 @@ enum AppLanguage {
     de => 'de',
     en => 'us',
     fr => 'fr',
+    es => 'es',
+    pt => 'br',
   };
 }

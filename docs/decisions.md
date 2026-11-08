@@ -237,3 +237,8 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   englischen Fassung (keine französische Datenschutzerklärung, die deutsche bleibt maßgeblich). F-Droid-Texte in
   `fastlane/metadata/android/fr-FR/`, aber **keine französischen Screenshots** (Benutzer) – F-Droid nimmt dann die
   englischen. Keine neuen Pakete, keine neuen Netzwerkziele.
+- 2026-11-08 · **Spanisch und Portugiesisch als vierte und fünfte Sprache** (Benutzer) · `app_es.arb` (neutrales
+  Spanisch, Du-Form „tú") und `app_pt.arb` als **brasilianisches** Portugiesisch (Benutzer: mehr Sprecher und Podcasts;
+  Portugiesen verstehen es). „Beliebt" = Apple-Chart **Spanien** (Benutzer) bzw. **Brasilien**, „Neuheiten" = fyyd
+  `language=es|pt`. Sprachcode bleibt `pt` (ein Portugal-Handy bekommt ebenfalls diese Fassung). F-Droid-Texte in
+  `es-ES/` und `pt-BR/`, wie bei Französisch ohne eigene Screenshots. Keine neuen Pakete, keine neuen Netzwerkziele.
