@@ -1,0 +1,4 @@
+• Nouveau : Android Auto – playlists, nouveaux épisodes, téléchargements et abonnements en voiture ; −15/+30, ⏭, commandes vocales (« Hey Google, joue la playlist … sur AA-AuralListen »)
+• Nouvelles langues : français, espagnol, portugais, russe, italien – l’application propose une fois la langue du téléphone
+• Correction : les MP3 sans durée s’arrêtaient trop tôt
+• Correction : la sauvegarde automatique de Google fermait l’application pendant la lecture

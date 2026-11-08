@@ -1,0 +1,5 @@
+• New: Android Auto – playlists, new episodes, downloads and subscriptions in the car; −15/+30, ⏭, voice commands ("Hey Google, play the playlist … on AA-AuralListen")
+• New languages: French, Spanish, Portuguese, Russian, Italian – the app offers your phone's language once
+• Fix: MP3s without a length in the feed ended too early
+• Fix: Google's automatic backup killed the app during playback
+• The "moved" message names the podcasts

@@ -1,0 +1,5 @@
+• Neu: Android Auto – Playlists, neue Folgen, Downloads und Abos im Auto; −15/+30, ⏭, Sprachbefehle („Hey Google, spiele die Playlist … in AA-AuralListen“)
+• Neue Sprachen: Französisch, Spanisch, Portugiesisch, Russisch, Italienisch – die App bietet die Handysprache einmal an
+• Korrektur: MP3s ohne Längenangabe endeten zu früh
+• Korrektur: Googles automatische Sicherung beendete die App mitten in der Wiedergabe
+• Umzugsmeldung nennt die Podcasts

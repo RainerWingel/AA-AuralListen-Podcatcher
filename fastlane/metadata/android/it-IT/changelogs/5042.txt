@@ -1,0 +1,4 @@
+• Novità: Android Auto – playlist, nuovi episodi, download e iscrizioni in auto; −15/+30, ⏭, comandi vocali (“Hey Google, riproduci la playlist … su AA-AuralListen”)
+• Nuove lingue: francese, spagnolo, portoghese, russo, italiano – l’app propone una volta la lingua del telefono
+• Correzione: gli MP3 senza durata finivano troppo presto
+• Correzione: il backup automatico di Google chiudeva l’app durante la riproduzione
