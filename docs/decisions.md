@@ -242,7 +242,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Portugiesen verstehen es). „Beliebt" = Apple-Chart **Spanien** (Benutzer) bzw. **Brasilien**, „Neuheiten" = fyyd
   `language=es|pt`. Sprachcode bleibt `pt` (ein Portugal-Handy bekommt ebenfalls diese Fassung). F-Droid-Texte in
   `es-ES/` und `pt-BR/`, wie bei Französisch ohne eigene Screenshots. Keine neuen Pakete, keine neuen Netzwerkziele.
-- 2026-11-08 · **Russisch als sechste Sprache** (Benutzer, Muttersprache – prüft die Texte selbst) · `app_ru.arb` mit den
+- 2026-11-08 · **Russisch als sechste Sprache** (Benutzer, hat die Texte durchgesehen) · `app_ru.arb` mit den
   drei russischen Mehrzahl-Formen, Größen „ГБ/МБ", „Beliebt" = Apple-Chart Russland, „Neuheiten" = fyyd `language=ru`
   (beide liefern Daten, geprüft 2026-11-08). F-Droid-Texte `ru-RU/` ohne Screenshots. Italienisch als siebte Sprache
   vorgeschlagen, noch nicht entschieden.

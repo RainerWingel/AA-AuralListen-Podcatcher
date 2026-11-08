@@ -293,7 +293,7 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
   Tempo „Normal (1,0x)". Ausgeschrieben (breiter Player) heißt Tempo 1,0 „Velocidad: normal" (`speedNormal`, nicht
   `boostOff` – das ergab „Velocidad: No"). Tabs: „Inicio · Suscritos · Playlists · Descargas · Ajustes" /
   „Início · Inscrições · Playlists · Downloads · Ajustes".
-- **Russisch** (seit 2026-11-08, Muttersprache des Benutzers – er prüft die Texte): „Вы"-Form, „выпуск" für Folge,
+- **Russisch** (seit 2026-11-08, Texte vom Benutzer durchgesehen): „Вы"-Form, „выпуск" für Folge,
   Anführungszeichen «…», Gedankenstrich —, Größen „ГБ/МБ" (`formatBytes`). **Drei Mehrzahl-Formen** über
   `one`/`few`/`many`/`other` (1/21 выпуск, 2/22 выпуска, 5/11 выпусков; Test in `l10n_test.dart`). Achtung: Flutter
   wertet `=1` und `one` gleich aus (der Generator warnt) – darum in `app_ru.arb` nie beide in einer Nachricht, und

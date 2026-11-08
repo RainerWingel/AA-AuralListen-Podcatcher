@@ -155,26 +155,26 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] `app_fr.arb` mit allen Texten, Français im Sprachwähler und unter Optionen → Sprache
 - [x] Chart Frankreich, fyyd-Neuheiten auf Französisch, Größen „Go/Mo", französische Füllwörter für Sprachbefehle im Auto
 - [x] F-Droid-Texte `fr-FR` (ohne Screenshots – F-Droid nimmt die englischen)
-- [ ] Ab v1.3.6 Changelogs auch in `fr-FR/changelogs/`
+- [x] Ab v1.3.6 Changelogs auch in `fr-FR/changelogs/` (erledigt mit 1.3.6)
 
 ## Zusatz – Spanisch und Portugiesisch (2026-11-08)
 - [x] `app_es.arb` (neutrales Spanisch) und `app_pt.arb` (Brasilien), Español/Português im Sprachwähler
 - [x] Chart Spanien bzw. Brasilien, fyyd-Neuheiten `es`/`pt`, Füllwörter für Sprachbefehle im Auto
 - [x] F-Droid-Texte `es-ES` und `pt-BR` (ohne Screenshots)
-- [ ] Ab v1.3.6 Changelogs auch in `es-ES/` und `pt-BR/changelogs/`
+- [x] Ab v1.3.6 Changelogs auch in `es-ES/` und `pt-BR/changelogs/` (erledigt mit 1.3.6)
 
 ## Zusatz – Russisch (2026-11-08)
 - [x] `app_ru.arb` mit drei Mehrzahl-Formen, Русский im Sprachwähler, Größen „ГБ/МБ"
 - [x] Chart Russland, fyyd-Neuheiten `ru`, russische Füllwörter für Sprachbefehle im Auto
 - [x] F-Droid-Texte `ru-RU` (ohne Screenshots)
 - [x] Nach dem Update einmal anbieten, auf die neue Handysprache umzustellen (Dialog in dieser Sprache)
-- [x] Durchsicht der Texte durch den Benutzer (Muttersprache) am A05s – „passt"
-- [ ] Ab v1.3.6 Changelogs auch in `ru-RU/changelogs/`
+- [x] Durchsicht der Texte durch den Benutzer am A05s – „passt"
+- [x] Ab v1.3.6 Changelogs auch in `ru-RU/changelogs/` (erledigt mit 1.3.6)
 
 ## Zusatz – Italienisch (2026-11-08)
 - [x] `app_it.arb`, Italiano im Sprachwähler, Chart Italien, fyyd-Neuheiten `it`, Füllwörter für Sprachbefehle
 - [x] F-Droid-Texte `it-IT` (ohne Screenshots)
-- [ ] Ab v1.3.6 Changelogs auch in `it-IT/changelogs/`
+- [x] Ab v1.3.6 Changelogs auch in `it-IT/changelogs/` (erledigt mit 1.3.6)
 
 ## Zusatz – Playlist fortsetzen (2026-09-29)
 - [x] Jede Playlist merkt sich die zuletzt daraus gespielte Folge (Schema v7), ▶ und „Fortsetzen" spielen sie weiter

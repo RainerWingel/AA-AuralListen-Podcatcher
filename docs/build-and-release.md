@@ -110,6 +110,10 @@ Bis v1.3.2 (Mac-Build, nur arm64): `flutter build apk --release --split-per-abi`
   (Bluetooth-„Pause", Downloads bei Netzverlust, Sleep-Timer, Kapitelliste); acht neue Screenshots je Sprache
   (+503, Codes 5031/5032/5033; Tag auf `beac6f70…`, DB v28 → v29). Lehre: Zum Warten auf den Build **nicht**
   `pgrep -f <Skriptname>` in einer Schleife nutzen – die Suche findet den eigenen Befehl und endet nie.
+- v1.3.6 (2026-11-08): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.3.6 – Android Auto
+  (Menüs, Sprachbefehle, Fehler im Auto), fünf neue Sprachen (fr, es, pt, ru, it) mit einmaligem Angebot der
+  Handysprache, keine Google-Auto-Sicherung mehr, MP3-Längen-Fix (+504, Codes 5041/5042/5043; Tag auf `38f9bfae…`,
+  DB unverändert v29). Changelogs erstmals in sieben Sprachen (21 Dateien).
 - v1.2.1 (2026-09-30): https://github.com/RainerWingel/AA-AuralListen-Podcatcher/releases/tag/v1.2.1 – Englisch,
   Playlist-Fortsetzen und -Farben, Abos-Suche, 15-s-Regel, Download-Fix (http → https)
 
