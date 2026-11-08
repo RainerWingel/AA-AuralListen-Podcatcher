@@ -303,6 +303,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get speedNormal => 'обычная';
+
+  @override
   String speedButton(String value) {
     return 'Скорость: $value';
   }

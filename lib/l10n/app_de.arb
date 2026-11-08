@@ -188,6 +188,10 @@
       }
     }
   },
+  "speedNormal": "Aus",
+  "@speedNormal": {
+    "description": "Speed 1.0 inside speedButton (\"Tempo: Aus\"); lower case where the language needs it."
+  },
   "speedButton": "Tempo: {value}",
   "@speedButton": {
     "placeholders": {

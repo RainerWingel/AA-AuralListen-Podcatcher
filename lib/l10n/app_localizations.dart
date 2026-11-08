@@ -588,6 +588,12 @@ abstract class AppLocalizations {
   /// **'Aus ({value})'**
   String speedOff(String value);
 
+  /// Speed 1.0 inside speedButton ("Tempo: Aus"); lower case where the language needs it.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus'**
+  String get speedNormal;
+
   /// No description provided for @speedButton.
   ///
   /// In de, this message translates to:

@@ -3324,12 +3324,16 @@ void main() {
   );
 
   /// Plays "Erste Folge" in the full player at the given view size.
-  Future<void> openPlayerAt(WidgetTester tester, Size physicalSize) async {
+  Future<void> openPlayerAt(
+    WidgetTester tester,
+    Size physicalSize, {
+    String language = 'de',
+  }) async {
     tester.view
       ..physicalSize = physicalSize
       ..devicePixelRatio = 3;
     addTearDown(tester.view.reset);
-    await pumpApp(tester);
+    await pumpApp(tester, language: language);
     await tester.runAsync(
       () =>
           ProviderScope.containerOf(tester.element(find.byType(NavigationBar)))
@@ -3461,6 +3465,17 @@ void main() {
       expect(find.byTooltip('Tempo: Aus'), findsOneWidget);
       expect(find.byTooltip('Boost: Aus'), findsOneWidget);
 
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'player: spelled-out buttons say "normal" speed, not "no" (Spanish)',
+    timeout: timeout,
+    (tester) async {
+      await openPlayerAt(tester, const Size(3600, 2340), language: 'es');
+      expect(find.text('Velocidad: normal'), findsOneWidget);
+      expect(find.text('Boost: No'), findsOneWidget);
       await disposeApp(tester);
     },
   );

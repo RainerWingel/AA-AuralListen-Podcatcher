@@ -97,7 +97,7 @@ class PlayerActionBar extends ConsumerWidget {
 
     final speed = ref.watch(speedSettingProvider(podcastId)).speed;
     final speedFull = l10n.speedButton(
-      speed == 1 ? l10n.boostOff : formatSpeed(l10n, speed),
+      speed == 1 ? l10n.speedNormal : formatSpeed(l10n, speed),
     );
 
     final boostId = podcastId;

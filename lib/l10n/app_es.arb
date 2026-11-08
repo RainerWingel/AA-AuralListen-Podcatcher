@@ -80,6 +80,7 @@
   "boostTitle": "Amplificación de volumen",
   "speedTitle": "Velocidad de reproducción",
   "speedOff": "Normal ({value})",
+  "speedNormal": "normal",
   "speedButton": "Velocidad: {value}",
   "boostOff": "No",
   "boostValue": "+{db} dB",

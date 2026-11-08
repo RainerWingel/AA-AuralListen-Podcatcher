@@ -80,6 +80,7 @@
   "boostTitle": "Volume boost",
   "speedTitle": "Playback speed",
   "speedOff": "Off ({value})",
+  "speedNormal": "Off",
   "speedButton": "Speed: {value}",
   "boostOff": "Off",
   "boostValue": "+{db} dB",

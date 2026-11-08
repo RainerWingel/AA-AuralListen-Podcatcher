@@ -300,6 +300,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get speedNormal => 'Off';
+
+  @override
   String speedButton(String value) {
     return 'Speed: $value';
   }

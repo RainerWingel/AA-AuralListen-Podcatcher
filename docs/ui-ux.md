@@ -290,7 +290,8 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
 - **Spanisch** und **Portugiesisch** (seit 2026-11-08): Spanisch neutral in der Du-Form („tú", wie Deutsch), mit ¿…? und
   Anführungszeichen “…”; Portugiesisch **brasilianisch** (Benutzer) in der „você"-Form, „baixar"/„excluir"/„celular".
   Größen in GB/MB. Segment-Knöpfe gleich kurz: Boost aus „No"/„Não" („Ninguno" brach am A05s um), Auto-Download „Solo wifi"/„Só Wi-Fi",
-  Tempo „Normal (1,0x)". Tabs: „Inicio · Suscritos · Playlists · Descargas · Ajustes" /
+  Tempo „Normal (1,0x)". Ausgeschrieben (breiter Player) heißt Tempo 1,0 „Velocidad: normal" (`speedNormal`, nicht
+  `boostOff` – das ergab „Velocidad: No"). Tabs: „Inicio · Suscritos · Playlists · Descargas · Ajustes" /
   „Início · Inscrições · Playlists · Downloads · Ajustes".
 - **Russisch** (seit 2026-11-08, Muttersprache des Benutzers – er prüft die Texte): „Вы"-Form, „выпуск" für Folge,
   Anführungszeichen «…», Gedankenstrich —, Größen „ГБ/МБ" (`formatBytes`). **Drei Mehrzahl-Formen** über

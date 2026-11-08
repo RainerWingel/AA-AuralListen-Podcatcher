@@ -80,6 +80,7 @@
   "boostTitle": "Усиление громкости",
   "speedTitle": "Скорость воспроизведения",
   "speedOff": "Обычная ({value})",
+  "speedNormal": "обычная",
   "speedButton": "Скорость: {value}",
   "boostOff": "Нет",
   "boostValue": "+{db} дБ",
