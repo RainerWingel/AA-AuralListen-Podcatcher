@@ -1006,9 +1006,24 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     // own (an estimate must neither be stored nor compared with itself).
     _loadingEpisode = episode;
     _durationDecided = false;
-    final reported = await _engine.load(source, initialPosition: start);
-    var duration = reported;
-    if (_durationLooksEstimated(reported, episode)) {
+    Duration? duration;
+    if (_sourceIsLocal && _isMp3(episode)) {
+      // A downloaded MP3 is read exactly right away: the length comes from
+      // its VBR header, not from an estimate (which may be far too short
+      // when the feed gives no length to compare with), and seeking ahead
+      // only reads the local file (docs/playback.md "VBR-MP3").
+      _durationDecided = true;
+      duration = await _engine.load(
+        source,
+        initialPosition: start,
+        exactMp3Seeking: true,
+      );
+      // No VBR header: constant bitrate, the normal load is exact.
+      duration ??= await _engine.load(source, initialPosition: start);
+    } else {
+      duration = await _engine.load(source, initialPosition: start);
+    }
+    if (!_durationDecided && _durationLooksEstimated(duration, episode)) {
       // ExoPlayer guessed the length of a VBR MP3 from its first frame:
       // every seek (resume, reload after a pause) lands elsewhere. Load
       // again with exact seeking (docs/playback.md "VBR-MP3").
@@ -1090,12 +1105,16 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (reported == null || expectedMs == null || expectedMs <= 0) {
       return false;
     }
-    final mime = episode.audioMimeType?.toLowerCase();
-    final isMp3 = mime == null || mime.contains('mpeg') || mime.contains('mp3');
-    if (!isMp3) return false;
+    if (!_isMp3(episode)) return false;
     final diffMs = (reported.inMilliseconds - expectedMs).abs();
     return diffMs >
         max(estimatedDurationTolerance.inMilliseconds, expectedMs ~/ 10);
+  }
+
+  /// MP3 by its MIME type; unknown counts as MP3 (most podcasts).
+  static bool _isMp3(Episode episode) {
+    final mime = episode.audioMimeType?.toLowerCase();
+    return mime == null || mime.contains('mpeg') || mime.contains('mp3');
   }
 
   /// Position shown before loading: played episodes and positions under
@@ -1208,10 +1227,24 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   bool get _nearEnd {
     final duration = _engine.duration;
+    if (!_loaded || duration == null || duration <= endTolerance) return false;
+    final left = duration - _engine.position;
+    // Beyond the length (paused after it): the length was too short.
+    return !left.isNegative && left <= endTolerance;
+  }
+
+  /// Still playing with the position standing exactly on the length: the
+  /// player reported too short a length (VBR MP3 without a length in the
+  /// feed), just_audio caps the position there, and the audio goes on
+  /// (bug 2026-11-08, Sternenkraft). Only the player's own end counts then.
+  bool get _cappedAtLength {
+    final duration = _engine.duration;
+    final state = _engine.state;
     return _loaded &&
+        state.playing &&
+        state.processing == EngineProcessing.ready &&
         duration != null &&
-        duration > endTolerance &&
-        duration - _engine.position <= endTolerance;
+        _engine.position >= duration;
   }
 
   Future<void> _onEngineState(EngineState state) async {
@@ -1406,6 +1439,11 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _watchdogPosition = position;
       _stalledChecks = 0;
       _recoveries = 0; // it plays again: a later hang gets fresh attempts
+      return;
+    }
+    // Audio still flows behind a too short length: neither end nor hang.
+    if (_cappedAtLength) {
+      _stalledChecks = 0;
       return;
     }
     // No progress in the last seconds: that was the end, not a hang.

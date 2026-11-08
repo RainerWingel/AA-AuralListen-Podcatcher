@@ -291,6 +291,63 @@ void main() {
       await handler.playEpisode(episodeId);
       expect(engine.exactLoads, [false]);
     });
+
+    group('downloaded', () {
+      setUp(() async {
+        await handler.dispose();
+        engine = FakePlayerEngine();
+        handler = PodcastAudioHandler(
+          engine: engine,
+          playback: PlaybackRepository(db, () => now),
+          settings: settings,
+          localAudioFile: (id) async => File('/data/episodes/$id.mp3'),
+        );
+      });
+
+      test('loaded exactly right away, also without a feed length', () async {
+        // Real case 2026-11-08 (Sternenkraft): no length in the feed, the
+        // player guessed 11:18 for a file of about 16 minutes.
+        engine
+          ..fakeDuration = const Duration(minutes: 15, seconds: 33)
+          ..estimatedDuration = const Duration(minutes: 11, seconds: 18);
+        await handler.playEpisode(episodeId);
+        expect(engine.exactLoads, [true]);
+        expect(engine.loadedAt, const Duration(seconds: 57));
+        expect(
+          (await episode()).durationMs,
+          const Duration(minutes: 15, seconds: 33).inMilliseconds,
+        );
+        expect(
+          handler.mediaItem.value!.duration,
+          const Duration(minutes: 15, seconds: 33),
+        );
+      });
+
+      test('without VBR header: loaded normally again', () async {
+        engine
+          ..exactLoadsHaveNoDuration = true
+          ..estimatedDuration = const Duration(minutes: 12);
+        await handler.playEpisode(episodeId);
+        expect(engine.exactLoads, [true, false]);
+        expect(
+          (await episode()).durationMs,
+          const Duration(minutes: 12).inMilliseconds,
+        );
+      });
+
+      test('other formats load normally', () async {
+        await setFeed(const Duration(minutes: 13), mime: 'audio/mp4');
+        await handler.playEpisode(episodeId);
+        expect(engine.exactLoads, [false]);
+      });
+    });
+
+    test('a stream without feed length keeps the normal load', () async {
+      // Nothing to compare with; seeking ahead would download everything.
+      engine.estimatedDuration = const Duration(minutes: 11, seconds: 18);
+      await handler.playEpisode(episodeId);
+      expect(engine.exactLoads, [false]);
+    });
   });
 
   group('stream the server builds anew per request (inserted ads)', () {
@@ -1257,6 +1314,27 @@ void main() {
       expect(problems, isEmpty);
     });
 
+    test('standing on a too short length while playing is neither end nor '
+        'hang', () async {
+      // Bug 2026-11-08: just_audio caps the position at a length that was
+      // estimated too short while the audio goes on; the hang detection
+      // took that for the end and started the next playlist episode.
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 10)); // = reported length
+      await wait(HangTicks.detect + 2);
+
+      expect(loads(), 1);
+      expect((await episode()).status, isNot(EpisodeStatus.played));
+      expect(handler.currentEpisodeId, episodeId);
+      expect(handler.playbackState.value.playing, isTrue);
+      expect(problems, isEmpty);
+
+      // The player's own end still counts.
+      engine.complete();
+      await pumpEventQueue();
+      expect((await episode()).status, EpisodeStatus.played);
+    });
+
     test('without network: retries, then stops and tells the user', () async {
       await handler.playEpisode(episodeId);
       engine.emitPosition(const Duration(minutes: 2));
@@ -1848,6 +1926,18 @@ void main() {
         await engine.pause(); // just_audio pauses itself
         await pumpEventQueue();
         expect((await episode()).status, EpisodeStatus.played);
+      });
+
+      test('a pause behind a too short length is just a pause', () async {
+        // just_audio reports the real place on pause, beyond the length.
+        await handler.playEpisode(episodeId, playlistId: playlistId);
+        engine.emitPosition(const Duration(minutes: 12));
+        await pumpEventQueue();
+        await handler.pause();
+        await pumpEventQueue();
+        expect((await episode()).status, EpisodeStatus.inProgress);
+        expect(handler.currentEpisodeId, episodeId);
+        expect(await itemsOf(playlistId), [episodeId, ep2, ep3]);
       });
 
       test('a pause 10 s before the end is just a pause', () async {

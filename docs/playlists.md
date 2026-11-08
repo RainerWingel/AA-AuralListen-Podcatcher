@@ -99,7 +99,9 @@ gelesen, die neue Reihenfolge gilt also sofort.
 - Erreicht die Folge ihr **Ende** (Dateiende; keine 98-%-Regel mehr, Benutzerwunsch 2026-10-03). **Als Ende zählt
   auch**, wenn die Wiedergabe in den **letzten 3 Sekunden** anhält (Benutzerwunsch 2026-10-06,
   `PodcastAudioHandler.endTolerance`): Pause (auch durch eine andere App/Tonunterbrechung) → gespielt, Position am Ende,
-  aber **kein** Weiterspielen; Fehler oder Hänger dort → wie Dateiende, die Playlist geht weiter.
+  aber **kein** Weiterspielen; Fehler oder Hänger dort → wie Dateiende, die Playlist geht weiter. **Nicht** als Ende
+  zählt eine Position, die bei laufendem Ton auf einer zu kurz geschätzten Länge stehen bleibt (`playback.md` →
+  Hänger-Erkennung, Bug 2026-11-08).
   1. Folge wird als **gespielt** markiert (`playedAt` gesetzt).
   2. Folge wird **nur aus der aktiven Playlist entfernt** (der mit ⏭; Benutzerwunsch 2026-10-03, vorher aus allen) und
      bleibt in allen anderen. Ohne aktive Playlist (auch wenn eine nur angeboten war) bleibt sie überall.

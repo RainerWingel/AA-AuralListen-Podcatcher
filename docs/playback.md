@@ -75,6 +75,10 @@ Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell
 - **Korrektur:** Position speichern, Folge an **genau** dieser Stelle neu laden und weiterspielen. Scheitert das Laden
   (kein Netz), neuer Versuch nach 15 s. Höchstens 3 Versuche (`maxRecoveries`), dann sauber anhalten
   (Position bleibt) und Infobox „Die Wiedergabe hing und wurde angehalten …".
+- **Kein Hänger und kein Ende:** Position steht **genau auf der gemeldeten Länge**, der Player spielt aber weiter
+  (`ready`). Dann war die Länge zu kurz geschätzt (just_audio hält die Position dort fest, der Ton läuft) – die App wartet
+  auf das echte Dateiende des Players (`_cappedAtLength`, Bug 2026-11-08). Eine Pause **hinter** der Länge (just_audio
+  meldet beim Pausieren die echte Stelle) ist eine normale Pause, kein „Ende in den letzten 3 s".
 - Bewegt sich die Position wieder, beginnt die Zählung neu. Pause, Stopp oder eine andere Folge beenden laufende Versuche.
 - **Laden scheitert beim Antippen** (kein Netz, Serverfehler): kein Absturz/keine stille Nicht-Reaktion mehr, sondern
   Infobox „Die Folge konnte nicht geladen werden …" (`PlaybackProblem.loadFailed`).
@@ -191,7 +195,15 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
   Feed-Abruf schreibt die Feed-Dauer wieder in die DB; beim nächsten Abspielen wiederholt sich das (ein Laden mehr).
 - Die geschätzte Dauer wird weder gespeichert noch angezeigt (sonst fehlt beim nächsten Mal der Vergleichswert).
   Migration v15 liest alle Feeds einmal neu und repariert so schon überschriebene Dauern.
-- Grenzen: Ohne Feed-Dauer keine Erkennung. Kleine Abweichungen (eingefügte Werbung) bleiben beim normalen Laden.
+- **Downloads (Fall 2026-11-08, Sternenkraft):** Eine Folge **ohne** Feed-Dauer (nichts zum Vergleichen) wurde auf 11:18
+  geschätzt, die Datei ist rund 16 min lang. just_audio hält die Position bei der gemeldeten Länge fest (Anzeige „-0:00"),
+  der Ton läuft weiter – die Hänger-Erkennung hielt das für das Ende und sprang mitten im Gespräch zur nächsten
+  Playlist-Folge. Jetzt: **heruntergeladene MP3s werden immer gleich exakt geladen** (Dauer aus dem Xing-Kopf; Sprünge
+  lesen nur die lokale Datei, kostet praktisch nichts). Meldet das exakte Laden keine Dauer (kein Xing-Kopf = feste
+  Bitrate), wird normal neu geladen. Die Hänger-Regel siehe „Hänger-Erkennung".
+- Grenzen: **Streams** ohne Feed-Dauer werden nicht erkannt (exaktes Laden würde bei jedem Sprung nach vorn alles bis
+  dorthin herunterladen) – dort schützt nur die Hänger-Regel vor dem Abschneiden, Anzeige und Sprünge bleiben ungenau.
+  Kleine Abweichungen (eingefügte Werbung) bleiben beim normalen Laden.
 - Regressionstests: Gruppe „VBR MP3 whose length the player only estimates" in `test/audio/podcast_audio_handler_test.dart`.
 
 ### Streams mit wechselnder Werbung (Benutzerwunsch 2026-10-03)
