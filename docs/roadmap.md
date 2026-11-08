@@ -197,7 +197,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Tests (Menübaum, Playlist wird aktiv, Listen, IDs); keine Streams/Timer → kein eigener Leak-Test nötig
 - [x] Datenschutzerklärung de/en: Übergabe von Titel/Cover an Android Auto auf dem Gerät
 - [x] README: Hinweis „Unbekannte Quellen"
-- [ ] Store-Texte (fastlane de/en) beim Release ergänzen
+- [x] Store-Texte ergänzt (2026-11-08, alle sieben Sprachen, Abschnitt „Android Auto“)
 - [x] A05s vorbereitet (2026-10-30): Android-Auto-Entwicklermodus, „Unbekannte Quellen" an, 1.3.5+Auto installiert, DHU verbindet
 - [x] Test mit der DHU auf dem A05s (2026-10-30; Fund: ⏭ ohne Playlist ohne Wirkung → nur noch mit aktiver Playlist)
 - [x] Sprachbefehle (weiterspielen, Playlist/Podcast per Namen) und Fehlermeldungen im Auto (2026-10-30)

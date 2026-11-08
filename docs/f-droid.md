@@ -174,7 +174,8 @@ der Prüfung nichts.
 Genauso wie die Screenshots – alles kommt aus diesem Repo, nicht aus fdroiddata:
 - `title.txt` – App-Name (Stand: „AA-AuralListen Podcatcher")
 - `short_description.txt` – Kurzbeschreibung, **max. 80 Zeichen**
-- `full_description.txt` – lange Beschreibung, **max. 4000 Zeichen**, einfaches HTML erlaubt (`<b>`, `<i>`, `<ul><li>`)
+- `full_description.txt` – lange Beschreibung, **max. 4000 Zeichen**, einfaches HTML erlaubt (`<b>`, `<i>`, `<ul><li>`).
+  Stand 2026-11-08: de-DE 3977, en-US 3983 Zeichen – Neues nur gegen Kürzungen an anderer Stelle.
 - `images/icon.png` – Symbol (512 × 512)
 
 jeweils unter `fastlane/metadata/android/de-DE/`, `…/en-US/`, `…/fr-FR/`, `…/es-ES/`, `…/pt-BR/`, `…/ru-RU/` und `…/it-IT/` (Inhalt in allen

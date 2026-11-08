@@ -44,6 +44,12 @@
 <li>Un símbolo en cada episodio que está en una playlist</li>
 </ul>
 
+<p><b>Android Auto</b></p>
+<ul>
+<li>Playlists, episodios nuevos, descargas y suscripciones en el coche; −15 s / +30 s y ⏭; comandos de voz (“Hey Google, pon la playlist … en AA-AuralListen”)</li>
+<li>Sin Play Store: activa una vez “Fuentes desconocidas” en los ajustes para desarrolladores de Android Auto</li>
+</ul>
+
 <p><b>Descargas</b></p>
 <ul>
 <li>Descargas manuales o automáticas por podcast, opcionalmente a una playlist; opción “Solo wifi”</li>

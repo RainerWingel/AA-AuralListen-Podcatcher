@@ -1,4 +1,4 @@
-<p>AA-AuralListen Podcatcher is a private podcast app for Android. It plays audio podcasts only, needs no account, shows no ads and does no tracking. Everything you do in the app stays on your phone – there is no server of the developer.</p>
+<p>AA-AuralListen Podcatcher is a private podcast app for Android. Audio only, no account, no ads, no tracking. Everything stays on your phone – there is no server of the developer.</p>
 
 <p><b>Find and subscribe</b></p>
 <ul>
@@ -18,8 +18,8 @@
 <li>Background playback with notification, lock screen and Bluetooth controls</li>
 <li>Skip −15 s / +30 s – hold a skip button to scan through the episode without playing; speed 1.0× to 2.0× and volume boost, each global or per podcast</li>
 <li>Remaining time or total length at a tap; at higher speed also the real remaining time</li>
-<li>Show notes with tappable links, episode number and release date</li>
-<li>Chapters (Podlove, JSON, ID3) with chapter pictures, the progress of the current chapter and per-chapter skip; bookmarks with notes (long press the bookmark button for the list)</li>
+<li>Show notes with tappable links</li>
+<li>Chapters (Podlove, JSON, ID3) with chapter pictures, the progress of the current chapter and per-chapter skip; bookmarks with notes</li>
 <li>Sleep timer with gentle fade-out, also "until the end of the episode"</li>
 <li>Remembers the position of every episode; an episode counts as played only at its end</li>
 <li>Playback history of the last 100 episodes played to the end</li>
@@ -29,7 +29,7 @@
 <p><b>Player</b></p>
 <ul>
 <li>Seek bar, play row and the four action buttons stay pinned at the bottom, the rest scrolls</li>
-<li>Strongly blurred cover or chapter picture as background; text colors follow its brightness</li>
+<li>Strongly blurred cover or chapter picture as background</li>
 <li>Own landscape layout: info on the left, controls on the right</li>
 <li>Choose the control panel background (Settings → Design): starry sky, aurora, waves, crystal, camouflage</li>
 </ul>
@@ -38,10 +38,16 @@
 <ul>
 <li>Several playlists that continue automatically, with colors, sorting and "Resume"</li>
 <li>"Play next" and "Add to the end" for the playlist that is playing; ⏮ ⏭ in the player and via Bluetooth</li>
-<li>Finished episodes leave the playlist at once, after 5 minutes or never – your choice; "mark as played" follows the same setting</li>
+<li>Finished episodes leave the playlist at once, after 5 minutes or never – your choice</li>
 <li>New episodes of a podcast can go into a playlist without downloading (streamed)</li>
 <li>All new or unplayed episodes of a podcast, topic or season into a playlist</li>
 <li>A symbol on every episode that is in a playlist</li>
+</ul>
+
+<p><b>Android Auto</b></p>
+<ul>
+<li>Playlists, new episodes, downloads and subscriptions in the car; −15 s / +30 s and ⏭; voice commands ("Hey Google, play the playlist … on AA-AuralListen")</li>
+<li>Not from the Play Store: turn on "Unknown sources" once in Android Auto's developer settings</li>
 </ul>
 
 <p><b>Downloads</b></p>

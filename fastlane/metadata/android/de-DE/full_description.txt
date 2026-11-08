@@ -1,4 +1,4 @@
-<p>AA-AuralListen Podcatcher ist eine private Podcast-App für Android. Sie spielt nur Audio-Podcasts, braucht kein Konto, zeigt keine Werbung und trackt nichts. Alles, was du in der App machst, bleibt auf deinem Handy – einen Server des Entwicklers gibt es nicht.</p>
+<p>AA-AuralListen Podcatcher ist eine private Podcast-App für Android. Nur Audio, kein Konto, keine Werbung, kein Tracking. Alles bleibt auf deinem Handy – einen Server des Entwicklers gibt es nicht.</p>
 
 <p><b>Finden und abonnieren</b></p>
 <ul>
@@ -18,8 +18,8 @@
 <li>Wiedergabe im Hintergrund mit Benachrichtigung, Sperrbildschirm- und Bluetooth-Tasten</li>
 <li>Sprünge −15 s / +30 s – Skip-Knopf gedrückt halten spult durch die Folge, ohne zu spielen; Tempo 1,0× bis 2,0× und Lautstärke-Boost, jeweils global oder pro Podcast</li>
 <li>Restzeit oder Gesamtlänge per Antippen; bei höherem Tempo zusätzlich die tatsächliche Restzeit</li>
-<li>Shownotes mit antippbaren Links, Folgennummer und Erscheinungsdatum</li>
-<li>Kapitel (Podlove, JSON, ID3) mit Kapitelbildern, Fortschritt des laufenden Kapitels und „Skip“ je Kapitel; Lesezeichen mit Notiz (langes Drücken auf den Lesezeichen-Knopf zeigt die Liste)</li>
+<li>Shownotes mit antippbaren Links</li>
+<li>Kapitel (Podlove, JSON, ID3) mit Kapitelbildern, Fortschritt des laufenden Kapitels und „Skip“ je Kapitel; Lesezeichen mit Notiz</li>
 <li>Sleep-Timer mit sanftem Ausblenden, auch „bis Ende der Folge“</li>
 <li>Merkt sich die Position jeder Folge; gespielt ist eine Folge erst am Ende</li>
 <li>Abspielverlauf der letzten 100 zu Ende gehörten Folgen</li>
@@ -29,7 +29,7 @@
 <p><b>Player</b></p>
 <ul>
 <li>Slider, Play-Reihe und Aktionsknöpfe bleiben fest unten, der Rest scrollt</li>
-<li>Stark geblurrtes Cover oder Kapitelbild als Hintergrund; die Schriftfarben folgen seiner Helligkeit</li>
+<li>Stark geblurrtes Cover oder Kapitelbild als Hintergrund</li>
 <li>Eigene Querformat-Ansicht: Info links, Bedienelemente rechts</li>
 <li>Bedienfeld-Hintergrund wählbar (Optionen → Design): Sternenhimmel, Nordlicht, Wellen, Kristall, Camouflage</li>
 </ul>
@@ -38,9 +38,15 @@
 <ul>
 <li>Mehrere Playlists mit automatischem Weiterspielen, Farben, Sortieren und „Fortsetzen“</li>
 <li>„Als Nächstes spielen“ und „Ans Ende anfügen“ für die laufende Playlist; ⏮ ⏭ im Player und per Bluetooth</li>
-<li>Fertige Folgen verlassen die Playlist sofort, nach 5 Minuten oder nie – wie du willst; „Als gespielt markieren“ folgt derselben Einstellung</li>
+<li>Fertige Folgen verlassen die Playlist sofort, nach 5 Minuten oder nie – wie du willst</li>
 <li>Neue Folgen eines Podcasts können ohne Download in eine Playlist kommen (gestreamt)</li>
 <li>Alle neuen oder ungespielten Folgen eines Podcasts, Themas oder einer Staffel in eine Playlist</li>
+</ul>
+
+<p><b>Android Auto</b></p>
+<ul>
+<li>Playlists, neue Folgen, Downloads und Abos im Auto; −15 s / +30 s und ⏭; Sprachbefehle („Hey Google, spiele die Playlist … in AA-AuralListen“)</li>
+<li>Nicht aus dem Play Store: in Android Auto einmalig „Unbekannte Quellen“ einschalten (Entwicklereinstellungen)</li>
 </ul>
 
 <p><b>Downloads</b></p>
