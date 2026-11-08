@@ -283,6 +283,9 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
 - **Französisch** (seit 2026-11-08) in der **Sie-Form** („vous", in französischen Apps üblich). Typografie: geschütztes
   Leerzeichen (U+00A0) vor `?`, `!`, `:`, `;`, `%` und innen in Guillemets « … »; Apostroph `’`. Größen in Oktett-Einheiten
   („1,2 Go", „350 Mo", `formatBytes`). Tab „Downloads" heißt „Téléchargés" (5 Tabs müssen passen).
+  Texte in **Segment-Knöpfen** (Tempo, Boost, Auto-Download) kurz halten – Französisch bricht sonst mitten im Wort um
+  (am A05s gesehen, 2026-11-08): Boost aus = „Aucun", Auto-Download = „Wi-Fi seul"; Tempo „Normale (1,0x)" bricht
+  sauber zweizeilig um.
 - Neue Sprache: ARB-Datei anlegen, Wert in `AppLanguage` (`lib/core/app_language.dart`, mit Chart-Land), Name in
   `languageName` und als `language<Sprache>` in allen ARB-Dateien, ggf. Füllwörter für Sprachbefehle
   (`car_browser.dart`), F-Droid-Ordner `fastlane/metadata/android/<xx-XX>/` (`f-droid.md`).

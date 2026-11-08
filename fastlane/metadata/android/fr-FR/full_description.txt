@@ -46,7 +46,7 @@
 
 <p><b>Téléchargements</b></p>
 <ul>
-<li>Téléchargements manuels ou automatiques par podcast, au choix dans une playlist ; option « Wi-Fi uniquement »</li>
+<li>Téléchargements manuels ou automatiques par podcast, au choix dans une playlist ; option « Wi-Fi seul »</li>
 <li>Flux de réseaux : téléchargements seulement pour les thèmes choisis</li>
 <li>Téléchargements écoutés supprimés après 96 heures ; limite d’espace réglable</li>
 </ul>

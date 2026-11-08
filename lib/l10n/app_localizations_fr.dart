@@ -298,7 +298,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String speedOff(String value) {
-    return 'Désactivé ($value)';
+    return 'Normale ($value)';
   }
 
   @override
@@ -307,7 +307,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get boostOff => 'Désactivé';
+  String get boostOff => 'Aucun';
 
   @override
   String boostValue(int db) {
@@ -471,7 +471,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get autoDownloadOff => 'Désactivé';
 
   @override
-  String get autoDownloadWifi => 'Wi-Fi uniquement';
+  String get autoDownloadWifi => 'Wi-Fi seul';
 
   @override
   String get autoDownloadAlways => 'Toujours';
