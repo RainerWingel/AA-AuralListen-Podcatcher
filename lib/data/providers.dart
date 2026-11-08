@@ -230,13 +230,11 @@ final directorySearchResultsProvider = FutureProvider.autoDispose
     );
 
 /// The most popular podcasts (Apple's chart): Germany for the German app, the
-/// USA for the English one.
+/// USA for the English one, France for the French one.
 final directoryTopProvider = FutureProvider.autoDispose<DirectorySearchOutcome>(
   (ref) {
     final language = ref.watch(appLanguageProvider).value ?? AppLanguage.de;
-    return ref
-        .watch(directorySearchProvider)
-        .top(language == AppLanguage.en ? 'us' : 'de');
+    return ref.watch(directorySearchProvider).top(language.chartCountry);
   },
 );
 

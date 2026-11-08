@@ -1,0 +1,60 @@
+<p>AA-AuralListen Podcatcher est une application de podcasts privée pour Android. Audio uniquement, sans compte, sans publicité, sans pistage. Tout reste sur votre téléphone – le développeur n’a aucun serveur.</p>
+
+<p><b>Trouver et s’abonner</b></p>
+<ul>
+<li>Recherche dans Apple Podcasts et fyyd.de, abonnement par adresse RSS, import et export OPML</li>
+<li>Nouveaux podcasts d’abord provisoires : écouter (streaming), puis s’abonner</li>
+<li>Notes de 1 à 5 étoiles – les abonnements sont triés selon la note</li>
+<li>Tirer pour actualiser, avec ligne d’état ; les podcasts qui changent d’adresse sont suivis automatiquement</li>
+<li>Compteur rouge des épisodes non écoutés ; recherche dans les abonnements</li>
+<li>Page du podcast avec description repliable, site web et lien de soutien</li>
+<li>Recherche avec « Populaires » (classements Apple) et « Nouveautés » – selon la langue de l’application</li>
+<li>Accueil : une flamme pour les podcasts que vous ne sautez presque jamais</li>
+<li>Saisons : « S2·5 » sur la pochette et filtre ; feuilletons dans l’ordre</li>
+</ul>
+
+<p><b>Écoute</b></p>
+<ul>
+<li>Lecture en arrière-plan, écran de verrouillage, commandes Bluetooth</li>
+<li>Sauts −15 s / +30 s (maintenir pour parcourir) ; vitesse 1,0× à 2,0× et amplification du volume, globales ou par podcast</li>
+<li>Temps restant ou durée totale ; en vitesse accélérée, aussi le temps réel</li>
+<li>Notes d’épisode avec liens cliquables</li>
+<li>Chapitres (Podlove, JSON, ID3) avec images et saut de chapitres ; signets avec notes</li>
+<li>Minuteur de mise en veille avec fondu doux, aussi « jusqu’à la fin de l’épisode »</li>
+<li>Position mémorisée pour chaque épisode ; écouté seulement à la fin</li>
+<li>Historique des 100 derniers épisodes écoutés jusqu’au bout</li>
+<li>Robuste face aux coupures réseau et aux MP3 à débit variable</li>
+</ul>
+
+<p><b>Lecteur</b></p>
+<ul>
+<li>Barre de progression et boutons fixés en bas, le reste défile</li>
+<li>Pochette floutée en arrière-plan</li>
+<li>Disposition paysage dédiée : infos à gauche, commandes à droite</li>
+<li>Arrière-plan des commandes au choix (Options → Design) : ciel étoilé, aurore boréale, vagues, cristal, camouflage</li>
+</ul>
+
+<p><b>Playlists</b></p>
+<ul>
+<li>Plusieurs playlists qui s’enchaînent, avec couleurs, tri et « Reprendre »</li>
+<li>« Lire ensuite » et « Ajouter à la fin » pour la playlist en cours ; ⏮ ⏭ dans le lecteur et via Bluetooth</li>
+<li>Les épisodes terminés quittent la playlist aussitôt, après 5 minutes ou jamais – au choix</li>
+<li>Nouveaux épisodes dans une playlist, même sans téléchargement</li>
+<li>Épisodes nouveaux ou non écoutés d’un podcast, thème ou saison dans une playlist</li>
+<li>Un symbole sur chaque épisode présent dans une playlist</li>
+</ul>
+
+<p><b>Téléchargements</b></p>
+<ul>
+<li>Téléchargements manuels ou automatiques par podcast, au choix dans une playlist ; option « Wi-Fi uniquement »</li>
+<li>Flux de réseaux : téléchargements seulement pour les thèmes choisis</li>
+<li>Téléchargements écoutés supprimés après 96 heures ; limite d’espace réglable</li>
+</ul>
+
+<p><b>Et aussi</b></p>
+<ul>
+<li>Français, allemand et anglais, mode clair et sombre, couleur au choix ou celle du fond d’écran (Android 12+)</li>
+<li>Numéros d’épisode sur les pochettes, sauvegarde et restauration</li>
+</ul>
+
+<p>La recherche de podcasts utilise l’API iTunes Search d’Apple et fyyd.de ; votre terme de recherche leur est envoyé. Tout le reste va directement aux fournisseurs de podcasts.</p>

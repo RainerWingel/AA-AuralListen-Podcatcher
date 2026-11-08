@@ -2504,6 +2504,18 @@ void main() {
         findsOneWidget,
       );
 
+      // … and to French.
+      await tester.tap(find.text('Language'));
+      await settle(tester);
+      await tester.tap(find.text('Français'));
+      await settle(tester);
+      expect(await stored(), 'fr');
+      expect(find.text('Langue'), findsOneWidget);
+      expect(
+        find.widgetWithText(NavigationDestination, 'Options'),
+        findsOneWidget,
+      );
+
       await disposeApp(tester);
     },
   );
@@ -2522,6 +2534,21 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Choose language'), findsNothing);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'the language picker speaks French on a French device',
+    timeout: timeout,
+    (tester) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('fr', 'BE')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+      await pumpApp(tester, language: null);
+      expect(find.text('Choisir la langue'), findsOneWidget);
+      expect(find.text('Français'), findsOneWidget);
 
       await disposeApp(tester);
     },

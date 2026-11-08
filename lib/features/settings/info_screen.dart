@@ -70,7 +70,7 @@ class InfoScreen extends ConsumerWidget {
             onTap: () => _open(
               context,
               ref,
-              l10n.localeName == 'en' ? privacyPolicyUrlEn : privacyPolicyUrl,
+              l10n.localeName == 'de' ? privacyPolicyUrl : privacyPolicyUrlEn,
             ),
           ),
           // Support (PayPal) lives on GitHub, not in the app: no payment

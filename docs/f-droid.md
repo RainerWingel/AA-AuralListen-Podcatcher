@@ -8,8 +8,8 @@ kommen aus diesem Repo. Stand 2026-10-05: eingereicht (MR !51179); Prüfer verla
 |-----|----|
 | Lizenz GPL-3.0 (offizieller Text) | `LICENSE`, README „Lizenz" |
 | Build-Rezept für F-Droid (Entwurf, wird in *fdroiddata* eingereicht) | `fdroid/io.github.rainerwingel.aurallisten.yml` |
-| Store-Texte, Icon, Changelog – de-DE und en-US | `fastlane/metadata/android/<Sprache>/` |
-| Screenshots (macht der Benutzer selbst) | `fastlane/metadata/android/<Sprache>/images/phoneScreenshots/` |
+| Store-Texte, Changelog – de-DE, en-US, fr-FR; Icon nur de-DE/en-US | `fastlane/metadata/android/<Sprache>/` |
+| Screenshots (macht der Benutzer selbst; nur de-DE und en-US) | `fastlane/metadata/android/<Sprache>/images/phoneScreenshots/` |
 | SQLite aus Quellcode statt heruntergeladener Binärdatei | `third_party/sqlite/`, `hooks:` in `pubspec.yaml` |
 | `audio_service` als angepasste Kopie (Medientaste Pause ist kein Umschalter) | `third_party/audio_service/` (`PATCH.md`), Pfad-Abhängigkeit in `pubspec.yaml` |
 | Ohne `key.properties` bleibt die Release-APK unsigniert | `android/app/build.gradle.kts` |
@@ -151,8 +151,9 @@ der Prüfung nichts.
   `ci.yml` im gewohnten Format, `pubspec.lock` aktuell.
 
 ### Wo trage ich den Changelog ein – und auf Deutsch oder Englisch?
-- **Beide Sprachen**, je eine Datei pro Versionscode:
-  `fastlane/metadata/android/de-DE/changelogs/<Code>.txt` und `fastlane/metadata/android/en-US/changelogs/<Code>.txt`.
+- **Alle drei Sprachen** (ab v1.3.6 auch Französisch), je eine Datei pro Versionscode:
+  `fastlane/metadata/android/de-DE/changelogs/<Code>.txt`, `…/en-US/changelogs/<Code>.txt` und
+  `…/fr-FR/changelogs/<Code>.txt` (Claude übersetzt).
 - Code = Build-Nummer × 10 + 1/2/3, also bei Build-Nummer 501 die Dateien `5011.txt`, `5012.txt`, `5013.txt` (gleicher
   Inhalt, weil F-Droid jedem Handy die APK seiner CPU-Art zeigt). Max. 500 Zeichen, einfacher Text, Aufzählung mit „•".
 - Die F-Droid-App zeigt den Text in der Sprache des Handys; gibt es die nicht, Englisch (en-US). Englisch also nie
@@ -164,7 +165,7 @@ der Prüfung nichts.
 1. Neue Bilder machen (Format und Tipps im Abschnitt „Screenshots" unten).
 2. In `fastlane/metadata/android/de-DE/images/phoneScreenshots/` bzw. `…/en-US/…` legen. Reihenfolge = Dateiname
    (`1.jpg`, `2.jpg` …). Austauschen = Datei mit gleichem Namen ersetzen; Bild entfernen = Datei löschen und die übrigen
-   lückenlos durchnummerieren. Fehlt eine Sprache, zeigt F-Droid die englischen Bilder.
+   lückenlos durchnummerieren. Fehlt eine Sprache, zeigt F-Droid die englischen Bilder (so bei fr-FR, s. u.).
 3. Claude wandelt PNGs in kleine JPGs um, committet und pusht (auf Ansage).
 4. **Sichtbar werden sie erst mit dem nächsten Release (Tag)** – F-Droid liest Bilder und Texte aus dem Stand der
    neuesten gebauten Version, nicht aus dem aktuellen `main`.
@@ -176,7 +177,8 @@ Genauso wie die Screenshots – alles kommt aus diesem Repo, nicht aus fdroiddat
 - `full_description.txt` – lange Beschreibung, **max. 4000 Zeichen**, einfaches HTML erlaubt (`<b>`, `<i>`, `<ul><li>`)
 - `images/icon.png` – Symbol (512 × 512)
 
-jeweils unter `fastlane/metadata/android/de-DE/` und `…/en-US/`. Ändern lassen (oder selbst ändern), committen,
+jeweils unter `fastlane/metadata/android/de-DE/`, `…/en-US/` und `…/fr-FR/` (Inhalt in allen drei Sprachen gleich
+halten). Ändern lassen (oder selbst ändern), committen,
 pushen – sichtbar mit dem **nächsten Release**. Dinge im Rezept (Kategorie, Lizenz, Spenden-Link, Autor) ändern sich
 dagegen nur per Merge Request in fdroiddata (neu forken, Datei bearbeiten → MR).
 
@@ -217,6 +219,10 @@ Auf Android 7–9 ungetestet.
   (Vorher, 2026-10-04: je 5 Bilder, PNG-Originale beim Benutzer unter `~/Pictures/AA-AuralListen-Screenshots-2026-10-04/`.)
 - Vorschlag: Start (mit Hintergrund), Abos, Podcast-Seite, Player, Playlists (mit Farben), Downloads, Optionen.
 - Auf dem Handy: App-Sprache umstellen (Optionen → Sprache) für die englischen Bilder; Seitentaste + Leiser.
+- **Französisch (fr-FR) bewusst ohne eigene Screenshots und ohne Icon** (Benutzer, 2026-11-08): F-Droid wählt jedes
+  Feld einzeln nach der besten vorhandenen Sprache aus; `en-US` ist die Rückfall-Sprache. Ein französisches Handy
+  bekommt also Titel/Beschreibung/Changelog aus `fr-FR`, Screenshots und Icon aus `en-US`. In `fr-FR/images/` darum
+  nichts ablegen – ein halber Satz Bilder würde den Rückfall abschalten.
 - Achtung, öffentlich: nichts Privates im Bild (Benachrichtigungen, Namen in Playlists …).
 
 ## Bekannte Punkte für die Prüfung

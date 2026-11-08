@@ -58,12 +58,18 @@ void main() {
     );
   });
 
+  test('every language has its own chart country', () {
+    expect(AppLanguage.values.map((l) => l.chartCountry), ['de', 'us', 'fr']);
+  });
+
   test('stored setting and device default', () {
     expect(AppLanguage.fromSetting('en'), AppLanguage.en);
     expect(AppLanguage.fromSetting(null), isNull);
-    expect(AppLanguage.fromSetting('fr'), isNull);
+    expect(AppLanguage.fromSetting('fr'), AppLanguage.fr);
+    expect(AppLanguage.fromSetting('it'), isNull);
     expect(AppLanguage.forDevice(const Locale('de', 'AT')), AppLanguage.de);
-    expect(AppLanguage.forDevice(const Locale('fr')), AppLanguage.en);
+    expect(AppLanguage.forDevice(const Locale('fr', 'CA')), AppLanguage.fr);
+    expect(AppLanguage.forDevice(const Locale('it')), AppLanguage.en);
     expect(AppLanguage.forDevice(null), AppLanguage.en);
   });
 
@@ -71,6 +77,8 @@ void main() {
     const size = 1288490189; // 1.2 GiB
     expect(formatBytes(size, 'de'), '1,2 GB');
     expect(formatBytes(size, 'en'), '1.2 GB');
+    expect(formatBytes(size, 'fr'), '1,2 Go');
+    expect(formatBytes(350 * 1024 * 1024, 'fr'), '350 Mo');
   });
 
   test('list dates use the short month name', () async {
@@ -84,5 +92,6 @@ void main() {
     expect(date('de', DateTime(2026, 2, 27)), '27. Feb.');
     expect(date('de', DateTime(2026, 3, 15)), '15. März');
     expect(date('de', DateTime(2025, 9, 26)), '26. Sept. 2025');
+    expect(date('fr', DateTime(2026, 3, 15)), '15 mars');
   });
 }

@@ -255,10 +255,32 @@ void main() {
       ));
     });
 
+    test('French voice commands', () async {
+      final a = await addPodcast('A');
+      final first = await addEpisode(a, '1', day: 1);
+      final list = await playlists.create('Trajet du matin');
+      await playlists.add(list, first);
+      await playlists.setLastEpisode(list, first);
+      final b = await addPodcast('L’Heure du Monde');
+      final newest = await addEpisode(b, 'new', day: 2);
+
+      expect(
+        await car.search(
+          'joue la playlist « Trajet du matin » sur AA-AuralListen',
+        ),
+        (episodeId: first, playlistId: list),
+      );
+      expect(await car.search("lance l'heure du monde"), (
+        episodeId: newest,
+        playlistId: null,
+      ));
+    });
+
     test('nothing matching, or only filler words', () async {
       await addPodcast('A');
       expect(await car.search('Hotel Matze'), isNull);
       expect(await car.search('spiele den Podcast'), isNull);
+      expect(await car.search('joue le podcast'), isNull);
     });
   });
 

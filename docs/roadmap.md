@@ -151,6 +151,12 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Datum/Größen in der gewählten Sprache, Kanalname der Benachrichtigung, Sprache bleibt beim Restore alter Backups
 - [ ] Praxistest auf dem S25 (Benutzer)
 
+## Zusatz – Französisch (2026-11-08)
+- [x] `app_fr.arb` mit allen Texten, Français im Sprachwähler und unter Optionen → Sprache
+- [x] Chart Frankreich, fyyd-Neuheiten auf Französisch, Größen „Go/Mo", französische Füllwörter für Sprachbefehle im Auto
+- [x] F-Droid-Texte `fr-FR` (ohne Screenshots – F-Droid nimmt die englischen)
+- [ ] Ab v1.3.6 Changelogs auch in `fr-FR/changelogs/`
+
 ## Zusatz – Playlist fortsetzen (2026-09-29)
 - [x] Jede Playlist merkt sich die zuletzt daraus gespielte Folge (Schema v7), ▶ und „Fortsetzen" spielen sie weiter
 - [x] Sortieren nur in der geöffneten Playlist, in der Übersicht stattdessen „Fortsetzen"

@@ -53,7 +53,7 @@
 
 <p><b>More</b></p>
 <ul>
-<li>German and English, light and dark mode, selectable app color or the color of your wallpaper (Android 12+)</li>
+<li>German, English and French, light and dark mode, selectable app color or the color of your wallpaper (Android 12+)</li>
 <li>Episode numbers on the covers, backup and restore</li>
 </ul>
 

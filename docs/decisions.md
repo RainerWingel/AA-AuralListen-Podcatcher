@@ -231,3 +231,9 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   das Handy lädt, im WLAN ist und der Bildschirm aus ist – also gerade beim Hören am Ladekabel oder im Auto mit Hotspot.
   Außerdem hätte eine kleinere Sicherung die Datenbank zu Google Drive kopiert, entgegen der Datenschutzerklärung. Die
   App hat ein eigenes Backup (`backup.md`). Geräteumzug per Kabel/Smart Switch (Android 12+) bleibt möglich.
+- 2026-11-08 · **Französisch als dritte Sprache** (Benutzer) · `app_fr.arb` mit allen Texten (Sie-Form, französische
+  Typografie), `AppLanguage.fr`; französisches Gerät → Sprachwähler auf Französisch. „Beliebt" = Apple-Chart Frankreich,
+  „Neuheiten" = fyyd `language=fr`, Größen in „Go/Mo", Datenschutz-Link führt bei allen Sprachen außer Deutsch zur
+  englischen Fassung (keine französische Datenschutzerklärung, die deutsche bleibt maßgeblich). F-Droid-Texte in
+  `fastlane/metadata/android/fr-FR/`, aber **keine französischen Screenshots** (Benutzer) – F-Droid nimmt dann die
+  englischen. Keine neuen Pakete, keine neuen Netzwerkziele.

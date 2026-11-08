@@ -52,7 +52,7 @@
 
 <p><b>Außerdem</b></p>
 <ul>
-<li>Deutsch und Englisch, hell und dunkel, wählbare App-Farbe oder Farbe aus dem Hintergrundbild (Android 12+)</li>
+<li>Deutsch, Englisch und Französisch, hell und dunkel, wählbare App-Farbe oder Farbe aus dem Hintergrundbild (Android 12+)</li>
 <li>Folgennummern auf den Covern, Backup und Wiederherstellung</li>
 </ul>
 

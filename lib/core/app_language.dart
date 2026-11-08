@@ -4,7 +4,8 @@ import 'dart:ui' show Locale;
 /// (`SettingsKeys.language`) and the ARB language code – never rename.
 enum AppLanguage {
   de,
-  en;
+  en,
+  fr;
 
   Locale get locale => Locale(name);
 
@@ -16,8 +17,15 @@ enum AppLanguage {
     return null;
   }
 
-  /// Language used before the user has chosen one: German on German devices,
-  /// English everywhere else.
+  /// Language used before the user has chosen one: the device language if
+  /// the app has it, English everywhere else.
   static AppLanguage forDevice(Locale? deviceLocale) =>
-      deviceLocale?.languageCode == 'de' ? de : en;
+      fromSetting(deviceLocale?.languageCode) ?? en;
+
+  /// Country of Apple's podcast chart ("Beliebt") for this language.
+  String get chartCountry => switch (this) {
+    de => 'de',
+    en => 'us',
+    fr => 'fr',
+  };
 }
