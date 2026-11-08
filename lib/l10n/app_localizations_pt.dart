@@ -1466,5 +1466,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Você pode mudar o idioma depois em Ajustes.';
 
   @override
+  String get newLanguageTitle => 'Agora também em português';
+
+  @override
+  String get newLanguageBody =>
+      'O AA-AuralListen agora está disponível no seu idioma. Quer mudar? Você pode mudar o idioma a qualquer momento em Ajustes → Idioma.';
+
+  @override
+  String get newLanguageSwitch => 'Mudar';
+
+  @override
+  String get newLanguageKeep => 'Agora não';
+
+  @override
   String get notificationChannelPlayback => 'Reprodução';
 }

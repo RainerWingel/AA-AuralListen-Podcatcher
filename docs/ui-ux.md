@@ -307,6 +307,13 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
   English / Français / Español / Português / Русский). Er erscheint in der Gerätesprache, wenn die App sie hat (jedes Land:
   `pt-PT` → Portugiesisch, `es-MX` → Spanisch), sonst Englisch. Ein Tipp speichert die
   Wahl, danach erscheint die App.
+- **Neue Sprache nach einem Update anbieten** (Benutzerwunsch 2026-11-08, `new_language_offer.dart`, unsichtbar in der
+  `AppShell`): Ist die Handysprache eine Sprache, die der Benutzer in der Liste noch nicht gesehen hat, und läuft die
+  App in einer anderen, fragt beim Start **einmal** ein Dialog **in der Handysprache** („Теперь и на русском" …
+  „Переключить" / „Не сейчас"). Gesehen = `settings['ui.knownLanguages']`; fehlt der Schlüssel (Update von 1.3.5 oder
+  älter), gelten nur Deutsch und Englisch als gesehen. Jede Wahl im Sprachwähler/Optionen und jede Antwort (auch
+  Wegtippen) speichert alle Sprachen als gesehen. Wer früher bewusst eine damals vorhandene Sprache gewählt hat (z. B.
+  Englisch auf deutschem Handy), wird nicht gefragt; kommt später eine weitere Sprache dazu, greift es von selbst.
 - Datum und Größen formatieren mit `AppLocalizations.localeName` (nie fest `'de'`). In **Listen** kurzer Monat
   (`formatEpisodeDate`, Benutzerwunsch 2026-09-29): „27. Feb." / „Feb 27", mit Jahr „15. März 2025" / „Mar 15, 2025";
   in Dialogen und Meldungen ausgeschrieben („10. Juni 2025"),

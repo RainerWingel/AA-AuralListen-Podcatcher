@@ -1463,5 +1463,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'You can change the language later in Settings.';
 
   @override
+  String get newLanguageTitle => 'Now in English';
+
+  @override
+  String get newLanguageBody =>
+      'AA-AuralListen is now available in your language. Switch now? You can change the language any time under Settings → Language.';
+
+  @override
+  String get newLanguageSwitch => 'Switch';
+
+  @override
+  String get newLanguageKeep => 'Not now';
+
+  @override
   String get notificationChannelPlayback => 'Playback';
 }

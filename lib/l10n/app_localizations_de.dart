@@ -1465,5 +1465,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Du kannst die Sprache später unter Optionen ändern.';
 
   @override
+  String get newLanguageTitle => 'Jetzt auch auf Deutsch';
+
+  @override
+  String get newLanguageBody =>
+      'AA-AuralListen gibt es jetzt in deiner Sprache. Möchtest du umstellen? Du kannst die Sprache jederzeit unter Optionen → Sprache ändern.';
+
+  @override
+  String get newLanguageSwitch => 'Umstellen';
+
+  @override
+  String get newLanguageKeep => 'Nicht jetzt';
+
+  @override
   String get notificationChannelPlayback => 'Wiedergabe';
 }

@@ -2374,6 +2374,30 @@ abstract class AppLocalizations {
   /// **'Du kannst die Sprache später unter Optionen ändern.'**
   String get languagePickerHint;
 
+  /// Dialog after an update, shown in the NEW language (the phone's): this language is now available.
+  ///
+  /// In de, this message translates to:
+  /// **'Jetzt auch auf Deutsch'**
+  String get newLanguageTitle;
+
+  /// No description provided for @newLanguageBody.
+  ///
+  /// In de, this message translates to:
+  /// **'AA-AuralListen gibt es jetzt in deiner Sprache. Möchtest du umstellen? Du kannst die Sprache jederzeit unter Optionen → Sprache ändern.'**
+  String get newLanguageBody;
+
+  /// No description provided for @newLanguageSwitch.
+  ///
+  /// In de, this message translates to:
+  /// **'Umstellen'**
+  String get newLanguageSwitch;
+
+  /// No description provided for @newLanguageKeep.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht jetzt'**
+  String get newLanguageKeep;
+
   /// Name of the Android notification channel (system settings → app notifications).
   ///
   /// In de, this message translates to:

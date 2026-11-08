@@ -11,6 +11,7 @@ import 'package:aapodcastguru/app/theme.dart';
 import 'package:aapodcastguru/audio/audio_providers.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/core/app_info.dart';
+import 'package:aapodcastguru/core/app_language.dart';
 import 'package:aapodcastguru/core/app_platform.dart';
 import 'package:aapodcastguru/core/link_color.dart';
 import 'package:aapodcastguru/core/panel_design.dart';
@@ -2562,6 +2563,71 @@ void main() {
       },
     );
   }
+
+  group('after an update, a new language matching the phone', () {
+    Future<String?> stored(WidgetTester tester, String key) =>
+        tester.runAsync<String?>(() => SettingsRepository(db).get(key));
+
+    testWidgets('is offered once, in that language', timeout: timeout, (
+      tester,
+    ) async {
+      tester.platformDispatcher.localesTestValue = const [Locale('ru', 'RU')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+      // 1.3.5 user: English chosen, no list of seen languages yet.
+      await pumpApp(tester, language: 'en');
+      expect(find.text('Теперь и на русском'), findsOneWidget);
+      await tester.tap(find.text('Переключить'));
+      await settle(tester);
+      expect(await stored(tester, SettingsKeys.language), 'ru');
+      expect(
+        await stored(tester, SettingsKeys.knownLanguages),
+        AppLanguage.allNames,
+      );
+      expect(
+        find.widgetWithText(NavigationDestination, 'Настройки'),
+        findsOneWidget,
+      );
+      await disposeApp(tester);
+    });
+
+    testWidgets(
+      '"not now" keeps the language and asks no more',
+      timeout: timeout,
+      (tester) async {
+        tester.platformDispatcher.localesTestValue = const [Locale('ru', 'RU')];
+        addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+        await pumpApp(tester, language: 'en');
+        await tester.tap(find.text('Не сейчас'));
+        await settle(tester);
+        expect(await stored(tester, SettingsKeys.language), 'en');
+        expect(find.text('Теперь и на русском'), findsNothing);
+        expect(
+          await stored(tester, SettingsKeys.knownLanguages),
+          AppLanguage.allNames,
+        );
+        await disposeApp(tester);
+
+        await pumpApp(tester, language: 'en');
+        expect(find.text('Теперь и на русском'), findsNothing);
+        await disposeApp(tester);
+      },
+    );
+
+    testWidgets(
+      'a language that existed before is not offered',
+      timeout: timeout,
+      (tester) async {
+        tester.platformDispatcher.localesTestValue = const [Locale('de', 'DE')];
+        addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+        await pumpApp(tester, language: 'en');
+        expect(find.text('Jetzt auch auf Deutsch'), findsNothing);
+        await disposeApp(tester);
+      },
+    );
+  });
 
   testWidgets('feed address can be changed after a move', timeout: timeout, (
     tester,

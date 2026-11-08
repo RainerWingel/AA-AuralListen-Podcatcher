@@ -377,5 +377,9 @@
   "languagePickerWelcome": "Bem-vindo ao Podcatcher “AA-AuralListen”",
   "languagePickerTitle": "Escolha o idioma",
   "languagePickerHint": "Você pode mudar o idioma depois em Ajustes.",
+  "newLanguageTitle": "Agora também em português",
+  "newLanguageBody": "O AA-AuralListen agora está disponível no seu idioma. Quer mudar? Você pode mudar o idioma a qualquer momento em Ajustes → Idioma.",
+  "newLanguageSwitch": "Mudar",
+  "newLanguageKeep": "Agora não",
   "notificationChannelPlayback": "Reprodução"
 }

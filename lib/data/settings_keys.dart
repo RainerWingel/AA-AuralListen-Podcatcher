@@ -15,9 +15,14 @@ abstract final class SettingsKeys {
   /// Background of the player's control panel: a `PanelDesign` name.
   static const panelDesign = 'ui.panelDesign';
 
-  /// UI language: `de` or `en` (AppLanguage names). Missing = not chosen yet,
-  /// the app asks on start.
+  /// UI language: an AppLanguage name (`de`, `en`, `fr` …). Missing = not
+  /// chosen yet, the app asks on start.
   static const language = 'ui.language';
+
+  /// AppLanguage names the user has seen in the language list, comma
+  /// separated. Missing = updated from 1.3.5 or older (`de`, `en`): a newer
+  /// language matching the phone is offered once (NewLanguageOffer).
+  static const knownLanguages = 'ui.knownLanguages';
 
   /// Main color: an AppColor name (`orange` … `wallpaper`). Missing = orange.
   static const appColor = 'ui.appColor';

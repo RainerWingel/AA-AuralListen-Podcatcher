@@ -1503,5 +1503,18 @@ class AppLocalizationsRu extends AppLocalizations {
       'Язык можно будет изменить позже в настройках.';
 
   @override
+  String get newLanguageTitle => 'Теперь и на русском';
+
+  @override
+  String get newLanguageBody =>
+      'AA-AuralListen теперь доступен на вашем языке. Переключить? Язык можно изменить в любой момент в разделе Настройки → Язык.';
+
+  @override
+  String get newLanguageSwitch => 'Переключить';
+
+  @override
+  String get newLanguageKeep => 'Не сейчас';
+
+  @override
   String get notificationChannelPlayback => 'Воспроизведение';
 }

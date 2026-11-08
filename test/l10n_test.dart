@@ -83,6 +83,25 @@ void main() {
     expect(AppLanguage.forDevice(null), AppLanguage.en);
   });
 
+  test('a new language is offered only if it is new to the user', () {
+    AppLanguage? offer(String device, {String? known, String current = 'en'}) =>
+        AppLanguage.newlyAvailable(
+          current: AppLanguage.fromSetting(current),
+          device: Locale(device),
+          known: known,
+        );
+    // Updated from 1.3.5 (nothing stored): only languages added since.
+    expect(offer('ru'), AppLanguage.ru);
+    expect(offer('fr'), AppLanguage.fr);
+    expect(offer('de'), isNull);
+    expect(offer('en', current: 'de'), isNull);
+    expect(offer('ru', current: 'ru'), isNull);
+    expect(offer('it'), isNull);
+    // Seen in the language list (picker, Settings or this offer).
+    expect(offer('ru', known: AppLanguage.allNames), isNull);
+    expect(offer('ru', known: 'de,en,fr,es,pt'), AppLanguage.ru);
+  });
+
   test('sizes use the decimal separator of the language', () {
     const size = 1288490189; // 1.2 GiB
     expect(formatBytes(size, 'de'), '1,2 GB');

@@ -7,9 +7,18 @@ import '../../data/settings_keys.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Stores the chosen UI language; the whole app switches immediately.
-Future<void> setAppLanguage(WidgetRef ref, AppLanguage language) => ref
+/// Whoever chooses has seen all languages: no offer of a new one later.
+Future<void> setAppLanguage(WidgetRef ref, AppLanguage language) async {
+  await rememberKnownLanguages(ref);
+  await ref
+      .read(settingsRepositoryProvider)
+      .set(SettingsKeys.language, language.name);
+}
+
+/// Marks all languages of this version as seen (NewLanguageOffer).
+Future<void> rememberKnownLanguages(WidgetRef ref) => ref
     .read(settingsRepositoryProvider)
-    .set(SettingsKeys.language, language.name);
+    .set(SettingsKeys.knownLanguages, AppLanguage.allNames);
 
 /// Name of a language in that language ("Deutsch", "English", "Français" …).
 String languageName(AppLocalizations l10n, AppLanguage language) =>

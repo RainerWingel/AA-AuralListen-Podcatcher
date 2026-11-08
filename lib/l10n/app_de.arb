@@ -934,6 +934,13 @@
     "description": "First start: shown in the device language before anything is chosen."
   },
   "languagePickerHint": "Du kannst die Sprache später unter Optionen ändern.",
+  "newLanguageTitle": "Jetzt auch auf Deutsch",
+  "@newLanguageTitle": {
+    "description": "Dialog after an update, shown in the NEW language (the phone's): this language is now available."
+  },
+  "newLanguageBody": "AA-AuralListen gibt es jetzt in deiner Sprache. Möchtest du umstellen? Du kannst die Sprache jederzeit unter Optionen → Sprache ändern.",
+  "newLanguageSwitch": "Umstellen",
+  "newLanguageKeep": "Nicht jetzt",
   "notificationChannelPlayback": "Wiedergabe",
   "@notificationChannelPlayback": {
     "description": "Name of the Android notification channel (system settings → app notifications)."

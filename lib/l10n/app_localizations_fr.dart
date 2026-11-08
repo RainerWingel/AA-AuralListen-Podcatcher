@@ -1483,5 +1483,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Vous pourrez changer la langue plus tard dans les Options.';
 
   @override
+  String get newLanguageTitle => 'Désormais en français';
+
+  @override
+  String get newLanguageBody =>
+      'AA-AuralListen est désormais disponible dans votre langue. Voulez-vous changer ? Vous pouvez changer de langue à tout moment dans Options → Langue.';
+
+  @override
+  String get newLanguageSwitch => 'Changer';
+
+  @override
+  String get newLanguageKeep => 'Pas maintenant';
+
+  @override
   String get notificationChannelPlayback => 'Lecture';
 }

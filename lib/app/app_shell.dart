@@ -8,6 +8,7 @@ import '../core/widgets/info_snack_bar.dart';
 import '../data/podcast_repository.dart' show RefreshProgress;
 import '../data/providers.dart';
 import '../features/player/mini_player.dart';
+import '../features/settings/new_language_offer.dart';
 import '../l10n/app_localizations.dart';
 
 /// Scaffold with the bottom navigation bar shared by all top-level tabs.
@@ -59,6 +60,7 @@ class AppShell extends ConsumerWidget {
       body: Stack(
         children: [
           navigationShell,
+          const NewLanguageOffer(),
           // Floats over the bottom edge, so lists do not jump when it
           // appears (user wish 2026-10-10).
           if (progress != null)

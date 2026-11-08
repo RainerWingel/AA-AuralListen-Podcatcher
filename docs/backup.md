@@ -22,7 +22,8 @@ Optionen → Sicherung → „Backup erstellen" → Speichern-Dialog (`AA-AuralL
 - **Nicht** enthalten: Audiodateien (Downloads) und die Kapitelbilder aus MP3-Tags (`chapter_images/`) – sie werden beim
   Öffnen der Kapitel automatisch neu gelesen (`playback.md`).
 - Sprache: Enthält das Backup `ui.language`, wird sie übernommen; ältere Backups ohne Sprache behalten die aktuelle
-  (sonst käme die Sprachabfrage des ersten Starts zurück).
+  (sonst käme die Sprachabfrage des ersten Starts zurück). `ui.knownLanguages` kommt wie alle Einstellungen aus dem
+  Backup; ein altes Backup ohne den Schlüssel bietet eine neue Handysprache darum noch einmal an (gewollt, harmlos).
 
 ## Wiederherstellen
 Optionen → Sicherung → „Backup wiederherstellen" → Datei wählen → Vorschau (Datum, Anzahl Abos/Folgen/Playlists/

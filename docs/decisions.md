@@ -246,3 +246,7 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   drei russischen Mehrzahl-Formen, Größen „ГБ/МБ", „Beliebt" = Apple-Chart Russland, „Neuheiten" = fyyd `language=ru`
   (beide liefern Daten, geprüft 2026-11-08). F-Droid-Texte `ru-RU/` ohne Screenshots. Italienisch als siebte Sprache
   vorgeschlagen, noch nicht entschieden.
+- 2026-11-08 · **Neue Sprache nach dem Update einmal anbieten** (Benutzer) · Ein Russe, der 1.3.5 auf Englisch nutzte,
+  soll nach 1.3.6 erfahren, dass es Russisch gibt. Dialog in der neuen Sprache, einmalig, nur für Sprachen, die der
+  Benutzer noch nicht in der Liste gesehen hat (`ui.knownLanguages`, fehlt = `de,en`). Kein erneutes Fragen nach
+  „Nicht jetzt"; bewusst gewählte, damals vorhandene Sprachen bleiben unangetastet.

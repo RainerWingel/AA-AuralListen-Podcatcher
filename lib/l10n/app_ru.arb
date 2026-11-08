@@ -377,5 +377,9 @@
   "languagePickerWelcome": "Добро пожаловать в подкаст-плеер «AA-AuralListen»",
   "languagePickerTitle": "Выберите язык",
   "languagePickerHint": "Язык можно будет изменить позже в настройках.",
+  "newLanguageTitle": "Теперь и на русском",
+  "newLanguageBody": "AA-AuralListen теперь доступен на вашем языке. Переключить? Язык можно изменить в любой момент в разделе Настройки → Язык.",
+  "newLanguageSwitch": "Переключить",
+  "newLanguageKeep": "Не сейчас",
   "notificationChannelPlayback": "Воспроизведение"
 }

@@ -167,6 +167,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] `app_ru.arb` mit drei Mehrzahl-Formen, Русский im Sprachwähler, Größen „ГБ/МБ"
 - [x] Chart Russland, fyyd-Neuheiten `ru`, russische Füllwörter für Sprachbefehle im Auto
 - [x] F-Droid-Texte `ru-RU` (ohne Screenshots)
+- [x] Nach dem Update einmal anbieten, auf die neue Handysprache umzustellen (Dialog in dieser Sprache)
 - [ ] Durchsicht der Texte durch den Benutzer (Muttersprache) am A05s
 - [ ] Ab v1.3.6 Changelogs auch in `ru-RU/changelogs/`
 
