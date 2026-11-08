@@ -925,6 +925,10 @@
   "@languageRussian": {
     "description": "Always the language's own name – same text in every ARB file."
   },
+  "languageItalian": "Italiano",
+  "@languageItalian": {
+    "description": "Always the language's own name – same text in every ARB file."
+  },
   "languagePickerWelcome": "Willkommen beim Podcatcher „AA-AuralListen“",
   "@languagePickerWelcome": {
     "description": "First start: headline at the top of the language picker."

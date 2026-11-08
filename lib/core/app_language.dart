@@ -8,7 +8,8 @@ enum AppLanguage {
   fr,
   es,
   pt,
-  ru;
+  ru,
+  it;
 
   Locale get locale => Locale(name);
 
@@ -57,5 +58,6 @@ enum AppLanguage {
     es => 'es',
     pt => 'br',
     ru => 'ru',
+    it => 'it',
   };
 }

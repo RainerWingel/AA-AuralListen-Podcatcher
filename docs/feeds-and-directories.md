@@ -14,10 +14,10 @@ Code: `lib/data/directory/directory_search.dart`, UI: `lib/features/search/searc
 - Fällt ein Dienst aus, werden die anderen trotzdem angezeigt (Hinweis-Banner „… nicht erreichbar").
 - **„Beliebt“ und „Neuheiten“** (Benutzerwunsch 2026-10-21): Zwei Knöpfe unter „Durchsucht Apple Podcasts und fyyd.de“ im leeren
   Suchbildschirm. **Beliebt** = Apples Chart der Top-Podcasts (Benutzerwunsch 2026-10-21: nach App-Sprache – Deutsch → Deutschland `de`,
-  Englisch → USA `us`, Französisch → Frankreich `fr`, Spanisch → Spanien `es`, Portugiesisch → Brasilien `br`, Russisch → Russland `ru` (`AppLanguage.chartCountry`); `rss.applemarketingtools.com/api/v2/<Land>/podcasts/top/50/podcasts.json`, Rang 1 zuerst); die Charts enthalten nur Id und
+  Englisch → USA `us`, Französisch → Frankreich `fr`, Spanisch → Spanien `es`, Portugiesisch → Brasilien `br`, Russisch → Russland `ru`, Italienisch → Italien `it` (`AppLanguage.chartCountry`); `rss.applemarketingtools.com/api/v2/<Land>/podcasts/top/50/podcasts.json`, Rang 1 zuerst); die Charts enthalten nur Id und
   Name, die Feed-Adressen kommen mit **einem** iTunes-„lookup“ (`id=1,2,…` für alle 50), Podcasts ohne Feed-Adresse
   (Apple-exklusiv) fallen heraus. **Neuheiten** = fyyd `/0.2/podcast/latest?language=<App-Sprache>` (Benutzerwunsch 2026-10-21: Sprache aus
-  den Einstellungen, `de`, `en`, `fr`, `es`, `pt` oder `ru`; neu aufgenommene Podcasts, neueste zuerst, nur mit mindestens einer Folge). Anzeige wie Suchergebnisse (⊕ → vorläufig hinzufügen); oben zwei Auswahl-Chips
+  den Einstellungen, `de`, `en`, `fr`, `es`, `pt`, `ru` oder `it`; neu aufgenommene Podcasts, neueste zuerst, nur mit mindestens einer Folge). Anzeige wie Suchergebnisse (⊕ → vorläufig hinzufügen); oben zwei Auswahl-Chips
   zum Wechseln, eine neue Suche beendet die Liste. Eine Liste wird bei einem Fehler **einmal** nach 0,5 s neu
   versucht (auf dem A05s schlug die allererste Anfrage einmal fehl); ist die Quelle dann nicht erreichbar: „Suche
   fehlgeschlagen“ statt leerer Liste. Code: `TopCharts.top`, `NewPodcasts.latest`, `DirectorySearch.top/latest`.

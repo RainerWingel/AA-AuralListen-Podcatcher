@@ -66,6 +66,7 @@ void main() {
       'es',
       'br',
       'ru',
+      'it',
     ]);
   });
 
@@ -73,13 +74,14 @@ void main() {
     expect(AppLanguage.fromSetting('en'), AppLanguage.en);
     expect(AppLanguage.fromSetting(null), isNull);
     expect(AppLanguage.fromSetting('fr'), AppLanguage.fr);
-    expect(AppLanguage.fromSetting('it'), isNull);
+    expect(AppLanguage.fromSetting('nl'), isNull);
     expect(AppLanguage.forDevice(const Locale('de', 'AT')), AppLanguage.de);
     expect(AppLanguage.forDevice(const Locale('fr', 'CA')), AppLanguage.fr);
     expect(AppLanguage.forDevice(const Locale('es', 'MX')), AppLanguage.es);
     expect(AppLanguage.forDevice(const Locale('pt', 'PT')), AppLanguage.pt);
     expect(AppLanguage.forDevice(const Locale('ru', 'KZ')), AppLanguage.ru);
-    expect(AppLanguage.forDevice(const Locale('it')), AppLanguage.en);
+    expect(AppLanguage.forDevice(const Locale('it', 'CH')), AppLanguage.it);
+    expect(AppLanguage.forDevice(const Locale('nl')), AppLanguage.en);
     expect(AppLanguage.forDevice(null), AppLanguage.en);
   });
 
@@ -96,7 +98,8 @@ void main() {
     expect(offer('de'), isNull);
     expect(offer('en', current: 'de'), isNull);
     expect(offer('ru', current: 'ru'), isNull);
-    expect(offer('it'), isNull);
+    expect(offer('it'), AppLanguage.it);
+    expect(offer('nl'), isNull);
     // Seen in the language list (picker, Settings or this offer).
     expect(offer('ru', known: AppLanguage.allNames), isNull);
     expect(offer('ru', known: 'de,en,fr,es,pt'), AppLanguage.ru);

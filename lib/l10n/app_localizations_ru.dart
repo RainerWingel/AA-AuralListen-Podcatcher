@@ -1492,6 +1492,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get languageRussian => 'Русский';
 
   @override
+  String get languageItalian => 'Italiano';
+
+  @override
   String get languagePickerWelcome =>
       'Добро пожаловать в подкаст-плеер «AA-AuralListen»';
 

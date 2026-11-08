@@ -53,7 +53,7 @@
 
 <p><b>Et aussi</b></p>
 <ul>
-<li>Français, allemand, anglais, espagnol, portugais et russe, mode clair et sombre, couleur au choix ou celle du fond d’écran (Android 12+)</li>
+<li>Français, allemand, anglais, espagnol, portugais, russe et italien, mode clair et sombre, couleur au choix ou celle du fond d’écran (Android 12+)</li>
 <li>Numéros d’épisode sur les pochettes, sauvegarde et restauration</li>
 </ul>
 

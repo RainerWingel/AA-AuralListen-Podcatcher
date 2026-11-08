@@ -250,3 +250,6 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   soll nach 1.3.6 erfahren, dass es Russisch gibt. Dialog in der neuen Sprache, einmalig, nur für Sprachen, die der
   Benutzer noch nicht in der Liste gesehen hat (`ui.knownLanguages`, fehlt = `de,en`). Kein erneutes Fragen nach
   „Nicht jetzt"; bewusst gewählte, damals vorhandene Sprachen bleiben unangetastet.
+- 2026-11-08 · **Italienisch als siebte Sprache** (Benutzer) · `app_it.arb` (Du-Form), „Beliebt" = Apple-Chart Italien,
+  „Neuheiten" = fyyd `language=it` (beide liefern Daten, geprüft 2026-11-08). F-Droid-Texte `it-IT/` ohne Screenshots.
+  Danach Release 1.3.6.

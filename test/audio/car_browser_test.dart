@@ -297,6 +297,21 @@ void main() {
       ));
     });
 
+    test('Italian voice commands', () async {
+      final a = await addPodcast('A');
+      final first = await addEpisode(a, '1', day: 1);
+      final list = await playlists.create('Viaggio in macchina');
+      await playlists.add(list, first);
+      await playlists.setLastEpisode(list, first);
+
+      expect(
+        await car.search(
+          'riproduci la playlist “Viaggio in macchina” su AA-AuralListen',
+        ),
+        (episodeId: first, playlistId: list),
+      );
+    });
+
     test('Russian voice commands', () async {
       final a = await addPodcast('Дилетант');
       final newest = await addEpisode(a, 'new', day: 2);
@@ -315,6 +330,7 @@ void main() {
       expect(await car.search('pon el podcast'), isNull);
       expect(await car.search('toca o podcast'), isNull);
       expect(await car.search('Включи подкаст'), isNull);
+      expect(await car.search('riproduci il podcast'), isNull);
     });
   });
 

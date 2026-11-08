@@ -168,8 +168,13 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Chart Russland, fyyd-Neuheiten `ru`, russische Füllwörter für Sprachbefehle im Auto
 - [x] F-Droid-Texte `ru-RU` (ohne Screenshots)
 - [x] Nach dem Update einmal anbieten, auf die neue Handysprache umzustellen (Dialog in dieser Sprache)
-- [ ] Durchsicht der Texte durch den Benutzer (Muttersprache) am A05s
+- [x] Durchsicht der Texte durch den Benutzer (Muttersprache) am A05s – „passt"
 - [ ] Ab v1.3.6 Changelogs auch in `ru-RU/changelogs/`
+
+## Zusatz – Italienisch (2026-11-08)
+- [x] `app_it.arb`, Italiano im Sprachwähler, Chart Italien, fyyd-Neuheiten `it`, Füllwörter für Sprachbefehle
+- [x] F-Droid-Texte `it-IT` (ohne Screenshots)
+- [ ] Ab v1.3.6 Changelogs auch in `it-IT/changelogs/`
 
 ## Zusatz – Playlist fortsetzen (2026-09-29)
 - [x] Jede Playlist merkt sich die zuletzt daraus gespielte Folge (Schema v7), ▶ und „Fortsetzen" spielen sie weiter

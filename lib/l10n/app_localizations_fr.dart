@@ -1472,6 +1472,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get languageRussian => 'Русский';
 
   @override
+  String get languageItalian => 'Italiano';
+
+  @override
   String get languagePickerWelcome =>
       'Bienvenue dans le Podcatcher « AA-AuralListen »';
 
