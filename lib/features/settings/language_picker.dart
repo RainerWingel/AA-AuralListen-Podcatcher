@@ -19,6 +19,7 @@ String languageName(AppLocalizations l10n, AppLanguage language) =>
       AppLanguage.fr => l10n.languageFrench,
       AppLanguage.es => l10n.languageSpanish,
       AppLanguage.pt => l10n.languagePortuguese,
+      AppLanguage.ru => l10n.languageRussian,
     };
 
 /// First start: asks for the UI language before the app is shown.

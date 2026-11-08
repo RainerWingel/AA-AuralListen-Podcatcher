@@ -165,7 +165,7 @@ class CarBrowser {
   /// Lower-case words of a spoken query, without quotes and filler words
   /// the voice assistant may pass on ("spiele die Playlist „…“ in
   /// AA-AuralListen", "joue la playlist « … » sur AA-AuralListen", "pon la
-  /// playlist …", "toca o podcast …").
+  /// playlist …", "toca o podcast …", "включи плейлист …").
   static List<String> _words(String query) => [
     for (final w in query.toLowerCase().split(RegExp('[\\s,.!?\'"„“”‚‘’«»]+')))
       if (w.isNotEmpty && !_fillers.contains(w)) w,
@@ -244,6 +244,22 @@ class CarBrowser {
     'em',
     'meu',
     'minha',
+    'включи',
+    'включить',
+    'поставь',
+    'запусти',
+    'играй',
+    'воспроизведи',
+    'послушать',
+    'плейлист',
+    'подкаст',
+    'в',
+    'на',
+    'из',
+    'с',
+    'мой',
+    'мою',
+    'мои',
   };
 
   /// Problems after which playback stands still: the car must say why.

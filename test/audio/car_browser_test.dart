@@ -297,6 +297,16 @@ void main() {
       ));
     });
 
+    test('Russian voice commands', () async {
+      final a = await addPodcast('Дилетант');
+      final newest = await addEpisode(a, 'new', day: 2);
+
+      expect(await car.search('Включи подкаст «Дилетант» в AA-AuralListen'), (
+        episodeId: newest,
+        playlistId: null,
+      ));
+    });
+
     test('nothing matching, or only filler words', () async {
       await addPodcast('A');
       expect(await car.search('Hotel Matze'), isNull);
@@ -304,6 +314,7 @@ void main() {
       expect(await car.search('joue le podcast'), isNull);
       expect(await car.search('pon el podcast'), isNull);
       expect(await car.search('toca o podcast'), isNull);
+      expect(await car.search('Включи подкаст'), isNull);
     });
   });
 

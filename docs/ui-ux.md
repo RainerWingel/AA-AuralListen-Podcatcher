@@ -1,6 +1,6 @@
 # UI / UX
 
-Vorbild: **Castbox**. Material 3, fünf Sprachen (de, en, fr, es, pt), Hell/Dunkel (Dunkel ab M7).
+Vorbild: **Castbox**. Material 3, sechs Sprachen (de, en, fr, es, pt, ru), Hell/Dunkel (Dunkel ab M7).
 Schrift: **Bildschirmtitel (AppBar) in Fredoka** halbfett (600) (Benutzerwahl 2026-09-30, zuerst Playfair Display,
 dann gewechselt; `AppTheme.titleFontFamily`, über `appBarTheme.titleTextStyle`); alles andere inkl. Tab-Beschriftungen
 in der Systemschrift. Die Schrift liegt als variable TTF in `assets/fonts/` (Gewicht über die `wght`-Achse), Lizenz
@@ -247,7 +247,7 @@ Beim Aktualisieren aller Podcasts (App-Start, Pull-to-Refresh) zeigt unten je la
 Hat ein Pull-to-Refresh Umzüge erkannt, meldet eine Infobox mit Namen (Benutzerwunsch 2026-10-30): „Podcast „XY“ ist umgezogen – die Adresse wurde aktualisiert." bzw. „N Podcasts sind umgezogen (A, B, C, …) – …" (höchstens 3 Namen, alter Titel vor dem Refresh)
 
 ## Optionen
-Abschnitt „Darstellung": „Sprache" → Dialog Deutsch / English / Français / Español / Português (`settings['ui.language']`, die App wechselt sofort) und
+Abschnitt „Darstellung": „Sprache" → Dialog Deutsch / English / Français / Español / Português / Русский (`settings['ui.language']`, die App wechselt sofort) und
 **„Design"** → eigene Seite (`design_screen.dart`, Benutzerwunsch 2026-10-26; Route `/einstellungen/design`):
 - **System / Hell / Dunkel** (`settings['ui.themeMode']`, Dark Mode aus derselben Grundfarbe) und
 - **„App-Farbe"** → Dialog mit 8 Farbkreisen + „Wie Hintergrundbild" (nur wenn das Handy Wallpaper-Farben liefert,
@@ -278,7 +278,7 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
   setzt `persist: false`. Test: `test/core/info_snack_bar_test.dart`.
 
 ## Sprache und Texte
-- Alle Texte in `lib/l10n/app_de.arb` (Vorlage), `app_en.arb`, `app_fr.arb`, `app_es.arb`, `app_pt.arb` – **jeder neue
+- Alle Texte in `lib/l10n/app_de.arb` (Vorlage), `app_en.arb`, `app_fr.arb`, `app_es.arb`, `app_pt.arb`, `app_ru.arb` – **jeder neue
   Schlüssel in alle**
   (Test `test/l10n_test.dart` prüft das). Deutsch in Du-Form, Englisch im gleichen lockeren Ton; kurz.
 - **Französisch** (seit 2026-11-08) in der **Sie-Form** („vous", in französischen Apps üblich). Typografie: geschütztes
@@ -292,13 +292,19 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
   Größen in GB/MB. Segment-Knöpfe gleich kurz: Boost aus „No"/„Não" („Ninguno" brach am A05s um), Auto-Download „Solo wifi"/„Só Wi-Fi",
   Tempo „Normal (1,0x)". Tabs: „Inicio · Suscritos · Playlists · Descargas · Ajustes" /
   „Início · Inscrições · Playlists · Downloads · Ajustes".
+- **Russisch** (seit 2026-11-08, Muttersprache des Benutzers – er prüft die Texte): „Вы"-Form, „выпуск" für Folge,
+  Anführungszeichen «…», Gedankenstrich —, Größen „ГБ/МБ" (`formatBytes`). **Drei Mehrzahl-Formen** über
+  `one`/`few`/`many`/`other` (1/21 выпуск, 2/22 выпуска, 5/11 выпусков; Test in `l10n_test.dart`). Achtung: Flutter
+  wertet `=1` und `one` gleich aus (der Generator warnt) – darum in `app_ru.arb` nie beide in einer Nachricht, und
+  `one`-Texte müssen auch für 21, 31 … passen. Segment-Knöpfe: Boost aus „Нет", Auto-Download „Выкл. / По Wi-Fi /
+  Всегда", Tempo „Обычная (1,0x)". Tabs: „Главная · Подписки · Плейлисты · Загрузки · Настройки".
 - Neue Sprache: ARB-Datei anlegen, Wert in `AppLanguage` (`lib/core/app_language.dart`, mit Chart-Land), Name in
   `languageName` und als `language<Sprache>` in allen ARB-Dateien, ggf. Füllwörter für Sprachbefehle
   (`car_browser.dart`), F-Droid-Ordner `fastlane/metadata/android/<xx-XX>/` (`f-droid.md`).
 - **Erster Start:** Ist `ui.language` nicht gesetzt, zeigt `AuralListenApp` (über `MaterialApp.builder`) statt der App
   den Sprachwähler (`lib/features/settings/language_picker.dart`: oben „Willkommen beim Podcatcher
   „AA-AuralListen“" / „Welcome to the Podcatcher …", App-Symbol, „Sprache wählen", Knöpfe Deutsch /
-  English / Français / Español / Português). Er erscheint in der Gerätesprache, wenn die App sie hat (jedes Land:
+  English / Français / Español / Português / Русский). Er erscheint in der Gerätesprache, wenn die App sie hat (jedes Land:
   `pt-PT` → Portugiesisch, `es-MX` → Spanisch), sonst Englisch. Ein Tipp speichert die
   Wahl, danach erscheint die App.
 - Datum und Größen formatieren mit `AppLocalizations.localeName` (nie fest `'de'`). In **Listen** kurzer Monat

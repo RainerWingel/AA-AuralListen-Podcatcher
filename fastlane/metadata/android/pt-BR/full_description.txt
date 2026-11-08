@@ -53,7 +53,7 @@
 
 <p><b>E mais</b></p>
 <ul>
-<li>Português, espanhol, francês, alemão e inglês, modo claro e escuro, cor à escolha ou a do papel de parede (Android 12+)</li>
+<li>Português, espanhol, francês, alemão, inglês e russo, modo claro e escuro, cor à escolha ou a do papel de parede (Android 12+)</li>
 <li>Números de episódio nas capas, backup e restauração</li>
 </ul>
 

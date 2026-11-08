@@ -373,7 +373,8 @@ Gruppe „Android Auto" in `podcast_audio_handler_test.dart`.
   und Anführungszeichen fallen weg – „Spiele die Playlist 'Wiedergabeliste' in AA-AuralListen" findet „Wiedergabeliste".
   Französische Füllwörter (seit 2026-11-08: „joue", „lance", „la", „le", „l'", „de", „du", „sur", „émission" …) ebenso –
   „Joue la playlist « Trajet » sur AA-AuralListen" findet „Trajet". Spanisch/Portugiesisch genauso („pon", „reproduce",
-  „el", „en", „toca", „o", „a", „do", „no" …). Die Füllwörter gelten unabhängig von der App-Sprache
+  „el", „en", „toca", „o", „a", „do", „no" …) und Russisch („включи", „поставь", „подкаст", „плейлист",
+  „в", „на" …; gebeugte Namen wie „Утреннюю" statt „Утренняя" findet die Suche nicht). Die Füllwörter gelten unabhängig von der App-Sprache
   (Google kann eine andere Sprache als die App sprechen).
   Nichts gefunden → Meldung „Nichts gefunden für …" im Auto. Folgentitel werden nicht durchsucht.
 - **Fehler im Auto:** Probleme, nach denen die Wiedergabe steht (Laden fehlgeschlagen, Hänger aufgegeben, Folge beim

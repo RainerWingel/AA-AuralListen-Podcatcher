@@ -2543,6 +2543,7 @@ void main() {
     (const Locale('fr', 'BE'), 'Choisir la langue'),
     (const Locale('es', 'MX'), 'Elige el idioma'),
     (const Locale('pt', 'BR'), 'Escolha o idioma'),
+    (const Locale('ru', 'RU'), 'Выберите язык'),
   ]) {
     testWidgets(
       'the language picker speaks the language of a $device device',
@@ -2553,7 +2554,7 @@ void main() {
 
         await pumpApp(tester, language: null);
         expect(find.text(title), findsOneWidget);
-        for (final name in ['Français', 'Español', 'Português']) {
+        for (final name in ['Français', 'Español', 'Português', 'Русский']) {
           expect(find.text(name), findsOneWidget);
         }
 

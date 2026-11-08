@@ -10,6 +10,7 @@ import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
 import 'app_localizations_fr.dart';
 import 'app_localizations_pt.dart';
+import 'app_localizations_ru.dart';
 
 // ignore_for_file: type=lint
 
@@ -102,6 +103,7 @@ abstract class AppLocalizations {
     Locale('es'),
     Locale('fr'),
     Locale('pt'),
+    Locale('ru'),
   ];
 
   /// No description provided for @appTitle.
@@ -2348,6 +2350,12 @@ abstract class AppLocalizations {
   /// **'Português'**
   String get languagePortuguese;
 
+  /// Always the language's own name – same text in every ARB file.
+  ///
+  /// In de, this message translates to:
+  /// **'Русский'**
+  String get languageRussian;
+
   /// First start: headline at the top of the language picker.
   ///
   /// In de, this message translates to:
@@ -2383,8 +2391,14 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['de', 'en', 'es', 'fr', 'pt'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'de',
+    'en',
+    'es',
+    'fr',
+    'pt',
+    'ru',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -2403,6 +2417,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsFr();
     case 'pt':
       return AppLocalizationsPt();
+    case 'ru':
+      return AppLocalizationsRu();
   }
 
   throw FlutterError(

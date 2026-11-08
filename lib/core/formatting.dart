@@ -38,15 +38,19 @@ String formatClock(Duration duration) {
 }
 
 /// "350 MB", "1,2 GB" (decimal separator of [locale]: "1.2 GB" in English;
-/// French writes octets: "1,2 Go").
+/// French writes octets: "1,2 Go", Russian Cyrillic units: "1,2 ГБ").
 String formatBytes(int bytes, String locale) {
   const mb = 1024 * 1024;
   const gb = 1024 * mb;
-  final french = locale.startsWith('fr');
+  final (gbUnit, mbUnit) = switch (locale.split('_').first) {
+    'fr' => ('Go', 'Mo'),
+    'ru' => ('ГБ', 'МБ'),
+    _ => ('GB', 'MB'),
+  };
   if (bytes >= gb) {
     final value = NumberFormat('#,##0.0', locale).format(bytes / gb);
-    return '$value ${french ? 'Go' : 'GB'}';
+    return '$value $gbUnit';
   }
   final value = NumberFormat('#,##0', locale).format((bytes / mb).ceil());
-  return '$value ${french ? 'Mo' : 'MB'}';
+  return '$value $mbUnit';
 }

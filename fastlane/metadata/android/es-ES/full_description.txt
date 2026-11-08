@@ -53,7 +53,7 @@
 
 <p><b>Además</b></p>
 <ul>
-<li>Español, portugués, francés, alemán e inglés, modo claro y oscuro, color a elegir o el del fondo de pantalla (Android 12+)</li>
+<li>Español, portugués, francés, alemán, inglés y ruso, modo claro y oscuro, color a elegir o el del fondo de pantalla (Android 12+)</li>
 <li>Números de episodio en las portadas, copia de seguridad y restauración</li>
 </ul>
 

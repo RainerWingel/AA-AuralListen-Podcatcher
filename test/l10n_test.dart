@@ -65,6 +65,7 @@ void main() {
       'fr',
       'es',
       'br',
+      'ru',
     ]);
   });
 
@@ -77,6 +78,7 @@ void main() {
     expect(AppLanguage.forDevice(const Locale('fr', 'CA')), AppLanguage.fr);
     expect(AppLanguage.forDevice(const Locale('es', 'MX')), AppLanguage.es);
     expect(AppLanguage.forDevice(const Locale('pt', 'PT')), AppLanguage.pt);
+    expect(AppLanguage.forDevice(const Locale('ru', 'KZ')), AppLanguage.ru);
     expect(AppLanguage.forDevice(const Locale('it')), AppLanguage.en);
     expect(AppLanguage.forDevice(null), AppLanguage.en);
   });
@@ -89,6 +91,23 @@ void main() {
     expect(formatBytes(350 * 1024 * 1024, 'fr'), '350 Mo');
     expect(formatBytes(size, 'es'), '1,2 GB');
     expect(formatBytes(size, 'pt'), '1,2 GB');
+    expect(formatBytes(size, 'ru'), '1,2 ГБ');
+    expect(formatBytes(350 * 1024 * 1024, 'ru'), '350 МБ');
+  });
+
+  test('Russian uses its three plural forms', () {
+    final ru = lookupAppLocalizations(const Locale('ru'));
+    expect(ru.episodeCount(0), 'Нет выпусков');
+    expect(ru.episodeCount(1), '1 выпуск');
+    expect(ru.episodeCount(2), '2 выпуска');
+    expect(ru.episodeCount(5), '5 выпусков');
+    expect(ru.episodeCount(11), '11 выпусков');
+    expect(ru.episodeCount(21), '21 выпуск');
+    expect(ru.episodeCount(22), '22 выпуска');
+    expect(ru.episodeCount(25), '25 выпусков');
+    expect(ru.ratingStars(5), '5 звёзд');
+    expect(ru.feedsMoved(1, 'A'), '1 подкаст переехал (A) — адрес обновлён.');
+    expect(ru.feedsMoved(21, 'A'), startsWith('21 подкаст переехал'));
   });
 
   test('list dates use the short month name', () async {

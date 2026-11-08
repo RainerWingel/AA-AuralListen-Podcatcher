@@ -921,6 +921,10 @@
   "@languagePortuguese": {
     "description": "Always the language's own name – same text in every ARB file."
   },
+  "languageRussian": "Русский",
+  "@languageRussian": {
+    "description": "Always the language's own name – same text in every ARB file."
+  },
   "languagePickerWelcome": "Willkommen beim Podcatcher „AA-AuralListen“",
   "@languagePickerWelcome": {
     "description": "First start: headline at the top of the language picker."
