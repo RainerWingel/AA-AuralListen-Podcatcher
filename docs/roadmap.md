@@ -199,7 +199,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [ ] Akku-Vergleich: 20–30 min Video-Folge mit und ohne „Bild bei Video-Folgen" (Benutzer, später)
 - [ ] Geparkt (2c): Audio-/Video-Fassung derselben Folge (`podcast:alternateEnclosure`) – nur bei echtem Bedarf
 - [x] Stufe 3: Bild im Bild (PiP) mit −15/Play-Pause/+30 im Fenster, Optionen → „Bild im Bild", auf dem A05s geprüft
-- [ ] Praxistest Stufe 3 (Benutzer)
+- [x] Praxistest Stufe 3 (Benutzer, 2026-11-12): erfolgreich
 
 ## Zusatz – Playlist fortsetzen (2026-09-29)
 - [x] Jede Playlist merkt sich die zuletzt daraus gespielte Folge (Schema v7), ▶ und „Fortsetzen" spielen sie weiter
