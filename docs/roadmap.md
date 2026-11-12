@@ -189,7 +189,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Player: Video statt Cover, Vollbild quer, Steuerung zum Einblenden; Hintergrund/Auto nur Ton
 - [x] 🎥 in Folgenlisten und Downloads; Auto-Download von Video nur über WLAN
 - [x] Texte in sieben Sprachen, Store-Texte „Audio und Video", Tests
-- [ ] Praxistest auf dem A05s (Benutzer): Video-Feed abonnieren, Vollbild, Bildschirm aus → Ton läuft weiter
+- [x] Praxistest auf dem A05s (Benutzer, 2026-11-12, „tagesschau in 100 Sekunden"): alles in Ordnung; erwartet fehlte
+  nur Bild im Bild bei der Home-Taste (= Stufe 3). Weitere Test-Feeds: tagesthemen, logo! (ZDF), Sendung mit der Maus
+  (meldet `video/mpeg` für MP4), TWiT (HD, ~3 GB je Folge)
 - [ ] Stufe 2: Audio-/Video-Varianten (`podcast:alternateEnclosure`), „Video-Folgen: Bild / nur Ton", Größenhinweis
 - [ ] Stufe 3: Bild im Bild (PiP)
 
