@@ -194,7 +194,9 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
   (meldet `video/mpeg` für MP4), TWiT (HD, ~3 GB je Folge)
 - [x] Stufe 2a: Optionen → „Bild bei Video-Folgen" (aus = nur Ton)
 - [x] Stufe 2b: Rückfrage beim Herunterladen von Video-Folgen (Nur WLAN / Sofort), „Alles herunterladen" lädt Video nur über WLAN
-- [ ] Praxistest Stufe 2 auf dem A05s (Benutzer)
+- [x] Praxistest Stufe 2 auf dem A05s (Benutzer, 2026-11-12): Schalter, Download-Rückfrage, „Alles herunterladen",
+  Spul-Fix bei vorläufigen Podcasts – alles in Ordnung
+- [ ] Akku-Vergleich: 20–30 min Video-Folge mit und ohne „Bild bei Video-Folgen" (Benutzer, später)
 - [ ] Geparkt (2c): Audio-/Video-Fassung derselben Folge (`podcast:alternateEnclosure`) – nur bei echtem Bedarf
 - [ ] Stufe 3: Bild im Bild (PiP)
 
