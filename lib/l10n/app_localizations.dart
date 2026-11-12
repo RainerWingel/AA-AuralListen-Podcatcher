@@ -768,6 +768,18 @@ abstract class AppLocalizations {
   /// **'Aus: nur Ton, spart Akku. Beim Streamen wird das Bild trotzdem mitgeladen.'**
   String get videoPictureHint;
 
+  /// No description provided for @videoPip.
+  ///
+  /// In de, this message translates to:
+  /// **'Bild im Bild'**
+  String get videoPip;
+
+  /// No description provided for @videoPipHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Beim Verlassen der App läuft das Video in einem kleinen Fenster weiter.'**
+  String get videoPipHint;
+
   /// No description provided for @videoDownloadTitle.
   ///
   /// In de, this message translates to:

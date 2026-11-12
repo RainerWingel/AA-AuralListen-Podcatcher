@@ -279,6 +279,8 @@ Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wie
 ### Bild bei Video-Folgen (Benutzerwunsch 2026-11-12)
 Optionen → Hören, nach „Fertige Folgen aus Playlist entfernen": Schalter mit Kamera-Symbol und Hinweis
 „Aus: nur Ton, spart Akku. Beim Streamen wird das Bild trotzdem mitgeladen." Standard an (`playback.md` „Video").
+Darunter **„Bild im Bild"** (Schalter, Standard an, ausgegraut wenn „Bild bei Video-Folgen" aus ist): „Beim Verlassen
+der App läuft das Video in einem kleinen Fenster weiter."
 
 ### Auto-Sleep-Timer (Benutzerwunsch 2026-11-12)
 Optionen → Hören → „Auto-Sleep-Timer" (Untertitel: Modus und Dauer, z. B. „Ein · 30 Minuten") → eigene Seite

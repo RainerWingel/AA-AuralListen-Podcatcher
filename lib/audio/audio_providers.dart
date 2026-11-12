@@ -5,6 +5,7 @@ import '../data/providers.dart';
 import '../data/settings_keys.dart';
 import 'auto_sleep_timer.dart';
 import 'battery_optimization.dart';
+import 'picture_in_picture.dart';
 import 'podcast_audio_handler.dart';
 import 'sleep_timer.dart';
 import 'video_output.dart';
@@ -22,6 +23,21 @@ final videoPictureOnProvider = StreamProvider<bool>(
       .watch(SettingsKeys.videoPicture)
       .map((value) => value != 'false'),
 );
+
+/// Optionen → Hören → "Bild im Bild" (on by default).
+final videoPipOnProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.videoPip)
+      .map((value) => value != 'false'),
+);
+
+/// The small video window when leaving the app (one per app).
+final pictureInPictureProvider = Provider<PictureInPicture>((ref) {
+  final pip = PlatformPictureInPicture();
+  ref.onDispose(pip.dispose);
+  return pip;
+});
 
 /// Picture of video episodes (one per app, like the player).
 final videoOutputProvider = Provider<VideoOutput>((ref) {

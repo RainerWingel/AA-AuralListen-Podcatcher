@@ -107,6 +107,7 @@ class SettingsScreen extends ConsumerWidget {
           const _AutoSleepTile(),
           const _FinishedRemovalTile(),
           const _VideoPictureTile(),
+          const _VideoPipTile(),
           const _BackgroundPlaybackTile(),
           SettingsSectionHeader(l10n.settingsSectionSubscriptions),
           ListTile(
@@ -204,6 +205,33 @@ class _VideoPictureTile extends ConsumerWidget {
             ? settings.remove(SettingsKeys.videoPicture)
             : settings.set(SettingsKeys.videoPicture, 'false');
       },
+    );
+  }
+}
+
+/// "Bild im Bild": a playing video goes on in a small window when the app
+/// is left. Only with "Bild bei Video-Folgen".
+class _VideoPipTile extends ConsumerWidget {
+  const _VideoPipTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final picture = ref.watch(videoPictureOnProvider).value ?? true;
+    final on = ref.watch(videoPipOnProvider).value ?? true;
+    return SwitchListTile(
+      secondary: const Icon(Icons.picture_in_picture_alt_outlined),
+      title: Text(l10n.videoPip),
+      subtitle: Text(l10n.videoPipHint),
+      value: picture && on,
+      onChanged: !picture
+          ? null
+          : (value) {
+              final settings = ref.read(settingsRepositoryProvider);
+              value
+                  ? settings.remove(SettingsKeys.videoPip)
+                  : settings.set(SettingsKeys.videoPip, 'false');
+            },
     );
   }
 }

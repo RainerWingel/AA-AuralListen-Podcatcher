@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/app_language.dart';
 import '../data/providers.dart';
+import '../features/player/picture_in_picture_host.dart';
 import '../features/settings/language_picker.dart';
 import '../l10n/app_localizations.dart';
 import 'router.dart';
@@ -46,9 +47,13 @@ class AuralListenApp extends ConsumerWidget {
         // Turned sideways the Android buttons (or a display cutout) sit at
         // the edge: the app stays beside them instead of under them (user
         // wish 2026-10-16). Top and bottom are handled by the screens.
-        return ColoredBox(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: SafeArea(top: false, bottom: false, child: child!),
+        // Video episodes: the small window when leaving the app
+        // (docs/playback.md "Video").
+        return PictureInPictureHost(
+          child: ColoredBox(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: SafeArea(top: false, bottom: false, child: child!),
+          ),
         );
       },
     );

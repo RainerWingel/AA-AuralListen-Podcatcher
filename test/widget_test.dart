@@ -54,6 +54,7 @@ import 'package:http/testing.dart';
 import 'support/fake_app_platform.dart';
 import 'support/fake_battery_optimization.dart';
 import 'support/fake_download_engine.dart';
+import 'support/fake_picture_in_picture.dart';
 import 'support/fake_player_engine.dart';
 import 'support/fake_video_output.dart';
 import 'support/id3_builder.dart';
@@ -3724,6 +3725,80 @@ void main() {
       await settle(tester);
       expect(find.byType(VideoPicture), findsOneWidget);
       expect(video.users, 1);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'video episode: picture-in-picture only while a playing video is shown',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final video = FakeVideoOutput();
+      addTearDown(video.dispose);
+      final pip = FakePictureInPicture();
+      addTearDown(pip.dispose);
+      await pumpApp(
+        tester,
+        overrides: [
+          videoOutputProvider.overrideWithValue(video),
+          pictureInPictureProvider.overrideWithValue(pip),
+        ],
+      );
+      await tester.runAsync(
+        () =>
+            ProviderScope.containerOf(
+                  tester.element(find.byType(NavigationBar)),
+                )
+                .read(podcastRepositoryProvider)
+                .subscribe('https://video.example.com/feed'),
+      );
+      await settle(tester);
+      await tester.tap(find.text('Folge mit Bild'));
+      await settle(tester);
+      // Playing, but no picture on screen: Home stays Home.
+      expect(pip.playing, isTrue);
+      expect(pip.wanted, isFalse);
+
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      video.format.value = const VideoFormat(width: 1280, height: 720);
+      video.picture.value = 3;
+      await settle(tester);
+      expect(pip.wanted, isTrue);
+      expect(pip.size, (1280, 720));
+      expect(pip.labels['pause'], 'Pause');
+
+      // In the small window only the video shows; the app waits offstage.
+      pip.active.value = true;
+      await tester.pump();
+      expect(find.byType(Texture), findsOneWidget);
+      expect(find.text('Folge mit Bild'), findsNothing);
+      expect(video.users, 2); // player (offstage) + window
+      pip.active.value = false;
+      await tester.pump();
+      expect(find.text('Folge mit Bild'), findsWidgets);
+      expect(video.users, 1);
+
+      // Paused: no window when leaving.
+      await tester.tap(find.byType(PlayPauseButton).last);
+      await settle(tester);
+      expect(pip.wanted, isFalse);
+      expect(pip.playing, isFalse);
+      await tester.tap(find.byType(PlayPauseButton).last);
+      await settle(tester);
+      expect(pip.wanted, isTrue);
+
+      // Optionen → "Bild im Bild" off.
+      await tester.runAsync(
+        () => SettingsRepository(db).set(SettingsKeys.videoPip, 'false'),
+      );
+      await settle(tester);
+      expect(pip.wanted, isFalse);
 
       await disposeApp(tester);
     },

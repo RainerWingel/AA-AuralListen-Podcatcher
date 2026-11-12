@@ -110,6 +110,8 @@
   "videoExitFullscreen": "Esci da schermo intero",
   "videoPicture": "Immagine negli episodi video",
   "videoPictureHint": "Disattivato: solo audio, risparmia batteria. In streaming l’immagine viene comunque scaricata.",
+  "videoPip": "Picture-in-picture",
+  "videoPipHint": "Uscendo dall’app, il video continua in una piccola finestra.",
   "videoDownloadTitle": "Scaricare l’episodio video?",
   "videoDownloadSize": "Gli episodi video sono grandi: questo occupa circa {size}.",
   "videoDownloadLarge": "Gli episodi video di solito sono molto grandi.",

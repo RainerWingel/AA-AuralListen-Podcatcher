@@ -404,6 +404,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Off: sound only, saves battery. When streaming, the picture is still downloaded.';
 
   @override
+  String get videoPip => 'Picture-in-picture';
+
+  @override
+  String get videoPipHint =>
+      'When leaving the app, the video keeps playing in a small window.';
+
+  @override
   String get videoDownloadTitle => 'Download video episode?';
 
   @override

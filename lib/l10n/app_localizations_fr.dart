@@ -406,6 +406,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Désactivé : son seul, économise la batterie. En streaming, l’image est quand même téléchargée.';
 
   @override
+  String get videoPip => 'Image dans l’image';
+
+  @override
+  String get videoPipHint =>
+      'En quittant l’app, la vidéo continue dans une petite fenêtre.';
+
+  @override
   String get videoDownloadTitle => 'Télécharger l’épisode vidéo ?';
 
   @override

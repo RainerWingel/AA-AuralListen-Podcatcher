@@ -255,6 +255,8 @@
   "videoExitFullscreen": "Vollbild beenden",
   "videoPicture": "Bild bei Video-Folgen",
   "videoPictureHint": "Aus: nur Ton, spart Akku. Beim Streamen wird das Bild trotzdem mitgeladen.",
+  "videoPip": "Bild im Bild",
+  "videoPipHint": "Beim Verlassen der App läuft das Video in einem kleinen Fenster weiter.",
   "videoDownloadTitle": "Video-Folge herunterladen?",
   "videoDownloadSize": "Video-Folgen sind groß – diese hat ca. {size}.",
   "@videoDownloadSize": {

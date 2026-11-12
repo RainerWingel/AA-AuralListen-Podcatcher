@@ -110,6 +110,8 @@
   "videoExitFullscreen": "Quitter le plein écran",
   "videoPicture": "Image des épisodes vidéo",
   "videoPictureHint": "Désactivé : son seul, économise la batterie. En streaming, l’image est quand même téléchargée.",
+  "videoPip": "Image dans l’image",
+  "videoPipHint": "En quittant l’app, la vidéo continue dans une petite fenêtre.",
   "videoDownloadTitle": "Télécharger l’épisode vidéo ?",
   "videoDownloadSize": "Les épisodes vidéo sont volumineux – celui-ci fait environ {size}.",
   "videoDownloadLarge": "Les épisodes vidéo sont généralement très volumineux.",

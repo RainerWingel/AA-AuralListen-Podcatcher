@@ -38,7 +38,7 @@ Portugiesisch (Brasilien), Russisch und Italienisch (Abfrage beim ersten Start, 
 | F20 | Podcast-Umzug | 301/308, `itunes:new-feed-url`, manuell „Feed-Adresse ändern" → `feeds-and-directories.md` |
 | F18 | Auto-Download nach Thema | Netzwerk-Feeds wie WRINT: nur angehakte Themen laden → `feeds-and-directories.md` |
 | F32 | Abspielgeschwindigkeit | Aus (1,0x) / 1,2x / 1,5x / 2,0x, global oder nur für einen Podcast → `playback.md` |
-| F33 | Video-Podcasts (Stufe 1) | Video-Folgen über denselben Player: Bild im Player und als Vollbild, im Hintergrund/Auto nur Ton, 🎥 in Listen, Auto-Download nur WLAN; Stufe 2/3 offen → `playback.md` „Video“ |
+| F33 | Video-Podcasts | Video-Folgen über denselben Player: Bild im Player und als Vollbild, im Hintergrund/Auto nur Ton, 🎥 in Listen, Auto-Download nur WLAN; Schalter „nur Ton", Download-Rückfrage, Bild im Bild → `playback.md` „Video“ |
 | F31 | Android Auto | Menü Playlists / Neu / Downloads / Abos, Player-Tasten im Auto, Cover aus dem Cache → `playback.md` |
 
 ## Soll (M6–M7)

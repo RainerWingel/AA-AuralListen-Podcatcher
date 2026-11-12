@@ -35,6 +35,12 @@ void main() {
     );
   });
 
+  test('video episodes may go picture-in-picture', () {
+    final manifest = File('android/app/src/main/AndroidManifest.xml')
+        .readAsStringSync();
+    expect(manifest, contains('android:supportsPictureInPicture="true"'));
+  });
+
   test('release builds keep the notification icons', () {
     final keep = File('android/app/src/main/res/raw/keep.xml')
         .readAsStringSync();

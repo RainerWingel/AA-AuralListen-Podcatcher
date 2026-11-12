@@ -50,6 +50,10 @@ abstract final class SettingsKeys {
   /// Hören); missing = picture on.
   static const videoPicture = 'player.videoPicture';
 
+  /// Picture-in-picture for video episodes: `false` = off (Optionen →
+  /// Hören); missing = on.
+  static const videoPip = 'player.videoPip';
+
   /// Milliseconds since epoch when an update brought video episodes (schema
   /// v30). A podcast's first refresh after that marks the old video episodes
   /// it finds as played (docs/feeds-and-directories.md). Missing = installed

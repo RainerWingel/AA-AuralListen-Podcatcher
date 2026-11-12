@@ -403,6 +403,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Desligado: só som, economiza bateria. No streaming, a imagem é baixada mesmo assim.';
 
   @override
+  String get videoPip => 'Picture-in-picture';
+
+  @override
+  String get videoPipHint =>
+      'Ao sair do app, o vídeo continua em uma janela pequena.';
+
+  @override
   String get videoDownloadTitle => 'Baixar episódio em vídeo?';
 
   @override

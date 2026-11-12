@@ -404,6 +404,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aus: nur Ton, spart Akku. Beim Streamen wird das Bild trotzdem mitgeladen.';
 
   @override
+  String get videoPip => 'Bild im Bild';
+
+  @override
+  String get videoPipHint =>
+      'Beim Verlassen der App läuft das Video in einem kleinen Fenster weiter.';
+
+  @override
   String get videoDownloadTitle => 'Video-Folge herunterladen?';
 
   @override

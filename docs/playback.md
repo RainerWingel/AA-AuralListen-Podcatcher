@@ -166,7 +166,7 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 - Samsung zeigt Apps in „Grenzen der Hintergrundnutzung" nur, wenn sie kürzlich liefen – dass die App dort zeitweise
   fehlt, ist normal.
 
-## Video (Benutzerwunsch 2026-11-12, Stufe 1 + 2 ✅)
+## Video (Benutzerwunsch 2026-11-12, Stufen 1–3 ✅)
 Video-Folgen laufen über **denselben Player** wie Audio (`decisions.md` 2026-11-12) – Hintergrund, Benachrichtigung,
 Hörposition, Sprünge, Kapitel, Sleep-/Auto-Sleep-Timer, Playlists und Android Auto gelten unverändert.
 ```
@@ -200,7 +200,21 @@ VideoOutput.java (third_party/just_audio, PATCH.md) → SurfaceProducer → ders
   trotzdem ganz geladen – steht als Hinweis unter dem Schalter). **Download-Rückfrage** für Video-Folgen: `eviction.md`.
   **Geparkt (2c):** Audio-/Video-Fassung derselben Folge (`podcast:alternateEnclosure`, mehrere `enclosure`) – selten,
   die Sender aus dem Test haben getrennte Audio- und Video-Feeds.
-  **Stufe 3 (offen):** Bild im Bild (PiP), Einstellung „Im Hintergrund: nur Ton / Bild im Bild".
+- **Stufe 3 ✅ Bild im Bild (PiP):** Läuft ein Video sichtbar (Player oder Vollbild, Texture zeigt ein Bild) und spielt,
+  wechselt die App beim Verlassen (Home, App-Wechsel) in ein kleines Fenster. Android 12+: `setAutoEnterEnabled`,
+  älter: `onUserLeaveHint` → `enterPictureInPictureMode` (`MainActivity.kt`, Kanal `aurallisten/pip`,
+  `android:supportsPictureInPicture` im Manifest). Dart: `PictureInPictureHost` um die ganze App
+  (`MaterialApp.builder`) meldet per `update` (dedupliziert), ob gewünscht, Seitenverhältnis (Android erlaubt 1:2,39 …
+  2,39:1) und Tastennamen; im Fenster zeigt er nur das Video, die App bleibt offstage erhalten.
+  - Tasten im Fenster: −15 s / Play-Pause / +30 s als `RemoteAction` → Medientasten an den `MediaButtonReceiver` von
+    `audio_service` (derselbe Weg wie Bluetooth-Tasten). Play-Pause wechselt mit dem Zustand.
+  - Pausiert oder kein Video im Bild → kein Fenster (Home bleibt Home). Fenster geschlossen (×) → App im Hintergrund,
+    Texture frei, Ton läuft weiter. Vergrößern → zurück in den Player.
+  - Lebenszyklus: Im Fenster ist die Activity pausiert (`inactive`), daher bleibt die Texture angemeldet.
+  - Optionen → Hören → **„Bild im Bild"** (Standard an, `player.videoPip` = `false` für aus; nur wählbar, wenn
+    „Bild bei Video-Folgen" an ist).
+  - Auf dem A05s geprüft (2026-11-12): Fenster erscheint, Tasten wirken, nach × spielt der Ton bis zum Folgenende.
+  - Tests: Widget-Test „video episode: picture-in-picture only while a playing video is shown" (`FakePictureInPicture`).
 - Tests: `test/audio/video_output_test.dart` (Anmelden, Hintergrund, Freigabe), Widget-Test „video episode: camera in
   the list, picture in the player, full screen" (`test/widget_test.dart`, mit `FakeVideoOutput`).
 

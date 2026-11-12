@@ -110,6 +110,8 @@
   "videoExitFullscreen": "Sair da tela cheia",
   "videoPicture": "Imagem em episódios de vídeo",
   "videoPictureHint": "Desligado: só som, economiza bateria. No streaming, a imagem é baixada mesmo assim.",
+  "videoPip": "Picture-in-picture",
+  "videoPipHint": "Ao sair do app, o vídeo continua em uma janela pequena.",
   "videoDownloadTitle": "Baixar episódio em vídeo?",
   "videoDownloadSize": "Episódios em vídeo são grandes – este tem cerca de {size}.",
   "videoDownloadLarge": "Episódios em vídeo costumam ser muito grandes.",

@@ -407,6 +407,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Выкл.: только звук, экономит батарею. При потоковом воспроизведении изображение всё равно загружается.';
 
   @override
+  String get videoPip => 'Картинка в картинке';
+
+  @override
+  String get videoPipHint =>
+      'При выходе из приложения видео продолжается в маленьком окне.';
+
+  @override
   String get videoDownloadTitle => 'Скачать видеовыпуск?';
 
   @override
