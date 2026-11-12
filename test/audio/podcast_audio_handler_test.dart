@@ -822,15 +822,52 @@ void main() {
       expect(engine.loadedAt, isNot(const Duration(seconds: 57)));
     });
 
-    test('a provisional podcast stores nothing', () async {
+    test('a provisional podcast stores nothing, plays on from there', () async {
       await (db.update(db.podcasts)..where((p) => p.id.equals(podcastId)))
           .write(const PodcastsCompanion(provisional: Value(true)));
       final before = await episode();
       await handler.playEpisode(episodeId);
       await handler.startScan(forward: true);
       await wait(250);
+      final scanned = handler.position;
       await handler.stopScan();
       expect((await episode()).positionMs, before.positionMs);
+      // Bug 2026-11-12: it started over at the stored position (0:00).
+      expect(engine.loadedAt, scanned);
+      expect(engine.state.playing, isTrue);
+    });
+  });
+
+  group('provisional podcast: the place lives in memory only', () {
+    setUp(
+      () => (db.update(db.podcasts)..where((p) => p.id.equals(podcastId)))
+          .write(const PodcastsCompanion(provisional: Value(true))),
+    );
+
+    test('a seek while unloaded is where play starts', () async {
+      await handler.playEpisode(episodeId);
+      await handler.stop();
+      await handler.seek(const Duration(minutes: 4));
+      await handler.play();
+      expect(engine.loadedAt, const Duration(minutes: 4));
+      expect((await episode()).positionMs, 60000); // untouched
+    });
+
+    test('after a long pause it resumes, not from the start', () async {
+      await handler.playEpisode(episodeId);
+      engine.emitPosition(const Duration(minutes: 3));
+      await handler.stop();
+      await handler.play();
+      expect(
+        engine.loadedAt,
+        const Duration(minutes: 3) - PodcastAudioHandler.resumeRewind,
+      );
+    });
+
+    test('a start position is used without being stored', () async {
+      await handler.playEpisode(episodeId, startAt: const Duration(minutes: 2));
+      expect(engine.loadedAt, const Duration(minutes: 2));
+      expect((await episode()).positionMs, 60000);
     });
   });
 

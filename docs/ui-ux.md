@@ -223,6 +223,10 @@ Podcast (markierbar), dann Autor, Folge (Nummer wie am Cover), Erschienen, Läng
   kein „wechselnde Werbung"-Merker. Im Player fehlen Lesezeichen- und Boost-Knopf (Boost gilt nur, wie er gerade ist).
   Der Handler prüft das bei jedem Schreiben (`PlaybackRepository.isProvisional`), „Abonnieren" während der Wiedergabe
   wirkt also sofort.
+  Die Stelle lebt solange **nur im Arbeitsspeicher** (`_idlePosition` im Handler): Nach Spulen (Skip gedrückt halten),
+  Sprung im entladenen Zustand, Netz-Wiederaufnahme oder 10-Minuten-Pause geht es dort weiter, nicht ab der
+  gespeicherten Position (Fehler 2026-11-12: Spulen sprang bei vorläufigen Podcasts auf 0:00 – fiel bei gestreamten
+  Video-Folgen auf, weil die meist vorläufig hinzugefügt waren).
 - **Abonnierte Podcasts:** „Abo kündigen" steht nicht mehr im ⋮, sondern als Knopf **„Deabonnieren"** an derselben
   Stelle wie „Abonnieren" (unter „XY Folgen"); löscht nach Rückfrage „Deabonnieren?" Podcast und Folgen.
 

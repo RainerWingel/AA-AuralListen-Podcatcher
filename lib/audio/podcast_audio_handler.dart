@@ -446,7 +446,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     _loaded = false;
     _exactStart = startAt != null;
     mediaItem.add(_withPlaylist(_toMediaItem(row)));
-    _setIdlePosition(_savedPosition(row.episode));
+    // Provisional podcasts do not store [startAt]: it lives on here.
+    _setIdlePosition(startAt ?? _savedPosition(row.episode));
     // Provisional podcasts leave no trace (also not "last episode").
     if (!provisional) {
       await _settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
@@ -1053,12 +1054,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final episode = row.episode;
     // Replaying starts over; it becomes "in progress" only from 15 s on.
     _replayOfPlayed = episode.status == EpisodeStatus.played;
-    // A replay under 15 s is not stored; after an interruption or a seek
-    // while unloaded the shown idle position is the one to continue from.
-    final saved = !_replayOfPlayed
-        ? Duration(milliseconds: episode.positionMs)
-        : _exactStart
+    // After a scan, an interruption or a seek while unloaded the shown idle
+    // position is the one to continue from. So it is for provisional
+    // podcasts, which store no position at all (bug 2026-11-12: a scan
+    // there went back to 0:00). A replay under 15 s is not stored either.
+    final saved = _exactStart || row.podcast.provisional
         ? _idlePosition
+        : !_replayOfPlayed
+        ? Duration(milliseconds: episode.positionMs)
         : Duration.zero;
     // Exact after an interruption or a seek while unloaded; otherwise
     // [resumeStart] (under 15 s → from the beginning).
