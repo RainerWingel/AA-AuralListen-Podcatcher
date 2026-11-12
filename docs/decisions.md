@@ -261,3 +261,13 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   ein laufender Timer wird nie überschrieben. Details `playback.md`.
   Nachbesserung (Benutzer): Überschneidungen benachbarter Wochentage werden abgelehnt; alte überlappende Daten gelten
   als eine Nacht; die Länge jedes Fensters wird angezeigt.
+- 2026-11-12 · **Video-Podcasts über denselben Player, `just_audio` als angepasste Kopie** (Benutzer: „nach Best Practices",
+  Stufe 1 freigegeben) · „Video" stand bisher unter „bewusst nicht" (`features.md`) – auf Wunsch des Benutzers aufgehoben.
+  ExoPlayer in `just_audio` kann Video schon, es fehlte nur eine Bildfläche: Die Kopie (`third_party/just_audio`, 0.10.6,
+  MIT, `PATCH.md`) hängt bei Bedarf eine Flutter-Texture an **denselben** ExoPlayer und schaltet die Video-Spur sonst ab.
+  So bleiben Hintergrund, Benachrichtigung, Hörposition, Timer, Playlists und Android Auto ohne Sonderfälle (wie bei
+  AntennaPod). Verworfen: das Paket `video_player` – ein zweiter ExoPlayer mit Übergabe der Position, Benachrichtigung
+  und Auto müssten zwei Player kennen, widerspricht „genau eine Player-Instanz". Kein neues Paket, nur Quellcode
+  (F-Droid). Stufe 1: Video-Folgen abspielen, Vollbild, Hintergrund = nur Ton, 🎥 in Listen, Auto-Download von Video nur
+  über WLAN, alte Video-Folgen kommen nach dem Update als gespielt (Schema v30). Stufe 2 (Audio-/Video-Varianten,
+  Einstellungen) und Stufe 3 (Bild im Bild) offen.

@@ -9,9 +9,11 @@ import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/episode_title.dart';
 import '../../core/widgets/info_snack_bar.dart';
 import '../../core/widgets/squares_background.dart';
+import '../../core/widgets/video_mark.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../data/storage/download_service.dart';
+import '../../data/video_episodes.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
 import 'download_details_sheet.dart';
@@ -175,7 +177,12 @@ class _DownloadTile extends ConsumerWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          Text(status),
+          Row(
+            children: [
+              if (item.episode.isVideo) const VideoMark(),
+              Flexible(child: Text(status)),
+            ],
+          ),
           if (download.state == DownloadState.running)
             Padding(
               padding: const EdgeInsets.only(top: 4),

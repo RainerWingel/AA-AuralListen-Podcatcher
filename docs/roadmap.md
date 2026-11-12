@@ -182,6 +182,17 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Ungültige Zeitfenster (Beginn = Ende, Überschneidung mit Nachbartag) abgelehnt, Meldung am Feld; Länge angezeigt
 - [ ] Praxistest auf dem A05s (Benutzer), im Auto mit Android Auto (startet nicht)
 
+## Zusatz – Video-Podcasts (2026-11-12, `playback.md` „Video")
+- [x] Konzept mit drei Stufen, Stufe 1 freigegeben (Benutzer)
+- [x] `just_audio` als angepasste Kopie: Texture am selben ExoPlayer, Video-Spur nur bei sichtbarem Bild
+- [x] Parser nimmt `video/*`; alte Video-Folgen nach dem Update als gespielt (Schema v30)
+- [x] Player: Video statt Cover, Vollbild quer, Steuerung zum Einblenden; Hintergrund/Auto nur Ton
+- [x] 🎥 in Folgenlisten und Downloads; Auto-Download von Video nur über WLAN
+- [x] Texte in sieben Sprachen, Store-Texte „Audio und Video", Tests
+- [ ] Praxistest auf dem A05s (Benutzer): Video-Feed abonnieren, Vollbild, Bildschirm aus → Ton läuft weiter
+- [ ] Stufe 2: Audio-/Video-Varianten (`podcast:alternateEnclosure`), „Video-Folgen: Bild / nur Ton", Größenhinweis
+- [ ] Stufe 3: Bild im Bild (PiP)
+
 ## Zusatz – Playlist fortsetzen (2026-09-29)
 - [x] Jede Playlist merkt sich die zuletzt daraus gespielte Folge (Schema v7), ▶ und „Fortsetzen" spielen sie weiter
 - [x] Sortieren nur in der geöffneten Playlist, in der Übersicht stattdessen „Fortsetzen"

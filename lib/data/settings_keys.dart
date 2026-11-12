@@ -45,4 +45,10 @@ abstract final class SettingsKeys {
 
   /// Playlist the current episode was started from (null = none).
   static const activePlaylistId = 'player.activePlaylistId';
+
+  /// Milliseconds since epoch when an update brought video episodes (schema
+  /// v30). A podcast's first refresh after that marks the old video episodes
+  /// it finds as played (docs/feeds-and-directories.md). Missing = installed
+  /// with video support, nothing to catch up.
+  static const videoSince = 'feeds.videoSince';
 }

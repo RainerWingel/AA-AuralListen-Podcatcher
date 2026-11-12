@@ -388,6 +388,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get episodeInPlaylist => 'In una playlist';
 
   @override
+  String get episodeVideo => 'Episodio video';
+
+  @override
+  String get videoFullscreen => 'Schermo intero';
+
+  @override
+  String get videoExitFullscreen => 'Esci da schermo intero';
+
+  @override
   String get downloadFailed => 'Download non riuscito';
 
   @override

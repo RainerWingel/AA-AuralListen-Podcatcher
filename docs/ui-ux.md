@@ -81,7 +81,8 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
   Rand; die ganze App bleibt daneben statt darunter (`SafeArea` links/rechts im `MaterialApp.builder`, `app.dart`).
   Oben/unten kümmern sich die Seiten selbst (AppBar, Navigationsleiste, Player).
 - **Vollbild-Player** (`/player`, fährt von unten ein, verdeckt die Navigation), **zwei Bereiche** (Benutzerwunsch 2026-10-16):
-  - **Oben, scrollbar:** großes Cover (nie höher als der sichtbare Bereich), Titel, Podcast (davor ✓-Download-Symbol
+  - **Oben, scrollbar:** großes Cover (nie höher als der sichtbare Bereich) – bei **Video-Folgen** stattdessen das Video
+    (so breit wie möglich, ⛶ unten rechts, Tippen → Vollbild quer; `playback.md` „Video"), Titel, Podcast (davor ✓-Download-Symbol
     „Heruntergeladen", wenn die Datei komplett auf dem Gerät ist), Playlist-Zeile, darunter „Kapitel x/n: Titel" (bzw.
     „Kapitel (n)" vor dem ersten Kapitel; tippen → Kapitel-Liste) und **eine Stufe darunter** der aufklappbare Bereich
     „Beschreibung" (Shownotes mit Links, zugeklappt; Benutzerwunsch 2026-10-01). Aufgeklappt steht oben „Folge 105 ·
@@ -134,7 +135,7 @@ war viel zu dünn und zu dunkel). **Abstände:** Play-Zeile → Knopfreihe 1 →
 Cover, Titel (max. 2 Zeilen), auf der Startseite der Podcast-Name in eigener Zeile, darunter **Datum · Dauer**
 (eigene Zeile, damit lange Podcast-Namen sie nie verdrängen), Fortschritt (Balken, nur bei `angefangen` und ab 15 s Position; immer gleich breit – rechts steht stets ein 24 pt breiter Platz, auch ohne Symbol, Benutzerwunsch 2026-10-04), Status-Icon (Punkt = **frisch** – ungespielt und von einem Refresh vor < 96 h geholt, gleiche Regel wie
 „Alle neuen Episoden spielen" (`isFreshEpisode`); ältere ungespielte Folgen ohne Punkt · Haken = gespielt · Equalizer = läuft gerade;
-laufende Folge hervorgehoben; eine **gespielte** Folge gilt nur als laufend, solange sie wirklich noch spielt –
+laufende Folge hervorgehoben; **Video-Folgen** tragen vor dem Datum eine kleine Kamera 🎥 (`VideoMark`, Tooltip „Video-Folge", auch im Downloads-Tab; Benutzerwunsch 2026-11-12); eine **gespielte** Folge gilt nur als laufend, solange sie wirklich noch spielt –
 nach dem Ende zeigt sie den Haken, auch wenn der Mini-Player sie noch anzeigt). Gespielte Folgen: Bild, Titel und Untertitel mit 50 % Deckkraft wie bei Castbox
 (`EpisodeTile.playedOpacity`), Haken bleibt voll sichtbar, die gerade laufende Folge wird nie abgeblendet. **Tippen = abspielen.** **Langes Drücken** = Menü: Abspielen, Als gespielt / ungespielt markieren.
 Menü außerdem: Herunterladen / Download abbrechen / Download löschen / Erneut herunterladen (je nach Zustand); wartet

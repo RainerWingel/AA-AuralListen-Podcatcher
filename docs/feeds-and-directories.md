@@ -34,7 +34,16 @@ Code: `lib/data/feed/` (`rss_parser.dart`, `feed_fetcher.dart`, `feed_dates.dart
 - Eigener Parser auf Basis von `xml`: RSS 2.0 + `itunes:` + `content:` + `podcast:` (Podcasting 2.0); `psc:` (Podlove Chapters) folgt in M6.
 - Namespaced Elemente werden über die Namespace-URI gefunden; fehlt die Deklaration im Feed, über den Präfix
   (sonst würde ein undeklariertes `itunes:image` mit `<image>` verwechselt).
-- Nur Audio: Items ohne `enclosure` oder mit `video/*` werden übersprungen (reine Video-Feeds wie „tagesschau" haben daher 0 Folgen).
+- Items ohne `enclosure` werden übersprungen. **Video-Enclosures** (`video/*`) sind seit 2026-11-12 Folgen wie alle anderen
+  (bis dahin übersprungen – reine Video-Feeds wie „tagesschau" hatten 0 Folgen); Wiedergabe → `playback.md` „Video".
+  Es zählt das **erste** `enclosure` eines Items (Audio-/Video-Varianten und `podcast:alternateEnclosure`: Stufe 2).
+- **Alte Video-Folgen nach dem Update** (Schema v30, `PodcastRepository._markOldVideoEpisodes`): Die Migration merkt
+  sich den Zeitpunkt (`settings` `feeds.videoSince`) und löscht ETag/Last-Modified aller Abos, damit der nächste Refresh
+  den Feed wirklich liest. Beim **ersten** Refresh eines Podcasts danach (`lastRefreshAt` vor dem Zeitpunkt) kommen neu
+  gefundene Video-Folgen, die **vor dem vorigen Refresh** erschienen sind (oder kein Datum haben), als **gespielt** an –
+  kein Punkt, kein Zähler, kein Auto-Download, keine Ziel-Playlist. Später erschienene zählen normal als neu. Neue
+  Installationen haben keinen Zeitpunkt, dort gilt die Regel nie. Tests: `podcast_repository_test.dart`
+  „old video episodes after the update".
 - Doppelte guids im Feed: erstes Vorkommen gewinnt.
 - `pubDate`: RFC 822 inkl. üblicher Abweichungen (Zonennamen, 2-stellige Jahre, ohne Sekunden) + ISO 8601.
 - `itunes:duration`: Sekunden, `MM:SS`, `HH:MM:SS`.

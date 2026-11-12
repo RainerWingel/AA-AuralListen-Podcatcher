@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../settings_keys.dart';
 import 'tables.dart';
 
 export 'tables.dart';
@@ -41,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 29;
+  int get schemaVersion => 30;
 
   /// Oldest schema that is still migrated (app 1.3.1); see [migration].
   static const oldestMigratedSchema = 20;
@@ -117,6 +118,20 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 29) {
         await m.addColumn(podcasts, podcasts.speed);
+      }
+      if (from < 30) {
+        // Data only: video episodes. Until now the parser skipped them, so
+        // the next refresh of every podcast would bring all the old ones as
+        // new. Remember when video came (PodcastRepository marks the old ones
+        // as played) and drop the validators, so that refresh really
+        // reads the feed instead of getting "304 Not Modified".
+        await customStatement(
+          'INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)',
+          [SettingsKeys.videoSince, '${DateTime.now().millisecondsSinceEpoch}'],
+        );
+        await customStatement(
+          'UPDATE podcasts SET etag = NULL, last_modified = NULL',
+        );
       }
     },
     beforeOpen: (details) async {

@@ -180,8 +180,9 @@ class RssParser {
     final audioUrl = _attr(enclosure, 'url');
     if (audioUrl == null) return null;
 
+    // Video enclosures too: the player shows their picture (docs/playback.md
+    // "Video").
     final mimeType = _attr(enclosure, 'type')?.toLowerCase();
-    if (mimeType != null && mimeType.startsWith('video/')) return null;
 
     final rawDescription =
         _text(_ns(item, _Ns.content, 'encoded')) ??

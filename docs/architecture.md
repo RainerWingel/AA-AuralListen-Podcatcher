@@ -8,7 +8,7 @@
 | Datenbank | Drift (SQLite, typisiert, Migrationen, reaktive Queries) | EF Core |
 | HTTP | `http` | HttpClient |
 | RSS/OPML | `xml` + eigener Parser (volle Kontrolle über Namespaces) | XDocument |
-| Audio | `just_audio` + `audio_service` | – |
+| Audio | `just_audio` + `audio_service` (beide als angepasste Kopie in `third_party/`, `PATCH.md`) | – |
 | Downloads | `background_downloader` | – |
 | Dateien | `path_provider`, `file_picker`, `share_plus`, `archive` | System.IO |
 | Bilder | `cached_network_image` mit begrenztem Cache-Manager | – |
@@ -34,7 +34,7 @@ lib/
     directory/    # iTunes, fyyd, Podcast Index
     storage/      # cover_cache, download_engine (Paket-Kapsel), download_service (Downloads + Eviction)
   audio/          # PodcastAudioHandler (Logik), PlayerEngine (just_audio-Kapsel), audio_providers.dart,
-                  # car_browser.dart (Android-Auto-Menü)
+                  # car_browser.dart (Android-Auto-Menü), video_output.dart (Bild von Video-Folgen)
   features/       # je Feature: Screens, Widgets, Provider
     subscriptions/ search/ episodes/ player/ playlists/
     downloads/ bookmarks/ settings/ backup/

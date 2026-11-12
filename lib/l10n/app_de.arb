@@ -244,6 +244,15 @@
   "downloadRetry": "Erneut herunterladen",
   "downloadDone": "Heruntergeladen",
   "episodeInPlaylist": "In einer Playlist",
+  "episodeVideo": "Video-Folge",
+  "@episodeVideo": {
+    "description": "Tooltip of the camera icon in episode lists"
+  },
+  "videoFullscreen": "Vollbild",
+  "@videoFullscreen": {
+    "description": "Tap on the video in the player"
+  },
+  "videoExitFullscreen": "Vollbild beenden",
   "downloadFailed": "Download fehlgeschlagen",
   "downloadQueued": "Wartet …",
   "downloadWifiWaiting": "Wartet auf WLAN …",

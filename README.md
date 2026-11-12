@@ -4,7 +4,7 @@
 
 # AA-AuralListen Podcatcher
 
-Privater, werbefreier Podcatcher für Android – nur Audio, ohne Konto, ohne Tracking. Alle Daten bleiben auf dem
+Privater, werbefreier Podcatcher für Android – Audio und Video, ohne Konto, ohne Tracking. Alle Daten bleiben auf dem
 Gerät. Geschrieben in Flutter.
 
 > **Sprachen:** Die App gibt es auf **Deutsch, Englisch, Französisch, Spanisch, (brasilianischem) Portugiesisch, Russisch und Italienisch**.

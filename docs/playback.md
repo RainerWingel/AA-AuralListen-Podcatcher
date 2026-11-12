@@ -166,6 +166,40 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 - Samsung zeigt Apps in „Grenzen der Hintergrundnutzung" nur, wenn sie kürzlich liefen – dass die App dort zeitweise
   fehlt, ist normal.
 
+## Video (Benutzerwunsch 2026-11-12, Stufe 1 ✅)
+Video-Folgen laufen über **denselben Player** wie Audio (`decisions.md` 2026-11-12) – Hintergrund, Benachrichtigung,
+Hörposition, Sprünge, Kapitel, Sleep-/Auto-Sleep-Timer, Playlists und Android Auto gelten unverändert.
+```
+PlayerPicture / VideoFullscreenScreen (lib/features/player/video_picture.dart)
+        │ acquire()/release(), Texture(textureId)
+VideoOutput (lib/audio/video_output.dart, videoOutputProvider)  ← App-Lebenszyklus (AppLifecycleListener)
+        │ MethodChannel com.ryanheise.just_audio.video
+VideoOutput.java (third_party/just_audio, PATCH.md) → SurfaceProducer → derselbe ExoPlayer wie der Ton
+```
+- **Ob ein Bild da ist, entscheidet die Datei**, nicht der MIME-Typ: ExoPlayer meldet beim Laden die Spuren
+  (`videoFormat` mit Breite, Höhe, Pixel-Seitenverhältnis; `null` = nur Ton). Ein `.mp4` ohne Bild zeigt also das Cover,
+  eingebettete Cover-Bilder (JPEG/PNG-Spur) zählen nicht. Drehung im Container wird nicht ausgewertet (bei Podcasts selten).
+- **Bildfläche nur, solange sie zu sehen ist:** Widgets, die das Video zeigen, melden sich an (`acquire`, gezählt –
+  Player und Vollbild teilen **eine** Texture). Erst dann und nur bei sichtbarer App (`resumed`/`inactive`) hängt
+  `VideoOutput` eine Texture an und schaltet die **Video-Spur ein**. Andere App, Bildschirm aus, Player geschlossen →
+  Texture freigegeben, **Video-Spur aus** (`TrackSelectionParameters.setTrackTypeDisabled`): nur Ton, im Hintergrund
+  wird nichts dekodiert (ohne Abschalten würde ExoPlayer in eine Platzhalter-Fläche weiterdekodieren). Beim Einschalten
+  springt ExoPlayer an die aktuelle Stelle (vom letzten Schlüsselbild) – kurzer Ruck im Ton möglich, dafür sofort Bild.
+- Bis das erste Bild auf der Texture liegt (`firstFrame`), zeigt der Player das Cover auf schwarzem Grund.
+- **Player:** statt des quadratischen Covers das Video, so breit wie möglich und nie höher als das Cover wäre
+  (`PlayerPicture`), unten rechts ⛶. **Tippen → Vollbild** (`VideoFullscreenScreen`, eigene Route auf dem Root-Navigator):
+  schwarz, `immersiveSticky`, quer bei breitem Bild (hochkant bei hohem); Tippen zeigt/versteckt Schließen, −15/Play/+30
+  und Slider, beim Spielen verschwinden sie nach 3 s (`videoControlsHideDelay`). Verlassen → 2 s hochkant (`videoPortraitHold`, sonst bliebe ein flach
+  liegendes Handy quer), dann Ausrichtung wieder frei, `edgeToEdge`. Hat die nächste Folge kein Bild (oder stoppt der Player), schließt sich das Vollbild selbst.
+- **Android Auto:** nur Ton und Cover (Video im Auto ist verboten; die App ist dann im Hintergrund).
+- **Grenzen:** Eine MP4-Datei wird beim Streamen samt Bild geladen, auch wenn nur der Ton läuft (nur HLS könnte auf
+  eine Ton-Spur wechseln). Downloads: `eviction.md` (Auto-Download von Video nur über WLAN).
+- **Stufe 2 (offen):** Audio-/Video-Varianten einer Folge (`podcast:alternateEnclosure`, mehrere `enclosure`), Einstellung
+  „Video-Folgen: Bild zeigen / nur Ton", Größenhinweis vor Video-Downloads über Mobilfunk.
+  **Stufe 3 (offen):** Bild im Bild (PiP), Einstellung „Im Hintergrund: nur Ton / Bild im Bild".
+- Tests: `test/audio/video_output_test.dart` (Anmelden, Hintergrund, Freigabe), Widget-Test „video episode: camera in
+  the list, picture in the player, full screen" (`test/widget_test.dart`, mit `FakeVideoOutput`).
+
 ## Audio-Fokus & Kopfhörer
 Übernimmt `just_audio` (Standard `handleInterruptions: true`):
 - Anruf / andere App mit Audio → Pause; nach einer **kurzen** Unterbrechung (z. B. Anruf) geht es automatisch weiter.

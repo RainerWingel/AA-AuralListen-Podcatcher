@@ -1,4 +1,6 @@
 import 'package:aapodcastguru/data/db/app_database.dart';
+import 'package:aapodcastguru/data/settings_keys.dart';
+import 'package:drift/native.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -208,6 +210,40 @@ void main() {
     final connection = await verifier.startAt(28);
     final db = AppDatabase.forTesting(connection);
     await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('upgrade to v30: video catch-up marker, feeds read in full', () async {
+    final schema = await verifier.schemaAt(29);
+    schema.rawDatabase.execute(
+      'INSERT INTO podcasts (feed_url, title, subscribed_at, etag, '
+      'last_modified) VALUES '
+      "('https://example.com/feed', 'P', 1767225600, '\"x\"', 'Mon')",
+    );
+    final before = DateTime.now();
+    final db = AppDatabase.forTesting(schema.newConnection());
+    final podcast = await db.select(db.podcasts).getSingle();
+    expect((podcast.etag, podcast.lastModified), (null, null));
+    final marker = await (db.select(
+      db.settings,
+    )..where((s) => s.key.equals(SettingsKeys.videoSince))).getSingle();
+    expect(
+      int.parse(marker.value),
+      greaterThanOrEqualTo(before.millisecondsSinceEpoch),
+    );
+    await db.close();
+  });
+
+  test('upgrade v29 → latest matches the current schema', () async {
+    final connection = await verifier.startAt(29);
+    final db = AppDatabase.forTesting(connection);
+    await verifier.migrateAndValidate(db, db.schemaVersion);
+    await db.close();
+  });
+
+  test('a new database has no video catch-up marker', () async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    expect(await db.select(db.settings).get(), isEmpty);
     await db.close();
   });
 

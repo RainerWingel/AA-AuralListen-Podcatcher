@@ -391,6 +391,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get episodeInPlaylist => 'В плейлисте';
 
   @override
+  String get episodeVideo => 'Видеовыпуск';
+
+  @override
+  String get videoFullscreen => 'Во весь экран';
+
+  @override
+  String get videoExitFullscreen => 'Выйти из полноэкранного режима';
+
+  @override
   String get downloadFailed => 'Ошибка загрузки';
 
   @override

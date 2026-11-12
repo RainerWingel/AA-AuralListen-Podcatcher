@@ -1183,10 +1183,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
         max(estimatedDurationTolerance.inMilliseconds, expectedMs ~/ 10);
   }
 
-  /// MP3 by its MIME type; unknown counts as MP3 (most podcasts).
+  /// MP3 by its MIME type; unknown counts as MP3 (most podcasts). Not
+  /// `video/mpeg` or an HLS playlist (`application/x-mpegurl`).
   static bool _isMp3(Episode episode) {
     final mime = episode.audioMimeType?.toLowerCase();
-    return mime == null || mime.contains('mpeg') || mime.contains('mp3');
+    return mime == null ||
+        (mime.startsWith('audio/') &&
+            !mime.contains('mpegurl') &&
+            (mime.contains('mpeg') || mime.contains('mp3')));
   }
 
   /// Position shown before loading: played episodes and positions under

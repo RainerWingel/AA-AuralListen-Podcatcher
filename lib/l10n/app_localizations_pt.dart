@@ -387,6 +387,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get episodeInPlaylist => 'Em uma playlist';
 
   @override
+  String get episodeVideo => 'Episódio em vídeo';
+
+  @override
+  String get videoFullscreen => 'Tela cheia';
+
+  @override
+  String get videoExitFullscreen => 'Sair da tela cheia';
+
+  @override
   String get downloadFailed => 'O download falhou';
 
   @override

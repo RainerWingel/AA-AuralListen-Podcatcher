@@ -7,12 +7,20 @@ import 'auto_sleep_timer.dart';
 import 'battery_optimization.dart';
 import 'podcast_audio_handler.dart';
 import 'sleep_timer.dart';
+import 'video_output.dart';
 
 /// The single player instance. Created in main() via AudioService.init and
 /// injected with an override (tests inject one with a fake engine).
 final audioHandlerProvider = Provider<PodcastAudioHandler>(
   (ref) => throw UnimplementedError('Overridden in main() and in tests'),
 );
+
+/// Picture of video episodes (one per app, like the player).
+final videoOutputProvider = Provider<VideoOutput>((ref) {
+  final output = PlatformVideoOutput();
+  ref.onDispose(output.dispose);
+  return output;
+});
 
 /// What is playing / was played last (null = mini player hidden).
 /// What the player shows. [MediaItem] compares by id only, so an update of

@@ -28,7 +28,7 @@ void main() {
       expect(feed.imageUrl, 'https://example.com/cover.jpg');
     });
 
-    test('keeps only audio items with enclosure, without duplicates', () {
+    test('keeps only items with enclosure, without duplicates', () {
       expect(feed.episodes.map((e) => e.guid), [
         'ep-2',
         'https://example.com/ep1.mp3',
@@ -54,6 +54,23 @@ void main() {
       expect(ep.duration, const Duration(minutes: 45));
       expect(ep.pubDate, DateTime.utc(2025, 6, 3, 10, 30));
     });
+  });
+
+  test('video enclosures are episodes too (docs/playback.md "Video")', () {
+    final feed = parser.parse('''
+<rss><channel><title>T</title>
+<item><title>Video</title><guid>v</guid>
+  <enclosure url="https://e.com/v.mp4" length="900000000" type="Video/MP4"/></item>
+<item><title>Stream</title><guid>s</guid>
+  <enclosure url="https://e.com/s.m3u8" type="application/x-mpegURL"/></item>
+<item><title>Audio</title><guid>a</guid>
+  <enclosure url="https://e.com/a.mp3" type="audio/mpeg"/></item>
+</channel></rss>''');
+    expect(
+      [for (final e in feed.episodes) (e.guid, e.audioMimeType)],
+      [('v', 'video/mp4'), ('s', 'application/x-mpegurl'), ('a', 'audio/mpeg')],
+    );
+    expect(feed.episodes.first.audioSizeBytes, 900000000);
   });
 
   test(

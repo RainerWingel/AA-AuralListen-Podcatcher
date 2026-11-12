@@ -11,6 +11,7 @@ import 'package:aapodcastguru/app/theme.dart';
 import 'package:aapodcastguru/audio/audio_providers.dart';
 import 'package:aapodcastguru/audio/auto_sleep_timer.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
+import 'package:aapodcastguru/audio/video_output.dart';
 import 'package:aapodcastguru/core/app_info.dart';
 import 'package:aapodcastguru/core/app_language.dart';
 import 'package:aapodcastguru/core/app_platform.dart';
@@ -33,6 +34,7 @@ import 'package:aapodcastguru/features/player/panel_background.dart';
 import 'package:aapodcastguru/features/player/player_action_bar.dart';
 import 'package:aapodcastguru/features/player/player_controls.dart';
 import 'package:aapodcastguru/features/player/player_screen.dart';
+import 'package:aapodcastguru/features/player/video_picture.dart';
 import 'package:aapodcastguru/features/playlists/playlist_screen.dart';
 import 'package:aapodcastguru/features/settings/auto_sleep_screen.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
@@ -42,6 +44,7 @@ import 'package:drift/drift.dart'
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart' show SystemChannels;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
@@ -52,6 +55,7 @@ import 'support/fake_app_platform.dart';
 import 'support/fake_battery_optimization.dart';
 import 'support/fake_download_engine.dart';
 import 'support/fake_player_engine.dart';
+import 'support/fake_video_output.dart';
 import 'support/id3_builder.dart';
 
 // Feed without images, so no network image loading happens in widget tests.
@@ -71,6 +75,24 @@ const _feed = '''
         <psc:chapter title="Begrüßung" start="00:00:00"/>
         <psc:chapter title="Hauptteil" start="00:10:00"/>
       </psc:chapters>
+    </item>
+  </channel>
+</rss>''';
+
+// A video episode and an audio one, without images.
+const _videoFeed = '''
+<rss version="2.0">
+  <channel>
+    <title>Video-Podcast</title>
+    <item>
+      <title>Folge mit Bild</title><guid>v1</guid>
+      <pubDate>Tue, 10 Jun 2025 04:00:00 +0000</pubDate>
+      <enclosure url="https://video.example.com/v1.mp4" type="video/mp4"/>
+    </item>
+    <item>
+      <title>Folge ohne Bild</title><guid>a1</guid>
+      <pubDate>Mon, 09 Jun 2025 04:00:00 +0000</pubDate>
+      <enclosure url="https://video.example.com/a1.mp3" type="audio/mpeg"/>
     </item>
   </channel>
 </rss>''';
@@ -252,6 +274,10 @@ void main() {
                 ),
                 'wrint.example.com' => http.Response.bytes(
                   utf8.encode(_themedFeed),
+                  200,
+                ),
+                'video.example.com' => http.Response.bytes(
+                  utf8.encode(_videoFeed),
                   200,
                 ),
                 'itunes.apple.com' => http.Response.bytes(
@@ -3500,6 +3526,110 @@ void main() {
       // button → description. The same visible gap (16) each time.
       expect(bookmark.top - play.bottom, 16);
       expect(description.top - chapter.bottom, 16);
+
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'video episode: camera in the list, picture in the player, full screen',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final video = FakeVideoOutput();
+      addTearDown(video.dispose);
+      await pumpApp(
+        tester,
+        overrides: [videoOutputProvider.overrideWithValue(video)],
+      );
+      await tester.runAsync(
+        () =>
+            ProviderScope.containerOf(
+                  tester.element(find.byType(NavigationBar)),
+                )
+                .read(podcastRepositoryProvider)
+                .subscribe('https://video.example.com/feed'),
+      );
+      await settle(tester);
+
+      // The camera marks only the video episode.
+      final camera = find.byIcon(Icons.videocam_outlined);
+      expect(
+        find.descendant(
+          of: find.widgetWithText(ListTile, 'Folge mit Bild'),
+          matching: camera,
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.widgetWithText(ListTile, 'Folge ohne Bild'),
+          matching: camera,
+        ),
+        findsNothing,
+      );
+
+      await tester.tap(find.text('Folge mit Bild'));
+      await settle(tester);
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      // Not known yet whether the file has a picture: the cover.
+      expect(find.byType(PlayerCover), findsOneWidget);
+      expect(video.users, 0);
+
+      // The player reports a 16:9 picture: as wide as the screen allows.
+      video.format.value = const VideoFormat(width: 1280, height: 720);
+      await tester.pump();
+      expect(find.byType(PlayerCover), findsNothing);
+      expect(video.users, 1);
+      final box = tester.getSize(find.byType(VideoPicture));
+      expect(box.width / box.height, closeTo(16 / 9, 0.01));
+      expect(find.byType(Texture), findsNothing); // cover until a picture
+      video.picture.value = 3;
+      await tester.pump();
+      expect(find.byType(Texture), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel('Vollbild'));
+      await settle(tester);
+      expect(find.byType(VideoFullscreenScreen), findsOneWidget);
+      expect(video.users, 2); // one texture, shown twice
+      expect(find.byTooltip('Vollbild beenden'), findsOneWidget);
+      // The controls hide while playing, a tap brings them back.
+      await tester.pump(videoControlsHideDelay);
+      await tester.pump();
+      expect(find.byTooltip('Vollbild beenden'), findsNothing);
+      await tester.tapAt(const Offset(100, 100));
+      await tester.pump();
+      expect(find.byTooltip('Vollbild beenden'), findsOneWidget);
+
+      // The next episode has no picture: full screen closes by itself.
+      video.format.value = null;
+      await settle(tester);
+      expect(find.byType(VideoFullscreenScreen), findsNothing);
+      expect(find.byType(PlayerCover), findsOneWidget);
+      expect(video.users, 0);
+      // Upright for a moment, then the phone may turn freely again.
+      final orientations = <Object?>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'SystemChrome.setPreferredOrientations') {
+            orientations.add(call.arguments);
+          }
+          return null;
+        },
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
+      await tester.pump(videoPortraitHold);
+      expect(orientations, [<Object?>[]]);
 
       await disposeApp(tester);
     },

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:aapodcastguru/data/db/app_database.dart';
 import 'package:aapodcastguru/data/feed/feed_fetcher.dart';
 import 'package:aapodcastguru/data/podcast_repository.dart';
+import 'package:aapodcastguru/data/settings_keys.dart';
 import 'package:aapodcastguru/data/storage/cover_cache.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
@@ -1041,5 +1042,79 @@ void main() {
       (await db.select(db.chapters).get()).map((c) => c.title),
       unorderedEquals(['Eins', 'Zwei']),
     );
+  });
+
+  group('old video episodes after the update (schema v30)', () {
+    String item(String guid, String type, DateTime pubDate) =>
+        '<item><title>T$guid</title><guid>$guid</guid>'
+        '<pubDate>${HttpDate.format(pubDate)}</pubDate>'
+        '<enclosure url="https://example.com/$guid" type="$type"/></item>';
+    var body = '';
+    void feed(List<String> items) =>
+        body = '<rss><channel><title>V</title>${items.join()}</channel></rss>';
+
+    // Subscribed before the update: the feed's video items were skipped.
+    Future<int> subscribedBefore() async {
+      feed([item('a1', 'audio/mpeg', now.subtract(const Duration(days: 9)))]);
+      server['https://example.com/v'] = () => http.Response(body, 200);
+      return repo.subscribe('https://example.com/v');
+    }
+
+    Future<void> update() async {
+      clockNow = clockNow.add(const Duration(days: 1));
+      await db
+          .into(db.settings)
+          .insert(
+            SettingsCompanion.insert(
+              key: SettingsKeys.videoSince,
+              value: '${clockNow.millisecondsSinceEpoch}',
+            ),
+          );
+    }
+
+    Future<void> refresh(int id, List<String> items) async {
+      feed(items);
+      clockNow = clockNow.add(const Duration(hours: 1));
+      await repo.refreshPodcast((await repo.watchPodcast(id).first)!);
+    }
+
+    Future<EpisodeStatus> status(String guid) async => (await (db.select(
+      db.episodes,
+    )..where((e) => e.guid.equals(guid))).getSingle()).status;
+
+    test('first refresh: old ones played, newer ones new', () async {
+      final id = await subscribedBefore();
+      await update();
+      await refresh(id, [
+        // Published after the last refresh before the update: really new.
+        item('v3', 'video/mp4', clockNow.subtract(const Duration(hours: 2))),
+        item('a2', 'audio/mpeg', now.subtract(const Duration(days: 8))),
+        item('v2', 'video/mp4', now.subtract(const Duration(days: 8))),
+        item('v1', 'video/quicktime', now.subtract(const Duration(days: 9))),
+        item('a1', 'audio/mpeg', now.subtract(const Duration(days: 9))),
+      ]);
+      expect(await status('v1'), EpisodeStatus.played);
+      expect(await status('v2'), EpisodeStatus.played);
+      expect(await status('v3'), EpisodeStatus.newEpisode);
+      // Audio is never caught up this way.
+      expect(await status('a2'), EpisodeStatus.newEpisode);
+    });
+
+    test('later refreshes and new installs bring video as new', () async {
+      final id = await subscribedBefore();
+      await refresh(id, [
+        item('v1', 'video/mp4', now.subtract(const Duration(days: 9))),
+      ]);
+      // No marker (installed with video support): nothing marked.
+      expect(await status('v1'), EpisodeStatus.newEpisode);
+
+      await update();
+      await refresh(id, []);
+      // The second refresh after the update: back to the normal rules.
+      await refresh(id, [
+        item('v0', 'video/mp4', now.subtract(const Duration(days: 30))),
+      ]);
+      expect(await status('v0'), EpisodeStatus.newEpisode);
+    });
   });
 }

@@ -63,6 +63,9 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
 - **Themen-Filter** (Netzwerk-Feeds): Ist `autoDownloadThemes` gesetzt, zählen und laden nur Folgen dieser Themen
   (leere Liste = nichts). Folgen ohne Thema fallen bei gesetztem Filter heraus. Neue Themen sind nicht automatisch dabei.
 - Budget: Feed-Größenangabe (`audioSizeBytes`) gegen das Speicherlimit; reicht es nicht, wird gestoppt.
+- **Video-Folgen** (MIME `video/*`, Benutzerwunsch 2026-11-12) lädt Auto-Download **immer nur über WLAN**, auch bei
+  „Immer" – sie sind ein Vielfaches größer. „Jetzt über Mobilfunk laden" geht wie sonst von Hand. Dateiendung aus dem
+  MIME-Typ (`mp4`, `m4v`, `mov`, `webm`); 96-h-Regel und Speicherlimit gelten unverändert.
 - **Ziel-Playlist** (optional pro Podcast, „Neue Folgen zur Playlist hinzufügen"; Benutzerwunsch 2026-09-30): jede
   automatisch eingereihte Folge wird auch ans Ende dieser Playlist gehängt (schon enthalten → übersprungen). Umbenannt →
   Name wird nachgeführt; gelöscht → beim nächsten Auto-Download unter dem gespeicherten Namen neu angelegt
@@ -130,6 +133,10 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
   Vordergrund ist (`WidgetsBindingObserver`; im Hintergrund/bei Bildschirm aus gibt es keinen Timer), in `dispose()` beendet.
   Kosten: ein Neuzeichnen der Karte pro Minute plus 0,9 s Überblendung, keine Animation sonst. Tests: `panel_reshuffle_test.dart`. ✅
 - `audio_service` nutzt für Benachrichtigungs-Cover den begrenzten `CoverCacheManager` (kein zweiter Cache). ✅
+- Video-Folgen (`playback.md` „Video"): höchstens **eine** Texture (`SurfaceProducer`) für die ganze App, gezählt über
+  `acquire`/`release` der Widgets; freigegeben, sobald kein Widget sie zeigt, die App im Hintergrund ist oder der
+  Provider endet (`dispose`); im Hintergrund ist die Video-Spur aus (kein Dekodieren). Der Player wird nie verdoppelt.
+  Tests: `test/audio/video_output_test.dart`, Widget-Test prüft, dass nach dem Schließen niemand mehr angemeldet ist. ✅
 - Android Auto: `CoverProvider` (Kotlin) liest Cover **nur** aus dem `CoverCacheManager`-Ordner, lädt nichts nach und
   legt keine Kopie an; Menülisten sind einmalige DB-Abfragen ohne offene Streams (`CarRepository`). ✅
 - Positions-Updates des Players gedrosselt in die DB schreiben (alle 5 s + bei Pause/Seek/Stopp/Folgenwechsel). ✅

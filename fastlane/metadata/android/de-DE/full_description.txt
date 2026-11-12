@@ -1,4 +1,4 @@
-<p>AA-AuralListen Podcatcher ist eine private Podcast-App für Android. Nur Audio, kein Konto, keine Werbung, kein Tracking. Alles bleibt auf deinem Handy – einen Server des Entwicklers gibt es nicht.</p>
+<p>AA-AuralListen Podcatcher ist eine private Podcast-App für Android. Audio und Video, kein Konto, keine Werbung, kein Tracking. Alles bleibt auf deinem Handy – einen Server des Entwicklers gibt es nicht.</p>
 
 <p><b>Finden und abonnieren</b></p>
 <ul>

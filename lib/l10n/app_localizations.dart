@@ -738,6 +738,24 @@ abstract class AppLocalizations {
   /// **'In einer Playlist'**
   String get episodeInPlaylist;
 
+  /// Tooltip of the camera icon in episode lists
+  ///
+  /// In de, this message translates to:
+  /// **'Video-Folge'**
+  String get episodeVideo;
+
+  /// Tap on the video in the player
+  ///
+  /// In de, this message translates to:
+  /// **'Vollbild'**
+  String get videoFullscreen;
+
+  /// No description provided for @videoExitFullscreen.
+  ///
+  /// In de, this message translates to:
+  /// **'Vollbild beenden'**
+  String get videoExitFullscreen;
+
   /// No description provided for @downloadFailed.
   ///
   /// In de, this message translates to:

@@ -28,11 +28,6 @@
       <itunes:duration>2700</itunes:duration>
     </item>
     <item>
-      <title>Video-Folge</title>
-      <guid>video</guid>
-      <enclosure url="https://example.com/v.mp4" type="video/mp4"/>
-    </item>
-    <item>
       <title>Ohne Audio</title>
       <guid>text-only</guid>
     </item>

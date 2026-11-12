@@ -47,7 +47,9 @@ dependencies:
   cached_network_image: ^4.0.2
   flutter_cache_manager: ^3.4.5
   file_picker: ^13.1.0
-  just_audio: ^0.10.6
+  # Patched copy (video picture on a texture) – third_party/just_audio/PATCH.md
+  just_audio:
+    path: third_party/just_audio
   # Patched copy (media keys: Pause only pauses) – third_party/audio_service/PATCH.md
   audio_service:
     path: third_party/audio_service

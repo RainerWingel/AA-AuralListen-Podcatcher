@@ -7,10 +7,12 @@ import '../../core/formatting.dart';
 import '../../core/widgets/cover_image.dart';
 import '../../core/widgets/episode_title.dart';
 import '../../core/widgets/info_snack_bar.dart';
+import '../../core/widgets/video_mark.dart';
 import '../../data/db/app_database.dart';
 import '../../data/playback_repository.dart' show PlaybackRepository;
 import '../../data/podcast_repository.dart' show isFreshEpisode;
 import '../../data/providers.dart';
+import '../../data/video_episodes.dart';
 import '../../l10n/app_localizations.dart';
 import '../playlists/playlist_actions.dart';
 import 'episode_description.dart';
@@ -313,6 +315,7 @@ class EpisodeTile extends ConsumerWidget {
               Text(podcast.title, maxLines: 1, overflow: TextOverflow.ellipsis),
             Row(
               children: [
+                if (episode.isVideo) const VideoMark(),
                 _DownloadIndicator(episodeId: episode.id),
                 // Inside a playlist the mark would always be on.
                 if (playlistId == null)

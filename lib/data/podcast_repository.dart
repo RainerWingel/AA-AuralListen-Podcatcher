@@ -9,6 +9,7 @@ import 'episode_numbers.dart';
 import 'feed/feed_fetcher.dart';
 import 'feed/rss_parser.dart';
 import 'hot_sources.dart';
+import 'settings_keys.dart';
 import 'storage/cover_cache.dart';
 
 enum SubscribeError { invalidUrl, alreadySubscribed, network, notAFeed }
@@ -778,7 +779,12 @@ class PodcastRepository {
             );
           }
           final moved = loaded.url != podcast.feedUrl;
-          await _storeFeed(podcast.id, loaded, now);
+          await _storeFeed(
+            podcast.id,
+            loaded,
+            now,
+            previousRefreshAt: podcast.lastRefreshAt,
+          );
           // A moved feed may carry new ids for old episodes: not now.
           if (!moved) await _streamNewEpisodes(podcast.id, now);
           return moved ? RefreshOutcome.moved : RefreshOutcome.updated;
@@ -841,29 +847,75 @@ class PodcastRepository {
   }
 
   /// Writes feed metadata and episodes (listening state stays untouched).
-  Future<void> _storeFeed(int podcastId, _LoadedFeed loaded, DateTime now) =>
-      _db.transaction(() async {
-        final feed = loaded.feed;
-        await _updatePodcast(
-          podcastId,
-          PodcastsCompanion(
-            feedUrl: Value(loaded.url),
-            title: Value(feed.title),
-            author: Value(feed.author),
-            description: Value(feed.description),
-            imageUrl: Value(feed.imageUrl),
-            websiteUrl: Value(feed.websiteUrl),
-            fundingUrl: Value(feed.fundingUrl),
-            fundingLabel: Value(feed.fundingLabel),
-            serial: Value(feed.serial),
-            etag: Value(loaded.fetched.etag),
-            lastModified: Value(loaded.fetched.lastModified),
-            lastRefreshAt: Value(now),
-            lastError: const Value(null),
+  /// [previousRefreshAt]: the podcast's refresh before this one (catching
+  /// up on video episodes, [_markOldVideoEpisodes]).
+  Future<void> _storeFeed(
+    int podcastId,
+    _LoadedFeed loaded,
+    DateTime now, {
+    DateTime? previousRefreshAt,
+  }) => _db.transaction(() async {
+    final feed = loaded.feed;
+    await _updatePodcast(
+      podcastId,
+      PodcastsCompanion(
+        feedUrl: Value(loaded.url),
+        title: Value(feed.title),
+        author: Value(feed.author),
+        description: Value(feed.description),
+        imageUrl: Value(feed.imageUrl),
+        websiteUrl: Value(feed.websiteUrl),
+        fundingUrl: Value(feed.fundingUrl),
+        fundingLabel: Value(feed.fundingLabel),
+        serial: Value(feed.serial),
+        etag: Value(loaded.fetched.etag),
+        lastModified: Value(loaded.fetched.lastModified),
+        lastRefreshAt: Value(now),
+        lastError: const Value(null),
+      ),
+    );
+    await _upsertEpisodes(podcastId, feed.episodes, now);
+    if (previousRefreshAt != null) {
+      await _markOldVideoEpisodes(podcastId, previousRefreshAt, now);
+    }
+  });
+
+  /// The first refresh after the update that brought video episodes
+  /// ([SettingsKeys.videoSince]) finds all the old video episodes the parser
+  /// used to skip. Those published before the previous refresh arrive as
+  /// played – no dot, no auto-download, no playlist; newer ones count as
+  /// new (docs/feeds-and-directories.md).
+  Future<void> _markOldVideoEpisodes(
+    int podcastId,
+    DateTime previousRefreshAt,
+    DateTime now,
+  ) async {
+    final row = await (_db.select(
+      _db.settings,
+    )..where((s) => s.key.equals(SettingsKeys.videoSince))).getSingleOrNull();
+    final since = int.tryParse(row?.value ?? '');
+    if (since == null ||
+        !previousRefreshAt.isBefore(
+          DateTime.fromMillisecondsSinceEpoch(since),
+        )) {
+      return;
+    }
+    await (_db.update(_db.episodes)..where(
+          (e) =>
+              e.podcastId.equals(podcastId) &
+              e.addedAt.equals(now) &
+              e.audioMimeType.like('video/%') &
+              e.status.equalsValue(EpisodeStatus.newEpisode) &
+              (e.pubDate.isNull() |
+                  e.pubDate.isSmallerOrEqualValue(previousRefreshAt)),
+        ))
+        .write(
+          EpisodesCompanion(
+            status: const Value(EpisodeStatus.played),
+            playedAt: Value(now),
           ),
         );
-        await _upsertEpisodes(podcastId, feed.episodes, now);
-      });
+  }
 
   /// Manually points a subscription to a new feed address (the publisher
   /// moved without redirect or announcement). The new feed must load;

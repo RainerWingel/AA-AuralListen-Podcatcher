@@ -1,0 +1,14 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    prefer_single_quotes: false
+    unawaited_futures: false
+    # AuralListen (PATCH.md): upstream code, keep `flutter analyze` at 0.
+    use_super_parameters: false

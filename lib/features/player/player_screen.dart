@@ -19,12 +19,12 @@ import '../../data/providers.dart';
 import '../../data/settings_keys.dart';
 import '../../l10n/app_localizations.dart';
 import '../episodes/episode_description.dart';
-import 'chapter_cover.dart';
 import 'chapters_and_bookmarks.dart';
 import 'panel_background.dart';
 import 'player_action_bar.dart';
 import 'player_backdrop.dart';
 import 'player_controls.dart';
+import 'video_picture.dart';
 
 /// "Downloaded" mark in front of the podcast name – only when the file is
 /// complete (playback then comes from the phone, not the network).
@@ -305,6 +305,7 @@ class _InfoArea extends StatelessWidget {
         child: _PlayerInfo(
           item: item,
           coverSize: coverSize,
+          videoWidth: max(72.0, constraints.maxWidth - 48),
           theme: theme,
           provisional: provisional,
         ),
@@ -338,7 +339,7 @@ class _PlayerControls extends StatelessWidget {
         Semantics(
           container: true,
           explicitChildNodes: true,
-          child: _SeekBar(
+          child: PlayerSeekBar(
             total: item.duration,
             podcastId: item.extras?['podcastId'] as int?,
           ),
@@ -373,12 +374,14 @@ class _PlayerInfo extends ConsumerWidget {
   const _PlayerInfo({
     required this.item,
     required this.coverSize,
+    required this.videoWidth,
     required this.theme,
     required this.provisional,
   });
 
   final MediaItem item;
   final double coverSize;
+  final double videoWidth;
   final ThemeData theme;
   final bool provisional;
 
@@ -389,10 +392,12 @@ class _PlayerInfo extends ConsumerWidget {
     return Column(
       children: [
         const SizedBox(height: 16),
-        PlayerCover(
+        // Video episodes: their picture (docs/playback.md "Video").
+        PlayerPicture(
           episodeId: episodeId,
           coverUrl: item.artUri?.toString(),
-          size: coverSize,
+          coverSize: coverSize,
+          maxWidth: videoWidth,
         ),
         const SizedBox(height: 24),
         Text(
@@ -447,8 +452,12 @@ class _PlayerInfo extends ConsumerWidget {
 
 /// Slider with elapsed / remaining time. While dragging, the slider follows
 /// the finger; the seek happens on release.
-class _SeekBar extends ConsumerStatefulWidget {
-  const _SeekBar({required this.total, required this.podcastId});
+class PlayerSeekBar extends ConsumerStatefulWidget {
+  const PlayerSeekBar({
+    required this.total,
+    required this.podcastId,
+    super.key,
+  });
 
   /// The podcast playing: its own speed counts for the real remaining time.
   final int? podcastId;
@@ -456,10 +465,10 @@ class _SeekBar extends ConsumerStatefulWidget {
   final Duration? total;
 
   @override
-  ConsumerState<_SeekBar> createState() => _SeekBarState();
+  ConsumerState<PlayerSeekBar> createState() => _PlayerSeekBarState();
 }
 
-class _SeekBarState extends ConsumerState<_SeekBar> {
+class _PlayerSeekBarState extends ConsumerState<PlayerSeekBar> {
   double? _dragValue;
 
   @override

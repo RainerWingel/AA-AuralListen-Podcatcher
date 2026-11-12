@@ -13,6 +13,7 @@ import '../podcast_repository.dart'
         PodcastRepository,
         autoDownloadThemesOf;
 import '../settings_keys.dart';
+import '../video_episodes.dart';
 import 'download_engine.dart';
 
 /// A download row with its episode and podcast, for the Downloads tab.
@@ -425,7 +426,11 @@ class DownloadService implements PodcastFilesCleaner, NewEpisodePlaylister {
         budget -= size;
         await download(
           episode.id,
-          wifiOnly: podcast.autoDownloadMode == AutoDownloadMode.wifiOnly,
+          // Videos are many times larger: never over mobile data on their
+          // own (docs/eviction.md).
+          wifiOnly:
+              podcast.autoDownloadMode == AutoDownloadMode.wifiOnly ||
+              episode.isVideo,
         );
         // Optional per podcast: also append it to a playlist (skipped if it
         // is there already).
@@ -645,6 +650,10 @@ const _extensionsByMime = {
   'audio/opus': 'opus',
   'audio/wav': 'wav',
   'audio/x-wav': 'wav',
+  'video/mp4': 'mp4',
+  'video/x-m4v': 'm4v',
+  'video/quicktime': 'mov',
+  'video/webm': 'webm',
 };
 
 /// File extension for an episode: from the MIME type, else the URL, else mp3.

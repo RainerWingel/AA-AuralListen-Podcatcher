@@ -33,6 +33,7 @@ void main() {
     DateTime? playedAt,
     DateTime? pubDate,
     int? podcast,
+    String mimeType = 'audio/mpeg',
   }) => db
       .into(db.episodes)
       .insert(
@@ -41,7 +42,7 @@ void main() {
           guid: guid,
           title: 'Folge $guid',
           audioUrl: 'https://example.com/$guid.mp3',
-          audioMimeType: const Value('audio/mpeg'),
+          audioMimeType: Value(mimeType),
           status: Value(status),
           playedAt: Value(playedAt),
           pubDate: Value(pubDate),
@@ -308,6 +309,10 @@ void main() {
           );
       await service.download(id);
       expect(engine.active[id]!.fileName, '$id.m4a');
+
+      final video = await addEpisode('v', mimeType: 'video/mp4');
+      await service.download(video);
+      expect(engine.active[video]!.fileName, '$video.mp4');
     });
   });
 
@@ -500,6 +505,24 @@ void main() {
 
       // Already at the maximum → nothing more.
       expect(await service.autoDownload(), 0);
+    });
+
+    test('video episodes only over Wi-Fi, also with "always"', () async {
+      await setPodcast(
+        const PodcastsCompanion(
+          autoDownloadMode: Value(AutoDownloadMode.always),
+        ),
+      );
+      final audio = await addEpisode('a', pubDate: DateTime(2026, 9, 1));
+      final video = await addEpisode(
+        'v',
+        pubDate: DateTime(2026, 9, 2),
+        mimeType: 'video/mp4',
+      );
+
+      expect(await service.autoDownload(), 2);
+      expect(engine.active[audio]!.wifiOnly, isFalse);
+      expect(engine.active[video]!.wifiOnly, isTrue);
     });
 
     test('retries a failed episode, gives up after 3 failures', () async {

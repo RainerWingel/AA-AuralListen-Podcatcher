@@ -24,6 +24,8 @@ Optionen → Sicherung → „Backup erstellen" → Speichern-Dialog (`AA-AuralL
 - Sprache: Enthält das Backup `ui.language`, wird sie übernommen; ältere Backups ohne Sprache behalten die aktuelle
   (sonst käme die Sprachabfrage des ersten Starts zurück). `ui.knownLanguages` kommt wie alle Einstellungen aus dem
   Backup; ein altes Backup ohne den Schlüssel bietet eine neue Handysprache darum noch einmal an (gewollt, harmlos).
+- Video-Merker (`feeds.videoSince`, `feeds-and-directories.md`): kommt mit; ein Backup vor Schema v30 bekommt ihn beim
+  Migrieren (Zeitpunkt der Wiederherstellung) – der nächste Refresh markiert dann alte Video-Folgen als gespielt.
 - Auto-Sleep-Timer (`player.autoSleep`): steckt wie alle Einstellungen in der Datenbank und kommt mit; ein älteres
   Backup ohne den Schlüssel stellt den Standard her (Ein, 22:00–04:00, 30 Minuten).
 
