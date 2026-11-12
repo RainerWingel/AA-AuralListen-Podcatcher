@@ -133,7 +133,11 @@ class EpisodeTile extends ConsumerWidget {
                   Navigator.of(context).pop();
                   ref
                       .read(audioHandlerProvider)
-                      .playEpisode(episode.id, playlistId: playlistId);
+                      .playEpisode(
+                        episode.id,
+                        playlistId: playlistId,
+                        fromApp: true,
+                      );
                 },
               ),
               // Notes are loaded only when opened (not with the list).
@@ -281,7 +285,7 @@ class EpisodeTile extends ConsumerWidget {
     return ListTile(
       onTap: () => ref
           .read(audioHandlerProvider)
-          .playEpisode(episode.id, playlistId: playlistId),
+          .playEpisode(episode.id, playlistId: playlistId, fromApp: true),
       onLongPress: () => _showMenu(context, ref),
       selected: isCurrent,
       leading: dim(

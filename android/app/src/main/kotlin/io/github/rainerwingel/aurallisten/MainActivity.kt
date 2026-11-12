@@ -56,7 +56,35 @@ class MainActivity : AudioServiceActivity() {
                     else -> result.notImplemented()
                 }
             }
+        // Android Auto connected? The Auto-Sleep-Timer never starts in the
+        // car, see docs/playback.md.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "aurallisten/car")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "isConnected" -> result.success(isCarConnected())
+                    else -> result.notImplemented()
+                }
+            }
     }
+
+    // The provider androidx.car.app's CarConnection reads (Android Auto app
+    // and Android Automotive publish it): 0 = not connected, 1 = built-in
+    // car system, 2 = phone projected to the car. No provider = no car.
+    private fun isCarConnected(): Boolean =
+        try {
+            contentResolver.query(
+                Uri.parse("content://androidx.car.app.connection"),
+                arrayOf("CarConnectionState"),
+                null,
+                null,
+                null,
+            )?.use { cursor ->
+                val column = cursor.getColumnIndex("CarConnectionState")
+                column >= 0 && cursor.moveToNext() && cursor.getInt(column) != 0
+            } ?: false
+        } catch (e: Exception) {
+            false
+        }
 
     private fun isExempt(): Boolean =
         (getSystemService(POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(packageName)

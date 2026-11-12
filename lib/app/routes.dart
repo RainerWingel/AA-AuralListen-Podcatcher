@@ -10,6 +10,7 @@ abstract final class Routes {
   static const history = '$settings/verlauf';
   static const info = '$settings/info';
   static const design = '$settings/design';
+  static const autoSleep = '$settings/auto-sleep-timer';
 
   static const search = '$subscriptions/suche';
 

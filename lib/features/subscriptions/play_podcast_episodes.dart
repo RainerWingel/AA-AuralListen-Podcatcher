@@ -343,7 +343,7 @@ Future<void> playPodcastEpisodes(
   }
   await ref
       .read(audioHandlerProvider)
-      .playEpisode(episodes.first.id, playlistId: playlist.id);
+      .playEpisode(episodes.first.id, playlistId: playlist.id, fromApp: true);
   showInfoSnackBar(
     messenger,
     l10n.episodesAddedToPlaylist(added.length, playlist.name),

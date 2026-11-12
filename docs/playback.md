@@ -66,6 +66,39 @@ Knopf in der festen Knopfreihe des Vollbild-Players (`PlayerActionBar`, `ui-ux.m
   „Aus", und das nächste Play (`_tryPlay`) setzt ihn wirklich zurück. Gemessen mit Wanduhrzeit (`DateTime.now()`), damit
   auch Handy-Schlaf zählt. Ein in der Pause neu gesetzter Timer beginnt die Stunde neu.
 
+### Auto-Sleep-Timer (Benutzerwunsch 2026-11-12)
+Code: `lib/audio/auto_sleep_timer.dart` (Einstellung + Zeitfenster-Logik, reine Funktionen), `PodcastAudioHandler`
+(Abschnitt „auto sleep timer"), Seite `lib/features/settings/auto_sleep_screen.dart` (`ui-ux.md`), Infobox in `AppShell`.
+Tests: `test/audio/auto_sleep_timer_test.dart`, Gruppe „auto sleep timer" in `podcast_audio_handler_test.dart`,
+zwei Tests „Auto-Sleep-Timer: …" in `widget_test.dart`.
+- **Modus** Aus · **Ein** (ein Zeitfenster für jeden Tag) · **Nach Wochentag** (sieben Fenster, jeder Tag einzeln
+  abschaltbar). **Standard (frische App und Update): Ein, 22:00–04:00, 30 Minuten** (Benutzerwunsch).
+  Gespeichert als JSON in `settings['player.autoSleep']` (`AutoSleepSchedule.encode/decode`; fehlt/kaputt = Standard).
+- **Zeitfenster:** Wanduhrzeit des Handys, Beginn gehört dazu, Ende nicht. Ende ≤ Beginn = über Mitternacht; die Nacht
+  **gehört zum Tag, an dem sie beginnt** („Freitag 22–04" gilt Freitagabend bis Samstag 04:00, auch wenn Samstag aus
+  ist). Gebaut aus Datum + Uhrzeit (`DateTime(j, m, t + 1, h, min)`), nie durch Addieren von Stunden – so endet das
+  Fenster auch in der Nacht der Zeitumstellung um 04:00. `windowStartAt(now)` liefert den **Beginn** des Fensters, in
+  dem `now` liegt; er unterscheidet die Nächte.
+- **Dauer:** dieselbe Auswahl wie beim Sleep-Timer ohne „Aus" (`SleepTimerButton.pick`), eine Dauer für alle Tage.
+  Der Auto-Timer ist danach ein ganz normaler Sleep-Timer (Spielzeit, Ausblenden, Verfall nach 1 Stunde Stillstand).
+- **Auslöser nur Play in der App:** `play(fromApp: true)` bzw. `playEpisode(…, fromApp: true)` – Play-Knopf
+  (Mini-/Vollbild-Player), Tippen auf Folgen, Playlist-/Podcast-„Abspielen", Lesezeichen, Verlauf, Downloads.
+  **Nie** über Android Auto, Benachrichtigung, Sperrbildschirm oder Bluetooth-Tasten: audio_service ruft dort `play()`
+  ohne `fromApp` auf (die Wege sind dort nicht unterscheidbar, Auto-Radio = Kopfhörer). Zusätzlich fragt der Handler
+  vor dem Start, ob das Handy mit **Android Auto verbunden** ist (`CarConnection`, Kanal `aurallisten/car` in
+  `MainActivity.kt`: Content-Provider `androidx.car.app.connection`, Spalte `CarConnectionState` ≠ 0 – dasselbe, was
+  die androidx-Bibliothek liest, ohne sie einzubinden; `<queries>`-Eintrag im Manifest). Unbekannt = nicht verbunden.
+  Automatisches Weiterspielen in der Playlist ist kein neues Play.
+- **Kein Überschreiben:** Läuft schon ein Timer (manuell oder automatisch), passiert nichts.
+- **Abbrechen gilt für die Nacht:** Schaltet der Benutzer einen automatisch gesetzten Timer auf „Aus" (Player-Knopf
+  oder „Abbrechen" in der Infobox), merkt sich der Handler den Fensterbeginn (`_autoSleepCancelled`, ein Wert) und
+  startet in diesem Fenster keinen neuen. Ist der Timer dagegen **abgelaufen**, startet das nächste Play im Fenster
+  wieder einen. Intern gesetzte „Aus" (Ablauf, Folgenende, Verfall) gehen über `_applySleepTimer` und zählen nicht als
+  Abbruch.
+- **Infobox:** „Sleep-Timer automatisch gestartet: 30 Minuten" mit „Abbrechen" (`autoSleepStarts`-Stream →
+  `autoSleepStartsProvider`). „Abbrechen" wirkt nur, solange noch der automatische Timer läuft.
+- Kein zusätzlicher Timer: geprüft wird nur beim Play. Der Stream wird in `dispose()` geschlossen (`eviction.md`).
+
 ### Hänger-Erkennung (Benutzerwunsch, sparsam)
 Code: `PodcastAudioHandler` (Abschnitt „hang detection"), Infobox in `AppShell`.
 - **Nur während der Wiedergabe** läuft ein Timer (alle 10 s, `stallCheckInterval`); bei Pause/Stopp gibt es keinen.

@@ -952,5 +952,57 @@
   "notificationChannelPlayback": "Wiedergabe",
   "@notificationChannelPlayback": {
     "description": "Name of the Android notification channel (system settings → app notifications)."
+  },
+  "autoSleepTitle": "Auto-Sleep-Timer",
+  "autoSleepModeOff": "Aus",
+  "autoSleepModeDaily": "Ein",
+  "@autoSleepModeDaily": {
+    "description": "Auto sleep timer mode: the same time window every day (segmented button, keep short)."
+  },
+  "autoSleepModeWeekdays": "Nach Wochentag",
+  "autoSleepIntro": "Drückst du in der App innerhalb des Zeitfensters auf Play, startet der Sleep-Timer automatisch. Ein schon laufender Timer bleibt, wie er ist. Über Android Auto, die Benachrichtigung, den Sperrbildschirm oder Bluetooth-Tasten startet er nie. Schaltest du ihn aus, startet er in dieser Nacht nicht noch einmal.",
+  "autoSleepDuration": "Dauer des Timers",
+  "autoSleepWindow": "Zeitfenster",
+  "autoSleepWindowsPerDay": "Zeitfenster je Wochentag",
+  "autoSleepFrom": "Von {time}",
+  "@autoSleepFrom": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "autoSleepUntil": "Bis {time}",
+  "@autoSleepUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "autoSleepNextDay": "(am nächsten Tag)",
+  "autoSleepPickStart": "Beginn",
+  "autoSleepPickEnd": "Ende",
+  "autoSleepSameTimeError": "Beginn und Ende dürfen nicht gleich sein – das Zeitfenster wäre 0 Minuten lang. Die Änderung wurde nicht übernommen.",
+  "autoSleepMidnightHint": "Ein Zeitfenster über Mitternacht gehört zum Tag, an dem es beginnt: „Freitag 22:00 bis 04:00“ gilt von Freitagabend bis Samstagmorgen 04:00.",
+  "autoSleepCopyToAll": "Auf alle Tage übernehmen",
+  "autoSleepCopiedToAll": "Zeiten von {day} auf alle Tage übernommen",
+  "@autoSleepCopiedToAll": {
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "Montag"
+      }
+    }
+  },
+  "autoSleepAllDaysOff": "Alle Tage sind ausgeschaltet – so startet der Auto-Sleep-Timer nie.",
+  "autoSleepStarted": "Sleep-Timer automatisch gestartet: {timer}",
+  "@autoSleepStarted": {
+    "description": "Info box when Play in the night window started the sleep timer; {timer} is e.g. \"30 Minuten\" or \"Bis Ende der Folge\".",
+    "placeholders": {
+      "timer": {
+        "type": "String"
+      }
+    }
   }
 }

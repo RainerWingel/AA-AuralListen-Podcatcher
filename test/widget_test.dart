@@ -9,6 +9,7 @@ import 'package:aapodcastguru/app/router.dart';
 import 'package:aapodcastguru/app/routes.dart';
 import 'package:aapodcastguru/app/theme.dart';
 import 'package:aapodcastguru/audio/audio_providers.dart';
+import 'package:aapodcastguru/audio/auto_sleep_timer.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
 import 'package:aapodcastguru/core/app_info.dart';
 import 'package:aapodcastguru/core/app_language.dart';
@@ -33,6 +34,7 @@ import 'package:aapodcastguru/features/player/player_action_bar.dart';
 import 'package:aapodcastguru/features/player/player_controls.dart';
 import 'package:aapodcastguru/features/player/player_screen.dart';
 import 'package:aapodcastguru/features/playlists/playlist_screen.dart';
+import 'package:aapodcastguru/features/settings/auto_sleep_screen.dart';
 import 'package:aapodcastguru/features/settings/opml_import_flow.dart';
 import 'package:aapodcastguru/features/settings/settings_screen.dart';
 import 'package:drift/drift.dart'
@@ -187,6 +189,8 @@ void main() {
   late FakeAppPlatform appPlatform;
   // Wallpaper color of the simulated phone; null = none (Android < 12).
   Color? wallpaperColor;
+  // Wall-clock time the player sees (Auto-Sleep-Timer).
+  late DateTime clock;
 
   setUp(() {
     episodesDir = Directory.systemTemp.createTempSync('widget_episodes_');
@@ -194,6 +198,9 @@ void main() {
     battery = FakeBatteryOptimization();
     appPlatform = FakeAppPlatform();
     wallpaperColor = null;
+    // Midday: the Auto-Sleep-Timer (on by default at night) stays out of
+    // tests run in the evening.
+    clock = DateTime(2026, 6, 1, 12);
     db = AppDatabase.forTesting(NativeDatabase.memory());
     engine = FakePlayerEngine();
     handler = PodcastAudioHandler(
@@ -201,6 +208,7 @@ void main() {
       playback: PlaybackRepository(db, DateTime.now),
       settings: SettingsRepository(db),
       playlists: PlaylistRepository(db, DateTime.now),
+      now: () => clock,
     );
   });
   // Closing inside the widget test's fake-async zone never completes.
@@ -2223,6 +2231,132 @@ void main() {
   );
 
   testWidgets(
+    'Auto-Sleep-Timer: modes, times and refused input',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      Future<AutoSleepSchedule> stored() async => AutoSleepSchedule.decode(
+        await tester.runAsync<String?>(
+          () => SettingsRepository(db).get(SettingsKeys.autoSleep),
+        ),
+      );
+      // The time the "user" picks next, and the title the picker showed.
+      late TimeOfDay answer;
+      String? pickerTitle;
+      Future<void> pickTime(String button, int hour, int minute) async {
+        answer = TimeOfDay(hour: hour, minute: minute);
+        await tester.tap(find.text(button));
+        await settle(tester);
+      }
+
+      await pumpApp(
+        tester,
+        overrides: [
+          timePickerProvider.overrideWithValue((_, _, title) async {
+            pickerTitle = title;
+            return answer;
+          }),
+        ],
+      );
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
+      await settle(tester);
+      // A fresh app: on, every night 22:00–04:00 (user wish).
+      expect(find.widgetWithText(ListTile, 'Ein · 30 Minuten'), findsOneWidget);
+      await tester.tap(find.widgetWithText(ListTile, 'Auto-Sleep-Timer'));
+      await settle(tester);
+      expect(find.text('Von 22:00'), findsOneWidget);
+      expect(find.text('Bis 04:00'), findsOneWidget);
+      expect(find.text('30 Minuten'), findsOneWidget);
+
+      await tester.tap(find.text('Aus'));
+      await settle(tester);
+      expect((await stored()).mode, AutoSleepMode.off);
+      expect(find.text('Von 22:00'), findsNothing);
+
+      await tester.tap(find.text('Ein'));
+      await settle(tester);
+      expect((await stored()).mode, AutoSleepMode.daily);
+
+      // End = start: refused with a message, the old value stays.
+      await pickTime('Bis 04:00', 22, 0);
+      expect(pickerTitle, 'Ende');
+      expect(
+        find.textContaining('Beginn und Ende dürfen nicht gleich sein'),
+        findsOneWidget,
+      );
+      expect((await stored()).daily, AutoSleepWindow.standard);
+      expect(find.text('Bis 04:00'), findsOneWidget);
+
+      // A valid end is saved and the message goes away.
+      await pickTime('Bis 04:00', 5, 30);
+      expect(find.textContaining('dürfen nicht gleich'), findsNothing);
+      expect((await stored()).daily.end, 5 * 60 + 30);
+      expect(find.text('Bis 05:30'), findsOneWidget);
+
+      // Per weekday: every day starts with the window chosen under "Ein".
+      await tester.tap(find.text('Nach Wochentag'));
+      await settle(tester);
+      final weekly = await stored();
+      expect(weekly.mode, AutoSleepMode.weekdays);
+      expect(weekly.weekdays, everyElement(weekly.daily));
+      expect(find.widgetWithText(SwitchListTile, 'Montag'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Montag'));
+      await settle(tester);
+      expect((await stored()).weekdays.first.enabled, isFalse);
+      expect((await stored()).weekdays[1].enabled, isTrue);
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
+    'Auto-Sleep-Timer: info box with "Abbrechen" at night',
+    timeout: timeout,
+    (tester) async {
+      clock = DateTime(2026, 11, 12, 23);
+      final episodeId = await tester.runAsync(() async {
+        final podcastId = await db
+            .into(db.podcasts)
+            .insert(
+              PodcastsCompanion.insert(
+                feedUrl: 'https://example.com/nacht',
+                title: 'Nachtpodcast',
+                subscribedAt: DateTime(2026),
+              ),
+            );
+        return db
+            .into(db.episodes)
+            .insert(
+              EpisodesCompanion.insert(
+                podcastId: podcastId,
+                guid: 'n',
+                title: 'Gute Nacht',
+                audioUrl: 'https://example.com/n.mp3',
+                addedAt: DateTime(2026),
+              ),
+            );
+      });
+      await pumpApp(tester);
+      // Like a tap on the episode in the app (the handler's work needs the
+      // test's frames, so it is not awaited here).
+      unawaited(handler.playEpisode(episodeId!, fromApp: true));
+      await settle(tester);
+      expect(
+        find.text('Sleep-Timer automatisch gestartet: 30 Minuten'),
+        findsOneWidget,
+      );
+      expect(handler.sleepTimerState.isActive, isTrue);
+      await tester.tap(find.widgetWithText(SnackBarAction, 'Abbrechen'));
+      await settle(tester);
+      expect(handler.sleepTimerState.isActive, isFalse);
+      await disposeApp(tester);
+    },
+  );
+
+  testWidgets(
     'the app color can be chosen, also from the wallpaper',
     timeout: timeout,
     (tester) async {
@@ -2708,10 +2842,15 @@ void main() {
       // Optionen shows the status; tapping opens the app's system settings.
       await tester.tap(find.widgetWithText(NavigationDestination, 'Optionen'));
       await settle(tester);
-      expect(find.textContaining('Akku-Optimierung aktiv'), findsOneWidget);
-      // Further down since the playlist setting sits above it.
-      await tester.ensureVisible(find.text('Hintergrund-Wiedergabe'));
+      // Further down since the playlist and Auto-Sleep-Timer settings sit
+      // above it.
+      await tester.dragUntilVisible(
+        find.text('Hintergrund-Wiedergabe'),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
       await settle(tester);
+      expect(find.textContaining('Akku-Optimierung aktiv'), findsOneWidget);
       await tester.tap(find.text('Hintergrund-Wiedergabe'));
       await settle(tester);
       expect(battery.settingsOpened, 1);

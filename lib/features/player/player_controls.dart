@@ -48,7 +48,7 @@ class PlayPauseButton extends ConsumerWidget {
           )
         : Icon(playing ? Icons.pause : Icons.play_arrow, size: size);
 
-    void onPressed() => playing ? handler.pause() : handler.play();
+    void onPressed() => playing ? handler.pause() : handler.play(fromApp: true);
     final tooltip = playing ? l10n.playerPause : l10n.playerPlay;
 
     return filled

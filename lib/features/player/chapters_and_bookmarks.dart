@@ -91,16 +91,28 @@ class SleepTimerButton {
   static const customMax = 3600;
 
   static Future<void> choose(BuildContext context, WidgetRef ref) async {
-    final l10n = AppLocalizations.of(context);
     final handler = ref.read(audioHandlerProvider);
-    final timer = handler.sleepTimerState.timer;
+    final chosen = await pick(context, current: handler.sleepTimerState.timer);
+    if (chosen != null) handler.setSleepTimer(chosen);
+  }
+
+  /// The choice dialog; null = cancelled. Without [offChoice] there is no
+  /// "Aus" (Optionen → Auto-Sleep-Timer: its duration).
+  static Future<SleepTimer?> pick(
+    BuildContext context, {
+    required SleepTimer current,
+    bool offChoice = true,
+    String? title,
+  }) async {
+    final l10n = AppLocalizations.of(context);
+    final timer = current;
     final customMinutes = switch (timer) {
       SleepTimerAfter(:final duration)
           when !minuteChoices.contains(duration.inMinutes) =>
         duration.inMinutes,
       _ => null,
     };
-    final current = switch (timer) {
+    final selected = switch (timer) {
       SleepTimerOff() => 'off',
       SleepTimerAfter() when customMinutes != null => 'custom',
       SleepTimerAfter(:final duration) => '${duration.inMinutes}',
@@ -109,20 +121,21 @@ class SleepTimerButton {
     final chosen = await showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: Text(l10n.sleepTimer),
+        title: Text(title ?? l10n.sleepTimer),
         children: [
           // Tapping the selected entry counts too (toggleable reports it as
           // null): e.g. to change "Eigene Zeit" or restart the countdown.
           RadioGroup<String>(
-            groupValue: current,
-            onChanged: (v) => Navigator.of(context).pop(v ?? current),
+            groupValue: selected,
+            onChanged: (v) => Navigator.of(context).pop(v ?? selected),
             child: Column(
               children: [
-                RadioListTile(
-                  value: 'off',
-                  toggleable: true,
-                  title: Text(l10n.sleepTimerOff),
-                ),
+                if (offChoice)
+                  RadioListTile(
+                    value: 'off',
+                    toggleable: true,
+                    title: Text(l10n.sleepTimerOff),
+                  ),
                 for (final m in minuteChoices)
                   RadioListTile(
                     value: '$m',
@@ -149,31 +162,34 @@ class SleepTimerButton {
         ],
       ),
     );
-    if (chosen == null) return;
+    if (chosen == null) return null;
     if (chosen == 'custom') {
-      if (!context.mounted) return;
+      if (!context.mounted) return null;
       final minutes = await showDialog<int>(
         context: context,
-        builder: (_) => _CustomMinutesDialog(initial: customMinutes),
+        builder: (_) => _CustomMinutesDialog(
+          initial: customMinutes,
+          confirmLabel: offChoice ? l10n.sleepTimerStart : l10n.save,
+        ),
       );
-      if (minutes == null) return;
-      handler.setSleepTimer(SleepTimerAfter(Duration(minutes: minutes)));
-      return;
+      if (minutes == null) return null;
+      return SleepTimerAfter(Duration(minutes: minutes));
     }
-    handler.setSleepTimer(switch (chosen) {
+    return switch (chosen) {
       'off' => const SleepTimerOff(),
       'end' => const SleepTimerAtEpisodeEnd(),
       _ => SleepTimerAfter(Duration(minutes: int.parse(chosen))),
-    });
+    };
   }
 }
 
 /// Number field for "Eigene Zeit": whole minutes from
 /// [SleepTimerButton.customMin] to [SleepTimerButton.customMax].
 class _CustomMinutesDialog extends StatefulWidget {
-  const _CustomMinutesDialog({this.initial});
+  const _CustomMinutesDialog({required this.confirmLabel, this.initial});
 
   final int? initial;
+  final String confirmLabel;
 
   @override
   State<_CustomMinutesDialog> createState() => _CustomMinutesDialogState();
@@ -243,7 +259,7 @@ class _CustomMinutesDialogState extends State<_CustomMinutesDialog> {
         ),
         FilledButton(
           onPressed: valid ? _submit : null,
-          child: Text(l10n.sleepTimerStart),
+          child: Text(widget.confirmLabel),
         ),
       ],
     );

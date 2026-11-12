@@ -1483,4 +1483,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationChannelPlayback => 'Playback';
+
+  @override
+  String get autoSleepTitle => 'Auto sleep timer';
+
+  @override
+  String get autoSleepModeOff => 'Off';
+
+  @override
+  String get autoSleepModeDaily => 'On';
+
+  @override
+  String get autoSleepModeWeekdays => 'By weekday';
+
+  @override
+  String get autoSleepIntro =>
+      'If you press Play in the app within the time window, the sleep timer starts automatically. A timer that is already running stays as it is. It never starts via Android Auto, the notification, the lock screen or Bluetooth buttons. If you switch it off, it does not start again that night.';
+
+  @override
+  String get autoSleepDuration => 'Timer duration';
+
+  @override
+  String get autoSleepWindow => 'Time window';
+
+  @override
+  String get autoSleepWindowsPerDay => 'Time window per weekday';
+
+  @override
+  String autoSleepFrom(String time) {
+    return 'From $time';
+  }
+
+  @override
+  String autoSleepUntil(String time) {
+    return 'Until $time';
+  }
+
+  @override
+  String get autoSleepNextDay => '(next day)';
+
+  @override
+  String get autoSleepPickStart => 'Start';
+
+  @override
+  String get autoSleepPickEnd => 'End';
+
+  @override
+  String get autoSleepSameTimeError =>
+      'Start and end must not be the same – the time window would be 0 minutes long. The change was not applied.';
+
+  @override
+  String get autoSleepMidnightHint =>
+      'A time window past midnight belongs to the day it starts: “Friday 22:00 to 04:00” applies from Friday evening until Saturday morning 04:00.';
+
+  @override
+  String get autoSleepCopyToAll => 'Apply to all days';
+
+  @override
+  String autoSleepCopiedToAll(String day) {
+    return 'Times of $day applied to all days';
+  }
+
+  @override
+  String get autoSleepAllDaysOff =>
+      'All days are switched off – the auto sleep timer will never start.';
+
+  @override
+  String autoSleepStarted(String timer) {
+    return 'Sleep timer started automatically: $timer';
+  }
 }

@@ -176,6 +176,12 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] F-Droid-Texte `it-IT` (ohne Screenshots)
 - [x] Ab v1.3.6 Changelogs auch in `it-IT/changelogs/` (erledigt mit 1.3.6)
 
+## Zusatz – Auto-Sleep-Timer (2026-11-12)
+- [x] Optionen → Auto-Sleep-Timer: Aus / Ein / Nach Wochentag, Dauer, Zeitfenster (Standard Ein 22:00–04:00, 30 min)
+- [x] Start nur bei Play in der App, nie im Auto; „Aus" gilt für die Nacht; Infobox mit „Abbrechen"
+- [x] Ungültige Zeitfenster (Beginn = Ende) abgelehnt, Meldung am Feld
+- [ ] Praxistest auf dem A05s (Benutzer), im Auto mit Android Auto (startet nicht)
+
 ## Zusatz – Playlist fortsetzen (2026-09-29)
 - [x] Jede Playlist merkt sich die zuletzt daraus gespielte Folge (Schema v7), ▶ und „Fortsetzen" spielen sie weiter
 - [x] Sortieren nur in der geöffneten Playlist, in der Übersicht stattdessen „Fortsetzen"

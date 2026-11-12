@@ -1485,4 +1485,73 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get notificationChannelPlayback => 'Wiedergabe';
+
+  @override
+  String get autoSleepTitle => 'Auto-Sleep-Timer';
+
+  @override
+  String get autoSleepModeOff => 'Aus';
+
+  @override
+  String get autoSleepModeDaily => 'Ein';
+
+  @override
+  String get autoSleepModeWeekdays => 'Nach Wochentag';
+
+  @override
+  String get autoSleepIntro =>
+      'Drückst du in der App innerhalb des Zeitfensters auf Play, startet der Sleep-Timer automatisch. Ein schon laufender Timer bleibt, wie er ist. Über Android Auto, die Benachrichtigung, den Sperrbildschirm oder Bluetooth-Tasten startet er nie. Schaltest du ihn aus, startet er in dieser Nacht nicht noch einmal.';
+
+  @override
+  String get autoSleepDuration => 'Dauer des Timers';
+
+  @override
+  String get autoSleepWindow => 'Zeitfenster';
+
+  @override
+  String get autoSleepWindowsPerDay => 'Zeitfenster je Wochentag';
+
+  @override
+  String autoSleepFrom(String time) {
+    return 'Von $time';
+  }
+
+  @override
+  String autoSleepUntil(String time) {
+    return 'Bis $time';
+  }
+
+  @override
+  String get autoSleepNextDay => '(am nächsten Tag)';
+
+  @override
+  String get autoSleepPickStart => 'Beginn';
+
+  @override
+  String get autoSleepPickEnd => 'Ende';
+
+  @override
+  String get autoSleepSameTimeError =>
+      'Beginn und Ende dürfen nicht gleich sein – das Zeitfenster wäre 0 Minuten lang. Die Änderung wurde nicht übernommen.';
+
+  @override
+  String get autoSleepMidnightHint =>
+      'Ein Zeitfenster über Mitternacht gehört zum Tag, an dem es beginnt: „Freitag 22:00 bis 04:00“ gilt von Freitagabend bis Samstagmorgen 04:00.';
+
+  @override
+  String get autoSleepCopyToAll => 'Auf alle Tage übernehmen';
+
+  @override
+  String autoSleepCopiedToAll(String day) {
+    return 'Zeiten von $day auf alle Tage übernommen';
+  }
+
+  @override
+  String get autoSleepAllDaysOff =>
+      'Alle Tage sind ausgeschaltet – so startet der Auto-Sleep-Timer nie.';
+
+  @override
+  String autoSleepStarted(String timer) {
+    return 'Sleep-Timer automatisch gestartet: $timer';
+  }
 }

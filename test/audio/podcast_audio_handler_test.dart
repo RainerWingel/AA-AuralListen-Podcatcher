@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui' show Locale;
 
+import 'package:aapodcastguru/audio/auto_sleep_timer.dart';
 import 'package:aapodcastguru/audio/car_browser.dart';
 import 'package:aapodcastguru/audio/player_engine.dart';
 import 'package:aapodcastguru/audio/podcast_audio_handler.dart';
@@ -1255,6 +1256,185 @@ void main() {
       var done = false;
       handler.sleepTimerStream.listen(null, onDone: () => done = true);
       await pumpEventQueue();
+      await handler.dispose();
+      await pumpEventQueue();
+      expect(done, isTrue);
+    });
+  });
+
+  group('auto sleep timer (Optionen → Auto-Sleep-Timer)', () {
+    late DateTime clock;
+    late bool inCar;
+    late List<SleepTimer> started;
+
+    // The chosen length (the remaining time already runs while playing).
+    Duration? minutes() => switch (handler.sleepTimerState.timer) {
+      SleepTimerAfter(:final duration) => duration,
+      _ => null,
+    };
+
+    Future<void> configure(AutoSleepSchedule schedule) =>
+        settings.set(SettingsKeys.autoSleep, schedule.encode());
+
+    final daily = AutoSleepSchedule(
+      mode: AutoSleepMode.daily,
+      timer: const SleepTimerAfter(Duration(minutes: 45)),
+    );
+
+    setUp(() async {
+      await handler.dispose();
+      engine = FakePlayerEngine();
+      clock = DateTime(2026, 11, 12, 23); // a Thursday, inside 22:00–04:00
+      inCar = false;
+      started = [];
+      handler = PodcastAudioHandler(
+        engine: engine,
+        playback: PlaybackRepository(db, () => now),
+        settings: settings,
+        playlists: playlists,
+        carConnected: () async => inCar,
+        now: () => clock,
+      );
+      handler.autoSleepStarts.listen(started.add);
+      await configure(daily);
+    });
+
+    test('Play in the app inside the window starts the timer', () async {
+      await handler.playEpisode(episodeId, fromApp: true);
+      expect(minutes(), const Duration(minutes: 45));
+      await pumpEventQueue();
+      expect(started, hasLength(1));
+    });
+
+    test('"Bis Ende der Folge" as duration', () async {
+      await configure(daily.copyWith(timer: const SleepTimerAtEpisodeEnd()));
+      await handler.playEpisode(episodeId, fromApp: true);
+      expect(handler.sleepTimerState.timer, isA<SleepTimerAtEpisodeEnd>());
+    });
+
+    test('outside the window nothing happens', () async {
+      clock = DateTime(2026, 11, 12, 4); // the end itself no longer counts
+      await handler.playEpisode(episodeId, fromApp: true);
+      expect(handler.sleepTimerState.isActive, isFalse);
+      await pumpEventQueue();
+      expect(started, isEmpty);
+    });
+
+    test('mode "Aus" never starts it', () async {
+      await configure(daily.copyWith(mode: AutoSleepMode.off));
+      await handler.playEpisode(episodeId, fromApp: true);
+      expect(handler.sleepTimerState.isActive, isFalse);
+    });
+
+    test(
+      'notification, lock screen, Bluetooth (play without fromApp)',
+      () async {
+        await handler.playEpisode(episodeId);
+        expect(handler.sleepTimerState.isActive, isFalse);
+        await handler.pause();
+        await handler.play();
+        expect(handler.sleepTimerState.isActive, isFalse);
+      },
+    );
+
+    test('never from Android Auto', () async {
+      await handler.playFromMediaId('$episodeId');
+      expect(handler.playbackState.value.playing, isTrue);
+      expect(handler.sleepTimerState.isActive, isFalse);
+    });
+
+    test('never while the phone is connected to the car', () async {
+      inCar = true;
+      await handler.playEpisode(episodeId, fromApp: true);
+      expect(handler.playbackState.value.playing, isTrue);
+      expect(handler.sleepTimerState.isActive, isFalse);
+    });
+
+    test('a timer set by hand stays as it is', () async {
+      await handler.playEpisode(episodeId);
+      handler.setSleepTimer(const SleepTimerAfter(Duration(minutes: 5)));
+      await handler.pause();
+      await handler.play(fromApp: true);
+      expect(minutes(), const Duration(minutes: 5));
+      await pumpEventQueue();
+      expect(started, isEmpty);
+    });
+
+    test('a playlist going on is no new Play', () async {
+      final list = await playlists.create('Liste');
+      final ep2 = await addEpisode('2');
+      await playlists.add(list, episodeId);
+      await playlists.add(list, ep2);
+      await handler.playEpisode(episodeId, playlistId: list);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.currentEpisodeId, ep2);
+      expect(handler.sleepTimerState.isActive, isFalse);
+    });
+
+    test('switched off: not again this night, but the next', () async {
+      await handler.playEpisode(episodeId, fromApp: true);
+      handler.setSleepTimer(const SleepTimerOff());
+      await handler.pause();
+
+      clock = DateTime(2026, 11, 13, 2); // same night, after midnight
+      await handler.play(fromApp: true);
+      expect(handler.sleepTimerState.isActive, isFalse);
+
+      await handler.pause();
+      clock = DateTime(2026, 11, 13, 22, 30); // the next night
+      await handler.play(fromApp: true);
+      expect(handler.sleepTimerState.isActive, isTrue);
+    });
+
+    test('"Abbrechen" in the info box counts as switched off', () async {
+      await handler.playEpisode(episodeId, fromApp: true);
+      handler.cancelAutoSleepTimer();
+      expect(handler.sleepTimerState.isActive, isFalse);
+      await handler.pause();
+      await handler.play(fromApp: true);
+      expect(handler.sleepTimerState.isActive, isFalse);
+    });
+
+    test('"Abbrechen" leaves a timer chosen by hand alone', () async {
+      await handler.playEpisode(episodeId, fromApp: true);
+      handler.setSleepTimer(const SleepTimerAfter(Duration(minutes: 5)));
+      handler.cancelAutoSleepTimer();
+      expect(minutes(), const Duration(minutes: 5));
+    });
+
+    test('after it ran out, the next Play starts it again', () async {
+      await configure(daily.copyWith(timer: const SleepTimerAtEpisodeEnd()));
+      await handler.playEpisode(episodeId, fromApp: true);
+      engine.complete();
+      await pumpEventQueue();
+      expect(handler.sleepTimerState.isActive, isFalse);
+
+      await handler.play(fromApp: true);
+      expect(handler.sleepTimerState.isActive, isTrue);
+    });
+
+    test('per weekday: a day switched off starts nothing', () async {
+      final weekly = AutoSleepSchedule(mode: AutoSleepMode.weekdays);
+      // Thursday off: Thursday 23:00 and the night into Friday stay quiet.
+      await configure(
+        weekly.withDay(
+          DateTime.thursday - 1,
+          AutoSleepWindow.standard.copyWith(enabled: false),
+        ),
+      );
+      await handler.playEpisode(episodeId, fromApp: true);
+      expect(handler.sleepTimerState.isActive, isFalse);
+
+      await handler.pause();
+      clock = DateTime(2026, 11, 13, 22); // Friday night is on
+      await handler.play(fromApp: true);
+      expect(handler.sleepTimerState.isActive, isTrue);
+    });
+
+    test('dispose ends the start stream', () async {
+      var done = false;
+      handler.autoSleepStarts.listen(null, onDone: () => done = true);
       await handler.dispose();
       await pumpEventQueue();
       expect(done, isTrue);

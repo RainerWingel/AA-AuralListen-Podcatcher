@@ -1503,4 +1503,73 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get notificationChannelPlayback => 'Lecture';
+
+  @override
+  String get autoSleepTitle => 'Minuteur de veille automatique';
+
+  @override
+  String get autoSleepModeOff => 'Désactivé';
+
+  @override
+  String get autoSleepModeDaily => 'Activé';
+
+  @override
+  String get autoSleepModeWeekdays => 'Par jour';
+
+  @override
+  String get autoSleepIntro =>
+      'Si vous appuyez sur Lecture dans l’app pendant la plage horaire, le minuteur de mise en veille démarre automatiquement. Un minuteur déjà en cours reste tel quel. Il ne démarre jamais via Android Auto, la notification, l’écran de verrouillage ou les boutons Bluetooth. Si vous le désactivez, il ne redémarre pas cette nuit-là.';
+
+  @override
+  String get autoSleepDuration => 'Durée du minuteur';
+
+  @override
+  String get autoSleepWindow => 'Plage horaire';
+
+  @override
+  String get autoSleepWindowsPerDay => 'Plage horaire par jour';
+
+  @override
+  String autoSleepFrom(String time) {
+    return 'De $time';
+  }
+
+  @override
+  String autoSleepUntil(String time) {
+    return 'À $time';
+  }
+
+  @override
+  String get autoSleepNextDay => '(le lendemain)';
+
+  @override
+  String get autoSleepPickStart => 'Début';
+
+  @override
+  String get autoSleepPickEnd => 'Fin';
+
+  @override
+  String get autoSleepSameTimeError =>
+      'Le début et la fin ne peuvent pas être identiques – la plage horaire durerait 0 minute. La modification n’a pas été appliquée.';
+
+  @override
+  String get autoSleepMidnightHint =>
+      'Une plage horaire qui dépasse minuit appartient au jour où elle commence : « vendredi 22:00 à 04:00 » s’applique du vendredi soir au samedi matin 04:00.';
+
+  @override
+  String get autoSleepCopyToAll => 'Appliquer à tous les jours';
+
+  @override
+  String autoSleepCopiedToAll(String day) {
+    return 'Horaires du $day appliqués à tous les jours';
+  }
+
+  @override
+  String get autoSleepAllDaysOff =>
+      'Tous les jours sont désactivés – le minuteur de veille automatique ne démarrera jamais.';
+
+  @override
+  String autoSleepStarted(String timer) {
+    return 'Minuteur de mise en veille démarré automatiquement : $timer';
+  }
 }

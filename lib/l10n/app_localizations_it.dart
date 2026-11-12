@@ -1497,4 +1497,73 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notificationChannelPlayback => 'Riproduzione';
+
+  @override
+  String get autoSleepTitle => 'Timer di spegnimento automatico';
+
+  @override
+  String get autoSleepModeOff => 'Disattivato';
+
+  @override
+  String get autoSleepModeDaily => 'Attivo';
+
+  @override
+  String get autoSleepModeWeekdays => 'Per giorno';
+
+  @override
+  String get autoSleepIntro =>
+      'Se premi Riproduci nell’app all’interno della fascia oraria, il timer di spegnimento parte automaticamente. Un timer già in corso resta com’è. Non parte mai da Android Auto, dalla notifica, dalla schermata di blocco o dai tasti Bluetooth. Se lo disattivi, quella notte non riparte.';
+
+  @override
+  String get autoSleepDuration => 'Durata del timer';
+
+  @override
+  String get autoSleepWindow => 'Fascia oraria';
+
+  @override
+  String get autoSleepWindowsPerDay => 'Fascia oraria per giorno';
+
+  @override
+  String autoSleepFrom(String time) {
+    return 'Dalle $time';
+  }
+
+  @override
+  String autoSleepUntil(String time) {
+    return 'Alle $time';
+  }
+
+  @override
+  String get autoSleepNextDay => '(giorno dopo)';
+
+  @override
+  String get autoSleepPickStart => 'Inizio';
+
+  @override
+  String get autoSleepPickEnd => 'Fine';
+
+  @override
+  String get autoSleepSameTimeError =>
+      'Inizio e fine non possono coincidere: la fascia oraria durerebbe 0 minuti. La modifica non è stata applicata.';
+
+  @override
+  String get autoSleepMidnightHint =>
+      'Una fascia oraria oltre la mezzanotte appartiene al giorno in cui inizia: «venerdì dalle 22:00 alle 04:00» vale da venerdì sera fino a sabato mattina alle 04:00.';
+
+  @override
+  String get autoSleepCopyToAll => 'Applica a tutti i giorni';
+
+  @override
+  String autoSleepCopiedToAll(String day) {
+    return 'Orari di $day applicati a tutti i giorni';
+  }
+
+  @override
+  String get autoSleepAllDaysOff =>
+      'Tutti i giorni sono disattivati: il timer automatico non partirà mai.';
+
+  @override
+  String autoSleepStarted(String timer) {
+    return 'Timer di spegnimento avviato automaticamente: $timer';
+  }
 }

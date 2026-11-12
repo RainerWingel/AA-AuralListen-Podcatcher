@@ -8,6 +8,7 @@ import '../core/widgets/info_snack_bar.dart';
 import '../data/podcast_repository.dart' show RefreshProgress;
 import '../data/providers.dart';
 import '../features/player/mini_player.dart';
+import '../features/settings/auto_sleep_screen.dart' show sleepTimerName;
 import '../features/settings/new_language_offer.dart';
 import '../l10n/app_localizations.dart';
 
@@ -53,6 +54,18 @@ class AppShell extends ConsumerWidget {
           PlaybackProblem.streamVaries => download,
           _ => null,
         },
+      );
+    });
+    ref.listen(autoSleepStartsProvider, (_, next) {
+      final start = next.value;
+      if (start == null) return;
+      showInfoSnackBar(
+        ScaffoldMessenger.of(context),
+        l10n.autoSleepStarted(sleepTimerName(l10n, start.timer)),
+        action: SnackBarAction(
+          label: l10n.cancel,
+          onPressed: ref.read(audioHandlerProvider).cancelAutoSleepTimer,
+        ),
       );
     });
     final progress = ref.watch(refreshProgressProvider).value;

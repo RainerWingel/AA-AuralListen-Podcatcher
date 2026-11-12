@@ -1523,4 +1523,73 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get notificationChannelPlayback => 'Воспроизведение';
+
+  @override
+  String get autoSleepTitle => 'Автоматический таймер сна';
+
+  @override
+  String get autoSleepModeOff => 'Выкл.';
+
+  @override
+  String get autoSleepModeDaily => 'Вкл.';
+
+  @override
+  String get autoSleepModeWeekdays => 'По дням';
+
+  @override
+  String get autoSleepIntro =>
+      'Если нажать «Воспроизвести» в приложении в пределах временного окна, таймер сна запустится автоматически. Уже запущенный таймер не меняется. Через Android Auto, уведомление, экран блокировки или кнопки Bluetooth он не запускается никогда. Если его выключить, этой ночью он больше не запустится.';
+
+  @override
+  String get autoSleepDuration => 'Длительность таймера';
+
+  @override
+  String get autoSleepWindow => 'Временное окно';
+
+  @override
+  String get autoSleepWindowsPerDay => 'Временное окно по дням недели';
+
+  @override
+  String autoSleepFrom(String time) {
+    return 'С $time';
+  }
+
+  @override
+  String autoSleepUntil(String time) {
+    return 'До $time';
+  }
+
+  @override
+  String get autoSleepNextDay => '(на следующий день)';
+
+  @override
+  String get autoSleepPickStart => 'Начало';
+
+  @override
+  String get autoSleepPickEnd => 'Конец';
+
+  @override
+  String get autoSleepSameTimeError =>
+      'Начало и конец не могут совпадать – окно длилось бы 0 минут. Изменение не применено.';
+
+  @override
+  String get autoSleepMidnightHint =>
+      'Окно, переходящее через полночь, относится ко дню, в который оно начинается: «пятница с 22:00 до 04:00» действует с вечера пятницы до 04:00 субботы.';
+
+  @override
+  String get autoSleepCopyToAll => 'Применить ко всем дням';
+
+  @override
+  String autoSleepCopiedToAll(String day) {
+    return 'Время ($day) применено ко всем дням';
+  }
+
+  @override
+  String get autoSleepAllDaysOff =>
+      'Все дни выключены – автоматический таймер сна никогда не запустится.';
+
+  @override
+  String autoSleepStarted(String timer) {
+    return 'Таймер сна запущен автоматически: $timer';
+  }
 }

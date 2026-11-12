@@ -10,7 +10,7 @@ permalink: /privacy/
 **App:** AA-AuralListen Podcatcher (Android, package name `io.github.rainerwingel.aurallisten`)
 **Developer:** Artem A. · Contact: via the
 [issues of the GitHub project](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
-**Last updated:** October 31, 2026
+**Last updated:** November 12, 2026
 
 ## In short
 
@@ -66,6 +66,9 @@ on the device. Google is responsible for Android Auto and speech recognition; th
 - **Internet / network state** – load feeds and episodes; check "Wi-Fi only" for downloads.
 - **Foreground service for media playback, wake lock** – playback in the background and with the screen off.
 - **Start after reboot** – continue unfinished downloads after the device restarts.
+
+Without any extra permission, the app checks while starting playback whether the phone is connected to Android Auto –
+only so that the auto sleep timer does not start in the car. This information is neither stored nor passed on.
 
 The app does not read contacts, location, photos or any other files. Files (backup, OPML) are only opened or saved
 when you select them yourself in the Android file dialog.

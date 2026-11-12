@@ -10,6 +10,7 @@ import '../data/playback_repository.dart';
 import '../data/playlist_repository.dart';
 import '../data/settings_keys.dart';
 import '../data/settings_repository.dart';
+import 'auto_sleep_timer.dart';
 import 'car_browser.dart';
 import 'chapter_skips.dart';
 import 'player_engine.dart';
@@ -32,12 +33,14 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     this._deleteDownload,
     this._onFinished,
     this._car,
+    this._carConnected,
+    DateTime Function()? now,
     this.stopAfterPause = const Duration(minutes: 10),
     this.stallCheckInterval = const Duration(seconds: 10),
     this.recoveryRetryDelay = const Duration(seconds: 15),
     this.sleepFadeDuration = const Duration(seconds: 30),
     this.sleepIdleExpiry = const Duration(hours: 1),
-  }) {
+  }) : _now = now ?? DateTime.now {
     _subscriptions
       ..add(_engine.stateStream.listen(_onEngineState))
       ..add(
@@ -75,6 +78,13 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
 
   /// Menu for Android Auto; null in tests that do not need it.
   final CarBrowser? _car;
+
+  /// Whether the phone is connected to Android Auto (CarConnection); the
+  /// Auto-Sleep-Timer never starts then. Null = never connected (tests).
+  final Future<bool> Function()? _carConnected;
+
+  /// Wall-clock time (tests set it).
+  final DateTime Function() _now;
 
   /// Message the car shows (Android Auto has no info box of the app); kept
   /// until the next Play.
@@ -168,6 +178,15 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   DateTime? _sleepIdleSince;
   bool _volumeLowered = false;
   final _sleepStates = StreamController<SleepTimerState>.broadcast();
+
+  /// Auto-Sleep-Timer: start of the night window whose timer is running
+  /// (null = the current timer was not set automatically) …
+  DateTime? _autoSleepWindow;
+
+  /// … and of the night in which the user switched it off: no new automatic
+  /// timer until that window is over.
+  DateTime? _autoSleepCancelled;
+  final _autoSleepStarts = StreamController<SleepTimer>.broadcast();
 
   /// Whether the hang-detection timer runs (only while playing).
   @visibleForTesting
@@ -299,9 +318,29 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     yield* _sleepStates.stream;
   }
 
-  /// Sets or clears the sleep timer (docs/playback.md). Minutes count only
-  /// while playing; [SleepTimerAtEpisodeEnd] stops after this episode.
+  /// The Auto-Sleep-Timer started a timer (info box with "Abbrechen").
+  Stream<SleepTimer> get autoSleepStarts => _autoSleepStarts.stream;
+
+  /// Sets or clears the sleep timer by the user (docs/playback.md). Minutes
+  /// count only while playing; [SleepTimerAtEpisodeEnd] stops after this
+  /// episode. Switching an automatic timer off means "not again tonight".
   void setSleepTimer(SleepTimer timer) {
+    if (timer is SleepTimerOff && _autoSleepWindow != null) {
+      _autoSleepCancelled = _autoSleepWindow;
+    }
+    _applySleepTimer(timer);
+  }
+
+  /// "Abbrechen" in the info box: switches the timer off only if it is still
+  /// the automatic one.
+  void cancelAutoSleepTimer() {
+    if (_autoSleepWindow != null) setSleepTimer(const SleepTimerOff());
+  }
+
+  /// Sets the timer without counting as a user decision (expiry, end of
+  /// the episode, Auto-Sleep-Timer).
+  void _applySleepTimer(SleepTimer timer, {DateTime? autoWindow}) {
+    _autoSleepWindow = autoWindow;
     _cancelSleepTimers();
     // While paused the volume stays down until the next Play (see _tryPlay):
     // raising it right after a pause lets the audio buffer blip loudly.
@@ -351,10 +390,15 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// [startAt], e.g. a bookmark). With [playlistId] – or without it, when the
   /// episode is in exactly one playlist – that playlist becomes active: when
   /// the episode ends, its next one starts. Otherwise playback stops at the end.
+  ///
+  /// [fromApp]: the user started it in the app (not the car, notification,
+  /// lock screen or a Bluetooth key) – only then the Auto-Sleep-Timer may
+  /// start.
   Future<void> playEpisode(
     int episodeId, {
     int? playlistId,
     Duration? startAt,
+    bool fromApp = false,
   }) async {
     await _finishScan();
     _resetRecovery();
@@ -376,7 +420,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       _watchMembership(episodeId);
       mediaItem.add(_withPlaylist(mediaItem.value));
       if (startAt != null) await seek(startAt);
-      return play();
+      return play(fromApp: fromApp);
     }
 
     await _saveCurrentPosition();
@@ -407,7 +451,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     if (!provisional) {
       await _settings.set(SettingsKeys.lastEpisodeId, '$episodeId');
     }
-    await play();
+    await play(fromApp: fromApp);
   }
 
   /// Offered playback speeds (user wish 2026-10-03); 1 = off.
@@ -667,12 +711,35 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     return position;
   }
 
+  /// [fromApp]: Play in the app itself – see [playEpisode]. audio_service
+  /// (car, notification, lock screen, Bluetooth) calls it without.
   @override
-  Future<void> play() async {
+  Future<void> play({bool fromApp = false}) async {
     _carError = null;
     await _finishScan();
     final error = await _tryPlay();
-    if (error != null) await _handleFailure(error, _Retry.none);
+    if (error != null) return _handleFailure(error, _Retry.none);
+    if (fromApp) await _startAutoSleepTimer();
+  }
+
+  // ---------------------------------------------------- auto sleep timer
+
+  /// Auto-Sleep-Timer (docs/playback.md): a Play in the app inside the night
+  /// window starts the chosen sleep timer – unless one runs already, the
+  /// user switched it off this night, or the phone is in the car.
+  Future<void> _startAutoSleepTimer() async {
+    if (!_loaded || !_engine.state.playing) return;
+    if (sleepTimerState.isActive) return;
+    final schedule = AutoSleepSchedule.decode(
+      await _settings.get(SettingsKeys.autoSleep),
+    );
+    final window = schedule.windowStartAt(_now());
+    if (window == null || window == _autoSleepCancelled) return;
+    if (await _carConnected?.call() ?? false) return;
+    // Still nothing set while the settings were read?
+    if (sleepTimerState.isActive || !_engine.state.playing) return;
+    _applySleepTimer(schedule.timer, autoWindow: window);
+    if (!_autoSleepStarts.isClosed) _autoSleepStarts.add(schedule.timer);
   }
 
   /// Loads if needed and plays. Returns the load error (null = playing or
@@ -680,7 +747,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<Object?> _tryPlay() async {
     if (_episodeId == null) return null;
     _pauseTimer?.cancel();
-    if (_sleepTimerStale) setSleepTimer(const SleepTimerOff());
+    if (_sleepTimerStale) _applySleepTimer(const SleepTimerOff());
     if (!_loaded) {
       try {
         await (_loadInFlight ??= _load().whenComplete(
@@ -785,6 +852,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     await _positions.close();
     await _problems.close();
     await _sleepStates.close();
+    await _autoSleepStarts.close();
     await chapterSkips.dispose();
     await _engine.dispose();
   }
@@ -1293,7 +1361,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
       }
       await stop();
       if (sleepAtEnd) {
-        setSleepTimer(const SleepTimerOff());
+        _applySleepTimer(const SleepTimerOff());
       } else if (next != null) {
         await playEpisode(next, playlistId: _activePlaylistId);
         return;
@@ -1398,7 +1466,7 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// comes back with the next Play.
   Future<void> _onSleepAlarm() async {
     await pause();
-    setSleepTimer(const SleepTimerOff());
+    _applySleepTimer(const SleepTimerOff());
   }
 
   void _cancelSleepTimers() {

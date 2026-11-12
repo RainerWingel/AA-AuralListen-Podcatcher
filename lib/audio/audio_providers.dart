@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers.dart';
 import '../data/settings_keys.dart';
+import 'auto_sleep_timer.dart';
 import 'battery_optimization.dart';
 import 'podcast_audio_handler.dart';
 import 'sleep_timer.dart';
@@ -64,6 +65,27 @@ final playbackProblemsProvider =
 /// Sleep timer setting; changes only (the countdown is computed on rebuild).
 final sleepTimerProvider = StreamProvider.autoDispose<SleepTimerState>(
   (ref) => ref.watch(audioHandlerProvider).sleepTimerStream,
+);
+
+/// The Auto-Sleep-Timer started a timer (info box with "Abbrechen").
+final autoSleepStartsProvider = StreamProvider.autoDispose<AutoSleepStart>(
+  (ref) =>
+      ref.watch(audioHandlerProvider).autoSleepStarts.map(AutoSleepStart.new),
+);
+
+/// One automatic start; without `==` so two starts in a row both show.
+class AutoSleepStart {
+  AutoSleepStart(this.timer);
+
+  final SleepTimer timer;
+}
+
+/// Optionen → Auto-Sleep-Timer.
+final autoSleepScheduleProvider = StreamProvider<AutoSleepSchedule>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.autoSleep)
+      .map(AutoSleepSchedule.decode),
 );
 
 /// Battery optimisation of the app (fake in tests).

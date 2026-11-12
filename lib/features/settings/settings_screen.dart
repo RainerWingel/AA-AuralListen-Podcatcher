@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../audio/audio_providers.dart';
+import '../../audio/auto_sleep_timer.dart';
 import '../../core/app_info.dart';
 import '../../core/app_language.dart';
 import '../../core/formatting.dart';
@@ -13,6 +14,7 @@ import '../../data/settings_keys.dart';
 import '../../data/storage/download_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../downloads/downloads_screen.dart';
+import 'auto_sleep_screen.dart';
 import 'backup_flow.dart';
 import 'language_picker.dart';
 import 'opml_import_flow.dart';
@@ -102,6 +104,7 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: Text(l10n.historySubtitle),
             onTap: () => context.go(Routes.history),
           ),
+          const _AutoSleepTile(),
           const _FinishedRemovalTile(),
           const _BackgroundPlaybackTile(),
           SettingsSectionHeader(l10n.settingsSectionSubscriptions),
@@ -174,6 +177,29 @@ class SettingsSectionHeader extends StatelessWidget {
           color: theme.colorScheme.primary,
         ),
       ),
+    );
+  }
+}
+
+/// Optionen → Auto-Sleep-Timer with what is set right now.
+class _AutoSleepTile extends ConsumerWidget {
+  const _AutoSleepTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final schedule =
+        ref.watch(autoSleepScheduleProvider).value ?? AutoSleepSchedule();
+    final mode = autoSleepModeName(l10n, schedule.mode);
+    return ListTile(
+      leading: const Icon(Icons.bedtime_outlined),
+      title: Text(l10n.autoSleepTitle),
+      subtitle: Text(
+        schedule.mode == AutoSleepMode.off
+            ? mode
+            : '$mode · ${sleepTimerName(l10n, schedule.timer)}',
+      ),
+      onTap: () => context.go(Routes.autoSleep),
     );
   }
 }

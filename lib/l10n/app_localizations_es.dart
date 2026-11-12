@@ -1499,4 +1499,73 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get notificationChannelPlayback => 'Reproducción';
+
+  @override
+  String get autoSleepTitle => 'Temporizador automático';
+
+  @override
+  String get autoSleepModeOff => 'Desactivado';
+
+  @override
+  String get autoSleepModeDaily => 'Activado';
+
+  @override
+  String get autoSleepModeWeekdays => 'Por día';
+
+  @override
+  String get autoSleepIntro =>
+      'Si pulsas Reproducir en la app dentro de la franja horaria, el temporizador se inicia automáticamente. Un temporizador que ya está en marcha se mantiene. Nunca se inicia desde Android Auto, la notificación, la pantalla de bloqueo ni los botones Bluetooth. Si lo desactivas, no vuelve a iniciarse esa noche.';
+
+  @override
+  String get autoSleepDuration => 'Duración del temporizador';
+
+  @override
+  String get autoSleepWindow => 'Franja horaria';
+
+  @override
+  String get autoSleepWindowsPerDay => 'Franja horaria por día';
+
+  @override
+  String autoSleepFrom(String time) {
+    return 'Desde $time';
+  }
+
+  @override
+  String autoSleepUntil(String time) {
+    return 'Hasta $time';
+  }
+
+  @override
+  String get autoSleepNextDay => '(día siguiente)';
+
+  @override
+  String get autoSleepPickStart => 'Inicio';
+
+  @override
+  String get autoSleepPickEnd => 'Fin';
+
+  @override
+  String get autoSleepSameTimeError =>
+      'El inicio y el fin no pueden ser iguales: la franja horaria duraría 0 minutos. El cambio no se ha aplicado.';
+
+  @override
+  String get autoSleepMidnightHint =>
+      'Una franja horaria que pasa de medianoche pertenece al día en que empieza: «viernes de 22:00 a 04:00» va del viernes por la noche al sábado a las 04:00.';
+
+  @override
+  String get autoSleepCopyToAll => 'Aplicar a todos los días';
+
+  @override
+  String autoSleepCopiedToAll(String day) {
+    return 'Horas del $day aplicadas a todos los días';
+  }
+
+  @override
+  String get autoSleepAllDaysOff =>
+      'Todos los días están desactivados: el temporizador automático nunca se iniciará.';
+
+  @override
+  String autoSleepStarted(String timer) {
+    return 'Temporizador iniciado automáticamente: $timer';
+  }
 }

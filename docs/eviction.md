@@ -120,6 +120,8 @@ Downloads-Tab: „x von y belegt" + Balken, jede Datei mit Größe, 🧹 „Jetz
 - Nach 10 Minuten Pause gibt der Handler den Player (Decoder, Netzwerkpuffer) frei. ✅
 - Sleep-Timer: ein `Timer` bis 30 s vor Ablauf, dann einer fürs Ausblenden – beide nur während der Wiedergabe,
   in `dispose()` beendet; Stream in `dispose()` geschlossen. ✅
+- Auto-Sleep-Timer: **kein** eigener Timer – geprüft wird nur beim Play in der App; gemerkt werden zwei
+  Zeitpunkte (Fensterbeginn); der `autoSleepStarts`-Stream wird in `dispose()` geschlossen (Test). ✅
 - Hänger-Erkennung: Timer existiert nur während der Wiedergabe; Timer und `problems`-Stream werden in `dispose()`
   beendet (Test `the watchdog only runs while playing`). ✅
 - Der Live-Positions-Stream wird nur abonniert, solange Mini-/Vollbild-Player sichtbar sind (`autoDispose`). ✅

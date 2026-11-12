@@ -224,7 +224,7 @@ Future<void> resumePlaylist(WidgetRef ref, int playlistId) async {
   if (episodeId == null) return;
   await ref
       .read(audioHandlerProvider)
-      .playEpisode(episodeId, playlistId: playlistId);
+      .playEpisode(episodeId, playlistId: playlistId, fromApp: true);
 }
 
 /// The playlist menu. In the overview ([onPlaylistScreen] false) it offers

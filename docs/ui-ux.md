@@ -267,8 +267,25 @@ Abschnitt „Darstellung": „Sprache" → Dialog Deutsch / English / Français 
 Abschnitt „Info" (ganz unten): „Über die App" → Info-Seite (`info_screen.dart`): App-Symbol, Name, **Version + Build
 automatisch von Android** (Kanal `aurallisten/app`, kommt beim Bauen aus `pubspec.yaml`), „Entwickelt von Artem A.",
 Links Datenschutzerklärung und „Quellcode auf GitHub" (öffnen den Browser). **Kein Zahlungslink in der App** –
-freiwillige Unterstützung (PayPal) steht auf GitHub (README „Unterstützen", Sponsor-Knopf via `.github/FUNDING.yml`). Abschnitt „Hören": Lesezeichen (alle), **„Abspielverlauf"** (`playback.md`), „Hintergrund-Wiedergabe" (Akku-Status, → `playback.md`). Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
+freiwillige Unterstützung (PayPal) steht auf GitHub (README „Unterstützen", Sponsor-Knopf via `.github/FUNDING.yml`). Abschnitt „Hören": Lesezeichen (alle), **„Abspielverlauf"** (`playback.md`), **„Auto-Sleep-Timer"** (eigene Seite,
+siehe unten), „Hintergrund-Wiedergabe" (Akku-Status, → `playback.md`). Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
 Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wiederherstellen (`backup.md`).
+
+### Auto-Sleep-Timer (Benutzerwunsch 2026-11-12)
+Optionen → Hören → „Auto-Sleep-Timer" (Untertitel: Modus und Dauer, z. B. „Ein · 30 Minuten") → eigene Seite
+(`auto_sleep_screen.dart`, Route `/einstellungen/auto-sleep-timer`). Verhalten: `playback.md`.
+- Oben Segment-Knöpfe **Aus / Ein / Nach Wochentag**, darunter ein kurzer Erklärtext.
+- Ab „Ein": Zeile **„Dauer des Timers"** (Dialog wie beim Sleep-Timer, ohne „Aus"), dann **„Von 22:00" / „Bis 04:00"**
+  (Flutters Uhrzeit-Dialog mit Ziffernblatt; Tastatur über das Symbol – deren Layout bricht bei kleiner Schrift, daher
+  nicht als Start). Endet das Fenster am Folgetag, steht „(am nächsten Tag)" daneben.
+- „Nach Wochentag": sieben Zeilen Montag–Sonntag (Namen über `intl` in der App-Sprache), je **Schalter** und – wenn an –
+  Zeitblock plus **„Auf alle Tage übernehmen"** (kopiert die Zeiten, lässt die Schalter). Beim ersten Wechsel bekommen
+  alle Tage das Fenster aus „Ein". Alle Tage aus → roter Hinweis „… startet nie".
+- **Ungültige Eingaben werden abgelehnt:** Beginn = Ende → rote Meldung direkt unter dem Zeitblock („… wäre 0 Minuten
+  lang. Die Änderung wurde nicht übernommen."), der alte Wert bleibt. Eigene Dauer nur 1–3600 Minuten (Knopf sonst
+  grau). Jede gültige Änderung wird sofort gespeichert (kein Speichern-Knopf, wie die übrigen Optionen).
+- Unter allem der Hinweis, dass eine Nacht zum Tag ihres Beginns gehört.
+- Der Uhrzeit-Dialog kommt über `timePickerProvider` (Tests ersetzen ihn).
 
 ## Infoboxen (SnackBars)
 - **Nur** über `showInfoSnackBar` (`lib/core/widgets/info_snack_bar.dart`) – nie `showSnackBar` direkt.

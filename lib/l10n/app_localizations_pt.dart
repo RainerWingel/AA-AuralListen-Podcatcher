@@ -1486,4 +1486,73 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get notificationChannelPlayback => 'Reprodução';
+
+  @override
+  String get autoSleepTitle => 'Timer de desligamento automático';
+
+  @override
+  String get autoSleepModeOff => 'Desativado';
+
+  @override
+  String get autoSleepModeDaily => 'Ativado';
+
+  @override
+  String get autoSleepModeWeekdays => 'Por dia';
+
+  @override
+  String get autoSleepIntro =>
+      'Se você tocar em Reproduzir no app dentro do intervalo de horário, o timer de desligamento começa automaticamente. Um timer que já está ativo continua como está. Ele nunca começa pelo Android Auto, pela notificação, pela tela de bloqueio ou pelos botões Bluetooth. Se você desativá-lo, ele não começa de novo naquela noite.';
+
+  @override
+  String get autoSleepDuration => 'Duração do timer';
+
+  @override
+  String get autoSleepWindow => 'Intervalo de horário';
+
+  @override
+  String get autoSleepWindowsPerDay => 'Intervalo de horário por dia';
+
+  @override
+  String autoSleepFrom(String time) {
+    return 'Das $time';
+  }
+
+  @override
+  String autoSleepUntil(String time) {
+    return 'Até $time';
+  }
+
+  @override
+  String get autoSleepNextDay => '(dia seguinte)';
+
+  @override
+  String get autoSleepPickStart => 'Início';
+
+  @override
+  String get autoSleepPickEnd => 'Fim';
+
+  @override
+  String get autoSleepSameTimeError =>
+      'O início e o fim não podem ser iguais – o intervalo teria 0 minutos. A alteração não foi aplicada.';
+
+  @override
+  String get autoSleepMidnightHint =>
+      'Um intervalo que passa da meia-noite pertence ao dia em que começa: “sexta-feira das 22:00 às 04:00” vale de sexta à noite até sábado às 04:00.';
+
+  @override
+  String get autoSleepCopyToAll => 'Aplicar a todos os dias';
+
+  @override
+  String autoSleepCopiedToAll(String day) {
+    return 'Horários de $day aplicados a todos os dias';
+  }
+
+  @override
+  String get autoSleepAllDaysOff =>
+      'Todos os dias estão desativados – o timer automático nunca vai começar.';
+
+  @override
+  String autoSleepStarted(String timer) {
+    return 'Timer de desligamento iniciado automaticamente: $timer';
+  }
 }

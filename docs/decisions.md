@@ -253,3 +253,9 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
 - 2026-11-08 · **Italienisch als siebte Sprache** (Benutzer) · `app_it.arb` (Du-Form), „Beliebt" = Apple-Chart Italien,
   „Neuheiten" = fyyd `language=it` (beide liefern Daten, geprüft 2026-11-08). F-Droid-Texte `it-IT/` ohne Screenshots.
   Danach Release 1.3.6.
+- 2026-11-12 · **Auto-Sleep-Timer** (Benutzerwunsch; WLAN/Bluetooth abschalten nach dem Sleep-Timer ist für normale
+  Apps seit Android 10/13 nicht mehr erlaubt) · Play in der App im Nacht-Zeitfenster startet den Sleep-Timer.
+  Standard **Ein, 22:00–04:00, 30 Minuten**. **Nie im Auto:** nur Starts aus der App zählen (nicht Benachrichtigung,
+  Sperrbildschirm, Bluetooth-Tasten, Android Auto – dort nicht unterscheidbar), zusätzlich Abfrage „mit Android Auto
+  verbunden" über den System-Provider ohne neue Bibliothek. Nacht gehört zum Starttag; „Aus" gilt für die ganze Nacht;
+  ein laufender Timer wird nie überschrieben. Details `playback.md`.

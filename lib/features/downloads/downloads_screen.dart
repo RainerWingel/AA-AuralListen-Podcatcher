@@ -155,7 +155,8 @@ class _DownloadTile extends ConsumerWidget {
     };
 
     return ListTile(
-      onTap: () => ref.read(audioHandlerProvider).playEpisode(episodeId),
+      onTap: () =>
+          ref.read(audioHandlerProvider).playEpisode(episodeId, fromApp: true),
       onLongPress: () => showDownloadDetailsSheet(context, item),
       leading: CoverImage(
         url: item.episode.imageUrl ?? item.podcast.imageUrl,

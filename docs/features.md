@@ -29,6 +29,7 @@ Portugiesisch (Brasilien), Russisch und Italienisch (Abfrage beim ersten Start, 
 | F26 | Podcast komplett abspielen | Abos: langes Drücken → alle neuen (96 h) / ungespielte seit Datum / alle ungespielten Folgen in eine Playlist → `playlists.md` |
 | F25 | Fehlerarten beim Abspielen | kaputter Download → streamen · Folge gelöscht · Format nicht abspielbar · Netz → `playback.md` |
 | F24 | Sleep-Timer | 5/15/30/60 min oder eigene Zeit (1–3600 min) Spielzeit oder bis Folgenende, Knopf in der Knopfreihe unten im Player → `playback.md` |
+| F24a | Auto-Sleep-Timer | Play in der App im Nacht-Zeitfenster startet den Sleep-Timer; Aus / Ein / Nach Wochentag, Standard Ein 22:00–04:00, 30 min; nie im Auto → `playback.md` |
 | F23 | Hänger-Erkennung | Wiedergabe steht 30 s → an gleicher Stelle neu laden, max. 3 Versuche → `playback.md` |
 | F22 | Ungespielt-Zähler | rotes Abzeichen je Abo-Kachel, „99+" ab 100 → `ui-ux.md` |
 | F21 | Kapitel überspringen | Chip „Skip" je Kapitel, nur im Arbeitsspeicher → `playback.md` |

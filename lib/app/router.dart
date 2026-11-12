@@ -10,6 +10,7 @@ import '../features/player/player_screen.dart';
 import '../features/playlists/playlist_screen.dart';
 import '../features/playlists/playlists_screen.dart';
 import '../features/search/search_screen.dart';
+import '../features/settings/auto_sleep_screen.dart';
 import '../features/settings/design_screen.dart';
 import '../features/settings/info_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -108,6 +109,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'design',
                     builder: (context, state) => const DesignScreen(),
+                  ),
+                  GoRoute(
+                    path: 'auto-sleep-timer',
+                    builder: (context, state) => const AutoSleepScreen(),
                   ),
                 ],
               ),

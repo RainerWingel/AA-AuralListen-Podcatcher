@@ -2417,6 +2417,120 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Wiedergabe'**
   String get notificationChannelPlayback;
+
+  /// No description provided for @autoSleepTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Auto-Sleep-Timer'**
+  String get autoSleepTitle;
+
+  /// No description provided for @autoSleepModeOff.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus'**
+  String get autoSleepModeOff;
+
+  /// Auto sleep timer mode: the same time window every day (segmented button, keep short).
+  ///
+  /// In de, this message translates to:
+  /// **'Ein'**
+  String get autoSleepModeDaily;
+
+  /// No description provided for @autoSleepModeWeekdays.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach Wochentag'**
+  String get autoSleepModeWeekdays;
+
+  /// No description provided for @autoSleepIntro.
+  ///
+  /// In de, this message translates to:
+  /// **'Drückst du in der App innerhalb des Zeitfensters auf Play, startet der Sleep-Timer automatisch. Ein schon laufender Timer bleibt, wie er ist. Über Android Auto, die Benachrichtigung, den Sperrbildschirm oder Bluetooth-Tasten startet er nie. Schaltest du ihn aus, startet er in dieser Nacht nicht noch einmal.'**
+  String get autoSleepIntro;
+
+  /// No description provided for @autoSleepDuration.
+  ///
+  /// In de, this message translates to:
+  /// **'Dauer des Timers'**
+  String get autoSleepDuration;
+
+  /// No description provided for @autoSleepWindow.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitfenster'**
+  String get autoSleepWindow;
+
+  /// No description provided for @autoSleepWindowsPerDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitfenster je Wochentag'**
+  String get autoSleepWindowsPerDay;
+
+  /// No description provided for @autoSleepFrom.
+  ///
+  /// In de, this message translates to:
+  /// **'Von {time}'**
+  String autoSleepFrom(String time);
+
+  /// No description provided for @autoSleepUntil.
+  ///
+  /// In de, this message translates to:
+  /// **'Bis {time}'**
+  String autoSleepUntil(String time);
+
+  /// No description provided for @autoSleepNextDay.
+  ///
+  /// In de, this message translates to:
+  /// **'(am nächsten Tag)'**
+  String get autoSleepNextDay;
+
+  /// No description provided for @autoSleepPickStart.
+  ///
+  /// In de, this message translates to:
+  /// **'Beginn'**
+  String get autoSleepPickStart;
+
+  /// No description provided for @autoSleepPickEnd.
+  ///
+  /// In de, this message translates to:
+  /// **'Ende'**
+  String get autoSleepPickEnd;
+
+  /// No description provided for @autoSleepSameTimeError.
+  ///
+  /// In de, this message translates to:
+  /// **'Beginn und Ende dürfen nicht gleich sein – das Zeitfenster wäre 0 Minuten lang. Die Änderung wurde nicht übernommen.'**
+  String get autoSleepSameTimeError;
+
+  /// No description provided for @autoSleepMidnightHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Ein Zeitfenster über Mitternacht gehört zum Tag, an dem es beginnt: „Freitag 22:00 bis 04:00“ gilt von Freitagabend bis Samstagmorgen 04:00.'**
+  String get autoSleepMidnightHint;
+
+  /// No description provided for @autoSleepCopyToAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Auf alle Tage übernehmen'**
+  String get autoSleepCopyToAll;
+
+  /// No description provided for @autoSleepCopiedToAll.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeiten von {day} auf alle Tage übernommen'**
+  String autoSleepCopiedToAll(String day);
+
+  /// No description provided for @autoSleepAllDaysOff.
+  ///
+  /// In de, this message translates to:
+  /// **'Alle Tage sind ausgeschaltet – so startet der Auto-Sleep-Timer nie.'**
+  String get autoSleepAllDaysOff;
+
+  /// Info box when Play in the night window started the sleep timer; {timer} is e.g. "30 Minuten" or "Bis Ende der Folge".
+  ///
+  /// In de, this message translates to:
+  /// **'Sleep-Timer automatisch gestartet: {timer}'**
+  String autoSleepStarted(String timer);
 }
 
 class _AppLocalizationsDelegate

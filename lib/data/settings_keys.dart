@@ -39,6 +39,10 @@ abstract final class SettingsKeys {
   /// after5Minutes).
   static const removeFinished = 'playlists.removeFinished';
 
+  /// Auto-Sleep-Timer: JSON of an AutoSleepSchedule (mode, night windows,
+  /// timer). Missing = on, every night 22:00–04:00, 30 minutes.
+  static const autoSleep = 'player.autoSleep';
+
   /// Playlist the current episode was started from (null = none).
   static const activePlaylistId = 'player.activePlaylistId';
 }

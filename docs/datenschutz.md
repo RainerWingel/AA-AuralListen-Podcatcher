@@ -10,7 +10,7 @@ permalink: /datenschutz/
 **App:** AA-AuralListen Podcatcher (Android, Paketname `io.github.rainerwingel.aurallisten`)
 **Entwickler:** Artem A. · Kontakt: über die
 [Issues des GitHub-Projekts](https://github.com/RainerWingel/AA-AuralListen-Podcatcher/issues)
-**Stand:** 31. Oktober 2026
+**Stand:** 12. November 2026
 
 ## Kurz gesagt
 
@@ -68,6 +68,9 @@ Auto und die Spracherkennung ist Google verantwortlich; es gilt die
 - **Vordergrunddienst für Medienwiedergabe, Wake-Lock** – Wiedergabe im Hintergrund und bei ausgeschaltetem
   Bildschirm.
 - **Start nach dem Neustart** – angefangene Downloads nach einem Neustart des Geräts fortsetzen.
+
+Ohne eigene Berechtigung fragt die App beim Abspielen ab, ob das Handy gerade mit Android Auto verbunden ist – nur
+damit der Auto-Sleep-Timer im Auto nicht startet. Diese Information wird weder gespeichert noch weitergegeben.
 
 Die App liest keine Kontakte, keinen Standort, keine Fotos und keine anderen Dateien. Dateien (Backup, OPML) werden
 nur geöffnet oder gespeichert, wenn du sie selbst im Android-Dateidialog auswählst.

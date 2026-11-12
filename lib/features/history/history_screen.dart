@@ -28,7 +28,7 @@ class HistoryScreen extends ConsumerWidget {
       showInfoSnackBar(messenger, gone);
       return;
     }
-    await ref.read(audioHandlerProvider).playEpisode(id);
+    await ref.read(audioHandlerProvider).playEpisode(id, fromApp: true);
   }
 
   Future<void> _clear(BuildContext context, WidgetRef ref) async {

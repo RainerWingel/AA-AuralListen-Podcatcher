@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/app.dart';
 import 'audio/audio_providers.dart';
 import 'audio/car_browser.dart';
+import 'audio/car_connection.dart';
 import 'audio/player_engine.dart';
 import 'audio/podcast_audio_handler.dart';
 import 'audio/stream_check.dart';
@@ -68,6 +69,7 @@ Future<void> main() async {
         l10n: currentL10n,
         coverUri: CoverCacheManager.instance.carCoverUri,
       ),
+      carConnected: CarConnection.isConnected,
     ),
     // Reuse the bounded cover cache instead of a second, separate image cache.
     cacheManager: CoverCacheManager.instance,

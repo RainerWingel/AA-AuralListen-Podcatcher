@@ -45,6 +45,7 @@ class BookmarksScreen extends ConsumerWidget {
                           startAt: Duration(
                             milliseconds: e.bookmark.positionMs,
                           ),
+                          fromApp: true,
                         ),
                   );
                 },
