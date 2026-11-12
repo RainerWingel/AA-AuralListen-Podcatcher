@@ -3635,6 +3635,100 @@ void main() {
     },
   );
 
+  testWidgets(
+    'video episode: download asks Wi-Fi or now; "Bild" off shows the cover',
+    timeout: timeout,
+    (tester) async {
+      tester.view
+        ..physicalSize = const Size(1080, 2340)
+        ..devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final video = FakeVideoOutput();
+      addTearDown(video.dispose);
+      await pumpApp(
+        tester,
+        overrides: [videoOutputProvider.overrideWithValue(video)],
+      );
+      await tester.runAsync(
+        () =>
+            ProviderScope.containerOf(
+                  tester.element(find.byType(NavigationBar)),
+                )
+                .read(podcastRepositoryProvider)
+                .subscribe('https://video.example.com/feed'),
+      );
+      await settle(tester);
+
+      // Audio: no question, right away as before.
+      await tester.longPress(find.text('Folge ohne Bild'));
+      await settle(tester);
+      await tester.tap(find.text('Herunterladen'));
+      await settle(tester);
+      expect(find.text('Video-Folge herunterladen?'), findsNothing);
+      expect(downloadEngine.active.values.single.wifiOnly, isFalse);
+
+      // Video: the question; canceled → nothing.
+      await tester.longPress(find.text('Folge mit Bild'));
+      await settle(tester);
+      await tester.tap(find.text('Herunterladen'));
+      await settle(tester);
+      expect(find.text('Video-Folge herunterladen?'), findsOneWidget);
+      expect(find.text('Video-Folgen sind meist sehr groß.'), findsOneWidget);
+      await tester.tap(find.text('Abbrechen'));
+      await settle(tester);
+      expect(downloadEngine.active, hasLength(1));
+
+      // "Nur WLAN" (suggested) waits for Wi-Fi.
+      await tester.longPress(find.text('Folge mit Bild'));
+      await settle(tester);
+      await tester.tap(find.text('Herunterladen'));
+      await settle(tester);
+      await tester.tap(find.widgetWithText(FilledButton, 'Nur WLAN'));
+      await settle(tester);
+      expect(downloadEngine.active, hasLength(2));
+      expect(
+        downloadEngine.active.values.where((d) => d.wifiOnly),
+        hasLength(1),
+      );
+
+      // Optionen → "Bild bei Video-Folgen" off: the player keeps the cover
+      // and never asks for the picture.
+      await tester.tap(find.text('Folge mit Bild'));
+      await settle(tester);
+      await tester.tap(find.text('Optionen'));
+      await settle(tester);
+      final pictureSwitch = find.widgetWithText(
+        SwitchListTile,
+        'Bild bei Video-Folgen',
+      );
+      await tester.scrollUntilVisible(pictureSwitch, 200);
+      await tester.tap(pictureSwitch);
+      await settle(tester);
+      expect(
+        await tester.runAsync(
+          () => SettingsRepository(db).get(SettingsKeys.videoPicture),
+        ),
+        'false',
+      );
+      await tester.tap(find.byType(MiniPlayer));
+      await settle(tester);
+      video.format.value = const VideoFormat(width: 1280, height: 720);
+      await settle(tester);
+      expect(find.byType(PlayerCover), findsOneWidget);
+      expect(find.byType(VideoPicture), findsNothing);
+      expect(video.users, 0);
+      // On again: the picture.
+      await tester.runAsync(
+        () => SettingsRepository(db).remove(SettingsKeys.videoPicture),
+      );
+      await settle(tester);
+      expect(find.byType(VideoPicture), findsOneWidget);
+      expect(video.users, 1);
+
+      await disposeApp(tester);
+    },
+  );
+
   /// Plays "Erste Folge" in the full player at the given view size.
   Future<void> openPlayerAt(
     WidgetTester tester,

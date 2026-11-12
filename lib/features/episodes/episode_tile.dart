@@ -14,6 +14,7 @@ import '../../data/podcast_repository.dart' show isFreshEpisode;
 import '../../data/providers.dart';
 import '../../data/video_episodes.dart';
 import '../../l10n/app_localizations.dart';
+import '../downloads/video_download_dialog.dart';
 import '../playlists/playlist_actions.dart';
 import 'episode_description.dart';
 
@@ -80,6 +81,14 @@ class EpisodeTile extends ConsumerWidget {
     final playback = ref.read(playbackRepositoryProvider);
     final downloads = ref.read(downloadServiceProvider);
     final download = ref.read(downloadStatesProvider).value?[episode.id];
+    // Video episodes ask first: only over Wi-Fi or right away (stage 2).
+    Future<void> startDownload(BuildContext context) async {
+      final wifiOnly = await askVideoDownloadWifiOnly(context, episode);
+      if (wifiOnly != null) {
+        await downloads.download(episode.id, wifiOnly: wifiOnly);
+      }
+    }
+
     final played = episode.status == EpisodeStatus.played;
 
     // Download entry depends on the current download state.
@@ -91,12 +100,12 @@ class EpisodeTile extends ConsumerWidget {
       null => (
         Icons.download,
         l10n.download,
-        () => downloads.download(episode.id),
+        () => startDownload(outerContext),
       ),
       DownloadState.failed => (
         Icons.refresh,
         l10n.downloadRetry,
-        () => downloads.download(episode.id),
+        () => startDownload(outerContext),
       ),
       DownloadState.queued || DownloadState.running => (
         Icons.close,

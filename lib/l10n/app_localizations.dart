@@ -756,6 +756,48 @@ abstract class AppLocalizations {
   /// **'Vollbild beenden'**
   String get videoExitFullscreen;
 
+  /// No description provided for @videoPicture.
+  ///
+  /// In de, this message translates to:
+  /// **'Bild bei Video-Folgen'**
+  String get videoPicture;
+
+  /// No description provided for @videoPictureHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus: nur Ton, spart Akku. Beim Streamen wird das Bild trotzdem mitgeladen.'**
+  String get videoPictureHint;
+
+  /// No description provided for @videoDownloadTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Video-Folge herunterladen?'**
+  String get videoDownloadTitle;
+
+  /// No description provided for @videoDownloadSize.
+  ///
+  /// In de, this message translates to:
+  /// **'Video-Folgen sind groß – diese hat ca. {size}.'**
+  String videoDownloadSize(String size);
+
+  /// No description provided for @videoDownloadLarge.
+  ///
+  /// In de, this message translates to:
+  /// **'Video-Folgen sind meist sehr groß.'**
+  String get videoDownloadLarge;
+
+  /// No description provided for @videoDownloadNow.
+  ///
+  /// In de, this message translates to:
+  /// **'Sofort laden'**
+  String get videoDownloadNow;
+
+  /// No description provided for @playlistDownloadAllVideoWifi.
+  ///
+  /// In de, this message translates to:
+  /// **'Video-Folgen werden nur über WLAN geladen.'**
+  String get playlistDownloadAllVideoWifi;
+
   /// No description provided for @downloadFailed.
   ///
   /// In de, this message translates to:

@@ -253,6 +253,20 @@
     "description": "Tap on the video in the player"
   },
   "videoExitFullscreen": "Vollbild beenden",
+  "videoPicture": "Bild bei Video-Folgen",
+  "videoPictureHint": "Aus: nur Ton, spart Akku. Beim Streamen wird das Bild trotzdem mitgeladen.",
+  "videoDownloadTitle": "Video-Folge herunterladen?",
+  "videoDownloadSize": "Video-Folgen sind groß – diese hat ca. {size}.",
+  "@videoDownloadSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "videoDownloadLarge": "Video-Folgen sind meist sehr groß.",
+  "videoDownloadNow": "Sofort laden",
+  "playlistDownloadAllVideoWifi": "Video-Folgen werden nur über WLAN geladen.",
   "downloadFailed": "Download fehlgeschlagen",
   "downloadQueued": "Wartet …",
   "downloadWifiWaiting": "Wartet auf WLAN …",

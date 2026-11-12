@@ -64,7 +64,11 @@ Tests: `test/data/storage/download_service_test.dart` (inkl. Mutationsprobe der 
   (leere Liste = nichts). Folgen ohne Thema fallen bei gesetztem Filter heraus. Neue Themen sind nicht automatisch dabei.
 - Budget: Feed-Größenangabe (`audioSizeBytes`) gegen das Speicherlimit; reicht es nicht, wird gestoppt.
 - **Video-Folgen** (MIME `video/*`, Benutzerwunsch 2026-11-12) lädt Auto-Download **immer nur über WLAN**, auch bei
-  „Immer" – sie sind ein Vielfaches größer. „Jetzt über Mobilfunk laden" geht wie sonst von Hand. Dateiendung aus dem
+  „Immer" – sie sind ein Vielfaches größer. „Jetzt über Mobilfunk laden" geht wie sonst von Hand. **Von Hand**
+  (Folgen-Menü → Herunterladen / Erneut herunterladen) fragt die App bei Video-Folgen vorher nach
+  (`askVideoDownloadWifiOnly`, Stufe 2b): „Video-Folge herunterladen? – Video-Folgen sind groß – diese hat ca. X"
+  (ohne Feed-Größe: „meist sehr groß") mit **Nur WLAN** (vorgeschlagen) / Sofort laden / Abbrechen. Playlist → „Alles
+  herunterladen" lädt Video-Folgen nur über WLAN (Satz im Bestätigungsdialog); Audio unverändert sofort. Dateiendung aus dem
   MIME-Typ (`mp4`, `m4v`, `mov`, `webm`); 96-h-Regel und Speicherlimit gelten unverändert.
 - **Ziel-Playlist** (optional pro Podcast, „Neue Folgen zur Playlist hinzufügen"; Benutzerwunsch 2026-09-30): jede
   automatisch eingereihte Folge wird auch ans Ende dieser Playlist gehängt (schon enthalten → übersprungen). Umbenannt →

@@ -15,6 +15,14 @@ final audioHandlerProvider = Provider<PodcastAudioHandler>(
   (ref) => throw UnimplementedError('Overridden in main() and in tests'),
 );
 
+/// Optionen → Hören → "Bild bei Video-Folgen" (off = sound only).
+final videoPictureOnProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(settingsRepositoryProvider)
+      .watch(SettingsKeys.videoPicture)
+      .map((value) => value != 'false'),
+);
+
 /// Picture of video episodes (one per app, like the player).
 final videoOutputProvider = Provider<VideoOutput>((ref) {
   final output = PlatformVideoOutput();

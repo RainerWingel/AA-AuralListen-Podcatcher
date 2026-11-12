@@ -106,6 +106,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const _AutoSleepTile(),
           const _FinishedRemovalTile(),
+          const _VideoPictureTile(),
           const _BackgroundPlaybackTile(),
           SettingsSectionHeader(l10n.settingsSectionSubscriptions),
           ListTile(
@@ -182,6 +183,31 @@ class SettingsSectionHeader extends StatelessWidget {
 }
 
 /// Optionen → Auto-Sleep-Timer with what is set right now.
+/// "Bild bei Video-Folgen": off shows the cover and plays the sound only
+/// (docs/playback.md "Video").
+class _VideoPictureTile extends ConsumerWidget {
+  const _VideoPictureTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final on = ref.watch(videoPictureOnProvider).value ?? true;
+    return SwitchListTile(
+      secondary: const Icon(Icons.videocam_outlined),
+      title: Text(l10n.videoPicture),
+      subtitle: Text(l10n.videoPictureHint),
+      isThreeLine: true,
+      value: on,
+      onChanged: (value) {
+        final settings = ref.read(settingsRepositoryProvider);
+        value
+            ? settings.remove(SettingsKeys.videoPicture)
+            : settings.set(SettingsKeys.videoPicture, 'false');
+      },
+    );
+  }
+}
+
 class _AutoSleepTile extends ConsumerWidget {
   const _AutoSleepTile();
 

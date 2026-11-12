@@ -397,6 +397,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String get videoExitFullscreen => 'Vollbild beenden';
 
   @override
+  String get videoPicture => 'Bild bei Video-Folgen';
+
+  @override
+  String get videoPictureHint =>
+      'Aus: nur Ton, spart Akku. Beim Streamen wird das Bild trotzdem mitgeladen.';
+
+  @override
+  String get videoDownloadTitle => 'Video-Folge herunterladen?';
+
+  @override
+  String videoDownloadSize(String size) {
+    return 'Video-Folgen sind groß – diese hat ca. $size.';
+  }
+
+  @override
+  String get videoDownloadLarge => 'Video-Folgen sind meist sehr groß.';
+
+  @override
+  String get videoDownloadNow => 'Sofort laden';
+
+  @override
+  String get playlistDownloadAllVideoWifi =>
+      'Video-Folgen werden nur über WLAN geladen.';
+
+  @override
   String get downloadFailed => 'Download fehlgeschlagen';
 
   @override

@@ -166,7 +166,7 @@ beendet (Signal 9, trotz Vordergrund-Dienst). Mit „Nicht eingeschränkt" darf 
 - Samsung zeigt Apps in „Grenzen der Hintergrundnutzung" nur, wenn sie kürzlich liefen – dass die App dort zeitweise
   fehlt, ist normal.
 
-## Video (Benutzerwunsch 2026-11-12, Stufe 1 ✅)
+## Video (Benutzerwunsch 2026-11-12, Stufe 1 + 2 ✅)
 Video-Folgen laufen über **denselben Player** wie Audio (`decisions.md` 2026-11-12) – Hintergrund, Benachrichtigung,
 Hörposition, Sprünge, Kapitel, Sleep-/Auto-Sleep-Timer, Playlists und Android Auto gelten unverändert.
 ```
@@ -194,8 +194,12 @@ VideoOutput.java (third_party/just_audio, PATCH.md) → SurfaceProducer → ders
 - **Android Auto:** nur Ton und Cover (Video im Auto ist verboten; die App ist dann im Hintergrund).
 - **Grenzen:** Eine MP4-Datei wird beim Streamen samt Bild geladen, auch wenn nur der Ton läuft (nur HLS könnte auf
   eine Ton-Spur wechseln). Downloads: `eviction.md` (Auto-Download von Video nur über WLAN).
-- **Stufe 2 (offen):** Audio-/Video-Varianten einer Folge (`podcast:alternateEnclosure`, mehrere `enclosure`), Einstellung
-  „Video-Folgen: Bild zeigen / nur Ton", Größenhinweis vor Video-Downloads über Mobilfunk.
+- **Stufe 2 ✅ (Benutzer: nur 2a + 2b):** Optionen → Hören → **„Bild bei Video-Folgen"** (Schalter, Standard an,
+  `settings` `player.videoPicture` = `false` für aus, `videoPictureOnProvider`): aus → der Player zeigt immer das Cover,
+  `PlayerPicture` meldet keine Texture an, die Video-Spur bleibt aus (nur Ton, spart Akku; gestreamt wird die Datei
+  trotzdem ganz geladen – steht als Hinweis unter dem Schalter). **Download-Rückfrage** für Video-Folgen: `eviction.md`.
+  **Geparkt (2c):** Audio-/Video-Fassung derselben Folge (`podcast:alternateEnclosure`, mehrere `enclosure`) – selten,
+  die Sender aus dem Test haben getrennte Audio- und Video-Feeds.
   **Stufe 3 (offen):** Bild im Bild (PiP), Einstellung „Im Hintergrund: nur Ton / Bild im Bild".
 - Tests: `test/audio/video_output_test.dart` (Anmelden, Hintergrund, Freigabe), Widget-Test „video episode: camera in
   the list, picture in the player, full screen" (`test/widget_test.dart`, mit `FakeVideoOutput`).

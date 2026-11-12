@@ -46,6 +46,10 @@ abstract final class SettingsKeys {
   /// Playlist the current episode was started from (null = none).
   static const activePlaylistId = 'player.activePlaylistId';
 
+  /// Video episodes show their picture: `false` = sound only (Optionen →
+  /// Hören); missing = picture on.
+  static const videoPicture = 'player.videoPicture';
+
   /// Milliseconds since epoch when an update brought video episodes (schema
   /// v30). A podcast's first refresh after that marks the old video episodes
   /// it finds as played (docs/feeds-and-directories.md). Missing = installed

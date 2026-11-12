@@ -8,6 +8,7 @@ import '../../core/widgets/text_input_dialog.dart';
 import '../../data/db/app_database.dart';
 import '../../data/playlist_repository.dart';
 import '../../data/providers.dart';
+import '../../data/video_episodes.dart';
 import '../../l10n/app_localizations.dart';
 import 'playlist_colors.dart';
 
@@ -355,7 +356,8 @@ Future<void> downloadWholePlaylist(
       content: Text(
         '${l10n.playlistDownloadAllConfirm(missing.length, playlist.name)}'
         '${bytes > 0 ? ' ${l10n.playlistDownloadAllSize(formatBytes(bytes, l10n.localeName))}' : ''}'
-        '\n\n${l10n.playlistDownloadAllHint}',
+        '\n\n${l10n.playlistDownloadAllHint}'
+        '${missing.any((e) => e.isVideo) ? ' ${l10n.playlistDownloadAllVideoWifi}' : ''}',
       ),
       actions: [
         TextButton(
@@ -371,7 +373,8 @@ Future<void> downloadWholePlaylist(
   );
   if (confirmed != true) return;
   for (final e in missing) {
-    await downloads.download(e.id);
+    // Videos are many times larger: Wi-Fi only (docs/eviction.md).
+    await downloads.download(e.id, wifiOnly: e.isVideo);
   }
   showInfoSnackBar(messenger, l10n.playlistDownloadAllStarted(missing.length));
 }

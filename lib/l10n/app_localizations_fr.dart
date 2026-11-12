@@ -399,6 +399,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String get videoExitFullscreen => 'Quitter le plein écran';
 
   @override
+  String get videoPicture => 'Image des épisodes vidéo';
+
+  @override
+  String get videoPictureHint =>
+      'Désactivé : son seul, économise la batterie. En streaming, l’image est quand même téléchargée.';
+
+  @override
+  String get videoDownloadTitle => 'Télécharger l’épisode vidéo ?';
+
+  @override
+  String videoDownloadSize(String size) {
+    return 'Les épisodes vidéo sont volumineux – celui-ci fait environ $size.';
+  }
+
+  @override
+  String get videoDownloadLarge =>
+      'Les épisodes vidéo sont généralement très volumineux.';
+
+  @override
+  String get videoDownloadNow => 'Télécharger maintenant';
+
+  @override
+  String get playlistDownloadAllVideoWifi =>
+      'Les épisodes vidéo ne se téléchargent qu’en Wi-Fi.';
+
+  @override
   String get downloadFailed => 'Échec du téléchargement';
 
   @override

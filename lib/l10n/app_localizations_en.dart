@@ -397,6 +397,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get videoExitFullscreen => 'Exit full screen';
 
   @override
+  String get videoPicture => 'Picture for video episodes';
+
+  @override
+  String get videoPictureHint =>
+      'Off: sound only, saves battery. When streaming, the picture is still downloaded.';
+
+  @override
+  String get videoDownloadTitle => 'Download video episode?';
+
+  @override
+  String videoDownloadSize(String size) {
+    return 'Video episodes are large – this one is about $size.';
+  }
+
+  @override
+  String get videoDownloadLarge => 'Video episodes are usually very large.';
+
+  @override
+  String get videoDownloadNow => 'Download now';
+
+  @override
+  String get playlistDownloadAllVideoWifi =>
+      'Video episodes download over Wi-Fi only.';
+
+  @override
   String get downloadFailed => 'Download failed';
 
   @override

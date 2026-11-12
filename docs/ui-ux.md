@@ -276,6 +276,10 @@ freiwillige Unterstützung (PayPal) steht auf GitHub (README „Unterstützen", 
 siehe unten), „Hintergrund-Wiedergabe" (Akku-Status, → `playback.md`). Abschnitt „Abos": OPML-Import. Abschnitt „Downloads": Speicherlimit (1–20 GB), „Jetzt aufräumen".
 Abschnitt „Sicherung": Abos als OPML exportieren, Backup erstellen, Backup wiederherstellen (`backup.md`).
 
+### Bild bei Video-Folgen (Benutzerwunsch 2026-11-12)
+Optionen → Hören, nach „Fertige Folgen aus Playlist entfernen": Schalter mit Kamera-Symbol und Hinweis
+„Aus: nur Ton, spart Akku. Beim Streamen wird das Bild trotzdem mitgeladen." Standard an (`playback.md` „Video").
+
 ### Auto-Sleep-Timer (Benutzerwunsch 2026-11-12)
 Optionen → Hören → „Auto-Sleep-Timer" (Untertitel: Modus und Dauer, z. B. „Ein · 30 Minuten") → eigene Seite
 (`auto_sleep_screen.dart`, Route `/einstellungen/auto-sleep-timer`). Verhalten: `playback.md`.

@@ -398,6 +398,32 @@ class AppLocalizationsEs extends AppLocalizations {
   String get videoExitFullscreen => 'Salir de pantalla completa';
 
   @override
+  String get videoPicture => 'Imagen en episodios de vídeo';
+
+  @override
+  String get videoPictureHint =>
+      'Desactivado: solo sonido, ahorra batería. En streaming, la imagen se descarga igualmente.';
+
+  @override
+  String get videoDownloadTitle => '¿Descargar episodio en vídeo?';
+
+  @override
+  String videoDownloadSize(String size) {
+    return 'Los episodios en vídeo son grandes: este ocupa unos $size.';
+  }
+
+  @override
+  String get videoDownloadLarge =>
+      'Los episodios en vídeo suelen ser muy grandes.';
+
+  @override
+  String get videoDownloadNow => 'Descargar ahora';
+
+  @override
+  String get playlistDownloadAllVideoWifi =>
+      'Los episodios en vídeo solo se descargan por wifi.';
+
+  @override
   String get downloadFailed => 'La descarga falló';
 
   @override

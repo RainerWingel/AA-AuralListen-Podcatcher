@@ -192,7 +192,10 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 - [x] Praxistest auf dem A05s (Benutzer, 2026-11-12, „tagesschau in 100 Sekunden"): alles in Ordnung; erwartet fehlte
   nur Bild im Bild bei der Home-Taste (= Stufe 3). Weitere Test-Feeds: tagesthemen, logo! (ZDF), Sendung mit der Maus
   (meldet `video/mpeg` für MP4), TWiT (HD, ~3 GB je Folge)
-- [ ] Stufe 2: Audio-/Video-Varianten (`podcast:alternateEnclosure`), „Video-Folgen: Bild / nur Ton", Größenhinweis
+- [x] Stufe 2a: Optionen → „Bild bei Video-Folgen" (aus = nur Ton)
+- [x] Stufe 2b: Rückfrage beim Herunterladen von Video-Folgen (Nur WLAN / Sofort), „Alles herunterladen" lädt Video nur über WLAN
+- [ ] Praxistest Stufe 2 auf dem A05s (Benutzer)
+- [ ] Geparkt (2c): Audio-/Video-Fassung derselben Folge (`podcast:alternateEnclosure`) – nur bei echtem Bedarf
 - [ ] Stufe 3: Bild im Bild (PiP)
 
 ## Zusatz – Playlist fortsetzen (2026-09-29)

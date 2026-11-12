@@ -400,6 +400,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String get videoExitFullscreen => 'Выйти из полноэкранного режима';
 
   @override
+  String get videoPicture => 'Изображение в видеовыпусках';
+
+  @override
+  String get videoPictureHint =>
+      'Выкл.: только звук, экономит батарею. При потоковом воспроизведении изображение всё равно загружается.';
+
+  @override
+  String get videoDownloadTitle => 'Скачать видеовыпуск?';
+
+  @override
+  String videoDownloadSize(String size) {
+    return 'Видеовыпуски большие — этот занимает около $size.';
+  }
+
+  @override
+  String get videoDownloadLarge => 'Видеовыпуски обычно очень большие.';
+
+  @override
+  String get videoDownloadNow => 'Скачать сейчас';
+
+  @override
+  String get playlistDownloadAllVideoWifi =>
+      'Видеовыпуски скачиваются только по Wi-Fi.';
+
+  @override
   String get downloadFailed => 'Ошибка загрузки';
 
   @override

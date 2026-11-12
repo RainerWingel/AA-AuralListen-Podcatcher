@@ -67,63 +67,67 @@ class PlayerPicture extends ConsumerWidget {
   final double maxWidth;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      ValueListenableBuilder<VideoFormat?>(
-        valueListenable: ref.watch(videoOutputProvider).format,
-        builder: (context, format, _) {
-          if (format == null) {
-            return PlayerCover(
-              episodeId: episodeId,
-              coverUrl: coverUrl,
-              size: coverSize,
-            );
-          }
-          // As wide as possible, but never taller than the cover would be.
-          var width = maxWidth;
-          var height = width / format.aspectRatio;
-          if (height > coverSize) {
-            height = coverSize;
-            width = height * format.aspectRatio;
-          }
-          final l10n = AppLocalizations.of(context);
-          return Semantics(
-            button: true,
-            label: l10n.videoFullscreen,
-            child: GestureDetector(
-              onTap: () => openVideoFullscreen(context),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ColoredBox(
-                        color: Colors.black,
-                        child: VideoPicture(
-                          fallback: Center(
-                            child: CoverImage(url: coverUrl, size: height),
-                          ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    // "Bild bei Video-Folgen" off: the cover; nothing acquires the texture,
+    // so the video track stays off (sound only).
+    final pictureOn = ref.watch(videoPictureOnProvider).value ?? true;
+    return ValueListenableBuilder<VideoFormat?>(
+      valueListenable: ref.watch(videoOutputProvider).format,
+      builder: (context, format, _) {
+        if (format == null || !pictureOn) {
+          return PlayerCover(
+            episodeId: episodeId,
+            coverUrl: coverUrl,
+            size: coverSize,
+          );
+        }
+        // As wide as possible, but never taller than the cover would be.
+        var width = maxWidth;
+        var height = width / format.aspectRatio;
+        if (height > coverSize) {
+          height = coverSize;
+          width = height * format.aspectRatio;
+        }
+        final l10n = AppLocalizations.of(context);
+        return Semantics(
+          button: true,
+          label: l10n.videoFullscreen,
+          child: GestureDetector(
+            onTap: () => openVideoFullscreen(context),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: SizedBox(
+                width: width,
+                height: height,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ColoredBox(
+                      color: Colors.black,
+                      child: VideoPicture(
+                        fallback: Center(
+                          child: CoverImage(url: coverUrl, size: height),
                         ),
                       ),
-                      const Positioned(
-                        right: 4,
-                        bottom: 4,
-                        child: Icon(
-                          Icons.fullscreen,
-                          color: Colors.white,
-                          shadows: [Shadow(blurRadius: 4)],
-                        ),
+                    ),
+                    const Positioned(
+                      right: 4,
+                      bottom: 4,
+                      child: Icon(
+                        Icons.fullscreen,
+                        color: Colors.white,
+                        shadows: [Shadow(blurRadius: 4)],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
+  }
 }
 
 /// Shows the video full screen (landscape for a wide picture).
