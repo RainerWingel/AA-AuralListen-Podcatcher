@@ -277,12 +277,16 @@ Optionen → Hören → „Auto-Sleep-Timer" (Untertitel: Modus und Dauer, z. B.
 - Oben Segment-Knöpfe **Aus / Ein / Nach Wochentag**, darunter ein kurzer Erklärtext.
 - Ab „Ein": Zeile **„Dauer des Timers"** (Dialog wie beim Sleep-Timer, ohne „Aus"), dann **„Von 22:00" / „Bis 04:00"**
   (Flutters Uhrzeit-Dialog mit Ziffernblatt; Tastatur über das Symbol – deren Layout bricht bei kleiner Schrift, daher
-  nicht als Start). Endet das Fenster am Folgetag, steht „(am nächsten Tag)" daneben.
+  nicht als Start). Daneben die **Länge** des Fensters („Länge 6 Std., endet am nächsten Tag" bzw. „Länge 2 Std.") –
+  so fallen vertauschte Zeiten (04:00–22:00 = 18 Std. am Tag) auf.
 - „Nach Wochentag": sieben Zeilen Montag–Sonntag (Namen über `intl` in der App-Sprache), je **Schalter** und – wenn an –
   Zeitblock plus **„Auf alle Tage übernehmen"** (kopiert die Zeiten, lässt die Schalter). Beim ersten Wechsel bekommen
   alle Tage das Fenster aus „Ein". Alle Tage aus → roter Hinweis „… startet nie".
 - **Ungültige Eingaben werden abgelehnt:** Beginn = Ende → rote Meldung direkt unter dem Zeitblock („… wäre 0 Minuten
-  lang. Die Änderung wurde nicht übernommen."), der alte Wert bleibt. Eigene Dauer nur 1–3600 Minuten (Knopf sonst
+  lang. Die Änderung wurde nicht übernommen."), der alte Wert bleibt. Ebenso eine **Überschneidung mit dem Vor- oder
+  Folgetag** („Überschneidet sich mit Montag (22:00–05:30). …"); schaltet man einen Tag ein, der sich überschneiden
+  würde, bleibt der Schalter aus und dieselbe Meldung kommt als Infobox. „Auf alle Tage übernehmen" kann keine
+  Überschneidung erzeugen (gleiche Zeiten jeden Tag). Eigene Dauer nur 1–3600 Minuten (Knopf sonst
   grau). Jede gültige Änderung wird sofort gespeichert (kein Speichern-Knopf, wie die übrigen Optionen).
 - Unter allem der Hinweis, dass eine Nacht zum Tag ihres Beginns gehört.
 - Der Uhrzeit-Dialog kommt über `timePickerProvider` (Tests ersetzen ihn).

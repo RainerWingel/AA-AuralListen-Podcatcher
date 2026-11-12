@@ -394,7 +394,6 @@
   "autoSleepWindowsPerDay": "Plage horaire par jour",
   "autoSleepFrom": "De {time}",
   "autoSleepUntil": "À {time}",
-  "autoSleepNextDay": "(le lendemain)",
   "autoSleepPickStart": "Début",
   "autoSleepPickEnd": "Fin",
   "autoSleepSameTimeError": "Le début et la fin ne peuvent pas être identiques – la plage horaire durerait 0 minute. La modification n’a pas été appliquée.",
@@ -402,5 +401,9 @@
   "autoSleepCopyToAll": "Appliquer à tous les jours",
   "autoSleepCopiedToAll": "Horaires du {day} appliqués à tous les jours",
   "autoSleepAllDaysOff": "Tous les jours sont désactivés – le minuteur de veille automatique ne démarrera jamais.",
-  "autoSleepStarted": "Minuteur de mise en veille démarré automatiquement : {timer}"
+  "autoSleepStarted": "Minuteur de mise en veille démarré automatiquement : {timer}",
+  "durationHours": "{hours} h",
+  "autoSleepSpanSameDay": "Durée {length}",
+  "autoSleepSpanNextDay": "Durée {length}, se termine le lendemain",
+  "autoSleepOverlapError": "Chevauche {day} ({window}). La modification n’a pas été appliquée."
 }

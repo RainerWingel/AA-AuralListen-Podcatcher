@@ -1540,9 +1540,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get autoSleepNextDay => '(le lendemain)';
-
-  @override
   String get autoSleepPickStart => 'Début';
 
   @override
@@ -1571,5 +1568,25 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String autoSleepStarted(String timer) {
     return 'Minuteur de mise en veille démarré automatiquement : $timer';
+  }
+
+  @override
+  String durationHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String autoSleepSpanSameDay(String length) {
+    return 'Durée $length';
+  }
+
+  @override
+  String autoSleepSpanNextDay(String length) {
+    return 'Durée $length, se termine le lendemain';
+  }
+
+  @override
+  String autoSleepOverlapError(String day, String window) {
+    return 'Chevauche $day ($window). La modification n’a pas été appliquée.';
   }
 }

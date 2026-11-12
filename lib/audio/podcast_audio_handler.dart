@@ -179,13 +179,13 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   bool _volumeLowered = false;
   final _sleepStates = StreamController<SleepTimerState>.broadcast();
 
-  /// Auto-Sleep-Timer: start of the night window whose timer is running
-  /// (null = the current timer was not set automatically) …
-  DateTime? _autoSleepWindow;
+  /// Auto-Sleep-Timer: the night whose timer is running (null = the current
+  /// timer was not set automatically) …
+  AutoSleepNight? _autoSleepNight;
 
-  /// … and of the night in which the user switched it off: no new automatic
-  /// timer until that window is over.
-  DateTime? _autoSleepCancelled;
+  /// … and the end of the night in which the user switched it off: no new
+  /// automatic timer before then.
+  DateTime? _autoSleepCancelledUntil;
   final _autoSleepStarts = StreamController<SleepTimer>.broadcast();
 
   /// Whether the hang-detection timer runs (only while playing).
@@ -325,8 +325,8 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// count only while playing; [SleepTimerAtEpisodeEnd] stops after this
   /// episode. Switching an automatic timer off means "not again tonight".
   void setSleepTimer(SleepTimer timer) {
-    if (timer is SleepTimerOff && _autoSleepWindow != null) {
-      _autoSleepCancelled = _autoSleepWindow;
+    if (timer is SleepTimerOff && _autoSleepNight != null) {
+      _autoSleepCancelledUntil = _autoSleepNight!.end;
     }
     _applySleepTimer(timer);
   }
@@ -334,13 +334,13 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
   /// "Abbrechen" in the info box: switches the timer off only if it is still
   /// the automatic one.
   void cancelAutoSleepTimer() {
-    if (_autoSleepWindow != null) setSleepTimer(const SleepTimerOff());
+    if (_autoSleepNight != null) setSleepTimer(const SleepTimerOff());
   }
 
   /// Sets the timer without counting as a user decision (expiry, end of
   /// the episode, Auto-Sleep-Timer).
-  void _applySleepTimer(SleepTimer timer, {DateTime? autoWindow}) {
-    _autoSleepWindow = autoWindow;
+  void _applySleepTimer(SleepTimer timer, {AutoSleepNight? autoNight}) {
+    _autoSleepNight = autoNight;
     _cancelSleepTimers();
     // While paused the volume stays down until the next Play (see _tryPlay):
     // raising it right after a pause lets the audio buffer blip loudly.
@@ -733,12 +733,16 @@ class PodcastAudioHandler extends BaseAudioHandler with SeekHandler {
     final schedule = AutoSleepSchedule.decode(
       await _settings.get(SettingsKeys.autoSleep),
     );
-    final window = schedule.windowStartAt(_now());
-    if (window == null || window == _autoSleepCancelled) return;
+    final now = _now();
+    final night = schedule.nightAt(now);
+    if (night == null) return;
+    if (_autoSleepCancelledUntil case final until? when now.isBefore(until)) {
+      return;
+    }
     if (await _carConnected?.call() ?? false) return;
     // Still nothing set while the settings were read?
     if (sleepTimerState.isActive || !_engine.state.playing) return;
-    _applySleepTimer(schedule.timer, autoWindow: window);
+    _applySleepTimer(schedule.timer, autoNight: night);
     if (!_autoSleepStarts.isClosed) _autoSleepStarts.add(schedule.timer);
   }
 

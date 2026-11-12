@@ -42,6 +42,22 @@ final timePickerProvider = Provider<TimePicker>(
       ),
 );
 
+/// "22:00" in the phone's time format.
+String formatTimeOfDay(BuildContext context, int minutes) =>
+    MaterialLocalizations.of(context).formatTimeOfDay(
+      TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60),
+      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+    );
+
+/// "6 Std. 30 Min.", "6 Std." or "45 Min.".
+String _formatLength(AppLocalizations l10n, Duration length) {
+  final hours = length.inHours;
+  final minutes = length.inMinutes.remainder(60);
+  if (hours == 0) return l10n.durationMinutes(minutes);
+  if (minutes == 0) return l10n.durationHours(hours);
+  return l10n.durationHoursMinutes(hours, minutes);
+}
+
 String autoSleepModeName(AppLocalizations l10n, AutoSleepMode mode) =>
     switch (mode) {
       AutoSleepMode.off => l10n.autoSleepModeOff,
@@ -140,6 +156,8 @@ class AutoSleepScreen extends ConsumerWidget {
                         key: ValueKey('auto-sleep-day-$i'),
                         dayName: weekdayName(context, i),
                         window: schedule.weekdays[i],
+                        check: (w) =>
+                            _overlapError(context, schedule.withDay(i, w), i),
                         onChanged: (w) => _save(ref, schedule.withDay(i, w)),
                         onCopyToAll: () async {
                           final source = schedule.weekdays[i];
@@ -193,6 +211,23 @@ class AutoSleepScreen extends ConsumerWidget {
     );
   }
 
+  /// Message if day [index] of [candidate] would overlap a neighbouring
+  /// day – one night with two beginnings ("Abbrechen" would not hold).
+  static String? _overlapError(
+    BuildContext context,
+    AutoSleepSchedule candidate,
+    int index,
+  ) {
+    final other = candidate.overlappingDay(index);
+    if (other == null) return null;
+    final window = candidate.weekdays[other];
+    return AppLocalizations.of(context).autoSleepOverlapError(
+      weekdayName(context, other),
+      '${formatTimeOfDay(context, window.start)}–'
+      '${formatTimeOfDay(context, window.end)}',
+    );
+  }
+
   /// Weekday name in the UI language; [index] 0 = Monday.
   static String weekdayName(BuildContext context, int index) =>
       // 2024-01-01 was a Monday.
@@ -205,6 +240,7 @@ class _DayEditor extends StatelessWidget {
   const _DayEditor({
     required this.dayName,
     required this.window,
+    required this.check,
     required this.onChanged,
     required this.onCopyToAll,
     super.key,
@@ -212,6 +248,9 @@ class _DayEditor extends StatelessWidget {
 
   final String dayName;
   final AutoSleepWindow window;
+
+  /// Why a changed window of this day is refused (overlap), or null.
+  final String? Function(AutoSleepWindow changed) check;
   final ValueChanged<AutoSleepWindow> onChanged;
   final VoidCallback onCopyToAll;
 
@@ -224,10 +263,18 @@ class _DayEditor extends StatelessWidget {
         SwitchListTile(
           title: Text(dayName),
           value: window.enabled,
-          onChanged: (on) => onChanged(window.copyWith(enabled: on)),
+          onChanged: (on) {
+            final changed = window.copyWith(enabled: on);
+            // Switching a day on can make it overlap a neighbour.
+            if (check(changed) case final error?) {
+              showInfoSnackBar(ScaffoldMessenger.of(context), error);
+              return;
+            }
+            onChanged(changed);
+          },
         ),
         if (window.enabled) ...[
-          _WindowEditor(window: window, onChanged: onChanged),
+          _WindowEditor(window: window, check: check, onChanged: onChanged),
           Align(
             alignment: AlignmentDirectional.centerEnd,
             child: Padding(
@@ -246,24 +293,29 @@ class _DayEditor extends StatelessWidget {
   }
 }
 
-/// "Von" and "Bis" of one window. A change that would make the window
-/// invalid is not passed on; the reason is shown below the times instead.
+/// "Von" and "Bis" of one window and its length. A change that would make
+/// the window invalid is not passed on; the reason is shown below the times
+/// instead.
 class _WindowEditor extends ConsumerStatefulWidget {
   const _WindowEditor({
     required this.window,
     required this.onChanged,
+    this.check,
     super.key,
   });
 
   final AutoSleepWindow window;
   final ValueChanged<AutoSleepWindow> onChanged;
 
+  /// Further reasons to refuse a change (overlap with another day).
+  final String? Function(AutoSleepWindow changed)? check;
+
   @override
   ConsumerState<_WindowEditor> createState() => _WindowEditorState();
 }
 
 class _WindowEditorState extends ConsumerState<_WindowEditor> {
-  AutoSleepWindowError? _error;
+  String? _error;
 
   @override
   void didUpdateWidget(_WindowEditor oldWidget) {
@@ -288,7 +340,10 @@ class _WindowEditorState extends ConsumerState<_WindowEditor> {
     final changed = start
         ? window.copyWith(start: minutes)
         : window.copyWith(end: minutes);
-    final error = changed.error;
+    final error = switch (changed.error) {
+      AutoSleepWindowError.sameTime => l10n.autoSleepSameTimeError,
+      null => widget.check?.call(changed),
+    };
     setState(() => _error = error);
     if (error == null) widget.onChanged(changed);
   }
@@ -297,11 +352,9 @@ class _WindowEditorState extends ConsumerState<_WindowEditor> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final format = MaterialLocalizations.of(context);
-    final h24 = MediaQuery.alwaysUse24HourFormatOf(context);
-    String show(int minutes) =>
-        format.formatTimeOfDay(_time(minutes), alwaysUse24HourFormat: h24);
+    String show(int minutes) => formatTimeOfDay(context, minutes);
     final window = widget.window;
+    final length = _formatLength(l10n, window.length);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
       child: Column(
@@ -322,17 +375,19 @@ class _WindowEditorState extends ConsumerState<_WindowEditor> {
                 icon: const Icon(Icons.wb_twilight, size: 18),
                 label: Text(l10n.autoSleepUntil(show(window.end))),
               ),
-              if (window.crossesMidnight)
-                Text(l10n.autoSleepNextDay, style: theme.textTheme.bodySmall),
+              Text(
+                window.crossesMidnight
+                    ? l10n.autoSleepSpanNextDay(length)
+                    : l10n.autoSleepSpanSameDay(length),
+                style: theme.textTheme.bodySmall,
+              ),
             ],
           ),
           if (_error != null)
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                switch (_error!) {
-                  AutoSleepWindowError.sameTime => l10n.autoSleepSameTimeError,
-                },
+                _error!,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.error,
                 ),

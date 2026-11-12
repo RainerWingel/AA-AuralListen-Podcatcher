@@ -179,7 +179,7 @@ Jeder Meilenstein = eigener Branch + Pull Request, CI muss grün sein. Erledigte
 ## Zusatz – Auto-Sleep-Timer (2026-11-12)
 - [x] Optionen → Auto-Sleep-Timer: Aus / Ein / Nach Wochentag, Dauer, Zeitfenster (Standard Ein 22:00–04:00, 30 min)
 - [x] Start nur bei Play in der App, nie im Auto; „Aus" gilt für die Nacht; Infobox mit „Abbrechen"
-- [x] Ungültige Zeitfenster (Beginn = Ende) abgelehnt, Meldung am Feld
+- [x] Ungültige Zeitfenster (Beginn = Ende, Überschneidung mit Nachbartag) abgelehnt, Meldung am Feld; Länge angezeigt
 - [ ] Praxistest auf dem A05s (Benutzer), im Auto mit Android Auto (startet nicht)
 
 ## Zusatz – Playlist fortsetzen (2026-09-29)

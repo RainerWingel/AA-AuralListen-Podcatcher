@@ -1387,6 +1387,35 @@ void main() {
       expect(handler.sleepTimerState.isActive, isTrue);
     });
 
+    test(
+      'switched off: overlapping windows (old data) are one night',
+      () async {
+        // Thursday 20:00–06:00 runs into Friday 00:00–05:00.
+        await configure(
+          AutoSleepSchedule(mode: AutoSleepMode.weekdays)
+              .withDay(
+                DateTime.thursday - 1,
+                const AutoSleepWindow(start: 20 * 60, end: 6 * 60),
+              )
+              .withDay(
+                DateTime.friday - 1,
+                const AutoSleepWindow(start: 0, end: 5 * 60),
+              ),
+        );
+        await handler.playEpisode(episodeId, fromApp: true); // Thu 23:00
+        handler.setSleepTimer(const SleepTimerOff());
+        for (final at in [
+          DateTime(2026, 11, 13, 1),
+          DateTime(2026, 11, 13, 5),
+        ]) {
+          await handler.pause();
+          clock = at;
+          await handler.play(fromApp: true);
+          expect(handler.sleepTimerState.isActive, isFalse, reason: '$at');
+        }
+      },
+    );
+
     test('"Abbrechen" in the info box counts as switched off', () async {
       await handler.playEpisode(episodeId, fromApp: true);
       handler.cancelAutoSleepTimer();

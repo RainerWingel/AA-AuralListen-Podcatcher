@@ -394,7 +394,6 @@
   "autoSleepWindowsPerDay": "Fascia oraria per giorno",
   "autoSleepFrom": "Dalle {time}",
   "autoSleepUntil": "Alle {time}",
-  "autoSleepNextDay": "(giorno dopo)",
   "autoSleepPickStart": "Inizio",
   "autoSleepPickEnd": "Fine",
   "autoSleepSameTimeError": "Inizio e fine non possono coincidere: la fascia oraria durerebbe 0 minuti. La modifica non è stata applicata.",
@@ -402,5 +401,9 @@
   "autoSleepCopyToAll": "Applica a tutti i giorni",
   "autoSleepCopiedToAll": "Orari di {day} applicati a tutti i giorni",
   "autoSleepAllDaysOff": "Tutti i giorni sono disattivati: il timer automatico non partirà mai.",
-  "autoSleepStarted": "Timer di spegnimento avviato automaticamente: {timer}"
+  "autoSleepStarted": "Timer di spegnimento avviato automaticamente: {timer}",
+  "durationHours": "{hours} h",
+  "autoSleepSpanSameDay": "Durata {length}",
+  "autoSleepSpanNextDay": "Durata {length}, termina il giorno dopo",
+  "autoSleepOverlapError": "Si sovrappone a {day} ({window}). La modifica non è stata applicata."
 }

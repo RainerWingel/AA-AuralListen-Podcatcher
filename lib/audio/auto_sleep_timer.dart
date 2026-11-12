@@ -15,6 +15,10 @@ enum AutoSleepMode {
   );
 }
 
+/// One night of the Auto-Sleep-Timer: a window – or several windows of
+/// neighbouring days that overlap, merged – from [start] to [end].
+typedef AutoSleepNight = ({DateTime start, DateTime end});
+
 /// Why a window cannot be saved.
 enum AutoSleepWindowError {
   /// Start and end are the same time – a window of length zero.
@@ -45,6 +49,12 @@ class AutoSleepWindow {
 
   bool get crossesMidnight => end < start;
 
+  /// How long the window is (shown next to the times, so swapped times stand
+  /// out). Wall-clock length: a daylight-saving night is an hour off.
+  Duration get length => Duration(
+    minutes: crossesMidnight ? end + minutesPerDay - start : end - start,
+  );
+
   /// Null if the window may be saved.
   AutoSleepWindowError? get error =>
       start == end ? AutoSleepWindowError.sameTime : null;
@@ -52,11 +62,13 @@ class AutoSleepWindow {
   bool get _inRange =>
       start >= 0 && start < minutesPerDay && end >= 0 && end < minutesPerDay;
 
-  /// Start of this window on [day] (its date only) if [now] lies inside it.
+  bool get _active => enabled && error == null && _inRange;
+
+  /// This window on [day] (its date only); null if switched off or invalid.
   /// Built from the calendar date and wall-clock time, so a daylight-saving
   /// change during the night does not shift the end.
-  DateTime? startIfInside(DateTime day, DateTime now) {
-    if (!enabled || error != null || !_inRange) return null;
+  AutoSleepNight? on(DateTime day) {
+    if (!_active) return null;
     final from = DateTime(
       day.year,
       day.month,
@@ -71,8 +83,14 @@ class AutoSleepWindow {
       end ~/ 60,
       end % 60,
     );
-    return !now.isBefore(from) && now.isBefore(to) ? from : null;
+    return (start: from, end: to);
   }
+
+  /// This window (of one day) runs into [next] (of the following day): it
+  /// passes midnight and ends after [next] begins. Such input is refused –
+  /// the two would be one night with two beginnings.
+  bool runsInto(AutoSleepWindow next) =>
+      _active && next._active && crossesMidnight && end > next.start;
 
   AutoSleepWindow copyWith({int? start, int? end, bool? enabled}) =>
       AutoSleepWindow(
@@ -149,17 +167,44 @@ class AutoSleepSchedule {
     AutoSleepMode.weekdays => weekdays[weekday - 1],
   };
 
-  /// Start of the window [now] lies in, or null if none. The start tells
-  /// the nights apart ("cancelled tonight" must not last until tomorrow).
-  /// A window past midnight belongs to the day it starts, so yesterday's
-  /// window is checked too.
-  DateTime? windowStartAt(DateTime now) {
+  /// The night [now] lies in, or null if none. A window past midnight
+  /// belongs to the day it starts. Windows of neighbouring days that
+  /// overlap (refused in the UI, but possible from old data) count as one
+  /// night, so "switched off for tonight" lasts until its very end.
+  AutoSleepNight? nightAt(DateTime now) {
     if (mode == AutoSleepMode.off) return null;
-    for (final back in const [0, 1]) {
-      final day = DateTime(now.year, now.month, now.day - back);
-      final start = windowFor(day.weekday).startIfInside(day, now);
-      if (start != null) return start;
+    final windows = <AutoSleepNight>[
+      // A week back covers any chain of overlapping windows that is not
+      // endless; tomorrow's window may lengthen tonight's. In order of
+      // their start (each starts on its own day).
+      for (var back = DateTime.daysPerWeek; back >= -1; back--)
+        ?_windowOn(DateTime(now.year, now.month, now.day - back)),
+    ];
+    bool contains(AutoSleepNight night) =>
+        !now.isBefore(night.start) && now.isBefore(night.end);
+    AutoSleepNight? night;
+    for (final window in windows) {
+      if (night != null && window.start.isBefore(night.end)) {
+        if (window.end.isAfter(night.end)) {
+          night = (start: night.start, end: window.end);
+        }
+      } else {
+        if (night != null && contains(night)) return night;
+        night = window;
+      }
     }
+    return night != null && contains(night) ? night : null;
+  }
+
+  AutoSleepNight? _windowOn(DateTime day) => windowFor(day.weekday).on(day);
+
+  /// Per weekday ([index] 0 = Monday): the day whose window overlaps that of
+  /// day [index] – the previous or the next one – or null.
+  int? overlappingDay(int index) {
+    final previous = (index + DateTime.daysPerWeek - 1) % DateTime.daysPerWeek;
+    final next = (index + 1) % DateTime.daysPerWeek;
+    if (weekdays[previous].runsInto(weekdays[index])) return previous;
+    if (weekdays[index].runsInto(weekdays[next])) return next;
     return null;
   }
 

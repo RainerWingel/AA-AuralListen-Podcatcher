@@ -394,7 +394,6 @@
   "autoSleepWindowsPerDay": "Intervalo de horário por dia",
   "autoSleepFrom": "Das {time}",
   "autoSleepUntil": "Até {time}",
-  "autoSleepNextDay": "(dia seguinte)",
   "autoSleepPickStart": "Início",
   "autoSleepPickEnd": "Fim",
   "autoSleepSameTimeError": "O início e o fim não podem ser iguais – o intervalo teria 0 minutos. A alteração não foi aplicada.",
@@ -402,5 +401,9 @@
   "autoSleepCopyToAll": "Aplicar a todos os dias",
   "autoSleepCopiedToAll": "Horários de {day} aplicados a todos os dias",
   "autoSleepAllDaysOff": "Todos os dias estão desativados – o timer automático nunca vai começar.",
-  "autoSleepStarted": "Timer de desligamento iniciado automaticamente: {timer}"
+  "autoSleepStarted": "Timer de desligamento iniciado automaticamente: {timer}",
+  "durationHours": "{hours} h",
+  "autoSleepSpanSameDay": "Duração {length}",
+  "autoSleepSpanNextDay": "Duração {length}, termina no dia seguinte",
+  "autoSleepOverlapError": "Se sobrepõe a {day} ({window}). A alteração não foi aplicada."
 }

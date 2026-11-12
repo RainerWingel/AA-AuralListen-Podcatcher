@@ -394,7 +394,6 @@
   "autoSleepWindowsPerDay": "Time window per weekday",
   "autoSleepFrom": "From {time}",
   "autoSleepUntil": "Until {time}",
-  "autoSleepNextDay": "(next day)",
   "autoSleepPickStart": "Start",
   "autoSleepPickEnd": "End",
   "autoSleepSameTimeError": "Start and end must not be the same – the time window would be 0 minutes long. The change was not applied.",
@@ -402,5 +401,9 @@
   "autoSleepCopyToAll": "Apply to all days",
   "autoSleepCopiedToAll": "Times of {day} applied to all days",
   "autoSleepAllDaysOff": "All days are switched off – the auto sleep timer will never start.",
-  "autoSleepStarted": "Sleep timer started automatically: {timer}"
+  "autoSleepStarted": "Sleep timer started automatically: {timer}",
+  "durationHours": "{hours} hr",
+  "autoSleepSpanSameDay": "Length {length}",
+  "autoSleepSpanNextDay": "Length {length}, ends the next day",
+  "autoSleepOverlapError": "Overlaps with {day} ({window}). The change was not applied."
 }

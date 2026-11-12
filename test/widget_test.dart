@@ -2246,9 +2246,9 @@ void main() {
       // The time the "user" picks next, and the title the picker showed.
       late TimeOfDay answer;
       String? pickerTitle;
-      Future<void> pickTime(String button, int hour, int minute) async {
+      Future<void> pickTime(Finder button, int hour, int minute) async {
         answer = TimeOfDay(hour: hour, minute: minute);
-        await tester.tap(find.text(button));
+        await tester.tap(button);
         await settle(tester);
       }
 
@@ -2269,6 +2269,7 @@ void main() {
       await settle(tester);
       expect(find.text('Von 22:00'), findsOneWidget);
       expect(find.text('Bis 04:00'), findsOneWidget);
+      expect(find.text('Länge 6 Std., endet am nächsten Tag'), findsOneWidget);
       expect(find.text('30 Minuten'), findsOneWidget);
 
       await tester.tap(find.text('Aus'));
@@ -2281,7 +2282,7 @@ void main() {
       expect((await stored()).mode, AutoSleepMode.daily);
 
       // End = start: refused with a message, the old value stays.
-      await pickTime('Bis 04:00', 22, 0);
+      await pickTime(find.text('Bis 04:00'), 22, 0);
       expect(pickerTitle, 'Ende');
       expect(
         find.textContaining('Beginn und Ende dürfen nicht gleich sein'),
@@ -2291,7 +2292,7 @@ void main() {
       expect(find.text('Bis 04:00'), findsOneWidget);
 
       // A valid end is saved and the message goes away.
-      await pickTime('Bis 04:00', 5, 30);
+      await pickTime(find.text('Bis 04:00'), 5, 30);
       expect(find.textContaining('dürfen nicht gleich'), findsNothing);
       expect((await stored()).daily.end, 5 * 60 + 30);
       expect(find.text('Bis 05:30'), findsOneWidget);
@@ -2304,10 +2305,52 @@ void main() {
       expect(weekly.weekdays, everyElement(weekly.daily));
       expect(find.widgetWithText(SwitchListTile, 'Montag'), findsOneWidget);
 
+      // Tuesday from 02:00 would overlap Monday night (until 05:30).
+      final tuesdayFrom = find.descendant(
+        of: find.byKey(const ValueKey('auto-sleep-day-1')),
+        matching: find.text('Von 22:00'),
+      );
+      await tester.dragUntilVisible(
+        tuesdayFrom,
+        find.byType(ListView),
+        const Offset(0, -100),
+      );
+      await settle(tester);
+      await pickTime(tuesdayFrom, 2, 0);
+      expect(
+        find.text(
+          'Überschneidet sich mit Montag (22:00–05:30). '
+          'Die Änderung wurde nicht übernommen.',
+        ),
+        findsOneWidget,
+      );
+      expect((await stored()).weekdays[1], weekly.weekdays[1]);
+
+      // With Monday off it is fine – and Monday cannot be switched on again.
+      await tester.dragUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Montag'),
+        find.byType(ListView),
+        const Offset(0, 100),
+      );
+      await settle(tester);
       await tester.tap(find.widgetWithText(SwitchListTile, 'Montag'));
       await settle(tester);
       expect((await stored()).weekdays.first.enabled, isFalse);
       expect((await stored()).weekdays[1].enabled, isTrue);
+      await pickTime(tuesdayFrom, 2, 0);
+      expect((await stored()).weekdays[1].start, 2 * 60);
+      expect(find.text('Länge 3 Std. 30 Min.'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Montag'));
+      await settle(tester);
+      expect(
+        find.text(
+          'Überschneidet sich mit Dienstag (02:00–05:30). '
+          'Die Änderung wurde nicht übernommen.',
+        ),
+        findsOneWidget,
+      );
+      expect((await stored()).weekdays.first.enabled, isFalse);
       await disposeApp(tester);
     },
   );

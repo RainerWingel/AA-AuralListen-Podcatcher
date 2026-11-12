@@ -2478,12 +2478,6 @@ abstract class AppLocalizations {
   /// **'Bis {time}'**
   String autoSleepUntil(String time);
 
-  /// No description provided for @autoSleepNextDay.
-  ///
-  /// In de, this message translates to:
-  /// **'(am nächsten Tag)'**
-  String get autoSleepNextDay;
-
   /// No description provided for @autoSleepPickStart.
   ///
   /// In de, this message translates to:
@@ -2531,6 +2525,30 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Sleep-Timer automatisch gestartet: {timer}'**
   String autoSleepStarted(String timer);
+
+  /// No description provided for @durationHours.
+  ///
+  /// In de, this message translates to:
+  /// **'{hours} Std.'**
+  String durationHours(int hours);
+
+  /// Length of the auto sleep time window next to its times, e.g. "Länge 6 Std.".
+  ///
+  /// In de, this message translates to:
+  /// **'Länge {length}'**
+  String autoSleepSpanSameDay(String length);
+
+  /// No description provided for @autoSleepSpanNextDay.
+  ///
+  /// In de, this message translates to:
+  /// **'Länge {length}, endet am nächsten Tag'**
+  String autoSleepSpanNextDay(String length);
+
+  /// Per weekday: the window would overlap the neighbouring day's; {day} = weekday name, {window} = e.g. "22:00–04:00".
+  ///
+  /// In de, this message translates to:
+  /// **'Überschneidet sich mit {day} ({window}). Die Änderung wurde nicht übernommen.'**
+  String autoSleepOverlapError(String day, String window);
 }
 
 class _AppLocalizationsDelegate

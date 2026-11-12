@@ -259,3 +259,5 @@ Format: Datum · Entscheidung · Begründung. Neue Einträge unten anhängen.
   Sperrbildschirm, Bluetooth-Tasten, Android Auto – dort nicht unterscheidbar), zusätzlich Abfrage „mit Android Auto
   verbunden" über den System-Provider ohne neue Bibliothek. Nacht gehört zum Starttag; „Aus" gilt für die ganze Nacht;
   ein laufender Timer wird nie überschrieben. Details `playback.md`.
+  Nachbesserung (Benutzer): Überschneidungen benachbarter Wochentage werden abgelehnt; alte überlappende Daten gelten
+  als eine Nacht; die Länge jedes Fensters wird angezeigt.

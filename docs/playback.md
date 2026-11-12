@@ -77,8 +77,12 @@ zwei Tests „Auto-Sleep-Timer: …" in `widget_test.dart`.
 - **Zeitfenster:** Wanduhrzeit des Handys, Beginn gehört dazu, Ende nicht. Ende ≤ Beginn = über Mitternacht; die Nacht
   **gehört zum Tag, an dem sie beginnt** („Freitag 22–04" gilt Freitagabend bis Samstag 04:00, auch wenn Samstag aus
   ist). Gebaut aus Datum + Uhrzeit (`DateTime(j, m, t + 1, h, min)`), nie durch Addieren von Stunden – so endet das
-  Fenster auch in der Nacht der Zeitumstellung um 04:00. `windowStartAt(now)` liefert den **Beginn** des Fensters, in
-  dem `now` liegt; er unterscheidet die Nächte.
+  Fenster auch in der Nacht der Zeitumstellung um 04:00. `nightAt(now)` liefert die **Nacht** (Beginn und Ende), in der
+  `now` liegt.
+- **Überschneidungen benachbarter Tage** (z. B. Montag 20–06 und Dienstag 00–05) lehnt die Seite ab
+  (`overlappingDay`, Nachbesserung 2026-11-12). Kommen sie trotzdem vor (altes Backup, kaputte Daten), führt `nightAt`
+  sie zu **einer** Nacht zusammen (auch Ketten über mehrere Tage, eine Woche zurück) – sonst wechselte der Beginn
+  mitten in der Nacht und „Abbrechen" hielte nicht.
 - **Dauer:** dieselbe Auswahl wie beim Sleep-Timer ohne „Aus" (`SleepTimerButton.pick`), eine Dauer für alle Tage.
   Der Auto-Timer ist danach ein ganz normaler Sleep-Timer (Spielzeit, Ausblenden, Verfall nach 1 Stunde Stillstand).
 - **Auslöser nur Play in der App:** `play(fromApp: true)` bzw. `playEpisode(…, fromApp: true)` – Play-Knopf
@@ -91,8 +95,8 @@ zwei Tests „Auto-Sleep-Timer: …" in `widget_test.dart`.
   Automatisches Weiterspielen in der Playlist ist kein neues Play.
 - **Kein Überschreiben:** Läuft schon ein Timer (manuell oder automatisch), passiert nichts.
 - **Abbrechen gilt für die Nacht:** Schaltet der Benutzer einen automatisch gesetzten Timer auf „Aus" (Player-Knopf
-  oder „Abbrechen" in der Infobox), merkt sich der Handler den Fensterbeginn (`_autoSleepCancelled`, ein Wert) und
-  startet in diesem Fenster keinen neuen. Ist der Timer dagegen **abgelaufen**, startet das nächste Play im Fenster
+  oder „Abbrechen" in der Infobox), merkt sich der Handler das **Ende** dieser Nacht (`_autoSleepCancelledUntil`, ein
+  Wert) und startet vorher keinen neuen. Ist der Timer dagegen **abgelaufen**, startet das nächste Play im Fenster
   wieder einen. Intern gesetzte „Aus" (Ablauf, Folgenende, Verfall) gehen über `_applySleepTimer` und zählen nicht als
   Abbruch.
 - **Infobox:** „Sleep-Timer automatisch gestartet: 30 Minuten" mit „Abbrechen" (`autoSleepStarts`-Stream →

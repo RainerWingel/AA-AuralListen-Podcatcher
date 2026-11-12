@@ -394,7 +394,6 @@
   "autoSleepWindowsPerDay": "Franja horaria por día",
   "autoSleepFrom": "Desde {time}",
   "autoSleepUntil": "Hasta {time}",
-  "autoSleepNextDay": "(día siguiente)",
   "autoSleepPickStart": "Inicio",
   "autoSleepPickEnd": "Fin",
   "autoSleepSameTimeError": "El inicio y el fin no pueden ser iguales: la franja horaria duraría 0 minutos. El cambio no se ha aplicado.",
@@ -402,5 +401,9 @@
   "autoSleepCopyToAll": "Aplicar a todos los días",
   "autoSleepCopiedToAll": "Horas del {day} aplicadas a todos los días",
   "autoSleepAllDaysOff": "Todos los días están desactivados: el temporizador automático nunca se iniciará.",
-  "autoSleepStarted": "Temporizador iniciado automáticamente: {timer}"
+  "autoSleepStarted": "Temporizador iniciado automáticamente: {timer}",
+  "durationHours": "{hours} h",
+  "autoSleepSpanSameDay": "Duración {length}",
+  "autoSleepSpanNextDay": "Duración {length}, termina al día siguiente",
+  "autoSleepOverlapError": "Se solapa con el {day} ({window}). El cambio no se ha aplicado."
 }

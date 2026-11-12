@@ -394,7 +394,6 @@
   "autoSleepWindowsPerDay": "Временное окно по дням недели",
   "autoSleepFrom": "С {time}",
   "autoSleepUntil": "До {time}",
-  "autoSleepNextDay": "(на следующий день)",
   "autoSleepPickStart": "Начало",
   "autoSleepPickEnd": "Конец",
   "autoSleepSameTimeError": "Начало и конец не могут совпадать – окно длилось бы 0 минут. Изменение не применено.",
@@ -402,5 +401,9 @@
   "autoSleepCopyToAll": "Применить ко всем дням",
   "autoSleepCopiedToAll": "Время ({day}) применено ко всем дням",
   "autoSleepAllDaysOff": "Все дни выключены – автоматический таймер сна никогда не запустится.",
-  "autoSleepStarted": "Таймер сна запущен автоматически: {timer}"
+  "autoSleepStarted": "Таймер сна запущен автоматически: {timer}",
+  "durationHours": "{hours} ч",
+  "autoSleepSpanSameDay": "Длительность {length}",
+  "autoSleepSpanNextDay": "Длительность {length}, заканчивается на следующий день",
+  "autoSleepOverlapError": "Пересекается с окном: {day} ({window}). Изменение не применено."
 }

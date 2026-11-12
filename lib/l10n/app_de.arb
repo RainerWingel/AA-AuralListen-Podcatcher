@@ -980,7 +980,6 @@
       }
     }
   },
-  "autoSleepNextDay": "(am nächsten Tag)",
   "autoSleepPickStart": "Beginn",
   "autoSleepPickEnd": "Ende",
   "autoSleepSameTimeError": "Beginn und Ende dürfen nicht gleich sein – das Zeitfenster wäre 0 Minuten lang. Die Änderung wurde nicht übernommen.",
@@ -1001,6 +1000,43 @@
     "description": "Info box when Play in the night window started the sleep timer; {timer} is e.g. \"30 Minuten\" or \"Bis Ende der Folge\".",
     "placeholders": {
       "timer": {
+        "type": "String"
+      }
+    }
+  },
+  "durationHours": "{hours} Std.",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "autoSleepSpanSameDay": "Länge {length}",
+  "@autoSleepSpanSameDay": {
+    "description": "Length of the auto sleep time window next to its times, e.g. \"Länge 6 Std.\".",
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "autoSleepSpanNextDay": "Länge {length}, endet am nächsten Tag",
+  "@autoSleepSpanNextDay": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "autoSleepOverlapError": "Überschneidet sich mit {day} ({window}). Die Änderung wurde nicht übernommen.",
+  "@autoSleepOverlapError": {
+    "description": "Per weekday: the window would overlap the neighbouring day's; {day} = weekday name, {window} = e.g. \"22:00–04:00\".",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "window": {
         "type": "String"
       }
     }
